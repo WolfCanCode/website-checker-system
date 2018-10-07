@@ -7,7 +7,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Getter
@@ -20,4 +19,11 @@ public class User {
     public String password;
     public String email;
     public String token;
+
+    public User(String name, String password, String email, String token) {
+        this.name = name;
+        this.password = password;
+        this.email = email;
+        this.token = token;
+    }
 }

@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 public class UserController {
@@ -31,9 +33,16 @@ public class UserController {
         return result;
     }
 
-    @GetMapping("/api/login")
-    public String test(){
-        return "hihi";
+    @GetMapping("/api/user")
+    public List<User> test(){
+        List<User> list = new ArrayList<>();
+        list.add(new User("Truong","123","tr","tr"));
+        list.add(new User("Trinh","123","tr","tr"));
+        list.add(new User("Vi","123","tr","tr"));
+        list.add(new User("P.A","123","tr","tr"));
+        list.add(new User("Khanh","123","tr","tr"));
+
+        return list;
     }
 
 
