@@ -9,19 +9,31 @@ import TableRow from './row-table';
 
 
 class speedTestScreen extends Component {
-    state = { list: [] };
+    state = { list: [], loadingTable: false };
 
 
-     componentDidMount() {
+    componentDidMount() {
         var comp = [];
-        fetch("/api/speedTest").then(response => response.json()).then((data)=>{
-            comp =  data.map((item,index)=>{
-                return(<TableRow key={index} interactiveTime={item.interactiveTime} pageLoadTime={item.pageLoadTime} size={item.size} />);
+        this.setState({ loadingTable: true });
+        var param = [{ "url": "https://www.block.vn/" },
+        { "url": "https://www.block.vn/khoa-hoc/ban-hang-gia-toc-voi-san-pham-so-va-affiliate" },
+        { "url": "https://www.block.vn/khoa-hoc/setup-he-thon-kinh-doanh-online-tu-dau-den-tu-dong-hoan-toan" }];
+        fetch("/api/speedTest", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(param)
+        }).then(response => response.json()).then((data) => {
+            comp = data.map((item, index) => {
+                return (<TableRow key={index} url={item.url} interactiveTime={item.interactiveTime} pageLoadTime={item.pageLoadTime} size={item.size} />);
             });
-            this.setState({list:comp});
+            this.setState({ list: comp });
+            this.setState({ loadingTable: false });
         });
-        
-  
+
+
     }
 
     render() {
@@ -31,7 +43,7 @@ class speedTestScreen extends Component {
                     <Segment><h3>Desktop Speed Test</h3></Segment>
                     <Segment.Group horizontal>
 
-                        <Segment basic>
+                        <Segment basic loading={this.state.loadingTable}>
 
 
                             <Segment.Group horizontal >
