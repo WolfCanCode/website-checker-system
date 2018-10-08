@@ -21,7 +21,7 @@ public class ContentService {
             String url =newList.getDesUrl();
 
             String title = getTitle(url);
-            String httoCode = getStatus(url);
+            int  httoCode = getStatus(url);
             String canonicalUrl = getCanonicalUrl(url);
 
             Pages page = new Pages(url, title,canonicalUrl,httoCode);
@@ -59,9 +59,9 @@ public class ContentService {
         return canUrl;
     }
 
-    public String getStatus(String url) throws IOException {
+    public int getStatus(String url) throws IOException {
 
-        String result = "";
+        int  result = 0;
         int code = 200;
         try {
             URL siteURL = new URL(url);
@@ -72,10 +72,10 @@ public class ContentService {
             code = connection.getResponseCode();
             String message = connection.getResponseMessage();
             if(code ==200){
-                result = ""+ code;
+                result =  code;
             }
             else if  (code == HttpURLConnection.HTTP_MOVED_PERM|| code== HttpURLConnection.HTTP_MOVED_TEMP){
-                result = ""+ code;
+                result = code;
 
 
                 String newUrl = connection.getHeaderField("Location");
@@ -93,7 +93,7 @@ public class ContentService {
                 System.out.println("Address: "+url+" -Redirect to URL : " + newUrl+": Type: "+message);
             }
         } catch (Exception e) {
-            result="404";
+            result=404;
         }
         System.out.println(result);
         return result;

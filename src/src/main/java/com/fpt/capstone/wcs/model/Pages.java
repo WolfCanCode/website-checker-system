@@ -18,14 +18,14 @@ public class Pages {
     @Id
     @GeneratedValue
     public Long id;
-    private String httpCode;
+    private int httpCode;
     private String url;
     private String titleWeb;
     private String canonicalUrl;
-    private String redirectUrl;
 
 
-    public Pages (String url, String titleWeb, String canonicalUrl, String httpCode){
+
+    public Pages (String url, String titleWeb, String canonicalUrl, int  httpCode){
         this.url=url;
         this.httpCode=httpCode;
         this.titleWeb = titleWeb;

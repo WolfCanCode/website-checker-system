@@ -21,9 +21,9 @@ public class ContentController {
         List<Pages> resultList = new ArrayList<>();
         for(int i = 0 ; i< list.length; i++) {
             String title  = con.getTitle(list[i].url);
-            String httpcode = con.getStatus(list[i].url);
+            int  httpcode = con.getStatus(list[i].url);
             String canoUrl = con.getCanonicalUrl(list[i].url);
-            Pages  item = new Pages(list[i].url,title,httpcode,canoUrl);
+            Pages  item = new Pages(list[i].url,title,canoUrl, httpcode);
             resultList.add(item);
         }
 

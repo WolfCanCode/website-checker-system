@@ -37,7 +37,7 @@ export default class Pages extends Component {
             body: JSON.stringify(param)
         }).then(response => response.json()).then((data) => {
             comp = data.map((item, index) => {
-                return (<TableRow key={index} url={item.url} titleWeb={item.titleWeb} httpCode={item.httpCode} canonicalUrl={item.canonicalUrl} />);
+                return (<TableRow key={index} url={item.url} titleWeb={item.titleWeb}  canonicalUrl={item.canonicalUrl} httpCode={item.httpCode} />);
             });
             this.setState({ list: comp });
             this.setState({ loadingTable: false });
