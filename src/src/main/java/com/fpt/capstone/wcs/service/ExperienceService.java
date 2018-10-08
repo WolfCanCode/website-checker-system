@@ -36,7 +36,7 @@ public class ExperienceService {
         capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
         capabilities.setCapability(CapabilityType.SUPPORTS_JAVASCRIPT, true);
         capabilities.setCapability(PhantomJSDriverService.PHANTOMJS_CLI_ARGS, cliArgsCap);
-        capabilities.setCapability(PhantomJSDriverService.PHANTOMJS_EXECUTABLE_PATH_PROPERTY, "C:/Users/ngoct/Downloads/speedTest/speedTest/phantomjs-2.1.1-windows/bin/phantomjs.exe");        //WebDriver
+        capabilities.setCapability(PhantomJSDriverService.PHANTOMJS_EXECUTABLE_PATH_PROPERTY, "D:\\home\\data\\phantomjs.exe");        //WebDriver
         WebDriver driver = new PhantomJSDriver(capabilities);
         driver.get(url);
 
