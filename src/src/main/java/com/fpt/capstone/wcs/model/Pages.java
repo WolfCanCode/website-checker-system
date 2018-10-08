@@ -22,7 +22,7 @@ public class Pages {
     private String url;
     private String titleWeb;
     private String canonicalUrl;
-
+    private String redirectUrl;
 
 
     public Pages (String url, String titleWeb, String canonicalUrl, String httpCode){

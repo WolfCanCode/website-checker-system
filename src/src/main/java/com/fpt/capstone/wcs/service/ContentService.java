@@ -68,13 +68,29 @@ public class ContentService {
             HttpURLConnection connection = (HttpURLConnection) siteURL.openConnection();
             connection.setRequestMethod("GET");
             connection.setRequestProperty("User-Agent","Mozilla/5.0 ");
-            connection.setConnectTimeout(500);
+//            connection.setConnectTimeout(500);
             code = connection.getResponseCode();
+            String message = connection.getResponseMessage();
             if(code ==200){
                 result = ""+ code;
             }
-            else if  (code != 200){
+            else if  (code == HttpURLConnection.HTTP_MOVED_PERM|| code== HttpURLConnection.HTTP_MOVED_TEMP){
                 result = ""+ code;
+
+
+                String newUrl = connection.getHeaderField("Location");
+
+                // get the cookie if need, for login
+//                String cookies = conn.getHeaderField("Set-Cookie");
+
+                // open the new connnection again
+                connection = (HttpURLConnection) new URL(newUrl).openConnection();
+//                connection.setRequestProperty("Cookie", cookies);
+                connection.addRequestProperty("Accept-Language", "en-US,en;q=0.8");
+                connection .addRequestProperty("User-Agent", "Mozilla");
+                connection.addRequestProperty("Referer", "google.com");
+
+                System.out.println("Address: "+url+" -Redirect to URL : " + newUrl+": Type: "+message);
             }
         } catch (Exception e) {
             result="404";

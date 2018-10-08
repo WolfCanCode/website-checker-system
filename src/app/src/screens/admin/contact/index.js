@@ -39,15 +39,15 @@ export default class Contact extends Component {
                 </Table.Header>
                 <Table.Body>
                   <Table.Row>
-                    <Table.Cell>028 66 567 768</Table.Cell>
-                    <Table.Cell style={{ fontSize: "24px" }}> 3 <Icon name="clone" /></Table.Cell>
-                    <Table.Cell><Button>Edit</Button></Table.Cell>
+                    <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>877-925-7140</Table.Cell>
+                    <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}> 3 <Icon name="clone" /></Table.Cell>
+                    <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}><Button>Edit</Button></Table.Cell>
 
                   </Table.Row>
                   <Table.Row>
-                    <Table.Cell>028 66 787 768</Table.Cell>
-                    <Table.Cell style={{ fontSize: "24px" }}> 2  <Icon name="clone" /></Table.Cell>
-                    <Table.Cell><Button>Edit</Button></Table.Cell>
+                    <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>877-925-7140</Table.Cell>
+                    <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}> 2  <Icon name="clone" /></Table.Cell>
+                    <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}><Button>Edit</Button></Table.Cell>
                   </Table.Row>
                 </Table.Body>
               </Table>
@@ -61,15 +61,15 @@ export default class Contact extends Component {
                 </Table.Header>
                 <Table.Body>
                   <Table.Row>
-                    <Table.Cell>hotro@block.vn</Table.Cell>
-                    <Table.Cell style={{ fontSize: "24px" }}> 3 <Icon name="clone" /></Table.Cell>
-                    <Table.Cell><Button>Edit</Button></Table.Cell>
+                    <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>franchising@hiccupsteahouse.com</Table.Cell>
+                    <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}> 3 <Icon name="clone" /></Table.Cell>
+                    <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}><Button>Edit</Button></Table.Cell>
 
                   </Table.Row>
                   <Table.Row>
-                    <Table.Cell>hotro@block.vn</Table.Cell>
-                    <Table.Cell style={{ fontSize: "24px" }}> 2 <Icon name="clone" /></Table.Cell>
-                    <Table.Cell><Button>Edit</Button></Table.Cell>
+                    <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>franchising@hiccupsteahouse.com</Table.Cell>
+                    <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}> 2 <Icon name="clone" /></Table.Cell>
+                    <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}><Button>Edit</Button></Table.Cell>
                   </Table.Row>
                 </Table.Body>
               </Table>

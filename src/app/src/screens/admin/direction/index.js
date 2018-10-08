@@ -25,10 +25,10 @@ export default class Direction extends Component {
                                 </Table.Header>
                                 <Table.Body>
                                     <Table.Row>
-                                        <Table.Cell>https://www.block.vn/</Table.Cell>
-                                        <Table.Cell style={{ fontSize: "24px" }}>https://block.vn </Table.Cell>
-                                        <Table.Cell>Permanent</Table.Cell>
-                                        <Table.Cell><Button>200</Button></Table.Cell>
+                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>http://www.apple.com/us/shop/go/bag</Table.Cell>
+                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>hhttps://www.apple.com/shop/bag</Table.Cell>
+                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>Moved Permanently</Table.Cell>
+                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}><Button>301</Button></Table.Cell>
                                     </Table.Row>
 
                                 </Table.Body>
