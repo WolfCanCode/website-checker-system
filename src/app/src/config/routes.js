@@ -25,6 +25,8 @@ import DireactionScreen from "../screens/admin/direction/index";
 import PagesScreen from'../screens/admin/pages/index';
 import JavascriptErrorScreen from '../screens/admin/javascripterror/index';
 import GrammarScreen from '../screens/admin/grammar/index';
+import MobileLayoutScreen from '../screens/admin/mobileLayout/index';
+
 import ProhibitedScreen from '../screens/admin/prohibitedcontent/index';
 import serverBehaviorScreen from '../screens/admin/serverBehavior/index';
 import CookieLawScreen from '../screens/admin/cookielaw/index';
@@ -58,6 +60,8 @@ export class RouteAdmin extends Component {
                 <Route path="/admin/spelling" component={spellingScreen} />     
                 <Route path="/admin/favicons" component={faviconScreen} />                
                 <Route path="/admin/contact" component={ContactScreen} />
+                <Route path="/admin/mobileLayout" component={MobileLayoutScreen} />
+
                 <Route path="/admin/serverBehavior" component={serverBehaviorScreen} />
                 <Route path="/admin/direction" component={DireactionScreen}/>
                 <Route path="/admin/pages" component={PagesScreen}/>

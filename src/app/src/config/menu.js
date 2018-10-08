@@ -51,7 +51,7 @@ const menu = [
         items: [
             {
                 name: "Mobile layout test",
-                to: "/admin/spelling",
+                to: "/admin/mobileLayout",
                 key: "test7",
                 alt: "This for test alt title"
             },
