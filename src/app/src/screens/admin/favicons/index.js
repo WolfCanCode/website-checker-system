@@ -87,18 +87,18 @@ class faviconScreen extends Component {
                             </div>
                             <div style={{ display: 'inline-flex', textAlign: 'center' }}>
                                 <div style={{ marginLeft: '80px', marginTop: '10px' }}>
-                                    <div style={{ marginBottom: '10px', fontSize: '20px' }}>Block - Nền tảng học trực tuyến</div>
+                                    <div style={{ marginBottom: '10px', fontSize: '20px' }}>Browse Top Albums, MP3 Songs, Latest Playlists on Gaana.</div>
                                     <div><Image src={image} size='medium' /></div>
 
                                 </div>
                                 <div style={{ marginLeft: '80px', marginTop: '10px' }}>
-                                    <div style={{ marginBottom: '10px', fontSize: '20px' }}>Block - Nền tảng học trực tuyến</div>
+                                    <div style={{ marginBottom: '10px', fontSize: '20px' }}>Browse Top Albums, MP3 Songs, Latest Playlists on Gaana.</div>
                                     <div><Image src={image} size='medium' /></div>
 
                                 </div>
 
                                 <div style={{ marginLeft: '80px', marginTop: '10px' }}>
-                                    <div style={{ marginBottom: '10px', fontSize: '20px' }}>Block - Nền tảng học trực tuyến</div>
+                                    <div style={{ marginBottom: '10px', fontSize: '20px' }}>Browse Top Albums, MP3 Songs, Latest Playlists on Gaana.</div>
                                     <div><Image src={image} size='medium' /></div>
 
                                 </div>

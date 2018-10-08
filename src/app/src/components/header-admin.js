@@ -4,7 +4,7 @@ import { Redirect } from "react-router-dom";
 
 export default class HeaderAdmin extends Component {
     state = { txtWebpage: "www.tests.vn", logout:false };
-    data = [{ key: 'block', value: 'block', text: 'www.block.vn' }, { key: 'bmag', value: 'bmag', text: 'www.bmag.vn' }];
+    data = [{ key: 'block', value: 'block', text: 'www.fpt.edu.vn' }, { key: 'bmag', value: 'bmag', text: 'www.fpt.com.vn' }];
 
     _changeWebPage(event) {
         this.setState({
