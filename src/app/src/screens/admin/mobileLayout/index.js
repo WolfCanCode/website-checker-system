@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import 'semantic-ui-css/semantic.min.css';
-import {Segment, Button, Table, Image, Icon, Input, Label } from 'semantic-ui-react'
+import {Segment, Button, Image, Icon, Input,  } from 'semantic-ui-react'
 
-import image from '../../../assets/image.jpg';
+import image from '../../../assets/mobile.png';
 
-import icon from '../../../assets/icon.png';
+
 
 
 
