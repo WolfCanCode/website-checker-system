@@ -1,7 +1,37 @@
 import React, { Component } from 'react';
 import {Segment, Button, SegmentGroup, Table, Input, Icon } from 'semantic-ui-react'
+import TableRow from './row-table';
 export default class Direction extends Component {
+    state = { list: [], loadingTable: false };
 
+
+    componentDidMount() {
+        var comp = [];
+        this.setState({ loadingTable: true });
+        var param = [{ "url": "https://twitter.com/hashtag/hiccupsteahouse?lang=en" },
+                    { "url": "http://www.cungmua.vn" },
+                    { "url": "http://www.google.com" },
+                    { "url": "http://www.apple.com/us/shop/go/bag" },
+                
+    
+        ];
+        fetch("/api/redirectiontest", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(param)
+        }).then(response => response.json()).then((data) => {
+            comp = data.map((item, index) => {
+                return (<TableRow key={index} webAddress={item.url} redirectUrl={item.driectToUrl}  type={item.type} httpcode={item.httpCode} />);
+            });
+            this.setState({ list: comp });
+            this.setState({ loadingTable: false });
+        });
+
+
+    }
     render() {
         return (
             <div >
@@ -20,16 +50,11 @@ export default class Direction extends Component {
                                         <Table.HeaderCell>Web Address</Table.HeaderCell>
                                         <Table.HeaderCell>Directs to</Table.HeaderCell>
                                         <Table.HeaderCell>Type</Table.HeaderCell>
-                                        <Table.HeaderCell>Type</Table.HeaderCell>
+                                        <Table.HeaderCell>Code</Table.HeaderCell>
                                     </Table.Row>
                                 </Table.Header>
                                 <Table.Body>
-                                    <Table.Row>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>http://www.apple.com/us/shop/go/bag</Table.Cell>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>hhttps://www.apple.com/shop/bag</Table.Cell>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>Moved Permanently</Table.Cell>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}><Button>301</Button></Table.Cell>
-                                    </Table.Row>
+                                {this.state.list}
 
                                 </Table.Body>
                             </Table>

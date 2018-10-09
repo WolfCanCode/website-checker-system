@@ -22,9 +22,7 @@ public class Pages {
     private String url;
     private String titleWeb;
     private String canonicalUrl;
-
-
-
+    
     public Pages (String url, String titleWeb, String canonicalUrl, int  httpCode){
         this.url=url;
         this.httpCode=httpCode;

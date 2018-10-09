@@ -1,5 +1,6 @@
 package com.fpt.capstone.wcs.service;
 
+import com.fpt.capstone.wcs.model.LinkRedirection;
 import com.fpt.capstone.wcs.model.Pages;
 import com.fpt.capstone.wcs.model.SiteLink;
 import org.jsoup.Jsoup;
@@ -26,6 +27,34 @@ public class ContentService {
 //
 //            Pages page = new Pages(url, title,canonicalUrl,httoCode);
 //            pageCheck.add(page);
+//        }
+//        return pageCheck;
+//    }
+
+//    public  List<LinkRedirection> redirectionTest(List<SiteLink> list) throws IOException {
+//        List<LinkRedirection> pageCheck = new ArrayList<>();
+//        for(SiteLink newList: list){
+//            int  code = Integer.parseInt(getStatus(newList.getDesUrl()));
+//            if(code== HttpURLConnection.HTTP_MOVED_TEMP || code == HttpURLConnection.HTTP_MOVED_PERM){
+//                URL siteURL = new URL(newList.getDesUrl());
+//                HttpURLConnection connection = (HttpURLConnection) siteURL.openConnection();
+//                connection.setRequestMethod("GET");
+//                connection.setRequestProperty("User-Agent","Mozilla/5.0 ");
+//                String message = connection.getResponseMessage();
+//                String newUrl = connection.getHeaderField("Location");
+//
+//                // get the cookie if need, for lo
+//                // open the new connnection again
+//                connection = (HttpURLConnection) new URL(newUrl).openConnection();
+////                connection.setRequestProperty("Cookie", cookies);
+//                connection.addRequestProperty("Accept-Language", "en-US,en;q=0.8");
+//                connection .addRequestProperty("User-Agent", "Mozilla");
+//                connection.addRequestProperty("Referer", "google.com");
+//
+//                String codeNew = ""+code;
+//                LinkRedirection link = new LinkRedirection(newList.getDesUrl(),newUrl, codeNew, message);
+//                pageCheck.add(link);
+//            }
 //        }
 //        return pageCheck;
 //    }
