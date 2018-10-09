@@ -17,14 +17,8 @@ import java.util.List;
 public class ExperienceController {
 
     @PostMapping("/api/speedTest")
-    public List<SpeedTest>  getDataSpeedTest(@RequestBody Url[] list){
+    public List<SpeedTest> getDataSpeedTest(@RequestBody Url[] list) throws InterruptedException {
         ExperienceService exp = new ExperienceService();
-        List<SpeedTest> resultList = new ArrayList<>();
-        for(int i = 0 ; i< list.length; i++) {
-            SpeedTest item = exp.speedTestService(list[i].url);
-            resultList.add(item);
-        }
-
-        return resultList;
+        return exp.speedTestService(list);
     }
 }
