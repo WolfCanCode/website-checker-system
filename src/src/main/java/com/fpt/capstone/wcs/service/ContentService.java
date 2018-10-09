@@ -14,21 +14,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ContentService {
-    public List<Pages> getPageInfor(List<SiteLink> list) throws IOException {
-        List<Pages> pageCheck = new ArrayList<>();
-        for(SiteLink newList : list){
-
-            String url =newList.getDesUrl();
-
-            String title = getTitle(url);
-            int  httoCode = getStatus(url);
-            String canonicalUrl = getCanonicalUrl(url);
-
-            Pages page = new Pages(url, title,canonicalUrl,httoCode);
-            pageCheck.add(page);
-        }
-        return pageCheck;
-    }
+//    public List<Pages> getPageInfor(List<SiteLink> list) throws IOException {
+//        List<Pages> pageCheck = new ArrayList<>();
+//        for(SiteLink newList : list){
+//
+//            String url =newList.getDesUrl();
+//
+//            String title = getTitle(url);
+//            int  httoCode = getStatus(url);
+//            String canonicalUrl = getCanonicalUrl(url);
+//
+//            Pages page = new Pages(url, title,canonicalUrl,httoCode);
+//            pageCheck.add(page);
+//        }
+//        return pageCheck;
+//    }
 
     public String getTitle(String url){
         String titleUrl="";
