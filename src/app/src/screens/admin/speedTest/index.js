@@ -9,15 +9,15 @@ import TableRow from './row-table';
 
 
 class speedTestScreen extends Component {
-    state = { list: [], loadingTable: false };
+    state = { list: [], loadingTable: false, averageInteractiveTime : "", averagePageLoadTime : "", averageSize : "" };
 
 
     componentDidMount() {
         var comp = [];
         this.setState({ loadingTable: true });
-        var param = [{ "url": "https://www.block.vn/" },
-        { "url": "https://www.block.vn/khoa-hoc/ban-hang-gia-toc-voi-san-pham-so-va-affiliate" },
-        { "url": "https://www.block.vn/khoa-hoc/setup-he-thon-kinh-doanh-online-tu-dau-den-tu-dong-hoan-toan" }];
+        var param = [{ "url": "https://gaana.com" },
+        { "url": "https://gaana.com/discover" },
+        { "url": "https://gaana.com/browser" }];
         fetch("/api/speedTest", {
             method: 'POST',
             headers: {
@@ -29,6 +29,27 @@ class speedTestScreen extends Component {
             comp = data.map((item, index) => {
                 return (<TableRow key={index} url={item.url} interactiveTime={item.interactiveTime} pageLoadTime={item.pageLoadTime} size={item.size} />);
             });
+
+            let totalInteractiveTime = data.reduce((interactiveTime, item) => {
+                return interactiveTime = +interactiveTime + +item.interactiveTime
+            }, 0)
+
+            let totalPageLoadTime = data.reduce((pageLoadTime, item) => {
+                return pageLoadTime = +pageLoadTime + +item.pageLoadTime
+            }, 0)
+
+            let totalSize = data.reduce((sizePage, item) => {
+                return sizePage = +sizePage + +item.size
+            }, 0)
+
+            let listLength = comp.length;
+            let averageInteractiveTime = (totalInteractiveTime/listLength).toFixed(1);
+            let averagePageLoadTime = (totalPageLoadTime/listLength).toFixed(1);
+            let averageSize = (totalSize/listLength).toFixed(1);
+
+            this.setState({ averageInteractiveTime: averageInteractiveTime });
+            this.setState({ averagePageLoadTime: averagePageLoadTime });
+            this.setState({ averageSize: averageSize });
             this.setState({ list: comp });
             this.setState({ loadingTable: false });
         });
@@ -49,16 +70,16 @@ class speedTestScreen extends Component {
                             <Segment.Group horizontal >
 
                                 <Segment style={{ paddingLeft: '10px' }}>
-                                    <p style={{ fontSize: 24 }}>5.1s <br />
+                                    <p style={{ fontSize: 24 }}>{this.state.averageInteractiveTime}s <br />
                                         Page interactive time</p>
 
                                 </Segment >
 
                                 <Segment>
-                                    <p style={{ fontSize: 24 }}>6.2s <br /> Page load time</p>
+                                    <p style={{ fontSize: 24 }}>{this.state.averagePageLoadTime}s <br /> Page load time</p>
                                 </Segment>
                                 <Segment>
-                                    <p style={{ fontSize: 24 }}>2.5 MB <br /> Average page size</p>
+                                    <p style={{ fontSize: 24 }}>{this.state.averageSize} MB <br /> Average page size</p>
                                 </Segment>
                             </Segment.Group>
                             <div style={{ marginBottom: '60px', marginRight: '20px' }}>

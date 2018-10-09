@@ -52,17 +52,17 @@ public class ExperienceService {
                         capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
                         capabilities.setCapability(CapabilityType.SUPPORTS_JAVASCRIPT, true);
                         capabilities.setCapability(PhantomJSDriverService.PHANTOMJS_CLI_ARGS, cliArgsCap);
-                        capabilities.setCapability(PhantomJSDriverService.PHANTOMJS_EXECUTABLE_PATH_PROPERTY, "C:\\Users\\ngoct\\Downloads\\speedTest\\speedTest\\phantomjs-2.1.1-windows\\bin\\phantomjs.exe");        //WebDriver
+                        capabilities.setCapability(PhantomJSDriverService.PHANTOMJS_EXECUTABLE_PATH_PROPERTY, "E:/phantomjs-2.1.1-windows/bin/phantomjs.exe");        //WebDriver
                         WebDriver driver = new PhantomJSDriver(capabilities);
                         driver.get(u.url);
                         //HAR
                         Har har = server.getHar();
                         HarLog log = har.getLog();
                         List<HarEntry> listEntry = log.getEntries();
-                        long sizeTransferred = 0;
+                        double sizeTransferred = 0;
                         for (HarEntry entry : listEntry) {
-                            float requestSize = entry.getRequest().getHeadersSize() + entry.getRequest().getBodySize();
-                            float reponseSize = entry.getResponse().getHeadersSize() + entry.getResponse().getBodySize();
+                            double requestSize = entry.getRequest().getHeadersSize() + entry.getRequest().getBodySize();
+                            double reponseSize = entry.getResponse().getHeadersSize() + entry.getResponse().getBodySize();
                             sizeTransferred += requestSize + reponseSize;
 //                            System.out.println("Entry: " + entry.getRequest().getMethod() + " " + entry.getRequest().getUrl() + " - " + requestSize + " B - " + reponseSize + " B");
                         }
@@ -77,13 +77,17 @@ public class ExperienceService {
 
                         Long loadPage = (Long) ((JavascriptExecutor) driver).executeScript(
                                 "return performance.timing.loadEventEnd  - performance.timing.navigationStart;");
+                        double loadTime = loadPage;
+                        double loadTime1 = Math.floor(loadTime/1000 * 10) / 10;
                         Long interact = (Long) ((JavascriptExecutor) driver).executeScript(
                                 "return performance.timing.domContentLoadedEventEnd  - performance.timing.navigationStart;");
-
-//                        System.out.println("Total Page Load Time : " + loadPage + " milliseconds");
+                        double interactTime = interact;
+                        double interactTime1 = Math.floor(interactTime/1000 * 10) / 10;
+//                System.out.println("Total Page Load Time : " + loadTime1 + " milliseconds");
 //                        System.out.println("Total Page Interact Time: " + interact + " milliseconds");
 //                        System.out.println("Total Page Size: " + (float) sizeTransferred / 1000 / 1000 + "MBs");
-                        resultList.add(new SpeedTest(u.url, interact + "", loadPage + "", sizeTransferred + ""));
+                        double sizeTransferred1 = Math.floor(sizeTransferred/1000000 * 10) / 10;
+                        resultList.add(new SpeedTest(u.url, interactTime1 + "", loadTime1 + "", sizeTransferred1 + ""));
                         driver.quit();
                         server.stop();
                     } catch (InterruptedException | BrokenBarrierException ex) {
