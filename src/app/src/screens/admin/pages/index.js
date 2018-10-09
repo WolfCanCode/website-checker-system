@@ -9,24 +9,15 @@ export default class Pages extends Component {
         var comp = [];
         this.setState({ loadingTable: true });
         var param = [{ "url": "https://twitter.com/hashtag/hiccupsteahouse?lang=en" },
-                    // { "url": "https://www.facebook.com/hiccupsteahouse"},
-                    // { "url": "https://www.instagram.com/hiccupsteahouse/" },
-                    // { "url": "http://hiccupsteahouse.com/" },
-                    // { "url": "https://www.orderhiccupsteahouse.com/" },
-                    // { "url": "http://hiccupsteahouse.com/wp-content/uploads/Hiccups-TeaHouse-Menu-9-18.pdf" },
-                    // { "url": "http://hiccupsteahouse.com/hiccups-locations/" },
-                    // { "url": "http://hiccupsteahouse.com/contact-us/" },
-                    // { "url": "http://hiccupsteahouse.com/careers/" },
-                    // { "url": "http://www.churroholic.com/"},
-                    // { "url": "http://hiccupsteahouse.com/locations/" },
-                    // { "url": "https://www.orderhiccupsteahouse.com/" },
-                    // { "url": "http://hiccupsteahouse.com/franchising/" },
-                    // { "url": "http://www.facebook.com" },
-                    { "url": "http://www.cungmua.vn" },
-                    { "url": "http://www.google.com" },
-                    { "url": "http://www.apple.com/us/shop/go/bag" },
-                
-    
+                    { "url": "https://www.facebook.com/hiccupsteahouse"},
+                    { "url": "https://www.instagram.com/hiccupsteahouse/" },
+                    { "url": "http://hiccupsteahouse.com/" },
+                    { "url": "https://www.orderhiccupsteahouse.com/" },
+                    { "url": "http://hiccupsteahouse.com/wp-content/uploads/Hiccups-TeaHouse-Menu-9-18.pdf" },
+                    { "url": "http://hiccupsteahouse.com/hiccups-locations/" },
+                    { "url": "http://hiccupsteahouse.com/contact-us/" },
+                    { "url": "http://hiccupsteahouse.com/careers/" },
+                    { "url": "http://www.churroholic.com/"},
         ];
         fetch("/api/pagestest", {
             method: 'POST',

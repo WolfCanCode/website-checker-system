@@ -33,7 +33,6 @@ public class ContentController {
             Pages  item = new Pages(list[i].url,title,canoUrl, httpcode);
             resultList.add(item);
         }
-
         return resultList;
     }
 
@@ -50,22 +49,14 @@ public class ContentController {
                 connection.setRequestProperty("User-Agent","Mozilla/5.0 ");
                 String message = connection.getResponseMessage();
                 String newUrl = connection.getHeaderField("Location");
-
-                // get the cookie if need, for lo
-                // open the new connnection again
                 connection = (HttpURLConnection) new URL(newUrl).openConnection();
-//                connection.setRequestProperty("Cookie", cookies);
                 connection.addRequestProperty("Accept-Language", "en-US,en;q=0.8");
                 connection .addRequestProperty("User-Agent", "Mozilla");
                 connection.addRequestProperty("Referer", "google.com");
-
-                String codeNew = ""+httpcode;
                 LinkRedirection link = new LinkRedirection(list[i].url ,newUrl, httpcode, message);
                 resultList.add(link);
             }
-
         }
-
         return resultList;
     }
 }

@@ -12,8 +12,15 @@ export default class Direction extends Component {
                     { "url": "http://www.cungmua.vn" },
                     { "url": "http://www.google.com" },
                     { "url": "http://www.apple.com/us/shop/go/bag" },
-                
-    
+                    { "url": "http://www.facebook.com" },
+                    { "url": "https://hiccupsteahouse.com/contact-us/" },
+                    { "url": "https://hiccupsteahouse.com/careers/" },
+                    { "url": "https://www.churroholic.com/"},
+                    { "url": "https://www.apple.com/us/shop/goto/giftcards" },
+                    { "url": "http://www.apple.com/today/camp/" },
+                    { "url": "https://www.apple.com/retail/camp/notify.html" },
+                    { "url": "https://www.apple.com/us/shop/goto/account" },
+                    
         ];
         fetch("/api/redirectiontest", {
             method: 'POST',
@@ -39,7 +46,7 @@ export default class Direction extends Component {
                     <Segment>
                         <h3>Redirection Test</h3></Segment>
                     <Segment.Group horizontal>
-                        <Segment basic >
+                        <Segment basic loading={this.state.loadingTable} >
                             <div style={{ float: 'right', marginBottom: '10px' }}>
                                 <Input icon='search' placeholder='Search...' />
                             </div>
