@@ -205,8 +205,8 @@ export default class Canvas extends Component {
 
     render() {
         return (
-            <Segment style={{maxHeight:550, overflow:"auto" }} basic>
-                <canvas id="myCanvas" ref="myCanvas" style={{ width: "100%", height:"100%", border: "1px solid #d3d3d3" }} >
+            <Segment style={{maxHeight:550, overflow:"auto" }} >
+                <canvas id="myCanvas" ref="myCanvas" style={{ width: "100%", height:"100%"}} >
                     Bla bla
                     </canvas>
             </Segment>
