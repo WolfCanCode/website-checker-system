@@ -96,8 +96,8 @@ public class ExperienceService {
                         resultList.add(new SpeedTest(u.url, interactTime1 + "", loadTime1 + "", sizeTransferred1 + ""));
                         driver.quit();
                         server.stop();
-                    } catch (InterruptedException | BrokenBarrierException ex) {
-                        Logger.getLogger(ExperienceService.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (InterruptedException | BrokenBarrierException e) {
+                        Logger.getLogger(ExperienceService.class.getName()).log(Level.SEVERE, null, e);
                     }
                 }
             });
@@ -140,13 +140,13 @@ public class ExperienceService {
                       //  resultList.add(new SpeedTest(u.url, interactTime1 + "", loadTime1 + "", sizeTransferred1 + ""));
 
                     }  catch (MalformedURLException e) {
-                        e.printStackTrace();
+                        Logger.getLogger(ExperienceService.class.getName()).log(Level.SEVERE, null, e);
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        Logger.getLogger(ExperienceService.class.getName()).log(Level.SEVERE, null, e);
                     } catch (InterruptedException e) {
-                        e.printStackTrace();
+                        Logger.getLogger(ExperienceService.class.getName()).log(Level.SEVERE, null, e);
                     } catch (BrokenBarrierException e) {
-                        e.printStackTrace();
+                        Logger.getLogger(ExperienceService.class.getName()).log(Level.SEVERE, null, e);
                     }
                 }
             });
@@ -194,13 +194,13 @@ public class ExperienceService {
 
 
                     }  catch (MalformedURLException e) {
-                        e.printStackTrace();
+                        Logger.getLogger(ExperienceService.class.getName()).log(Level.SEVERE, null, e);
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        Logger.getLogger(ExperienceService.class.getName()).log(Level.SEVERE, null, e);
                     } catch (InterruptedException e) {
-                        e.printStackTrace();
+                        Logger.getLogger(ExperienceService.class.getName()).log(Level.SEVERE, null, e);
                     } catch (BrokenBarrierException e) {
-                        e.printStackTrace();
+                        Logger.getLogger(ExperienceService.class.getName()).log(Level.SEVERE, null, e);
                     }
                 }
             });

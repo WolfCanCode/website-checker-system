@@ -12,9 +12,9 @@ import javax.persistence.Id;
 @Getter
 @Setter
 public class BrokenPage {
-    public Long id;
     @Id
     @GeneratedValue
+    private Long id;
     private String urlPage;
     private String stt;
     private int httpCode;

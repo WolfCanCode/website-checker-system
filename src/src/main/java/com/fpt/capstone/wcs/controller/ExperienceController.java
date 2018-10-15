@@ -1,6 +1,8 @@
 package com.fpt.capstone.wcs.controller;
 
 import com.fpt.capstone.wcs.model.*;
+import com.fpt.capstone.wcs.repository.BrokenLinkRepository;
+import com.fpt.capstone.wcs.repository.BrokenPageRepository;
 import com.fpt.capstone.wcs.repository.SpeedtestRepository;
 import com.fpt.capstone.wcs.service.ExperienceService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +18,8 @@ import java.util.List;
 public class ExperienceController {
     @Autowired
     SpeedtestRepository speedtestRepository;
+    BrokenPageRepository brokenPageRepository;
+    BrokenLinkRepository brokenLinkRepository;
 
     @PostMapping("/api/speedTest")
     public List<SpeedTest> getDataSpeedTest(@RequestBody Url[] list) throws InterruptedException {
@@ -44,7 +48,8 @@ public class ExperienceController {
     public List<BrokenLink> getDataBrokenLink(@RequestBody Url[] list) throws InterruptedException {
         ExperienceService exp = new ExperienceService();
         List<BrokenLink> resultList = exp.brokenLinkService(list);
-        //speedtestRepository.saveAll(resultList);
+        brokenLinkRepository.deleteAll();
+        brokenLinkRepository.saveAll(resultList);
         return resultList;
     }
 
@@ -52,7 +57,8 @@ public class ExperienceController {
     public List<BrokenPage> getDataBrokenPage(@RequestBody Url[] list) throws InterruptedException {
         ExperienceService exp = new ExperienceService();
         List<BrokenPage> resultList = exp.brokenPageService(list);
-        //speedtestRepository.saveAll(resultList);
+        brokenPageRepository.deleteAll();
+        brokenPageRepository.saveAll(resultList);
         return resultList;
     }
 }
