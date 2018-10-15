@@ -8,7 +8,7 @@ import lombok.Setter;
 @Data
 @Getter @Setter
 public class Url {
-    public String url;
+    private String url;
 
     public Url(){}
 

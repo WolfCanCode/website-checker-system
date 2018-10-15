@@ -36,13 +36,13 @@ public class ExperienceService {
                 public void run() {
                     try {
                         gate.await();
-                        System.out.println("start testing url= " + u.url);
+                        System.out.println("start testing url= " + u.getUrl());
                         //BrowserMobProxy
                         BrowserMobProxy server = new BrowserMobProxyServer();
                         server.start(0);
                         server.setHarCaptureTypes(CaptureType.getAllContentCaptureTypes());
                         server.enableHarCaptureTypes(CaptureType.REQUEST_CONTENT, CaptureType.RESPONSE_CONTENT);
-                        server.newHar(u.url);
+                        server.newHar(u.getUrl());
                         //PHANTOMJS_CLI_ARGS
                         List<String> cliArgsCap = new ArrayList<String>();
                         cliArgsCap.add("--proxy=localhost:" + server.getPort());
@@ -52,9 +52,9 @@ public class ExperienceService {
                         capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
                         capabilities.setCapability(CapabilityType.SUPPORTS_JAVASCRIPT, true);
                         capabilities.setCapability(PhantomJSDriverService.PHANTOMJS_CLI_ARGS, cliArgsCap);
-                        capabilities.setCapability(PhantomJSDriverService.PHANTOMJS_EXECUTABLE_PATH_PROPERTY, "E:/phantomjs-2.1.1-windows/bin/phantomjs.exe");        //WebDriver
+                        capabilities.setCapability(PhantomJSDriverService.PHANTOMJS_EXECUTABLE_PATH_PROPERTY, "//Users//mptt2//Downloads//phantomjs//bin//phantomjs");        //WebDriver
                         WebDriver driver = new PhantomJSDriver(capabilities);
-                        driver.get(u.url);
+                        driver.get(u.getUrl());
                         //HAR
                         Har har = server.getHar();
                         HarLog log = har.getLog();
@@ -87,7 +87,7 @@ public class ExperienceService {
 //                        System.out.println("Total Page Interact Time: " + interact + " milliseconds");
 //                        System.out.println("Total Page Size: " + (float) sizeTransferred / 1000 / 1000 + "MBs");
                         double sizeTransferred1 = Math.floor(sizeTransferred/1000000 * 10) / 10;
-                        resultList.add(new SpeedTest(u.url, interactTime1 + "", loadTime1 + "", sizeTransferred1 + ""));
+                        resultList.add(new SpeedTest(u.getUrl(), interactTime1 + "", loadTime1 + "", sizeTransferred1 + ""));
                         driver.quit();
                         server.stop();
                     } catch (InterruptedException | BrokenBarrierException ex) {

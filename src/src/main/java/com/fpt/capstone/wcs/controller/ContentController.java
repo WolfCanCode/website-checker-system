@@ -27,10 +27,10 @@ public class ContentController {
         List<Pages> resultList = new ArrayList<>();
         ContentService con = new ContentService();
         for(int i = 0 ; i< list.length; i++)  {
-            String title  = con.getTitle(list[i].url);
-            int  httpcode = con.getStatus(list[i].url);
-            String canoUrl = con.getCanonicalUrl(list[i].url);
-            Pages  item = new Pages(list[i].url,title,canoUrl, httpcode);
+            String title  = con.getTitle(list[i].getUrl());
+            int  httpcode = con.getStatus(list[i].getUrl());
+            String canoUrl = con.getCanonicalUrl(list[i].getUrl());
+            Pages  item = new Pages(list[i].getUrl(),title,canoUrl, httpcode);
             resultList.add(item);
         }
         return resultList;
@@ -41,9 +41,10 @@ public class ContentController {
         ContentService con  = new ContentService();
         List<LinkRedirection> resultList = new ArrayList<>();
         for(int i = 0 ; i< list.length; i++) {
-            int  httpcode = con.getStatus(list[i].url);
+            int  httpcode = con.getStatus(list[i].getUrl());
+
             if(httpcode== HttpURLConnection.HTTP_MOVED_TEMP || httpcode == HttpURLConnection.HTTP_MOVED_PERM){
-                URL siteURL = new URL(list[i].url);
+                URL siteURL = new URL(list[i].getUrl());
                 HttpURLConnection connection = (HttpURLConnection) siteURL.openConnection();
                 connection.setRequestMethod("GET");
                 connection.setRequestProperty("User-Agent","Mozilla/5.0 ");
@@ -53,7 +54,8 @@ public class ContentController {
                 connection.addRequestProperty("Accept-Language", "en-US,en;q=0.8");
                 connection .addRequestProperty("User-Agent", "Mozilla");
                 connection.addRequestProperty("Referer", "google.com");
-                LinkRedirection link = new LinkRedirection(list[i].url ,newUrl, httpcode, message);
+                LinkRedirection link = new LinkRedirection(list[i].getUrl() ,newUrl, httpcode, message);
+                System.out.println(link.getDriectToUrl());
                 resultList.add(link);
             }
         }
