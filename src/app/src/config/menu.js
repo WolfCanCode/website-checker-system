@@ -7,6 +7,12 @@ const menu = [
         key: "d",
         items : null
     },
+    {
+        name: "SiteMap",
+        to: "/admin/sitemap",
+        key: "sitemap",
+        items : null
+    },
 
     {
         name: "Quality",

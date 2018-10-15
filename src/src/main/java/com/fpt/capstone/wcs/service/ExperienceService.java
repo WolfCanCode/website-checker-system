@@ -31,12 +31,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class ExperienceService {
+
     public List<SpeedTest> speedTestService(Url[] url) throws InterruptedException {
         //Asign list speed info
         List<SpeedTest> resultList = new ArrayList<>();
         final CyclicBarrier gate = new CyclicBarrier(url.length);
         List<Thread> listThread = new ArrayList<>();
-
         for (Url u : url) {
             listThread.add(new Thread() {
                 public void run() {
@@ -45,7 +45,7 @@ public class ExperienceService {
                         System.out.println("start testing url= " + u.getUrl());
                         //BrowserMobProxy
                         BrowserMobProxy server = new BrowserMobProxyServer();
-                        server.start(0);
+                        server.start();
                         server.setHarCaptureTypes(CaptureType.getAllContentCaptureTypes());
                         server.enableHarCaptureTypes(CaptureType.REQUEST_CONTENT, CaptureType.RESPONSE_CONTENT);
                         server.newHar(u.getUrl());
@@ -58,7 +58,7 @@ public class ExperienceService {
                         capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
                         capabilities.setCapability(CapabilityType.SUPPORTS_JAVASCRIPT, true);
                         capabilities.setCapability(PhantomJSDriverService.PHANTOMJS_CLI_ARGS, cliArgsCap);
-                        capabilities.setCapability(PhantomJSDriverService.PHANTOMJS_EXECUTABLE_PATH_PROPERTY, "E:/phantomjs-2.1.1-windows/bin/phantomjs.exe");        //WebDriver
+                        capabilities.setCapability(PhantomJSDriverService.PHANTOMJS_EXECUTABLE_PATH_PROPERTY, "resources/phantomjs.exe");        //WebDriver
                         WebDriver driver = new PhantomJSDriver(capabilities);
                         driver.get(u.getUrl());
                         //HAR
@@ -89,9 +89,6 @@ public class ExperienceService {
                                 "return performance.timing.domContentLoadedEventEnd  - performance.timing.navigationStart;");
                         double interactTime = interact;
                         double interactTime1 = Math.floor(interactTime/1000 * 10) / 10;
-//                System.out.println("Total Page Load Time : " + loadTime1 + " milliseconds");
-//                        System.out.println("Total Page Interact Time: " + interact + " milliseconds");
-//                        System.out.println("Total Page Size: " + (float) sizeTransferred / 1000 / 1000 + "MBs");
                         double sizeTransferred1 = Math.floor(sizeTransferred/1000000 * 10) / 10;
                         resultList.add(new SpeedTest(u.getUrl(), interactTime1 + "", loadTime1 + "", sizeTransferred1 + ""));
                         driver.quit();
