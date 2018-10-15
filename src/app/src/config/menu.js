@@ -11,6 +11,7 @@ const menu = [
         name: "SiteMap",
         to: "/admin/sitemap",
         key: "sitemap",
+        alt: "The sitemap of page",
         items : null
     },
 
