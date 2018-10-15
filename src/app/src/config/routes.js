@@ -14,6 +14,7 @@ import RegisterScreen from '../screens/register/index';
 import Dashboard from '../screens/admin/dashboard/index';
 import Dashboard1 from '../screens/admin/dashboard/index1';
 
+import SiteMapScreen from '../screens/admin/sitemap/sitemap';
 import brokenLinksScreen from '../screens/admin/brokenLinks/index';
 import brokenPagesScreen from '../screens/admin/brokenPages/index';
 import missingFilesScreen from '../screens/admin/missingFiles/index';
@@ -53,6 +54,9 @@ export class RouteAdmin extends Component {
             <Switch>
                 {/* Router for admin page*/}
                 <Route path="/admin" exact component={Dashboard} />
+
+                <Route path="/admin/sitemap" component={SiteMapScreen}/>
+
                 <Route path="/admin/brokenLinks" component={brokenLinksScreen} />
                 <Route path="/admin/brokenPages" component={brokenPagesScreen} />
                 <Route path="/admin/missingFiles" component={missingFilesScreen} />
