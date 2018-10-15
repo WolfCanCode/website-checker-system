@@ -9,7 +9,6 @@ import javax.persistence.Id;
 @Data
 @Getter
 @Setter
-@NoArgsConstructor
 public class Pages {
     @Id
     @GeneratedValue

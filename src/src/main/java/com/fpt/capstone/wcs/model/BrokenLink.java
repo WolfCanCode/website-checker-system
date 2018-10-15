@@ -9,7 +9,6 @@ import javax.persistence.Id;
 @Entity
 @Getter
 @Setter
-@NoArgsConstructor
 public class BrokenLink {
 
     @Id

@@ -9,7 +9,6 @@ import javax.persistence.Id;
 @Entity
 @Getter
 @Setter
-@NoArgsConstructor
 public class BrokenPage {
     @Id
     @GeneratedValue

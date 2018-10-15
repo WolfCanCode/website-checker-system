@@ -7,10 +7,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 @Data
-
 @Getter
 @Setter
-@NoArgsConstructor
 public class LinkRedirection {
     @Id
     @GeneratedValue

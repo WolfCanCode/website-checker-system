@@ -7,7 +7,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 @Data
-@NoArgsConstructor
 @Entity
 @Getter
 @Setter
