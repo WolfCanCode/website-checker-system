@@ -75,15 +75,16 @@ export default class Pages extends Component {
                     <Button icon labelPosition='right' disabled={this.state.isDisable} onClick={()=>this._doPageTest()}>
                         Check
                        <Icon name='right arrow' />
-                    </Button></Segment>
-                    <Segment.Group horizontal>
-                        <Segment basic loading={this.state.loadingTable}>
-                            <div style={{ float: 'right', marginBottom: '10px' }}>
+                    </Button>
+                    <div style={{ float: 'right', marginBottom: '10px' }}>
                                 <Input icon='search' placeholder='Search...' />
                             </div>
 
 
-                            <Button style={{ marginRight: '10px' }} floated='right'><Icon name="print" />Export</Button>
+                            <Button style={{ marginRight: '10px' }} floated='right'><Icon name="print" />Export</Button></Segment>
+                    <Segment.Group horizontal style={{maxHeight:450, overflow:"auto" }}>
+                        <Segment basic loading={this.state.loadingTable}>
+                            
 
                             <Table singleLine>
                                 <Table.Header>
