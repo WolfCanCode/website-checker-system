@@ -2,13 +2,49 @@ import React, { Component } from 'react';
 import 'semantic-ui-css/semantic.min.css';
 import { Segment, Button, Table, Image, Icon, Input } from 'semantic-ui-react'
 import BrokenLinks from '../../../assets/BrokenLinks.png';
-
+import TableRow from './row-table';
 
 
 
 
 
 class brokenLinksScreen extends Component {
+
+    state = { list: [], loadingTable: false };
+
+
+    componentDidMount() {
+        var comp = [];
+        this.setState({ loadingTable: true });
+        var param = [{ "url": "https://www.nottingham.ac.uk/about/campuses/campuses.aspx" },
+        { "url": "https://www.nottingham.ac.uk/about/visitorinformation/information.aspx" },
+        { "url": "https://www.nottingham.ac.uk/about/keydates/index.aspx" },
+        { "url": "https://www.nottingham.ac.uk/about/facilities/facilities.aspx" },
+        { "url": "https://www.nottingham.ac.uk/about/facts/factsandfigures.aspx" },
+        { "url": "https://www.nottingham.ac.uk/about/structure/universitystructure.aspx" },
+        { "url": "https://www.nottingham.ac.uk/about/structure/universitystructure1.aspx" },
+        { "url": "https://www.nottingham.ac.uk/about/facts/factsandfigures1.aspx" },
+        { "url": "https://www.nottingham.ac.uk/about/keydates/index1.aspx" },
+
+        ];
+        fetch("/api/brokenLink", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(param)
+        }).then(response => response.json()).then((data) => {
+            comp = data.map((item, index) => {
+                return (<TableRow key={index} urlPage={item.urlPage} urlLink={item.urlLink} />);
+            });
+            this.setState({ list: comp });
+            this.setState({ loadingTable: false });
+        });
+
+
+    }
+
 
     render() {
         return (
@@ -17,7 +53,7 @@ class brokenLinksScreen extends Component {
                 <Segment.Group>
                     <Segment><h3>Broken Links test</h3></Segment>
                     <Segment.Group horizontal>
-                        <Segment basic>
+                        <Segment basic loading={this.state.loadingTable}>
                             <Segment.Group horizontal >
                                 <Segment style={{ margin: 'auto', textAlign: 'center', padding: 0 }}>
                                     <Icon className="check" size='huge' color='green' />
@@ -43,39 +79,12 @@ class brokenLinksScreen extends Component {
                                         <Table.HeaderCell>Page</Table.HeaderCell>
                                         <Table.HeaderCell>Broken link</Table.HeaderCell>
                                         <Table.HeaderCell>Issue</Table.HeaderCell>
-                                        <Table.HeaderCell>Action</Table.HeaderCell>
+                                        {/* <Table.HeaderCell>Action</Table.HeaderCell> */}
 
                                     </Table.Row>
                                 </Table.Header>
                                 <Table.Body>
-                                    <Table.Row>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}><a href='https://react.semantic-ui.com'>www.react.semantic-ui.com</a></Table.Cell>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}><a href='https://react.semantic-ui.com/Contact'>www.react.semantic-ui.com/Contact</a></Table.Cell>
-                                        <Table.Cell textAlign='left' style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>www.react.semantic-ui.com/Contact does not exist</Table.Cell>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}><Button>Ignore</Button> </Table.Cell>
-
-                                    </Table.Row>
-                                    <Table.Row>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}><a href='https://react.semantic-ui.com'>www.react.semantic-ui.com</a></Table.Cell>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}><a href='https://react.semantic-ui.com/Contact'>www.react.semantic-ui.com/Contact</a></Table.Cell>
-                                        <Table.Cell textAlign='left' style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>www.react.semantic-ui.com/Contact does not exist</Table.Cell>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}><Button>Ignore</Button> </Table.Cell>
-
-                                    </Table.Row>
-                                    <Table.Row>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}><a href='https://react.semantic-ui.com'>www.react.semantic-ui.com</a></Table.Cell>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}><a href='https://react.semantic-ui.com/Contact'>www.react.semantic-ui.com/Contact</a></Table.Cell>
-                                        <Table.Cell textAlign='left' style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>www.react.semantic-ui.com/Contact does not exist</Table.Cell>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}><Button>Ignore</Button> </Table.Cell>
-
-                                    </Table.Row>
-                                    <Table.Row>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}><a href='https://react.semantic-ui.com'>www.react.semantic-ui.com</a></Table.Cell>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}><a href='https://react.semantic-ui.com/Contact'>www.react.semantic-ui.com/Contact</a></Table.Cell>
-                                        <Table.Cell textAlign='left' style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>www.react.semantic-ui.com/Contact does not exist</Table.Cell>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}><Button>Ignore</Button> </Table.Cell>
-
-                                    </Table.Row>
+                                {this.state.list}
 
 
                                 </Table.Body>

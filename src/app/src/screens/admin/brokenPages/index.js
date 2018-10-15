@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import 'semantic-ui-css/semantic.min.css';
-import { Segment, Button, Table, Image, Icon, Input, Label } from 'semantic-ui-react'
+import { Segment, Button, Table, Image, Icon, Input } from 'semantic-ui-react'
 import BrokenPages from '../../../assets/brokenPage.png';
+import TableRow from './row-table';
 
 
 
@@ -9,6 +10,42 @@ import BrokenPages from '../../../assets/brokenPage.png';
 
 
 class brokenPagesScreen extends Component {
+
+    state = { list: [], loadingTable: false };
+
+
+    componentDidMount() {
+        var comp = [];
+        this.setState({ loadingTable: true });
+        var param = [{ "url": "https://www.nottingham.ac.uk/about/campuses/campuses.aspx" },
+        { "url": "https://www.nottingham.ac.uk/about/visitorinformation/information.aspx" },
+        { "url": "https://www.nottingham.ac.uk/about/keydates/index.aspx" },
+        { "url": "https://www.nottingham.ac.uk/about/facilities/facilities.aspx" },
+        { "url": "https://www.nottingham.ac.uk/about/facts/factsandfigures.aspx" },
+        { "url": "https://www.nottingham.ac.uk/about/structure/universitystructure.aspx" },
+        { "url": "https://www.nottingham.ac.uk/about/structure/universitystructure1.aspx" },
+        { "url": "https://www.nottingham.ac.uk/about/facts/factsandfigures1.aspx" },
+        { "url": "https://www.nottingham.ac.uk/about/keydates/index1.aspx" },
+
+        ];
+        fetch("/api/brokenPage", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(param)
+        }).then(response => response.json()).then((data) => {
+            comp = data.map((item, index) => {
+                return (<TableRow key={index} urlPage={item.urlPage} stt={item.stt} httpCode={item.httpCode} />);
+            });
+            this.setState({ list: comp });
+            this.setState({ loadingTable: false });
+        });
+
+
+    }
+
 
     render() {
         return (
@@ -18,7 +55,7 @@ class brokenPagesScreen extends Component {
                     <Segment><h3>Broken Pages test</h3></Segment>
                     <Segment.Group horizontal>
 
-                        <Segment basic>
+                        <Segment basic loading={this.state.loadingTable}>
 
 
 
@@ -60,27 +97,8 @@ class brokenPagesScreen extends Component {
                                     </Table.Row>
                                 </Table.Header>
                                 <Table.Body>
-                                    <Table.Row>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}><a href='https://react.semantic-ui.com'>www.react.semantic-ui.com</a></Table.Cell>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}> <Label style={{ fontSize: '13px' }} color='red' horizontal>Missing Page</Label></Table.Cell>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}> <Label style={{ fontSize: '13px' }} >404</Label></Table.Cell>
-                                    </Table.Row>
-                                    <Table.Row>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}><a href='https://react.semantic-ui.com'>www.react.semantic-ui.com</a></Table.Cell>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}> <Label style={{ fontSize: '13px' }} color='red' horizontal>Missing Page</Label></Table.Cell>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}> <Label style={{ fontSize: '13px' }} >404</Label></Table.Cell>
-                                    </Table.Row>
-                                    <Table.Row>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}><a href='https://react.semantic-ui.com'>www.react.semantic-ui.com</a></Table.Cell>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}> <Label style={{ fontSize: '13px' }} color='red' horizontal>Missing Page</Label></Table.Cell>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}> <Label style={{ fontSize: '13px' }} >404</Label></Table.Cell>
-                                    </Table.Row>
-                                    <Table.Row>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}><a href='https://react.semantic-ui.com'>www.react.semantic-ui.com</a></Table.Cell>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}> <Label style={{ fontSize: '13px' }} color='red' horizontal>Missing Page</Label></Table.Cell>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}> <Label style={{ fontSize: '13px' }} >404</Label></Table.Cell>
-                                    </Table.Row>
 
+                                    {this.state.list}
 
 
 

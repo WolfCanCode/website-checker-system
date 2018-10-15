@@ -8,4 +8,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface SpeedtestRepository extends JpaRepository<SpeedTest,Long> {
+
 }
