@@ -17,6 +17,28 @@ class brokenPagesScreen extends Component {
     componentDidMount() {
         var comp = [];
         this.setState({ loadingTable: true });
+        var param = [];
+        fetch("/api/brokenPage/lastest", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(param)
+        }).then(response => response.json()).then((data) => {
+            comp = data.map((item, index) => {
+                return (<TableRow key={index} urlPage={item.urlPage} stt={item.stt} httpCode={item.httpCode} />);
+            });
+            this.setState({ list: comp });
+            this.setState({ loadingTable: false });
+        });
+
+
+    }
+
+    _doBrokenPage(){
+        var comp = [];
+        this.setState({ loadingTable: true });
         var param = [{ "url": "https://www.nottingham.ac.uk/about/campuses/campuses.aspx" },
         { "url": "https://www.nottingham.ac.uk/about/visitorinformation/information.aspx" },
         { "url": "https://www.nottingham.ac.uk/about/keydates/index.aspx" },
@@ -45,6 +67,7 @@ class brokenPagesScreen extends Component {
 
 
     }
+        
 
 
     render() {
@@ -52,7 +75,12 @@ class brokenPagesScreen extends Component {
             <div style={{ height: 'auto', marginTop: '20px' }}>
 
                 <Segment.Group>
-                    <Segment><h3>Broken Pages test</h3></Segment>
+                    <Segment><h3>Broken Pages test</h3>
+                    <Button icon labelPosition='right' onClick={()=>this._doBrokenPage()}>
+                        Check
+                       <Icon name='right arrow' />
+                    </Button>
+                    </Segment>
                     <Segment.Group horizontal>
 
                         <Segment basic loading={this.state.loadingTable}>
@@ -98,7 +126,9 @@ class brokenPagesScreen extends Component {
                                 </Table.Header>
                                 <Table.Body>
 
-                                    {this.state.list}
+                                    {/* {this.state.list} */}
+                                {this.state.list.length === 0 ? <b>This page haven't test yet, please try to test</b> : this.state.list}
+
 
 
 

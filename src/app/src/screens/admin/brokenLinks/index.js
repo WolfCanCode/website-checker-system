@@ -16,6 +16,28 @@ class brokenLinksScreen extends Component {
     componentDidMount() {
         var comp = [];
         this.setState({ loadingTable: true });
+        var param = [];
+        fetch("/api/brokenLink/lastest", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(param)
+        }).then(response => response.json()).then((data) => {
+            comp = data.map((item, index) => {
+                return (<TableRow key={index} urlPage={item.urlPage} urlLink={item.urlLink} />);
+            });
+            this.setState({ list: comp });
+            this.setState({ loadingTable: false });
+        });
+
+
+    }
+
+    _doBrokenLink(){
+        var comp = [];
+        this.setState({ loadingTable: true });
         var param = [{ "url": "https://www.nottingham.ac.uk/about/campuses/campuses.aspx" },
         { "url": "https://www.nottingham.ac.uk/about/visitorinformation/information.aspx" },
         { "url": "https://www.nottingham.ac.uk/about/keydates/index.aspx" },
@@ -42,7 +64,6 @@ class brokenLinksScreen extends Component {
             this.setState({ loadingTable: false });
         });
 
-
     }
 
 
@@ -51,7 +72,12 @@ class brokenLinksScreen extends Component {
             <div style={{ height: 'auto', marginTop: '20px' }}>
 
                 <Segment.Group>
-                    <Segment><h3>Broken Links test</h3></Segment>
+                    <Segment><h3>Broken Links test</h3>
+                    <Button icon labelPosition='right' onClick={()=>this._doBrokenLink()}>
+                        Check
+                       <Icon name='right arrow' />
+                    </Button>
+                    </Segment>
                     <Segment.Group horizontal>
                         <Segment basic loading={this.state.loadingTable}>
                             <Segment.Group horizontal >
@@ -84,7 +110,9 @@ class brokenLinksScreen extends Component {
                                     </Table.Row>
                                 </Table.Header>
                                 <Table.Body>
-                                {this.state.list}
+                                {/* {this.state.list} */}
+                                {this.state.list.length === 0 ? <b>This page haven't test yet, please try to test</b> : this.state.list}
+
 
 
                                 </Table.Body>

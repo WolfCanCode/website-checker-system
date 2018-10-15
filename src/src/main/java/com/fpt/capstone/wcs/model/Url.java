@@ -4,7 +4,7 @@ import lombok.*;
 
 @Data
 @Getter @Setter
-@AllArgsConstructor
+
 public class Url {
     private String url;
 
