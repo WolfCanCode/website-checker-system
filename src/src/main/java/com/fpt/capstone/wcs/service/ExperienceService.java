@@ -1,5 +1,7 @@
 package com.fpt.capstone.wcs.service;
 
+import com.fpt.capstone.wcs.model.BrokenLink;
+import com.fpt.capstone.wcs.model.BrokenPage;
 import com.fpt.capstone.wcs.model.SpeedTest;
 import com.fpt.capstone.wcs.model.Url;
 import net.lightbody.bmp.BrowserMobProxy;
@@ -17,6 +19,10 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BrokenBarrierException;
@@ -109,4 +115,108 @@ public class ExperienceService {
         return resultList;
 
     }
+
+    public List<BrokenLink> brokenLinkService(Url[] url) throws InterruptedException {
+        //Asign list Broken Link
+        List<BrokenLink> resultList = new ArrayList<>();
+        final CyclicBarrier gate = new CyclicBarrier(url.length);
+        List<Thread> listThread = new ArrayList<>();
+
+        for (Url u : url) {
+            listThread.add(new Thread() {
+                public void run() {
+                    try {
+                        gate.await();
+                        HttpURLConnection connection = (HttpURLConnection) new URL(u.url).openConnection();
+                        connection.connect();
+                        String response = connection.getResponseMessage();
+                        int respCode = connection.getResponseCode();
+                        connection.disconnect();
+                        System.out.println("URL: " + u.url + " returned " + response + " code " + respCode);
+                        if(respCode == HttpURLConnection.HTTP_NOT_FOUND){
+
+                            resultList.add(new BrokenLink(respCode, "https://www.nottingham.ac.uk/about", u.url));
+                        }
+                      //  resultList.add(new SpeedTest(u.url, interactTime1 + "", loadTime1 + "", sizeTransferred1 + ""));
+
+                    }  catch (MalformedURLException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } catch (BrokenBarrierException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        }
+        for (Thread t : listThread) {
+            System.out.println("Threed start");
+            t.start();
+        }
+
+        for (Thread t : listThread) {
+            System.out.println("Threed join");
+            t.join();
+        }
+
+        return resultList;
+
+    }
+
+    public List<BrokenPage> brokenPageService(Url[] url) throws InterruptedException {
+        //Asign list Broken Page
+        List<BrokenPage> resultList = new ArrayList<>();
+        final CyclicBarrier gate = new CyclicBarrier(url.length);
+        List<Thread> listThread = new ArrayList<>();
+
+        for (Url u : url) {
+            listThread.add(new Thread() {
+                public void run() {
+                    try {
+                        gate.await();
+                        HttpURLConnection connection = (HttpURLConnection) new URL(u.url).openConnection();
+                        connection.connect();
+                        String response = connection.getResponseMessage();
+                        int respCode = connection.getResponseCode();
+                        connection.disconnect();
+                        System.out.println("URL: " + u.url + " returned " + response + " code " + respCode);
+                        if(respCode == HttpURLConnection.HTTP_NOT_FOUND){
+
+                            resultList.add(new BrokenPage(u.url, "Missing Page", respCode));
+                        }
+
+                        if(respCode == HttpURLConnection.HTTP_NO_CONTENT){
+
+                            resultList.add(new BrokenPage(u.url, "Empty Page", respCode));
+                        }
+
+
+                    }  catch (MalformedURLException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } catch (BrokenBarrierException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        }
+        for (Thread t : listThread) {
+            System.out.println("Threed start");
+            t.start();
+        }
+
+        for (Thread t : listThread) {
+            System.out.println("Threed join");
+            t.join();
+        }
+
+        return resultList;
+
+    }
+
 }

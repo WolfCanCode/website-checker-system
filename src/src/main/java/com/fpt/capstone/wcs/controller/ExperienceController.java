@@ -1,8 +1,6 @@
 package com.fpt.capstone.wcs.controller;
 
-import com.fpt.capstone.wcs.model.SpeedTest;
-import com.fpt.capstone.wcs.model.Url;
-import com.fpt.capstone.wcs.model.User;
+import com.fpt.capstone.wcs.model.*;
 import com.fpt.capstone.wcs.repository.SpeedtestRepository;
 import com.fpt.capstone.wcs.service.ExperienceService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,5 +36,22 @@ public class ExperienceController {
     public boolean checkAlreadyCheck(){
         boolean success = speedtestRepository.findAll().isEmpty();
         return  success;
+    }
+
+
+    @PostMapping("/api/brokenLink")
+    public List<BrokenLink> getDataBrokenLink(@RequestBody Url[] list) throws InterruptedException {
+        ExperienceService exp = new ExperienceService();
+        List<BrokenLink> resultList = exp.brokenLinkService(list);
+        //speedtestRepository.saveAll(resultList);
+        return resultList;
+    }
+
+    @PostMapping("/api/brokenPage")
+    public List<BrokenPage> getDataBrokenPage(@RequestBody Url[] list) throws InterruptedException {
+        ExperienceService exp = new ExperienceService();
+        List<BrokenPage> resultList = exp.brokenPageService(list);
+        //speedtestRepository.saveAll(resultList);
+        return resultList;
     }
 }
