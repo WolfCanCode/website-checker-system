@@ -9,7 +9,7 @@ import TableRow from './row-table';
 
 
 class speedTestScreen extends Component {
-    state = { list: [], loadingTable: false, averageInteractiveTime: 0, averagePageLoadTime: 0, averageSize: 0 };
+    state = { list: [], loadingTable: false, averageInteractiveTime: 0, averagePageLoadTime: 0, averageSize: 0,  isDisable: false };
 
 
     componentDidMount() {
@@ -57,6 +57,7 @@ class speedTestScreen extends Component {
 
     _doSpeedTest() {
         this.setState({ loadingTable: true });
+        this.setState({ isDisable: true});
         var comp = [];
         var param = [{ "url": "https://gaana.com" },
         { "url": "https://gaana.com/discover" },
@@ -95,6 +96,8 @@ class speedTestScreen extends Component {
             this.setState({ averageSize: averageSize });
             this.setState({ list: comp });
             this.setState({ loadingTable: false });
+            this.setState({ isDisable: false});
+
         });
     }
 
@@ -103,7 +106,7 @@ class speedTestScreen extends Component {
             <div style = {{ height: 'auto', marginTop: '20px' }} >
             <Segment.Group>
                 <Segment><h3>Desktop Speed Test</h3>
-                    <Button icon labelPosition='right' onClick={()=>this._doSpeedTest()}>
+                    <Button icon labelPosition='right' disabled={this.state.isDisable} onClick={()=>this._doSpeedTest()}>
                         Check
                        <Icon name='right arrow' />
                     </Button>

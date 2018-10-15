@@ -11,7 +11,7 @@ import TableRow from './row-table';
 
 class brokenPagesScreen extends Component {
 
-    state = { list: [], loadingTable: false };
+    state = { list: [], loadingTable: false, isDisable: false  };
 
 
     componentDidMount() {
@@ -38,7 +38,7 @@ class brokenPagesScreen extends Component {
 
     _doBrokenPage(){
         var comp = [];
-        this.setState({ loadingTable: true });
+        this.setState({ loadingTable: true , isDisable: true });
         var param = [{ "url": "https://www.nottingham.ac.uk/about/campuses/campuses.aspx" },
         { "url": "https://www.nottingham.ac.uk/about/visitorinformation/information.aspx" },
         { "url": "https://www.nottingham.ac.uk/about/keydates/index.aspx" },
@@ -62,7 +62,7 @@ class brokenPagesScreen extends Component {
                 return (<TableRow key={index} urlPage={item.urlPage} stt={item.stt} httpCode={item.httpCode} />);
             });
             this.setState({ list: comp });
-            this.setState({ loadingTable: false });
+            this.setState({ loadingTable: false , isDisable: false });
         });
 
 
@@ -76,7 +76,7 @@ class brokenPagesScreen extends Component {
 
                 <Segment.Group>
                     <Segment><h3>Broken Pages test</h3>
-                    <Button icon labelPosition='right' onClick={()=>this._doBrokenPage()}>
+                    <Button icon labelPosition='right' disabled={this.state.isDisable} onClick={()=>this._doBrokenPage()}>
                         Check
                        <Icon name='right arrow' />
                     </Button>

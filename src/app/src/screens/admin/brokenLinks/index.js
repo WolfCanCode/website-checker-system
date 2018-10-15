@@ -10,7 +10,7 @@ import TableRow from './row-table';
 
 class brokenLinksScreen extends Component {
 
-    state = { list: [], loadingTable: false };
+    state = { list: [], loadingTable: false , isDisable: false };
 
 
     componentDidMount() {
@@ -37,7 +37,7 @@ class brokenLinksScreen extends Component {
 
     _doBrokenLink(){
         var comp = [];
-        this.setState({ loadingTable: true });
+        this.setState({ loadingTable: true , isDisable: true });
         var param = [{ "url": "https://www.nottingham.ac.uk/about/campuses/campuses.aspx" },
         { "url": "https://www.nottingham.ac.uk/about/visitorinformation/information.aspx" },
         { "url": "https://www.nottingham.ac.uk/about/keydates/index.aspx" },
@@ -61,7 +61,7 @@ class brokenLinksScreen extends Component {
                 return (<TableRow key={index} urlPage={item.urlPage} urlLink={item.urlLink} />);
             });
             this.setState({ list: comp });
-            this.setState({ loadingTable: false });
+            this.setState({ loadingTable: false ,isDisable: false });
         });
 
     }
@@ -73,7 +73,7 @@ class brokenLinksScreen extends Component {
 
                 <Segment.Group>
                     <Segment><h3>Broken Links test</h3>
-                    <Button icon labelPosition='right' onClick={()=>this._doBrokenLink()}>
+                    <Button icon labelPosition='right' disabled={this.state.isDisable} onClick={()=>this._doBrokenLink()}>
                         Check
                        <Icon name='right arrow' />
                     </Button>
