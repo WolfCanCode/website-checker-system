@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import {Segment, Button, SegmentGroup, Table, Input, Icon } from 'semantic-ui-react'
 import TableRow from './row-table';
 export default class Direction extends Component {
-    state = { list: [], loadingTable: false };
+    state = { list: [], loadingTable: false,  isDisable: false  };
 
 
     componentDidMount() {
@@ -40,7 +40,7 @@ export default class Direction extends Component {
 
     }
     _doLinkRedirection() {
-        this.setState({ loadingTable: true });
+        this.setState({ loadingTable: true,  isDisable: true  });
         var comp = [];
         var param = [{ "url": "https://twitter.com/hashtag/hiccupsteahouse?lang=en" },
                     { "url": "http://www.cungmua.vn" },
@@ -78,7 +78,7 @@ export default class Direction extends Component {
                 <SegmentGroup vertical='true'>
                     <Segment>
                         <h3>Redirection Test</h3>
-                        <Button icon labelPosition='right' onClick={()=>this._doLinkRedirection()}>
+                        <Button icon labelPosition='right' disabled={this.state.isDisable} onClick={()=>this._doLinkRedirection()}>
                         Check
                        <Icon name='right arrow' />
                     </Button>

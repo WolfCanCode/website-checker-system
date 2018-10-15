@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import {Segment, Button, SegmentGroup, Table, Input, Icon } from 'semantic-ui-react'
 import TableRow from'../pages/row-table';
 export default class Pages extends Component {
-    state = { list: [], loadingTable: false };
+    state = { list: [], loadingTable: false,  isDisable: false  };
 
 
     componentDidMount() {
@@ -37,7 +37,7 @@ export default class Pages extends Component {
 
     }
     _doPageTest() {
-        this.setState({ loadingTable: true });
+        this.setState({ loadingTable: true,  isDisable: true  });
         var comp = [];
         var param = [{ "url": "https://twitter.com/hashtag/hiccupsteahouse?lang=en" },
                     { "url": "https://www.facebook.com/hiccupsteahouse"},
@@ -72,7 +72,7 @@ export default class Pages extends Component {
             <div >
                 <SegmentGroup vertical='true'>
                     <Segment><h3>Pages Test</h3>  
-                    <Button icon labelPosition='right' onClick={()=>this._doPageTest()}>
+                    <Button icon labelPosition='right' disabled={this.state.isDisable} onClick={()=>this._doPageTest()}>
                         Check
                        <Icon name='right arrow' />
                     </Button></Segment>
