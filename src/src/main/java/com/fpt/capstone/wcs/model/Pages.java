@@ -28,36 +28,5 @@ public class Pages {
         this.titleWeb = titleWeb;
         this.canonicalUrl = canonicalUrl;
     }
-//
-//    public void setUrl(String url) {
-//        this.url = url;
-//    }
-//
-//    public String getUrl() {
-//        return url;
-//    }
-//
-//    public void setCanonicalUrl(String canonicalUrl) {
-//        this.canonicalUrl = canonicalUrl;
-//    }
-//
-//    public String getCanonicalUrl() {
-//        return canonicalUrl;
-//    }
-//
-//    public void setHttpCode(String httpCode) {
-//        this.httpCode = httpCode;
-//    }
-//
-//    public String getHttpCode() {
-//        return httpCode;
-//    }
-//
-//    public void setTitleWeb(String titleWeb) {
-//        this.titleWeb = titleWeb;
-//    }
-//
-//    public String getTitleWeb() {
-//        return titleWeb;
-//    }
+
 }
