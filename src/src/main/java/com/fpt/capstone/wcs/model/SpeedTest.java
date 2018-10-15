@@ -7,7 +7,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Getter
@@ -20,4 +19,11 @@ public class SpeedTest {
     private String interactiveTime;
     private String pageLoadTime;
     private String size;
+
+    public SpeedTest(String url, String interactiveTime, String pageLoadTime, String size) {
+        this.url = url;
+        this.interactiveTime = interactiveTime;
+        this.pageLoadTime = pageLoadTime;
+        this.size = size;
+    }
 }

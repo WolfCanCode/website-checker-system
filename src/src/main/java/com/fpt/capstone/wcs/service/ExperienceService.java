@@ -127,7 +127,7 @@ public class ExperienceService {
                 public void run() {
                     try {
                         gate.await();
-                        HttpURLConnection connection = (HttpURLConnection) new URL(u.url).openConnection();
+                        HttpURLConnection connection = (HttpURLConnection) new URL(u.getUrl()).openConnection();
                         connection.connect();
                         String response = connection.getResponseMessage();
                         int respCode = connection.getResponseCode();
@@ -135,7 +135,7 @@ public class ExperienceService {
                         System.out.println("URL: " + u.getUrl() + " returned " + response + " code " + respCode);
                         if(respCode == HttpURLConnection.HTTP_NOT_FOUND){
 
-                            resultList.add(new BrokenLink(respCode, "https://www.nottingham.ac.uk/about", u.url));
+                            resultList.add(new BrokenLink(respCode, "https://www.nottingham.ac.uk/about", u.getUrl()));
                         }
                       //  resultList.add(new SpeedTest(u.url, interactTime1 + "", loadTime1 + "", sizeTransferred1 + ""));
 

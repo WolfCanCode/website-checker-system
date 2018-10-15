@@ -9,7 +9,6 @@ import javax.persistence.Id;
 @Entity
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
 public class BrokenPage {
     @Id
@@ -19,4 +18,9 @@ public class BrokenPage {
     private String stt;
     private int httpCode;
 
+    public BrokenPage(String urlPage, String stt, int httpCode) {
+        this.urlPage = urlPage;
+        this.stt = stt;
+        this.httpCode = httpCode;
+    }
 }

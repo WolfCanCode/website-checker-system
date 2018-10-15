@@ -9,7 +9,6 @@ import javax.persistence.Id;
 @Entity
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
 public class BrokenLink {
 
@@ -20,4 +19,10 @@ public class BrokenLink {
     private String urlPage;
     private String urlLink;
 
+
+    public BrokenLink(int httpCode, String urlPage, String urlLink) {
+        this.httpCode = httpCode;
+        this.urlPage = urlPage;
+        this.urlLink = urlLink;
+    }
 }

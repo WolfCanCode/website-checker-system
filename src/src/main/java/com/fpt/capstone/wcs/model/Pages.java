@@ -9,7 +9,6 @@ import javax.persistence.Id;
 @Data
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
 public class Pages {
     @Id
@@ -20,4 +19,10 @@ public class Pages {
     private String titleWeb;
     private String canonicalUrl;
 
+    public Pages(int httpCode, String url, String titleWeb, String canonicalUrl) {
+        this.httpCode = httpCode;
+        this.url = url;
+        this.titleWeb = titleWeb;
+        this.canonicalUrl = canonicalUrl;
+    }
 }

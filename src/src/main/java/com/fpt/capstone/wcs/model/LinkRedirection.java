@@ -10,7 +10,6 @@ import javax.persistence.Id;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
 public class LinkRedirection {
     @Id
@@ -20,4 +19,11 @@ public class LinkRedirection {
     private String url;
     private String type;
     private String driectToUrl;
+
+    public LinkRedirection(int httpCode, String url, String type, String driectToUrl) {
+        this.httpCode = httpCode;
+        this.url = url;
+        this.type = type;
+        this.driectToUrl = driectToUrl;
+    }
 }
