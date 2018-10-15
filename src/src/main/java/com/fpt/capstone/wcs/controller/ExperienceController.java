@@ -23,6 +23,7 @@ public class ExperienceController {
     public List<SpeedTest> getDataSpeedTest(@RequestBody Url[] list) throws InterruptedException {
         ExperienceService exp = new ExperienceService();
         List<SpeedTest> resultList = exp.speedTestService(list);
+        speedtestRepository.deleteAll();
         speedtestRepository.saveAll(resultList);
         return resultList;
     }
