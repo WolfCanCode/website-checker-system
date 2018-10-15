@@ -30,7 +30,7 @@ public class ContentController {
             String title  = con.getTitle(list[i].getUrl());
             int  httpcode = con.getStatus(list[i].getUrl());
             String canoUrl = con.getCanonicalUrl(list[i].getUrl());
-            Pages  item = new Pages(list[i].getUrl(),title,canoUrl, httpcode);
+            Pages  item = new Pages(httpcode,list[i].getUrl(),title,canoUrl);
             resultList.add(item);
         }
         return resultList;
@@ -54,7 +54,7 @@ public class ContentController {
                 connection.addRequestProperty("Accept-Language", "en-US,en;q=0.8");
                 connection .addRequestProperty("User-Agent", "Mozilla");
                 connection.addRequestProperty("Referer", "google.com");
-                LinkRedirection link = new LinkRedirection(list[i].getUrl() ,newUrl, httpcode, message);
+                LinkRedirection link = new LinkRedirection(httpcode,list[i].getUrl(), message ,newUrl);
                 System.out.println(link.getDriectToUrl());
                 resultList.add(link);
             }
