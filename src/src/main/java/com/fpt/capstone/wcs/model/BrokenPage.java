@@ -1,7 +1,5 @@
 package com.fpt.capstone.wcs.model;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -11,6 +9,8 @@ import javax.persistence.Id;
 @Entity
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class BrokenPage {
     @Id
     @GeneratedValue
@@ -19,9 +19,4 @@ public class BrokenPage {
     private String stt;
     private int httpCode;
 
-    public BrokenPage(String urlPage, String stt, int httpCode) {
-        this.urlPage = urlPage;
-        this.stt = stt;
-        this.httpCode = httpCode;
-    }
 }

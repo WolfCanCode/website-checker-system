@@ -8,23 +8,16 @@ import javax.persistence.Id;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Getter
 @Setter
 public class SpeedTest {
     @Id
     @GeneratedValue
-    public Long id;
-    public String url;
-    public String interactiveTime;
-    public String pageLoadTime;
-    public String size;
-
-
-    public SpeedTest(String url, String interactiveTime, String pageLoadTime, String size) {
-        this.interactiveTime = interactiveTime;
-        this.pageLoadTime = pageLoadTime;
-        this.size = size;
-        this.url = url;
-    }
+    private Long id;
+    private String url;
+    private String interactiveTime;
+    private String pageLoadTime;
+    private String size;
 }

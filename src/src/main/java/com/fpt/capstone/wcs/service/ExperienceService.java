@@ -132,7 +132,7 @@ public class ExperienceService {
                         String response = connection.getResponseMessage();
                         int respCode = connection.getResponseCode();
                         connection.disconnect();
-                        System.out.println("URL: " + u.url + " returned " + response + " code " + respCode);
+                        System.out.println("URL: " + u.getUrl() + " returned " + response + " code " + respCode);
                         if(respCode == HttpURLConnection.HTTP_NOT_FOUND){
 
                             resultList.add(new BrokenLink(respCode, "https://www.nottingham.ac.uk/about", u.url));
@@ -176,20 +176,20 @@ public class ExperienceService {
                 public void run() {
                     try {
                         gate.await();
-                        HttpURLConnection connection = (HttpURLConnection) new URL(u.url).openConnection();
+                        HttpURLConnection connection = (HttpURLConnection) new URL(u.getUrl()).openConnection();
                         connection.connect();
                         String response = connection.getResponseMessage();
                         int respCode = connection.getResponseCode();
                         connection.disconnect();
-                        System.out.println("URL: " + u.url + " returned " + response + " code " + respCode);
+                        System.out.println("URL: " + u.getUrl() + " returned " + response + " code " + respCode);
                         if(respCode == HttpURLConnection.HTTP_NOT_FOUND){
 
-                            resultList.add(new BrokenPage(u.url, "Missing Page", respCode));
+                            resultList.add(new BrokenPage(u.getUrl(), "Missing Page", respCode));
                         }
 
                         if(respCode == HttpURLConnection.HTTP_NO_CONTENT){
 
-                            resultList.add(new BrokenPage(u.url, "Empty Page", respCode));
+                            resultList.add(new BrokenPage(u.getUrl(), "Empty Page", respCode));
                         }
 
 
