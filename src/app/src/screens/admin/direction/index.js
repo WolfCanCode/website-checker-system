@@ -75,7 +75,7 @@ export default class Direction extends Component {
     render() {
         return (
 
-            <Segment.Group horizontal>
+            <Segment.Group horizontal style={{margin:0}}>
 
                 <Segment basic loading={this.state.loadingTable} >
                     <Button icon labelPosition='right' disabled={this.state.isDisable} onClick={() => this._doLinkRedirection()}>

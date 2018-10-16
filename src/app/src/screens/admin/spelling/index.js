@@ -12,9 +12,8 @@ class spellingScreen extends Component {
 
     render() {
         return (
-            <div style={{ height: 'auto', marginTop: '20px' }}>
+            <div style={{ height: 'auto' }}>
                 <Segment.Group>
-                    <Segment><h3>Spelling test</h3></Segment>
                     <Segment.Group horizontal>
 
                         <Segment basic>

@@ -51,12 +51,12 @@ export class RouteClient extends Component {
 export class RouteAdmin extends Component {
     render() {
         return (
+            <div style={{background:"#fff", boxShadow:"-5px 5px 15px rgba(0,0,0,0.1)", maxHeight:550, overflowX:"auto"}}>
+                
             <Switch>
                 {/* Router for admin page*/}
                 <Route path="/admin" exact component={Dashboard} />
-
                 <Route path="/admin/sitemap" component={SiteMapScreen}/>
-
                 <Route path="/admin/brokenLinks" component={brokenLinksScreen} />
                 <Route path="/admin/brokenPages" component={brokenPagesScreen} />
                 <Route path="/admin/missingFiles" component={missingFilesScreen} />
@@ -65,7 +65,6 @@ export class RouteAdmin extends Component {
                 <Route path="/admin/favicons" component={faviconScreen} />                
                 <Route path="/admin/contact" component={ContactScreen} />
                 <Route path="/admin/mobileLayout" component={MobileLayoutScreen} />
-
                 <Route path="/admin/serverBehavior" component={serverBehaviorScreen} />
                 <Route path="/admin/direction" component={DireactionScreen}/>
                 <Route path="/admin/pages" component={PagesScreen}/>
@@ -75,8 +74,8 @@ export class RouteAdmin extends Component {
                 <Route path="/admin/cookielaw" component={CookieLawScreen}/>
                 <Route path='/logout' component={() => window.location = 'http://localhost:3000/login'}/>
                 <Route path="/admin1" exact component={Dashboard1}/>
-
             </Switch>
+            </div>
         )
     }
 }

@@ -20,11 +20,11 @@ export default class AdminScreen extends Component {
         return (
             <Router>
                 <div style={{ height: '100vh' }}>
-                    <Sidebar.Pushable as={Segment}>
+                    <Sidebar.Pushable as={Segment} style={{background:"#E0E0E0"}}>
                         <SideMenu updateHeader={(title, alt) => this._onUpdateHeader(title, alt)} />
                         <HeaderAdmin/>
                         <Sidebar.Pusher>
-                            <Segment style={{ marginLeft: '160px', marginRight: '10px', marginTop: '65px' }}>
+                            <Segment style={{background:"#F5F5F5", marginLeft: '160px', marginRight: '10px', marginTop: '60px', boxShadow:"0 5px 15px rgba(0,0,0,0.2)" , height: 685}}>
                                 <HeaderContent title={this.state.titleHeader} alt={this.state.altHeader} />
                                 <RouteAdmin />
                             </Segment>

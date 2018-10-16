@@ -7,7 +7,7 @@ class brokenLinksScreen extends Component {
 
     render() {
         return (
-            <div style={{ height: 'auto', marginTop: '20px' }}>
+            <div style={{ height: 'auto' }}>
                 <Segment.Group>
                     <Segment><span>Done</span> <Label style={{ fontSize: '13px' }} >4</Label></Segment>
                     <Segment><div style={{ fontSize: '25px' }}>Website redirects from www to non-www.</div>

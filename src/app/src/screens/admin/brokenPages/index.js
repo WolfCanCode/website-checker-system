@@ -72,9 +72,9 @@ class brokenPagesScreen extends Component {
 
     render() {
         return (
-            <div style={{ height: 'auto', marginTop: '20px' }}>
+            <div style={{ height: 'auto' }}>
 
-                    <Segment.Group horizontal>
+                    <Segment.Group horizontal  style={{margin:0}}>
 
                         <Segment basic loading={this.state.loadingTable}>
                             <Button icon labelPosition='right' disabled={this.state.isDisable} onClick={() => this._doBrokenPage()}>

@@ -28,7 +28,7 @@ export default class HeaderAdmin extends Component {
 
     render() {
         return (
-            <Menu className="top" style={{ background: '#1E88E5', position: 'absolute', width: '100%', zIndex: '4', margin: '0', height: '50px' }}>
+            <Menu className="top" style={{ background: 'rgb(55, 33, 173)', position: 'absolute', width: '100%', zIndex: '4', margin: '0', height: '50px' }}>
                 <Menu.Item><Dropdown options={this.data} text={this.state.txtWebpage} onChange={event => this._changeWebPage(event)} style={{ marginLeft: '160px', color: 'white', fontSize: '18px' }} /></Menu.Item>
                 <Menu.Menu position='right'>
                     <Menu.Item>

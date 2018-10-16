@@ -16,7 +16,7 @@ class faviconScreen extends Component {
 
     render() {
         return (
-            <div style={{ height: 'auto', marginTop: '20px' }}>
+            <div style={{ height: 'auto' }}>
                 <Segment.Group>
                     <Segment.Group horizontal >
                         <Segment style={{ margin: 'auto', textAlign: 'center', padding: 0, size: 'mini' }}>

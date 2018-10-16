@@ -16,7 +16,7 @@ class mobileLayoutScreen extends Component {
 
     render() {
         return (
-            <div style={{ height: 'auto', marginTop: '20px' }}>
+            <div style={{ height: 'auto' }}>
                 <Segment.Group>
                     <Segment.Group horizontal >
 

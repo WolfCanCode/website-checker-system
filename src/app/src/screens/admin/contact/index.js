@@ -5,9 +5,9 @@ export default class Contact extends Component {
   render() {
     return (
       <div >
-          <Segment.Group horizontal>
+          <Segment.Group horizontal  style={{margin:0}} >
             <Segment basic>
-              <Segment.Group horizontal  >
+              <Segment.Group horizontal>
                 <Segment style={{ margin: 'auto', textAlign: 'center', padding: 0 }}>
                   <Icon name='phone square' size='huge' />
                 </Segment>
