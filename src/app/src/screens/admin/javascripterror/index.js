@@ -1,74 +1,95 @@
 import React, { Component } from 'react';
-import {Segment, Button, SegmentGroup, Table, Input, Icon, Label } from 'semantic-ui-react'
-export default class Direction extends Component {
+import { Segment, Button, SegmentGroup, Table, Input, Icon } from 'semantic-ui-react'
+import TableRow from './row-table';
 
+export default class JavascriptErrorScreen extends Component {
+  state = { list: [], loadingTable: false, isDisable: false };
+
+  componentDidMount() {
+    var comp = [];
+    this.setState({ loadingTable: true });
+    var param = [];
+    fetch("/api/jsTest/lastest", {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(param)
+    }).then(response => response.json()).then((data) => {
+      if (data.length !== 0) {
+        comp = data.map((item, index) => {
+          return (<TableRow key={index} page={item.page} type={item.type} messages={item.messages} />);
+        });
+        this.setState({ list: comp });
+      }
+      this.setState({ loadingTable: false });
+    });
+
+  }
+
+  _doJSTest() {
+    this.setState({ loadingTable: true });
+    this.setState({ isDisable: true });
+    var comp = [];
+    var param = [{ "url": "http://fpt.edu.vn/" },
+        { "url": "https://gaana.com/discover" },
+        { "url": "https://gaana.com/browser" },
+        { "url": "https://www.dcpxsuvi.com" },
+        { "url": "https://www.dcpxsuvi.com/tê-phun-xăm/54-63/tê-becabela-tê-đức.catalog" },
+        { "url": "https://www.dcpxsuvi.com/t%E1%BA%A5t-c%E1%BA%A3-c%C3%A1c-s%E1%BA%A3n-ph%E1%BA%A9m/52/dao-c%E1%BA%A1o-li%E1%BB%81n-c%C3%A1n.catalog" },
+        { "url": "https://www.dcpxsuvi.com/t%E1%BA%A5t-c%E1%BA%A3-c%C3%A1c-s%E1%BA%A3n-ph%E1%BA%A9m/51/da-gi%E1%BA%A3.catalog" }];
+    fetch("/api/jsTest", {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(param)
+    }).then(response => response.json()).then((data) => {
+      comp = data.map((item, index) => {
+        return (<TableRow key={index} page={item.page} type={item.type} messages={item.messages} />);
+      });
+
+      this.setState({ list: comp });
+      this.setState({ loadingTable: false });
+      this.setState({ isDisable: false });
+
+    });
+  }
   render() {
     return (
-      <div >
+      <SegmentGroup vertical='true'>
+        <Segment.Group horizontal>
 
+          <Segment basic loading={this.state.loadingTable}>
+            <Button icon labelPosition='right' disabled={this.state.isDisable} onClick={() => this._doJSTest()}>
+              Check
+                       <Icon name='right arrow' />
+            </Button>
+            <Button style={{ marginLeft: '10px' }} floated='right'><Icon name="print" />Export</Button>
+            <div style={{ marginBottom: '10px', float: 'right' }}>
+              <Input icon='search' placeholder='Search...' />
+            </div>
+            <Table singleLine style={{ fontSize: '14px' }}>
+              <Table.Header>
+                <Table.Row>
+                  <Table.HeaderCell>Error Message</Table.HeaderCell>
+                  <Table.HeaderCell>Type</Table.HeaderCell>
+                  <Table.HeaderCell>Pages</Table.HeaderCell>
+                </Table.Row>
+              </Table.Header>
+              <Table.Body>
+                {this.state.list.length === 0 ? <Table.Row>This page haven't test yet, please try to test</Table.Row> : this.state.list}
 
-        <SegmentGroup vertical='true'>
-          <Segment.Group horizontal>
-
-            <Segment basic >
-              <Button style={{ marginRight: '10px' }} floated='right'><Icon name="print" />Export</Button>
-              <div style={{ marginBottom: '10px' }}>
-                <Input icon='search' placeholder='Search...' />
-              </div>
-              <Table singleLine style={{ fontSize: '14px' }}>
-                <Table.Header>
-                  <Table.Row>
-                    <Table.HeaderCell></Table.HeaderCell>
-                    <Table.HeaderCell>Error   Message</Table.HeaderCell>
-                    <Table.HeaderCell>Type</Table.HeaderCell>
-                    <Table.HeaderCell>Pages</Table.HeaderCell>
-                    <Table.HeaderCell></Table.HeaderCell>
-                  </Table.Row>
-                </Table.Header>
-                <Table.Body>
-                  <Table.Row>
-                    <Table.Cell><Icon circular inverted color='blue' name="search" /></Table.Cell>
-                    <Table.Cell>Data</Table.Cell>
-                    <Table.Cell> <Label style={{ fontSize: '14px' }} horizontal>
-                      Log
-      </Label></Table.Cell>
-                    <Table.Cell> <Label style={{ fontSize: '14px' }} horizontal>
-                      10
-      </Label></Table.Cell>
-                    <Table.Cell><Button floated='right'>Ignore</Button></Table.Cell>
-                  </Table.Row>
-                  <Table.Row>
-                    <Table.Cell><Icon circular inverted color='blue' name="search" /></Table.Cell>
-                    <Table.Cell>123</Table.Cell>
-                    <Table.Cell> <Label style={{ fontSize: '14px' }} horizontal>
-                      Log
-      </Label></Table.Cell>
-                    <Table.Cell> <Label style={{ fontSize: '14px' }} horizontal>
-                      2
-      </Label></Table.Cell>
-                    <Table.Cell><Button floated='right'>Ignore</Button></Table.Cell>
-                  </Table.Row>
-                  <Table.Row>
-                    <Table.Cell><Icon circular inverted color='blue' name="search" /></Table.Cell>
-                    <Table.Cell>[Facebook Pixel] - Duplicate Pixel ID: 1541902979357787.</Table.Cell>
-                    <Table.Cell> <Label style={{ fontSize: '14px' }} color='yellow' horizontal>
-                      Warning
-      </Label></Table.Cell>
-                    <Table.Cell> <Label style={{ fontSize: '14px' }} horizontal>
-                      2
-      </Label></Table.Cell>
-                    <Table.Cell><Button floated='right'>Ignore</Button></Table.Cell>
-                  </Table.Row>
-
-                </Table.Body>
-              </Table>
-            </Segment>
-            {/* <Segment basic>
+              </Table.Body>
+            </Table>
+          </Segment>
+          {/* <Segment basic>
                             
                         </Segment> */}
-          </Segment.Group>
-        </SegmentGroup>
-      </div>
+        </Segment.Group>
+      </SegmentGroup>
     );
   }
 }
