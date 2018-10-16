@@ -14,7 +14,6 @@ class missingFilesScreen extends Component {
         return (
             <div style={{ height: 'auto', marginTop: '20px' }}>
                 <Segment.Group>
-                    <Segment><h3>Missing Files test</h3></Segment>
                     <Segment.Group horizontal>
 
                         <Segment basic>

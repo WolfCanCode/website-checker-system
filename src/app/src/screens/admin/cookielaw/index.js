@@ -1,14 +1,11 @@
 import React, { Component } from 'react';
-import {Segment, Button, SegmentGroup, Icon, Table, Label, Input} from 'semantic-ui-react'
+import {Segment, Button, Icon, Table, Label, Input} from 'semantic-ui-react'
 
 export default class CookieLaw extends Component {
 
     render() {
         return (
-            <div>
 
-                <SegmentGroup vertical='true'>
-                    <Segment><h3>Cookie used by this website</h3></Segment>
                     <Segment.Group horizontal>
                         <Segment basic>
                             <Segment.Group horizontal>
@@ -66,8 +63,6 @@ export default class CookieLaw extends Component {
                         </Segment>
                         
                     </Segment.Group>
-                </SegmentGroup>
-            </div>
         );
     }
 }

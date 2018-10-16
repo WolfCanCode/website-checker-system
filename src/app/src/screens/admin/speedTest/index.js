@@ -9,7 +9,7 @@ import TableRow from './row-table';
 
 
 class speedTestScreen extends Component {
-    state = { list: [], loadingTable: false, averageInteractiveTime: 0, averagePageLoadTime: 0, averageSize: 0,  isDisable: false };
+    state = { list: [], loadingTable: false, averageInteractiveTime: 0, averagePageLoadTime: 0, averageSize: 0, isDisable: false };
 
 
     componentDidMount() {
@@ -57,9 +57,9 @@ class speedTestScreen extends Component {
 
     _doSpeedTest() {
         this.setState({ loadingTable: true });
-        this.setState({ isDisable: true});
+        this.setState({ isDisable: true });
         var comp = [];
-        var param = [{ "url": "https://gaana.com" },
+        var param = [{ "url": "http://fpt.edu.vn/" },
         { "url": "https://gaana.com/discover" },
         { "url": "https://gaana.com/browser" },
         { "url": "https://www.dcpxsuvi.com" },
@@ -100,24 +100,16 @@ class speedTestScreen extends Component {
             this.setState({ averageSize: averageSize });
             this.setState({ list: comp });
             this.setState({ loadingTable: false });
-            this.setState({ isDisable: false});
+            this.setState({ isDisable: false });
 
         });
     }
 
     render() {
-                return(
-            <div style = {{ height: 'auto', marginTop: '20px' }} >
+        return (
             <Segment.Group>
-                <Segment><h3>Desktop Speed Test</h3>
-                    <Button icon labelPosition='right' disabled={this.state.isDisable} onClick={()=>this._doSpeedTest()}>
-                        Check
-                       <Icon name='right arrow' />
-                    </Button>
-                </Segment>
                 <Segment.Group horizontal>
                     <Segment basic loading={this.state.loadingTable}>
-
 
                         <Segment.Group horizontal >
 
@@ -134,29 +126,34 @@ class speedTestScreen extends Component {
                                 <p style={{ fontSize: 24 }}>{isNaN(this.state.averageSize) ? 0 : this.state.averageSize} MB <br /> Average page size</p>
                             </Segment>
                         </Segment.Group>
-                        <div style={{ marginBottom: '60px', marginRight: '20px' }}>
+                        <Segment basic>
+                            <Button icon labelPosition='right' disabled={this.state.isDisable} onClick={() => this._doSpeedTest()}>
+                                Check
+                       <Icon name='right arrow' />
+                            </Button>
                             <Button floated='right' ><Icon name="print" />Export</Button>
 
                             <Input icon='search' placeholder='Search...' style={{ float: 'right' }} />
-                        </div>
-                        <Table singleLine textAlign='center' style={{ tableLayout: 'auto' }}>
-                            <Table.Header >
-                                <Table.Row>
-                                    <Table.HeaderCell>Page</Table.HeaderCell>
-                                    <Table.HeaderCell>Interactive time</Table.HeaderCell>
-                                    <Table.HeaderCell>Load time</Table.HeaderCell>
-                                    <Table.HeaderCell>Size</Table.HeaderCell>
+                        </Segment>
+                        <Segment basic style={{ maxHeight: 300, overflow: "auto" }}>
+                            <Table singleLine textAlign='center' style={{ tableLayout: 'auto' }}>
+                                <Table.Header >
+                                    <Table.Row>
+                                        <Table.HeaderCell>Page</Table.HeaderCell>
+                                        <Table.HeaderCell>Interactive time</Table.HeaderCell>
+                                        <Table.HeaderCell>Load time</Table.HeaderCell>
+                                        <Table.HeaderCell>Size</Table.HeaderCell>
 
-                                </Table.Row>
-                            </Table.Header>
-                            <Table.Body>
-                                {this.state.list.length === 0 ? <b>This page haven't test yet, please try to test</b> : this.state.list}
+                                    </Table.Row>
+                                </Table.Header>
+                                <Table.Body>
+                                    {this.state.list.length === 0 ? <b>This page haven't test yet, please try to test</b> : this.state.list}
 
 
 
-                            </Table.Body>
-                        </Table>
-
+                                </Table.Body>
+                            </Table>
+                        </Segment>
                     </Segment>
 
 
@@ -169,7 +166,6 @@ class speedTestScreen extends Component {
 
                 </Segment.Group>
             </Segment.Group>
-            </div >
 
         );
     }

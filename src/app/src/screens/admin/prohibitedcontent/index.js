@@ -7,7 +7,6 @@ export default class ProhibitedContent extends Component {
         return (
             <div>
                 <SegmentGroup vertical='true'>
-                    <Segment><h3>Prohibited content test</h3></Segment>
                     <Segment.Group horizontal>
                         <Segment basic>
                             <Segment.Group horizontal>

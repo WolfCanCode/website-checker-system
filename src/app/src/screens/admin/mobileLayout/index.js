@@ -18,7 +18,6 @@ class mobileLayoutScreen extends Component {
         return (
             <div style={{ height: 'auto', marginTop: '20px' }}>
                 <Segment.Group>
-                    <Segment><h3>Mobile Layout test</h3></Segment>
                     <Segment.Group horizontal >
 
                         <Segment style={{ margin: 'auto', textAlign: 'center', padding: 0 }}>

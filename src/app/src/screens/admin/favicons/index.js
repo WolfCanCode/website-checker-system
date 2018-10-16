@@ -18,7 +18,6 @@ class faviconScreen extends Component {
         return (
             <div style={{ height: 'auto', marginTop: '20px' }}>
                 <Segment.Group>
-                    <Segment><h3>Favicons test</h3></Segment>
                     <Segment.Group horizontal >
                         <Segment style={{ margin: 'auto', textAlign: 'center', padding: 0, size: 'mini' }}>
                             <Icon className="star" size='huge' color='violet' /></Segment>
@@ -42,13 +41,13 @@ class faviconScreen extends Component {
                     </Segment.Group>
                     <Segment.Group horizontal>
 
-                        <Segment basic>
+                        <Segment basic style={{ minWidth:"auto" }}>
                             <h4>All Favicons</h4>
-                            <div style={{ marginBottom: '60px', marginRight: '10px' }}>
+                            <Segment basic style={{ minWidth:"350px" }}>
                                 <Button floated='right' ><Icon name="print" />Export</Button>
 
-                                <Input icon='search' placeholder='Search...' style={{ float: 'right' }} />
-                            </div>
+                                <Input icon='search' placeholder='Search...' />
+                            </Segment>
                             <Table singleLine textAlign='center' style={{ tableLayout: 'auto' }}>
                                 <Table.Header >
                                     <Table.Row>
@@ -77,32 +76,32 @@ class faviconScreen extends Component {
                         </Segment>
 
 
-                        <Segment basic>
+                        <Segment basic >
                             <h4>Pages With Favicons</h4>
 
-                            <div style={{ marginBottom: '60px', marginRight: '20px' }}>
+                            <div style={{ marginBottom: '60px', marginRight: 'auto' }}>
                                 <Button floated='right' ><Icon name="print" />Export</Button>
 
                                 <Input icon='search' placeholder='Search...' style={{ float: 'right' }} />
                             </div>
-                            <div style={{ display: 'inline-flex', textAlign: 'center' }}>
-                                <div style={{ marginLeft: '80px', marginTop: '10px' }}>
-                                    <div style={{ marginBottom: '10px', fontSize: '20px' }}>Browse Top Albums, MP3 Songs, Latest Playlists on Gaana.</div>
-                                    <div><Image src={image} size='medium' /></div>
+                            <Segment.Group horizontal >
+                                <Segment basic>
+                                    <div style={{ marginBottom: '10px', fontSize: '15px', textAlign:'center' }}>Browse Top Albums, MP3 Songs, Latest Playlists on Gaana.</div>
+                                    <div><Image src={image} size='medium' style={{margin:'auto'}} /></div>
 
-                                </div>
-                                <div style={{ marginLeft: '80px', marginTop: '10px' }}>
-                                    <div style={{ marginBottom: '10px', fontSize: '20px' }}>Browse Top Albums, MP3 Songs, Latest Playlists on Gaana.</div>
-                                    <div><Image src={image} size='medium' /></div>
+                                </Segment >
+                                <Segment basic>
+                                    <div style={{ marginBottom: '10px', fontSize: '15px', textAlign:'center' }}>Browse Top Albums, MP3 Songs, Latest Playlists on Gaana.</div>
+                                    <div><Image src={image} size='medium' style={{margin:'auto'}} /></div>
 
-                                </div>
+                                </Segment>
 
-                                <div style={{ marginLeft: '80px', marginTop: '10px' }}>
-                                    <div style={{ marginBottom: '10px', fontSize: '20px' }}>Browse Top Albums, MP3 Songs, Latest Playlists on Gaana.</div>
-                                    <div><Image src={image} size='medium' /></div>
+                                <Segment basic>
+                                    <div style={{ marginBottom: '10px', fontSize: '15px', textAlign:'center' }}>Browse Top Albums, MP3 Songs, Latest Playlists on Gaana.</div>
+                                    <div><Image src={image} size='medium' style={{margin:'auto'}}/></div>
 
-                                </div>
-                            </div>
+                                </Segment>
+                            </Segment.Group>
 
 
                         </Segment>

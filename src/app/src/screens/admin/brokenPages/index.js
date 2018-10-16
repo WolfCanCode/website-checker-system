@@ -11,7 +11,7 @@ import TableRow from './row-table';
 
 class brokenPagesScreen extends Component {
 
-    state = { list: [], loadingTable: false, isDisable: false  };
+    state = { list: [], loadingTable: false, isDisable: false };
 
 
     componentDidMount() {
@@ -36,9 +36,9 @@ class brokenPagesScreen extends Component {
 
     }
 
-    _doBrokenPage(){
+    _doBrokenPage() {
         var comp = [];
-        this.setState({ loadingTable: true , isDisable: true });
+        this.setState({ loadingTable: true, isDisable: true });
         var param = [{ "url": "https://www.nottingham.ac.uk/about/campuses/campuses.aspx" },
         { "url": "https://www.nottingham.ac.uk/about/visitorinformation/information.aspx" },
         { "url": "https://www.nottingham.ac.uk/about/keydates/index.aspx" },
@@ -62,31 +62,25 @@ class brokenPagesScreen extends Component {
                 return (<TableRow key={index} urlPage={item.urlPage} stt={item.stt} httpCode={item.httpCode} />);
             });
             this.setState({ list: comp });
-            this.setState({ loadingTable: false , isDisable: false });
+            this.setState({ loadingTable: false, isDisable: false });
         });
 
 
     }
-        
+
 
 
     render() {
         return (
             <div style={{ height: 'auto', marginTop: '20px' }}>
 
-                <Segment.Group>
-                    <Segment><h3>Broken Pages test</h3>
-                    <Button icon labelPosition='right' disabled={this.state.isDisable} onClick={()=>this._doBrokenPage()}>
-                        Check
-                       <Icon name='right arrow' />
-                    </Button>
-                    </Segment>
                     <Segment.Group horizontal>
 
                         <Segment basic loading={this.state.loadingTable}>
-
-
-
+                            <Button icon labelPosition='right' disabled={this.state.isDisable} onClick={() => this._doBrokenPage()}>
+                                Check
+                       <Icon name='right arrow' />
+                            </Button>
                             <Segment.Group horizontal >
 
                                 <Segment style={{ margin: 'auto', textAlign: 'center', padding: 0 }}>
@@ -127,7 +121,7 @@ class brokenPagesScreen extends Component {
                                 <Table.Body>
 
                                     {/* {this.state.list} */}
-                                {this.state.list.length === 0 ? <b>This page haven't test yet, please try to test</b> : this.state.list}
+                                    {this.state.list.length === 0 ? <b>This page haven't test yet, please try to test</b> : this.state.list}
 
 
 
@@ -146,7 +140,6 @@ class brokenPagesScreen extends Component {
 
 
                     </Segment.Group>
-                </Segment.Group>
             </div>
 
         );

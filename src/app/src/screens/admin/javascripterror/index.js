@@ -8,10 +8,6 @@ export default class Direction extends Component {
 
 
         <SegmentGroup vertical='true'>
-          <Segment>
-            <h3>Javascript Error Test</h3></Segment>
-
-
           <Segment.Group horizontal>
 
             <Segment basic >

@@ -1,15 +1,10 @@
 import React, { Component } from 'react';
-import {Segment, Button, SegmentGroup, Table, Icon } from 'semantic-ui-react'
+import {Segment, Button, Table, Icon } from 'semantic-ui-react'
 export default class Contact extends Component {
 
   render() {
     return (
       <div >
-
-
-        <SegmentGroup vertical='true'>
-          <Segment><h3>Contact Test</h3></Segment>
-
           <Segment.Group horizontal>
             <Segment basic>
               <Segment.Group horizontal  >
@@ -79,7 +74,6 @@ export default class Contact extends Component {
                             
                         </Segment> */}
           </Segment.Group>
-        </SegmentGroup>
       </div>
     );
   }
