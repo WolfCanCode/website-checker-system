@@ -24,7 +24,7 @@ export default class AdminScreen extends Component {
                         <SideMenu updateHeader={(title, alt) => this._onUpdateHeader(title, alt)} />
                         <HeaderAdmin/>
                         <Sidebar.Pusher>
-                            <Segment style={{background:"#F5F5F5", marginLeft: '160px', marginRight: '10px', marginTop: '60px', boxShadow:"0 5px 15px rgba(0,0,0,0.2)" , height: 685}}>
+                            <Segment style={{background:"#F5F5F5", marginLeft: '160px', marginRight: '10px', marginTop: '60px', boxShadow:"0 5px 15px rgba(0,0,0,0.2)" , height: '90vh'}}>
                                 <HeaderContent title={this.state.titleHeader} alt={this.state.altHeader} />
                                 <RouteAdmin />
                             </Segment>
