@@ -7,7 +7,6 @@ import TableRow from './row-table';
 
 
 
-
 class brokenLinksScreen extends Component {
 
     state = { list: [], loadingTable: false, isDisable: false };

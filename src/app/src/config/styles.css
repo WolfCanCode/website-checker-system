@@ -1,0 +1,71 @@
+.fade-enter,
+.fade-exit {
+  transition: 0.8s ease all;
+}
+.fade-enter,
+.fade-exit-active {
+  opacity: 0;
+}
+.fade-enter-active {
+  opacity: 1;
+  z-index: 1;
+}
+
+
+.container {
+  width: 200px;
+  height: 100px;
+  margin: 100px auto;
+  border: 5px solid gold;
+  border-radius: 5px;
+  overflow: hidden;
+}
+.container > div {
+  height: 100px;
+  position: relative;
+}
+.container > div :nth-child(3),
+.container > div :nth-child(4),
+.container > div :nth-child(5) {
+  background: red;
+  opacity: 1;
+}
+
+.link {
+  color: black;
+  background: rgba(255, 215, 0, 0.4);
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-size: 48px;
+  text-decoration: none;
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+  box-sizing: border-box;
+}
+.link.white {
+  background: white;
+}
+
+.animatable div {
+  height: 100px;
+}
+
+.animate-check {
+  display: flex;
+  font-size: 24px;
+  align-items: center;
+  justify-content: center;
+}
+.animate-check input {
+  height: 24px;
+  width: 24px;
+  margin-right: 8px;
+}
+
+p {
+  text-align: center;
+  font-size: 18px;
+}
