@@ -1,9 +1,7 @@
 package com.fpt.capstone.wcs.controller;
 
-import com.fpt.capstone.wcs.model.LinkRedirection;
-import com.fpt.capstone.wcs.model.Pages;
-import com.fpt.capstone.wcs.model.SpeedTest;
-import com.fpt.capstone.wcs.model.Url;
+import com.fpt.capstone.wcs.model.*;
+import com.fpt.capstone.wcs.repository.ContactDetailRepository;
 import com.fpt.capstone.wcs.repository.LinkRedirectionRepository;
 import com.fpt.capstone.wcs.repository.PageTestRepository;
 import com.fpt.capstone.wcs.service.ContentService;
@@ -27,6 +25,8 @@ public class ContentController {
     PageTestRepository pageTestRepository;
     @Autowired
     LinkRedirectionRepository linkRedirectionRepository;
+    @Autowired
+    ContactDetailRepository contactDetailRepository;
 
 
 
@@ -58,6 +58,22 @@ public class ContentController {
     public List<LinkRedirection> getLastestLinkRedirection()
     {
         List<LinkRedirection> resultList =  linkRedirectionRepository.findAll();
+        return resultList;
+    }
+
+    @PostMapping("/api/contactDetail")
+    public List<ContactDetail> getDataContactDetail(@RequestBody Url[] list) throws IOException {
+        ContentService con  = new ContentService();
+        List<ContactDetail> resultList = con.getContactDetail(list);
+        contactDetailRepository.deleteAll();
+        contactDetailRepository.saveAll(resultList);
+        return resultList;
+    }
+
+    @PostMapping("/api/contactDetail/lastest")
+    public List<ContactDetail> getLastestContactDetail()
+    {
+        List<ContactDetail> resultList =  contactDetailRepository.findAll();
         return resultList;
     }
 }

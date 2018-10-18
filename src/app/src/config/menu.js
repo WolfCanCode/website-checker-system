@@ -103,13 +103,13 @@ const menu = [
         name: "Content Test",
         items: [
             {
-                name: "Contact Test",
+                name: "Contact Details",
                 to: "/admin/contact",
                 key: "test13",
                 alt: "This for test alt title"
             },
             {
-                name: "Direction Test",
+                name: "Redirection Test",
                 to: "/admin/direction",
                 key: "test14",
                 alt: "This for test alt title"
