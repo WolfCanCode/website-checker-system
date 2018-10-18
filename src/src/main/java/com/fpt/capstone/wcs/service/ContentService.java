@@ -118,7 +118,7 @@ public class ContentService {
                 connection .addRequestProperty("User-Agent", "Mozilla");
                 connection.addRequestProperty("Referer", "google.com");
 
-                System.out.println("Address: "+url+" -Redirect to URL : " + newUrl+": Type: "+message);
+                System.out.println("Addresses: "+url+" -Redirect to URL : " + newUrl+": Type: "+message);
             }
         } catch (Exception e) {
             result=404;
@@ -126,4 +126,8 @@ public class ContentService {
         System.out.println(result);
         return result;
     }
+
+
+
+
 }
