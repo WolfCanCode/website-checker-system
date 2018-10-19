@@ -4,6 +4,7 @@ import { Segment, Label } from 'semantic-ui-react'
 
 
 class brokenLinksScreen extends Component {
+    state = {done:0};
     componentDidMount() {
         this.setState({ loadingTable: true });
         var param = { "url": "https://www.dcpxsuvi.com/" }
@@ -16,7 +17,7 @@ class brokenLinksScreen extends Component {
             },
             body: JSON.stringify(param)
         }).then(response => response.json()).then((data) => {
-            console.log(data);
+            this.setState({done:4});
         });
     }
 

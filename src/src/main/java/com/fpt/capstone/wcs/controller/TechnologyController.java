@@ -40,7 +40,7 @@ public class TechnologyController {
         TechnologyService technologyService = new TechnologyService();
         ServerBehavior result = technologyService.checkServerBehavior(url);
 //        serverBehaviorRepository.save(result);
-        return result;;
+        return result;
     }
 
     @PostMapping("/api/svbehavior/lastest")
