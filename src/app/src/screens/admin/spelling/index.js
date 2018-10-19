@@ -12,7 +12,7 @@ class spellingScreen extends Component {
 
     render() {
         return (
-            <div style={{ height: 'auto' }}>
+            <div>
                 <Segment.Group>
                     <Segment.Group horizontal>
 

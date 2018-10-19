@@ -32,6 +32,9 @@ import MobileLayoutScreen from '../screens/admin/mobileLayout/index';
 import ProhibitedScreen from '../screens/admin/prohibitedcontent/index';
 import serverBehaviorScreen from '../screens/admin/serverBehavior/index';
 import CookieLawScreen from '../screens/admin/cookielaw/index';
+
+import Error404 from '../screens/admin/error404/index';
+
 import { TransitionGroup, CSSTransition } from "react-transition-group";
 import "./styles.css";
 
@@ -81,6 +84,7 @@ export const RouteAdmin = withRouter(({ location }) => (
                 <Route path="/admin/cookielaw" component={CookieLawScreen} />
                 <Route path='/logout' component={() => window.location = 'http://localhost:3000/login'} />
                 <Route path="/admin1" exact component={Dashboard1} />
+                <Route path="*" component={Error404}/>
             </Switch>
             </CSSTransition>
             </TransitionGroup>

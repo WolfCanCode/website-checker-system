@@ -5,7 +5,7 @@ export default class Dashboard extends Component {
 
     render() {
         return (
-            <div style={{ height: 'auto' }}>
+            <div>
 
                 <SegmentGroup vertical='true'>
                     <Segment><h3>Test</h3></Segment>

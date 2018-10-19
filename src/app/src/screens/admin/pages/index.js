@@ -95,7 +95,7 @@ export default class Pages extends Component {
                                 </Table.Row>
                             </Table.Header>
                             <Table.Body>
-                                {this.state.list.length === 0 ? <b>This page haven't test yet, please try to test</b> : this.state.list}
+                                {this.state.list.length === 0 ? <Table.Row><Table.Cell>This page haven't test yet, please try to test</Table.Cell></Table.Row> : this.state.list}
 
                             </Table.Body>
                         </Table>

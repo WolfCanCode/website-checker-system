@@ -35,9 +35,7 @@ export default class JavascriptErrorScreen extends Component {
     var param = [{ "url": "http://fpt.edu.vn/" },
         { "url": "https://gaana.com/discover" },
         { "url": "https://gaana.com/browser" },
-        { "url": "https://www.dcpxsuvi.com" },
-        { "url": "https://www.dcpxsuvi.com/tê-phun-xăm/54-63/tê-becabela-tê-đức.catalog" },
-        { "url": "https://www.dcpxsuvi.com/t%E1%BA%A5t-c%E1%BA%A3-c%C3%A1c-s%E1%BA%A3n-ph%E1%BA%A9m/52/dao-c%E1%BA%A1o-li%E1%BB%81n-c%C3%A1n.catalog" },
+        { "url": "https://tuoitre.vn/" },
         { "url": "https://www.dcpxsuvi.com/t%E1%BA%A5t-c%E1%BA%A3-c%C3%A1c-s%E1%BA%A3n-ph%E1%BA%A9m/51/da-gi%E1%BA%A3.catalog" }];
     fetch("/api/jsTest", {
       method: 'POST',
@@ -80,7 +78,7 @@ export default class JavascriptErrorScreen extends Component {
                 </Table.Row>
               </Table.Header>
               <Table.Body>
-                {this.state.list.length === 0 ? <Table.Row>This page haven't test yet, please try to test</Table.Row> : this.state.list}
+                {this.state.list.length === 0 ? <Table.Row><Table.Cell>This page haven't test yet, please try to test</Table.Cell></Table.Row> : this.state.list}
 
               </Table.Body>
             </Table>

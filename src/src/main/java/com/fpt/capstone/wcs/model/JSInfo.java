@@ -16,7 +16,7 @@ import javax.persistence.Id;
 public class JSInfo {
     @Id @GeneratedValue
     private long id;
-    @Column(length = 10000)
+    @Column(length = 2000)
     private String messages;
     private String type;
     private String page;
