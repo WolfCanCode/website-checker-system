@@ -116,6 +116,10 @@ public class TechnologyService {
         System.out.println(urlRedirect);
         if(urlRedirect.toLowerCase().contains("www"))
         {
+            url = url.replace("https://","");
+            url = url.replace("http://","");
+            urlRedirect = urlRedirect.replace("https://","");
+            urlRedirect = urlRedirect.replace("http://","");
             if(urlRedirect.replace("www","").equals(url))
             {
                 result=true;
