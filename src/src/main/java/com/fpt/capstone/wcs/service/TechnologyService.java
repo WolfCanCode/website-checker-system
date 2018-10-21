@@ -120,7 +120,8 @@ public class TechnologyService {
             url = url.replace("http://","");
             urlRedirect = urlRedirect.replace("https://","");
             urlRedirect = urlRedirect.replace("http://","");
-            if(urlRedirect.replace("www","").equals(url))
+            urlRedirect = urlRedirect.replace("www.","");
+            if(urlRedirect.equals(url))
             {
                 result=true;
             }

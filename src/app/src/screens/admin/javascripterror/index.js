@@ -19,7 +19,10 @@ export default class JavascriptErrorScreen extends Component {
     }).then(response => response.json()).then((data) => {
       if (data.length !== 0) {
         comp = data.map((item, index) => {
-          return (<TableRow key={index} page={item.page} type={item.type} messages={item.messages} />);
+          var msg = item.messages.replace("-", "");
+          msg = msg.replace(msg.split(" ")[0], "");
+          var messages = msg.split(" at");
+          return (<TableRow key={index} page={item.page} type={item.type} messages={messages} />);
         });
         this.setState({ list: comp });
       }
@@ -33,10 +36,10 @@ export default class JavascriptErrorScreen extends Component {
     this.setState({ isDisable: true });
     var comp = [];
     var param = [{ "url": "http://fpt.edu.vn/" },
-        { "url": "https://gaana.com/discover" },
-        { "url": "https://gaana.com/browser" },
-        { "url": "https://tuoitre.vn/" },
-        { "url": "https://www.dcpxsuvi.com/t%E1%BA%A5t-c%E1%BA%A3-c%C3%A1c-s%E1%BA%A3n-ph%E1%BA%A9m/51/da-gi%E1%BA%A3.catalog" }];
+    { "url": "https://dcpxsuvi.com/" },
+    { "url": "https://gaana.com/browser" },
+    { "url": "https://tuoitre.vn/" },
+    { "url": "genk.vn" }];
     fetch("/api/jsTest", {
       method: 'POST',
       headers: {
@@ -45,13 +48,16 @@ export default class JavascriptErrorScreen extends Component {
       },
       body: JSON.stringify(param)
     }).then(response => response.json()).then((data) => {
-      comp = data.map((item, index) => {
-        return (<TableRow key={index} page={item.page} type={item.type} messages={item.messages} />);
-      });
-
-      this.setState({ list: comp });
+      if (data.length !== 0) {
+        comp = data.map((item, index) => {
+          var msg = item.messages.replace("-", "");
+          msg = msg.replace(msg.split(" ")[0], "");
+          var messages = msg.split(" at");
+          return (<TableRow key={index} page={item.page} type={item.type} messages={messages} />);
+        });
+        this.setState({ list: comp });
+      }
       this.setState({ loadingTable: false });
-      this.setState({ isDisable: false });
 
     });
   }
@@ -77,15 +83,9 @@ export default class JavascriptErrorScreen extends Component {
                   <Table.HeaderCell>Pages</Table.HeaderCell>
                 </Table.Row>
               </Table.Header>
-              <Table.Body>
-                {this.state.list.length === 0 ? <Table.Row><Table.Cell>This page haven't test yet, please try to test</Table.Cell></Table.Row> : this.state.list}
-
-              </Table.Body>
+              {this.state.list.length === 0 ? <Table.Body><Table.Row><Table.Cell>This page haven't test yet, please try to test</Table.Cell></Table.Row></Table.Body> : this.state.list}
             </Table>
           </Segment>
-          {/* <Segment basic>
-                            
-                        </Segment> */}
         </Segment.Group>
       </SegmentGroup>
     );

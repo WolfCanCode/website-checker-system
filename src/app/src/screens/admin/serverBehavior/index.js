@@ -25,8 +25,8 @@ class brokenLinksScreen extends Component {
         return (
             <div>
                 <Segment.Group>
-                    <Segment><span>Done</span> <Label style={{ fontSize: '13px' }} >4</Label></Segment>
-                    <Segment><div style={{ fontSize: '25px' }}>Website redirects from www to non-www.</div>
+                    <Segment><span>Done</span> <Label style={{ fontSize: '13px',background:'green', color:'white' }} >{this.state.done}</Label></Segment>
+                    {this.state.done ===0 ? "" : <div><Segment><div style={{ fontSize: '25px' }}>Website redirects from www to non-www.</div>
                         <div style={{ fontSize: '15px', marginTop: '10px' }}>The website should handle URLs with a www prefix and redirect them to a non-www prefix wherever possible.</div>
                     </Segment>
                     <Segment><div style={{ fontSize: '25px' }}>Website redirects HTTP to HTTPS.</div>
@@ -37,7 +37,7 @@ class brokenLinksScreen extends Component {
                     </Segment>
                     <Segment><div style={{ fontSize: '25px' }}>All pages use SSL.</div>
                         <div style={{ fontSize: '15px', marginTop: '10px' }}>Google is progressively penalising websites which avoid SSL, in both search results and the Chrome browser.</div>
-                    </Segment>
+                    </Segment></div>}
 
 
 
