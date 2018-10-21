@@ -15,7 +15,7 @@ import RegisterScreen from '../screens/register/index';
 import Dashboard from '../screens/admin/dashboard/index';
 import Dashboard1 from '../screens/admin/dashboard/index1';
 
-import SiteMapScreen from '../screens/admin/sitemap/canvas';
+import SiteMapScreen from '../screens/admin/sitemap/controller';
 import brokenLinksScreen from '../screens/admin/brokenLinks/index';
 import brokenPagesScreen from '../screens/admin/brokenPages/index';
 import missingFilesScreen from '../screens/admin/missingFiles/index';
