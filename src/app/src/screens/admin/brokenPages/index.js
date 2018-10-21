@@ -27,7 +27,7 @@ class brokenPagesScreen extends Component {
             body: JSON.stringify(param)
         }).then(response => response.json()).then((data) => {
             comp = data.map((item, index) => {
-                return (<TableRow key={index} urlPage={item.urlPage} stt={item.stt} httpCode={item.httpCode} />);
+                return (<TableRow key={index} urlPage={item.urlPage} stt={item.stt} httpCode={item.httpCode} httpMessage={item.httpMessage} />);
             });
             this.setState({ list: comp });
             this.setState({ loadingTable: false });
@@ -59,7 +59,7 @@ class brokenPagesScreen extends Component {
             body: JSON.stringify(param)
         }).then(response => response.json()).then((data) => {
             comp = data.map((item, index) => {
-                return (<TableRow key={index} urlPage={item.urlPage} stt={item.stt} httpCode={item.httpCode} />);
+                return (<TableRow key={index} urlPage={item.urlPage} stt={item.stt} httpCode={item.httpCode} httpMessage={item.httpMessage}/>);
             });
             this.setState({ list: comp });
             this.setState({ loadingTable: false, isDisable: false });
@@ -90,13 +90,7 @@ class brokenPagesScreen extends Component {
                                     <p style={{ fontSize: 24 }}>10<br />
                                         Missing pages</p>
                                 </Segment >
-                                <Segment style={{ margin: 'auto', textAlign: 'center', padding: 0 }}>
-                                    <Icon className="check" size='huge' color='green' />
-                                </Segment>
-                                <Segment style={{ paddingLeft: '10px' }}>
-                                    <p style={{ fontSize: 24 }}>0 <br />
-                                        Empty pages</p>
-                                </Segment >
+                               
                                 <Segment style={{ margin: 'auto', textAlign: 'center', padding: 0 }}>
                                     <Icon className="warning sign" size='huge' color='black' /></Segment>
                                 <Segment>
@@ -113,7 +107,7 @@ class brokenPagesScreen extends Component {
                                     <Table.Row>
                                         <Table.HeaderCell>Page</Table.HeaderCell>
                                         <Table.HeaderCell>Status</Table.HeaderCell>
-                                        <Table.HeaderCell>HTTP Code</Table.HeaderCell>
+                                        <Table.HeaderCell>Issue</Table.HeaderCell>
 
 
                                     </Table.Row>

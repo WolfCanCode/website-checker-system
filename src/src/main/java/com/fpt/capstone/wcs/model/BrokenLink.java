@@ -15,12 +15,14 @@ public class BrokenLink {
     @GeneratedValue
     private Long id;
     private int httpCode;
+    private String httpMessage;
     private String urlPage;
     private String urlLink;
 
 
-    public BrokenLink(int httpCode, String urlPage, String urlLink) {
+    public BrokenLink(int httpCode, String httpMessage,  String urlPage, String urlLink) {
         this.httpCode = httpCode;
+        this.httpMessage = httpMessage;
         this.urlPage = urlPage;
         this.urlLink = urlLink;
     }

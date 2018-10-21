@@ -25,7 +25,7 @@ class brokenLinksScreen extends Component {
             body: JSON.stringify(param)
         }).then(response => response.json()).then((data) => {
             comp = data.map((item, index) => {
-                return (<TableRow key={index} urlPage={item.urlPage} urlLink={item.urlLink} />);
+                return (<TableRow key={index} urlPage={item.urlPage} urlLink={item.urlLink} httpCode={item.httpCode} httpMessage={item.httpMessage}  />);
             });
             this.setState({ list: comp });
             this.setState({ loadingTable: false });
@@ -57,7 +57,7 @@ class brokenLinksScreen extends Component {
             body: JSON.stringify(param)
         }).then(response => response.json()).then((data) => {
             comp = data.map((item, index) => {
-                return (<TableRow key={index} urlPage={item.urlPage} urlLink={item.urlLink} />);
+                return (<TableRow key={index} urlPage={item.urlPage} urlLink={item.urlLink} httpCode={item.httpCode} httpMessage={item.httpMessage}  />);
             });
             this.setState({ list: comp });
             this.setState({ loadingTable: false, isDisable: false });

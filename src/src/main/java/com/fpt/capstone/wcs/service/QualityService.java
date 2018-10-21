@@ -29,14 +29,19 @@ public class QualityService {
                         gate.await();
                         HttpURLConnection connection = (HttpURLConnection) new URL(u.getUrl()).openConnection();
                         connection.connect();
-                        String response = connection.getResponseMessage();
-                        int respCode = connection.getResponseCode();
+                        String responseMessage = connection.getResponseMessage();
+                        int responseCode = connection.getResponseCode();
                         connection.disconnect();
-                        System.out.println("URL: " + u.getUrl() + " returned " + response + " code " + respCode);
-                        if(respCode == HttpURLConnection.HTTP_NOT_FOUND){
+                        System.out.println("URL: " + u.getUrl() + " returned " + responseMessage + " code " + responseCode);
+                        int[] errresponseCode = {203 ,204 , 205 , 206, 403, 404 ,  405 , 409 , 500 , 511, 503 , 505, 507, 510 , 511 };
+                        for (int i = 0; i < errresponseCode.length; i++){
+                            if(responseCode == errresponseCode[i] ){
+                                resultList.add(new BrokenLink(responseCode, responseMessage,"https://www.nottingham.ac.uk/about", u.getUrl()));
+                            }
 
-                            resultList.add(new BrokenLink(respCode, "https://www.nottingham.ac.uk/about", u.getUrl()));
                         }
+
+
                         //  resultList.add(new SpeedTest(u.url, interactTime1 + "", loadTime1 + "", sizeTransferred1 + ""));
 
                     }  catch (MalformedURLException e) {
@@ -78,19 +83,26 @@ public class QualityService {
                         gate.await();
                         HttpURLConnection connection = (HttpURLConnection) new URL(u.getUrl()).openConnection();
                         connection.connect();
-                        String response = connection.getResponseMessage();
-                        int respCode = connection.getResponseCode();
+                        String responseMessage = connection.getResponseMessage();
+                        int responseCode = connection.getResponseCode();
                         connection.disconnect();
-                        System.out.println("URL: " + u.getUrl() + " returned " + response + " code " + respCode);
-                        if(respCode == HttpURLConnection.HTTP_NOT_FOUND){
+                        int[] errresponseCode = {203 ,204 , 205 , 206, 403 ,  405 , 409 , 500 , 511, 503 , 505, 507, 510 , 511 };
 
-                            resultList.add(new BrokenPage(u.getUrl(), "Missing Page", respCode));
+                        System.out.println("URL: " + u.getUrl() + " returned " + responseMessage + " code " + responseCode);
+                        if(responseCode == 404){
+
+                            resultList.add(new BrokenPage(u.getUrl(), "Missing Page", responseCode , responseMessage));
                         }
 
-                        if(respCode == HttpURLConnection.HTTP_NO_CONTENT){
+                        for (int i = 0; i < errresponseCode.length; i++){
+                            if(responseCode == errresponseCode[i] ){
+                                resultList.add(new BrokenPage(u.getUrl(), "Error Page", responseCode , responseMessage));
 
-                            resultList.add(new BrokenPage(u.getUrl(), "Empty Page", respCode));
+                            }
+
                         }
+
+
 
 
                     }  catch (MalformedURLException e) {
