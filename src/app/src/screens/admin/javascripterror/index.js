@@ -58,7 +58,6 @@ export default class JavascriptErrorScreen extends Component {
         this.setState({ list: comp });
       }
       this.setState({ loadingTable: false });
-
     });
   }
   render() {
