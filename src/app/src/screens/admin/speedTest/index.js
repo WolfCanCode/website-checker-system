@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import 'semantic-ui-css/semantic.min.css';
-import { Segment, Button, Table, Image, Icon, Input } from 'semantic-ui-react'
-import SpeedTest from '../../../assets/desktopSpeed.png';
+import { Segment, Button, Table, Icon, Input } from 'semantic-ui-react'
 import TableRow from './row-table';
 
 
@@ -155,14 +154,6 @@ class speedTestScreen extends Component {
                             </Table>
                         </Segment>
                     </Segment>
-
-
-
-                    <Segment basic style={{ textAlign: 'center', margin: 'auto' }} >
-                        <div ><strong >Desktop Speed </strong><Icon name='question circle' size='large'></Icon></div>
-                        <Image src={SpeedTest} size='medium' style={{ margin: 'auto' }} />
-                    </Segment>
-
 
                 </Segment.Group>
             </Segment.Group>

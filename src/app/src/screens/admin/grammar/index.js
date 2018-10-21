@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import {Segment, Button, SegmentGroup, Icon, Image, Table, Label, Input} from 'semantic-ui-react'
-import GrammarFile from '../../../assets/grammar.PNG';
+import {Segment, Button, SegmentGroup, Icon, Table, Label, Input} from 'semantic-ui-react'
 export default class Grammar extends Component {
 
     render() {
@@ -61,10 +60,7 @@ export default class Grammar extends Component {
                                 </Table.Body>
                             </Table>
                         </Segment>
-                        <Segment basic style={{ textAlign: 'center', margin: 'auto' }} >
-                            <div ><strong >Grammar Errors </strong><Icon name='question circle' size='large'></Icon></div>
-                            <Image src={GrammarFile} size='medium' style={{ margin: 'auto' }} />
-                        </Segment>
+                        
                     </Segment.Group>
                 </SegmentGroup>
             </div>

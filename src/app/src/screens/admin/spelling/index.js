@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import 'semantic-ui-css/semantic.min.css';
-import {Segment, Button, Table, Image, Icon, Input,Label } from 'semantic-ui-react'
-import SpellingFiles from '../../../assets/spelling.png';
+import {Segment, Button, Table, Icon, Input,Label } from 'semantic-ui-react'
 
 
 
@@ -91,14 +90,6 @@ class spellingScreen extends Component {
                             </Table>
 
                         </Segment>
-
-
-
-                        <Segment basic style={{ textAlign: 'center', margin: 'auto' }} >
-                            <div ><strong >Spellings Errors </strong><Icon name='question circle' size='large'></Icon></div>
-                            <Image src={SpellingFiles} size='medium' style={{ margin: 'auto' }} />
-                        </Segment>
-
 
                     </Segment.Group>
                 </Segment.Group>

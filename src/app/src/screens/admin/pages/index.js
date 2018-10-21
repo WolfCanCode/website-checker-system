@@ -80,7 +80,7 @@ export default class Pages extends Component {
                     </div>
                     <Button style={{ marginRight: '10px' }} floated='right'><Icon name="print" />Export</Button>
                 </Segment>
-                <Segment.Group horizontal style={{ maxHeight: 450, overflow: "auto"}}>
+                <Segment.Group horizontal style={{ maxHeight: '63vh', overflow: "auto"}}>
                     <Segment basic loading={this.state.loadingTable}>
 
 
@@ -99,12 +99,8 @@ export default class Pages extends Component {
 
                             </Table.Body>
                         </Table>
-
-
                     </Segment>
-                    {/* <Segment basic>
-                            
-                        </Segment> */}
+
                 </Segment.Group>
             </Segment.Group>
         );

@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import 'semantic-ui-css/semantic.min.css';
-import {Segment, Button, Table, Image, Icon, Input, Label , Divider} from 'semantic-ui-react'
-import MissingFiles from '../../../assets/missingFile.png';
+import {Segment, Button, Table, Icon, Input, Label } from 'semantic-ui-react'
 
 
 
@@ -35,7 +34,7 @@ class missingFilesScreen extends Component {
                                     <p style={{ fontSize: 24 }}>2 <br /> Affected Pages</p>
                                 </Segment>
                             </Segment.Group>
-                            <Segment.Group  horizontal basic>
+                            {/* <Segment.Group  horizontal basic>
                                 <Segment  basic style={{ float:'left', width:'70%'}}>
                                 <div attached style={{ float:'left', width:'50%', marginTop:'5%'}}>
                                     <h2>Don't go missing</h2>
@@ -53,7 +52,7 @@ class missingFilesScreen extends Component {
                                 <Image src={MissingFiles} size='medium' style={{ margin:'auto' }} />
                                 </Segment>
 
-                            </Segment.Group>
+                            </Segment.Group> */}
                             {/* <Segment basic style={{ textAlign: 'center', margin: 'auto' } } horizontal >
                             <div style={{ float:'left' }}></div>
                             <div style={{ float:'right', marginRight:'0' }}>

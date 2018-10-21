@@ -1,4 +1,11 @@
-
+import BrokenLinks from '../assets/BrokenLinks.png';
+import BrokenPage from '../assets/brokenPage.png';
+import Spelling from '../assets/spelling.png';
+import Grammar from '../assets/grammar.png';
+import SpeedTest from '../assets/desktopSpeed.png';
+import MissingFile from '../assets/missingFile.png';
+import Favicons from '../assets/favicon.png';
+import Prohibited from '../assets/prohibited.PNG';
 
 const menu = [
     {
@@ -22,33 +29,39 @@ const menu = [
                 name: "Spelling test",
                 to: "/admin/spelling",
                 key: "test1",
-                alt: "Spelling test for checking right or wrong spelling in your website"
+                alt: "Spelling test for checking right or wrong spelling in your website",
+                image: Spelling
             },
             {
                 name: "Grammar test",
                 to: "/admin/grammar",
                 key: "test 2",
-                alt: "This for test alt title"
+                alt: "This for test alt title",
+                image: Grammar
             },{
                 name: "Broken links test",
                 to: "/admin/brokenLinks",
                 key: "test3",
-                alt: "This for test alt title"
+                alt: "This for test alt title",
+                image: BrokenLinks
             },{
                 name: "Broken pages test",
                 to: "/admin/brokenPages",
                 key: "test4",
-                alt: "This for test alt title"
+                alt: "This for test alt title",
+                image: BrokenPage
             },{
                 name: "Missing files test",
                 to: "/admin/missingFiles",
                 key: "test5",
-                alt: "This for test alt title"
+                alt: "This for test alt title",
+                image: MissingFile
             },{
                 name: "Prohibited content test",
                 to: "/admin/prohibited",
                 key: "test6",
-                alt: "This for test alt title"
+                alt: "This for test alt title",
+                image: Prohibited
             },
 
         ]
@@ -66,7 +79,8 @@ const menu = [
                 name: "Speed test",
                 to: "/admin/speedTest",
                 key: "test8",
-                alt: "This for test alt title"
+                alt: "This for test alt title",
+                image: SpeedTest
             },
 
         ]
@@ -85,7 +99,8 @@ const menu = [
                 name: "Favicons Test",
                 to: "/admin/favicons",
                 key: "test10",
-                alt: "This for test alt title"
+                alt: "This for test alt title",
+                image: Favicons
             },
             {
                 name: "Law Cookie Test",

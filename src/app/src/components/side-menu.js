@@ -49,7 +49,7 @@ export default class SideMenu extends Component {
     async _doActiveChange(item) {
         await this.setState({ menuActive: item.key });
         this._mapItem();
-        this.props.updateHeader(item.name, item.alt);
+        this.props.updateHeader(item.name, item.alt,item.image);
     }
 
     render() {
