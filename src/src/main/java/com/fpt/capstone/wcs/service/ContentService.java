@@ -87,7 +87,6 @@ public class ContentService {
     }
 
     public int getStatus(String url) throws IOException {
-
         int  result = 0;
         int code = 200;
         try {
@@ -95,7 +94,6 @@ public class ContentService {
             HttpURLConnection connection = (HttpURLConnection) siteURL.openConnection();
             connection.setRequestMethod("GET");
             connection.setRequestProperty("User-Agent","Mozilla/5.0 ");
-//            connection.setConnectTimeout(500);
             code = connection.getResponseCode();
             String message = connection.getResponseMessage();
             if(code ==200){
@@ -106,13 +104,7 @@ public class ContentService {
 
 
                 String newUrl = connection.getHeaderField("Location");
-
-                // get the cookie if need, for login
-//                String cookies = conn.getHeaderField("Set-Cookie");
-
-                // open the new connnection again
                 connection = (HttpURLConnection) new URL(newUrl).openConnection();
-//                connection.setRequestProperty("Cookie", cookies);
                 connection.addRequestProperty("Accept-Language", "en-US,en;q=0.8");
                 connection .addRequestProperty("User-Agent", "Mozilla");
                 connection.addRequestProperty("Referer", "google.com");
@@ -129,7 +121,6 @@ public class ContentService {
 
     public List<ContactDetail> getContactDetail(Url[] list)throws IOException{
         List<ContactDetail> list1 = new ArrayList<>();
-
         for (Url newList : list){
             try {
                 String url = newList.getUrl();

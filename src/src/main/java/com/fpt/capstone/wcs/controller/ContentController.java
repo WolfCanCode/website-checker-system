@@ -73,6 +73,7 @@ public class ContentController {
     @PostMapping("/api/contactDetail/lastest")
     public List<ContactDetail> getLastestContactDetail()
     {
+
         List<ContactDetail> resultList =  contactDetailRepository.findAll();
         return resultList;
     }
