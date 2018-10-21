@@ -5,7 +5,14 @@ import { Table, Label } from 'semantic-ui-react'
 export default class TableRow extends Component {
 
     render() {
-        let comp = this.props.messages.map((item, index) => {
+        var toList = [];
+        let data = {};
+        data.text = this.props.messages[0];
+        data.type = this.props.type;
+        data.page = this.props.page;
+        data.isParent = true;
+        toList.push(data);
+        this.props.messages.map(async (item, index) => {
             if (index !== 0) {
                 var text = item.split("(")[0];
                 var link = item.replace(text, "");
@@ -15,22 +22,33 @@ export default class TableRow extends Component {
                 var fileNameWithLine = pathSeparate[pathSeparate.length - 1];
                 var fileName = fileNameWithLine.split(":")[0];
                 link = link.split(":")[1];
-
-
-                return (<Table.Row key={index} style={{ background: "#ffebee" }}>
-                    <Table.Cell key={index} style={{ width: '300px', whiteSpace: 'normal', wordBreak: 'break-all', color: '#ef5350' }}>|--------------- at {text} <a href={link}>({fileName})</a></Table.Cell><Table.Cell></Table.Cell><Table.Cell></Table.Cell>
-                </Table.Row>);
+                let data = {};
+                data.text = text;
+                data.link = link;
+                data.fileName = fileName;
+                data.isParent = false;
+                toList.push(data);
             };
-            return "";
         });
-        return (<Table.Body>
-            <Table.Row style={{ background: this.props.type === "WARNING"? "#FFFDE7" : "#ffebee"}}>
-                <Table.Cell style={{ width: '300px', whiteSpace: 'normal', wordBreak: 'break-all', color: this.props.type === "WARNING"? "#F9A825" : "#ef5350", fontWeight:'bold' }}>{this.props.messages[0]}</Table.Cell>
-                <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}><Label style={{ fontSize: '14px' }} color={this.props.type === "WARNING" ? "yellow" : "red"} horizontal>{this.props.type}</Label></Table.Cell>
-                <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}><a href={this.props.page}>{this.props.page}</a></Table.Cell>
-            </Table.Row>
-            {comp}
-        </Table.Body>
+        var comp = toList.map((item, index) => {
+            //parrent node
+            if (!item.isParent) {
+                return (<Table.Row key={index} style={{ background: "#ffebee" }}>
+                    <Table.Cell key={index} style={{ width: '300px', whiteSpace: 'normal', wordBreak: 'break-all', color: '#ef5350' }}>|--------------- at {item.text} <a href={item.link}>({item.fileName})</a></Table.Cell><Table.Cell></Table.Cell><Table.Cell></Table.Cell>
+                </Table.Row>
+                );
+            } else {
+                //child node
+                return (<Table.Row key={index} style={{ background: item.type === "WARNING" ? "#FFFDE7" : "#ffebee" }}>
+                    <Table.Cell style={{ width: '300px', whiteSpace: 'normal', wordBreak: 'break-all', color: this.props.type === "WARNING" ? "#F9A825" : "#ef5350", fontWeight: 'bold' }}>{item.text}</Table.Cell>
+                    <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}><Label style={{ fontSize: '14px' }} color={item.type === "WARNING" ? "yellow" : "red"} horizontal>{item.type}</Label></Table.Cell>
+                    <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}><a href={item.page}>{item.page}</a></Table.Cell>
+                </Table.Row>);
+            }
+        });
+
+        return (<React.Fragment>
+            {comp}</ React.Fragment> //blank tag
         );
     }
 }

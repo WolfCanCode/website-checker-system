@@ -83,7 +83,9 @@ export default class JavascriptErrorScreen extends Component {
                   <Table.HeaderCell>Pages</Table.HeaderCell>
                 </Table.Row>
               </Table.Header>
-              {this.state.list.length === 0 ? <Table.Body><Table.Row><Table.Cell>This page haven't test yet, please try to test</Table.Cell></Table.Row></Table.Body> : this.state.list}
+              <Table.Body>
+                {this.state.list.length === 0 ? <Table.Row><Table.Cell>This page haven't test yet, please try to test</Table.Cell></Table.Row> : this.state.list}
+              </Table.Body>
             </Table>
           </Segment>
         </Segment.Group>
