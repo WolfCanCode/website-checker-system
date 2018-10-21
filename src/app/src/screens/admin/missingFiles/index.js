@@ -1,14 +1,61 @@
 import React, { Component } from 'react';
 import 'semantic-ui-css/semantic.min.css';
 import {Segment, Button, Table, Icon, Input, Label } from 'semantic-ui-react'
-
-
+import TableRow from '../missingFiles/row-table'
 
 
 
 
 class missingFilesScreen extends Component {
+    state = { list: [], loadingTable: false, isDisable: false };
 
+    componentDidMount() {
+        var comp = [];
+        this.setState({ loadingTable: true });
+        var param = [{ "url": "https://www.bhcosmetics.com/" },
+        
+        ];
+        fetch("/api/missingtest/lastest", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(param)
+        }).then(response => response.json()).then((data) => {
+            comp = data.map((item, index) => {
+                return (<TableRow key={index} fileMissing={item.fileMissing} description={item.description} pages={item.pages} />);
+            });
+            this.setState({ list: comp });
+            this.setState({ loadingTable: false });
+        });
+
+    }
+    _doMissingFilePagesTest() {
+        this.setState({ loadingTable: true, isDisable: true });
+        var comp = [];
+        var param = [{ "url": "https://www.bhcosmetics.com/" },
+        ];
+        fetch("/api/missingtest", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(param)
+        }).then(response => response.json()).then((data) => {
+            comp = data.map((item, index) => {
+                return (<TableRow key={index} fileMissing={item.fileMissing} description={item.description} pages={item.pages} />);
+            });
+
+            this.setState({ list: comp });
+            this.setState({ loadingTable: false });
+            this.setState({ isDisable: false });
+
+        });
+    }
+
+    
     render() {
         return (
             <div style={{ height: 'auto'}}>
@@ -34,6 +81,13 @@ class missingFilesScreen extends Component {
                                     <p style={{ fontSize: 24 }}>2 <br /> Affected Pages</p>
                                 </Segment>
                             </Segment.Group>
+
+                            <Segment>
+                            <Button icon labelPosition='right' disabled={this.state.isDisable} onClick={() => this._doMissingFilePagesTest()}>
+                        Check
+                       <Icon name='right arrow' />
+                    </Button>
+                            </Segment>
                             {/* <Segment.Group  horizontal basic>
                                 <Segment  basic style={{ float:'left', width:'70%'}}>
                                 <div attached style={{ float:'left', width:'50%', marginTop:'5%'}}>
@@ -81,34 +135,7 @@ class missingFilesScreen extends Component {
                                     </Table.Row>
                                 </Table.Header>
                                 <Table.Body>
-                                    <Table.Row>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}><a href='https://api2.insites.com/images/missing-files1.png'>https://api2.insites.com/images/missing-files1.png</a></Table.Cell>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>File Not Found (404)</Table.Cell>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}> <Label style={{fontSize:'13px'}} >1</Label></Table.Cell>                                   
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}><Button>Ignore</Button> </Table.Cell>
-
-                                    </Table.Row>
-                                    <Table.Row>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}><a href='https://api2.insites.com/images/missing-files1.png'>https://api2.insites.com/images/missing-files1.png</a></Table.Cell>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>File Not Found (404)</Table.Cell>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}> <Label style={{fontSize:'13px'}} >1</Label></Table.Cell>                                   
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}><Button>Ignore</Button> </Table.Cell>
-
-                                    </Table.Row>
-                                    <Table.Row>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}><a href='https://api2.insites.com/images/missing-files1.png'>https://api2.insites.com/images/missing-files1.png</a></Table.Cell>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>File Not Found (404)</Table.Cell>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}> <Label style={{fontSize:'13px'}} >1</Label></Table.Cell>                                   
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}><Button>Ignore</Button> </Table.Cell>
-
-                                    </Table.Row>
-                                    <Table.Row>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}><a href='https://api2.insites.com/images/missing-files1.png'>https://api2.insites.com/images/missing-files1.png</a></Table.Cell>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>File Not Found (404)</Table.Cell>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}> <Label style={{fontSize:'13px'}} >1</Label></Table.Cell>                                   
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}><Button>Ignore</Button> </Table.Cell>
-
-                                    </Table.Row>
+                                {this.state.list.length === 0 ? <Table.Row><Table.Cell>This page haven't test yet, please try to test</Table.Cell></Table.Row> : this.state.list}
                                    
                                    
                                     
