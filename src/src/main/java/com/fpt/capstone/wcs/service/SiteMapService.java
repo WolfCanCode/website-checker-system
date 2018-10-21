@@ -1,31 +1,33 @@
-package com.fpt.capstone.wcs.model;
+package com.fpt.capstone.wcs.service;
 
+import com.fpt.capstone.wcs.model.SiteLink;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.*;
 
-public class SiteMap {
+public class SiteMapService {
     private HashMap<String, Integer> urlMap = new HashMap<String, Integer>();
     private String rootDomain = "";
     private List<List<SiteLink>> graph = new ArrayList<List<SiteLink>>();
-    private List<List<SiteLink>> invGraph = null;
+    private List<List<SiteLink>> invGraph = new ArrayList<List<SiteLink>>();
     private int verticesNum;
     private List<Integer> typeNode = new ArrayList<Integer>(); //Type link: 1 is internal, 2 is external and 3 is error internal link
     private List<String> links = new ArrayList<String>();
 
     // init site-map with 'root Domain' link
-    public SiteMap(String rootDomain) {
+    public SiteMapService(String rootDomain) {
         this.rootDomain = rootDomain;
         urlMap.clear();
         invGraph.clear();
         verticesNum = 0;
     }
 
-    public List<String> crawlHtmlSource(String url) {
+    public List<String> crawlHtmlSource(String url) throws MalformedURLException {
         int nodeId = urlMap.get(url);
         List<String> newURL = new ArrayList<String>();
         try {
@@ -58,7 +60,7 @@ public class SiteMap {
     }
 
 
-    public void buildSiteMap() {
+    public void buildSiteMap() throws MalformedURLException {
         Queue<String> queue = new LinkedList<String>();
 
         queue.add(rootDomain);
@@ -186,6 +188,7 @@ public class SiteMap {
             typeMap.add(subTypeMap);
             urlMap.add(subUrlMap);
         }
+
         // Generate structure code
         String codeGraph = "";
 

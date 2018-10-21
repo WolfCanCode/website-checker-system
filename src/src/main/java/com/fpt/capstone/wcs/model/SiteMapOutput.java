@@ -7,8 +7,9 @@ import lombok.*;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class SiteLink {
-    private String srcUrl;
-    private String desUrl;
-    private int desType;
+public class SiteMapOutput {
+    private String map;
+    private String typeMap;
+    private String urlMap;
+
 }
