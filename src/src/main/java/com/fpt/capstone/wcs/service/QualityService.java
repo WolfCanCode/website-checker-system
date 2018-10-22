@@ -33,25 +33,49 @@ public class QualityService {
                         int responseCode = connection.getResponseCode();
                         connection.disconnect();
                         System.out.println("URL: " + u.getUrl() + " returned " + responseMessage + " code " + responseCode);
-                        int[] errresponseCode = {203 ,204 , 205 , 206, 403, 404 ,  405 , 409 , 500 , 511, 503 , 505, 507, 510 , 511 };
-                        for (int i = 0; i < errresponseCode.length; i++){
-                            if(responseCode == errresponseCode[i] ){
-                                resultList.add(new BrokenLink(responseCode, responseMessage,"https://www.nottingham.ac.uk/about", u.getUrl()));
-                            }
+                        if(responseCode == HttpURLConnection.HTTP_NOT_FOUND){
+                            resultList.add(new BrokenLink(responseCode, responseMessage,"https://www.nottingham.ac.uk/about", u.getUrl()));
+
+
+                        }
+
+                        if(responseCode == HttpURLConnection.HTTP_BAD_REQUEST){
+                            resultList.add(new BrokenLink(responseCode, responseMessage,"https://www.nottingham.ac.uk/about", u.getUrl()));
+
 
                         }
 
 
-                        //  resultList.add(new SpeedTest(u.url, interactTime1 + "", loadTime1 + "", sizeTransferred1 + ""));
-
                     }  catch (MalformedURLException e) {
-                        Logger.getLogger(ExperienceService.class.getName()).log(Level.SEVERE, null, e);
+
+                        System.out.println("hihi 1");
+                        System.out.println("message 1" + e.getMessage());
+                        if(e.toString().contains("java.net.MalformedURLException")){
+                            resultList.add(new BrokenLink(HttpURLConnection.HTTP_BAD_REQUEST, "Bad Request","https://www.nottingham.ac.uk/about", u.getUrl()));
+                        }
+                       // Logger.getLogger(ExperienceService.class.getName()).log(Level.SEVERE, null, e);
                     } catch (IOException e) {
-                        Logger.getLogger(ExperienceService.class.getName()).log(Level.SEVERE, null, e);
+                        e.printStackTrace();
+                        System.out.println("hihi 2");
+                        System.out.println("message 2" + e.getMessage());
+                        System.out.println("message 2.1" + e.toString());
+                        if(e.toString().contains("java.net.UnknownHostException")){
+                            resultList.add(new BrokenLink(HttpURLConnection.HTTP_BAD_REQUEST, "Bad Request","https://www.nottingham.ac.uk/about", u.getUrl()));
+                        }
+
+//                        if(e.toString().contains("java.net.ConnectException")){
+//                            resultList.add(new BrokenLink(HttpURLConnection.HTTP_GATEWAY_TIMEOUT, "Gateway Timeout","https://www.nottingham.ac.uk/about", u.getUrl()));
+//                        }
+
+                        //Logger.getLogger(ExperienceService.class.getName()).log(Level.SEVERE, null, e);
                     } catch (InterruptedException e) {
-                        Logger.getLogger(ExperienceService.class.getName()).log(Level.SEVERE, null, e);
+                        System.out.println("hihi 3");
+                        System.out.println("message 3" + e.getMessage());
+                        //Logger.getLogger(ExperienceService.class.getName()).log(Level.SEVERE, null, e);
                     } catch (BrokenBarrierException e) {
-                        Logger.getLogger(ExperienceService.class.getName()).log(Level.SEVERE, null, e);
+                        System.out.println("hihi 4");
+                        System.out.println("message 4" + e.getMessage());
+                       // Logger.getLogger(ExperienceService.class.getName()).log(Level.SEVERE, null, e);
                     }
                 }
             });
@@ -86,7 +110,7 @@ public class QualityService {
                         String responseMessage = connection.getResponseMessage();
                         int responseCode = connection.getResponseCode();
                         connection.disconnect();
-                        int[] errresponseCode = {203 ,204 , 205 , 206, 403 ,  405 , 409 , 500 , 511, 503 , 505, 507, 510 , 511 };
+                        int[] errResponseCode = {203 ,204 , 205 , 206, 403 ,400,  405 , 409 , 500 , 511, 503 , 505, 507, 510 , 511 };
 
                         System.out.println("URL: " + u.getUrl() + " returned " + responseMessage + " code " + responseCode);
                         if(responseCode == 404){
@@ -94,8 +118,8 @@ public class QualityService {
                             resultList.add(new BrokenPage(u.getUrl(), "Missing Page", responseCode , responseMessage));
                         }
 
-                        for (int i = 0; i < errresponseCode.length; i++){
-                            if(responseCode == errresponseCode[i] ){
+                        for (int i = 0; i < errResponseCode.length; i++){
+                            if(responseCode == errResponseCode[i] ){
                                 resultList.add(new BrokenPage(u.getUrl(), "Error Page", responseCode , responseMessage));
 
                             }
@@ -107,8 +131,19 @@ public class QualityService {
 
                     }  catch (MalformedURLException e) {
                         Logger.getLogger(ExperienceService.class.getName()).log(Level.SEVERE, null, e);
+                        if(e.toString().contains("java.net.MalformedURLException")){
+                            resultList.add(new BrokenPage(u.getUrl(), "Error Page", HttpURLConnection.HTTP_BAD_REQUEST , "Bad Request"));
+                        }
                     } catch (IOException e) {
                         Logger.getLogger(ExperienceService.class.getName()).log(Level.SEVERE, null, e);
+                        if(e.toString().contains("java.net.UnknownHostException")){
+                            resultList.add(new BrokenPage(u.getUrl(), "Error Page", HttpURLConnection.HTTP_BAD_REQUEST , "Bad Request"));
+                        }
+
+
+                        if(e.toString().contains("java.net.ConnectException")){
+                            resultList.add(new BrokenPage(u.getUrl(), "Error Page", HttpURLConnection.HTTP_GATEWAY_TIMEOUT , "Gateway Timeout"));
+                        }
                     } catch (InterruptedException e) {
                         Logger.getLogger(ExperienceService.class.getName()).log(Level.SEVERE, null, e);
                     } catch (BrokenBarrierException e) {

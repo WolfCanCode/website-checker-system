@@ -1,12 +1,8 @@
 package com.fpt.capstone.wcs.controller;
 
-import com.fpt.capstone.wcs.model.JSInfo;
-import com.fpt.capstone.wcs.model.MissingFilesPages;
-import com.fpt.capstone.wcs.model.ServerBehavior;
-import com.fpt.capstone.wcs.model.Url;
-import com.fpt.capstone.wcs.repository.JSCheckRepository;
-import com.fpt.capstone.wcs.repository.MissingFilesPagesRepository;
-import com.fpt.capstone.wcs.repository.ServerBehaviorRepository;
+import com.fpt.capstone.wcs.model.*;
+import com.fpt.capstone.wcs.repository.*;
+import com.fpt.capstone.wcs.service.QualityService;
 import com.fpt.capstone.wcs.service.TechnologyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,6 +21,8 @@ public class TechnologyController {
     ServerBehaviorRepository serverBehaviorRepository;
     @Autowired
     MissingFilesPagesRepository missingFilesPagesRepository;
+    @Autowired
+    CookieRepository cookieRepository;
 
     @PostMapping("/api/jsTest")
     public List<JSInfo> getDataPagesTest(@RequestBody Url[] list) throws InterruptedException {
@@ -77,6 +75,24 @@ public class TechnologyController {
     public List<MissingFilesPages> getLastestMissingFile() {
         List<MissingFilesPages> result = missingFilesPagesRepository.findAll();
         return result;
+    }
+
+
+
+    @PostMapping("/api/cookie")
+    public List<Cookie> getCookies(@RequestBody Url[] list) throws InterruptedException {
+        TechnologyService technologyService = new TechnologyService();
+        List<Cookie> resultList = technologyService.cookieService(list);
+        cookieRepository.deleteAll();
+        cookieRepository.saveAll(resultList);
+        return resultList;
+    }
+
+    @PostMapping("/api/cookie/lastest")
+    public List<Cookie> getLastestCookies()
+    {
+        List<Cookie> resultList = cookieRepository.findAll();
+        return resultList;
     }
 
 }

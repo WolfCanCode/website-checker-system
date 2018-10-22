@@ -1,54 +1,107 @@
 import React, { Component } from 'react';
-import {Segment, Button, Icon, Table, Label, Input} from 'semantic-ui-react'
+import { Segment, Button, Icon, Table, Input } from 'semantic-ui-react'
+import TableRow from './row-table';
 
 export default class CookieLaw extends Component {
+
+    state = { list: [], loadingTable: false, isDisable: false };
+
+
+    componentDidMount() {
+        var comp = [];
+        this.setState({ loadingTable: true });
+        var param = [];
+        fetch("/api/cookie/lastest", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(param)
+        }).then(response => response.json()).then((data) => {
+            comp = data.map((item, index) => {
+                return (<TableRow key={index} cookieName={item.cookieName} exampleValue={item.exampleValue} host={item.host} expiryDate={item.expiryDate} />);
+            });
+            this.setState({ list: comp });
+            this.setState({ loadingTable: false });
+        });
+
+
+    }
+
+    _doCookies() {
+        var comp = [];
+        this.setState({ loadingTable: true, isDisable: true });
+
+
+        var param = [{ "url": "https://www.nottingham.ac.uk/about/campuses/campuses.aspx" },
+        { "url": "https://www.nottingham.ac.uk/about/keydates/index.aspx" },
+        { "url": "https://www.nottingham.ac.uk/about/facilities/facilities.aspx" },
+        { "url": "https://www.nottingham.ac.uk/about/facts/factsandfigures.aspx" },
+        { "url": "https://www.nottingham.ac.uk/about/structure/universitystructure.aspx" },
+
+
+        ];
+        fetch("/api/cookie", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(param)
+        }).then(response => response.json()).then((data) => {
+            comp = data.map((item, index) => {
+                return (<TableRow key={index} cookieName={item.cookieName} exampleValue={item.exampleValue} host={item.host} expiryDate={item.expiryDate} />);
+            });
+            this.setState({ list: comp });
+            this.setState({ loadingTable: false, isDisable: false });
+        });
+
+    }
 
     render() {
         return (
 
-                    <Segment.Group horizontal  style={{margin:0}}>
-                        <Segment basic>
-                            <Segment.Group horizontal>
-                                <Segment style={{ margin: 'auto', textAlign: 'center', padding: 0 }}>
-                                    <Icon className="warning sign" size='huge' color='yellow' />
-                                </Segment>
-                                <Segment style={{ paddingLeft: '10px' }}>
-                                    <p style={{ fontSize: 24 }}>2,154 <br />
-                                        Pages setting cookie</p>
-                                </Segment >
-                                <Segment style={{ margin: 'auto', textAlign: 'center', padding: 0 }}>
-                                    <Icon className="file outline" size='huge' color='teal' /></Segment>
-                                <Segment>
-                                    <p style={{ fontSize: 24 }}>0<br /> Pages not explaining they use cookie</p>
-                                </Segment>
+            <Segment.Group horizontal style={{ margin: 0 }}>
 
-                            </Segment.Group>
-                            <Button style={{ marginRight: '10px' }} floated='right'><Icon name="print" />Export</Button>
-                            <div style={{ marginBottom: '10px' }}>
-                                <Input icon='search' placeholder='Search...' />
-                            </div>
-                            <Table singleLine style={{ fontSize: '14px' }}>
-                                <Table.Header>
-                                    <Table.Row>
-                                        <Table.HeaderCell>Technology</Table.HeaderCell>
-                                        <Table.HeaderCell>Description</Table.HeaderCell>
-                                        <Table.HeaderCell>Cookie used</Table.HeaderCell>
-                                        <Table.HeaderCell>Pages</Table.HeaderCell>
-                                        <Table.HeaderCell>%</Table.HeaderCell>
-                                    </Table.Row>
-                                </Table.Header>
-                                <Table.Body>
-                                    <Table.Row>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>unkown</Table.Cell>
-                                        <Table.Cell style={{ width: '300px', whiteSpace: 'normal', wordBreak: 'break-all' }}>The purpose of these cookie   is unknown</Table.Cell>
-                                        <Table.Cell style={{ width: '500px', whiteSpace: 'normal', wordBreak: 'break-all' }}><Label circular color='yellow'>_gid</Label><Label circular color='yellow'>sessionId</Label>
-                                        <Label circular color='yellow'>visitorId</Label> <Label circular color='yellow'>nssr</Label> <Label circular color='yellow'>__stripe_sid</Label><Label circular color='yellow'>__stripe_mind</Label><Label circular color='yellow'>pxrc</Label>
-                                        <Label circular color='yellow'>nnls</Label> <Label circular color='yellow'>didts</Label> <Label circular color='yellow'>NID</Label>
-                                        </Table.Cell>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}> 2,154  </Table.Cell>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>100%</Table.Cell>
-                                    </Table.Row>
-                                    <Table.Row>
+                <Segment basic loading={this.state.loadingTable} >
+                    <Button icon labelPosition='right' disabled={this.state.isDisable} onClick={() => this._doCookies()}>
+                        Check
+                       <Icon name='right arrow' />
+                    </Button>
+                    <Segment.Group horizontal >
+
+                        <Segment style={{ margin: 'auto', textAlign: 'center', padding: 0 }}>
+                            <Icon className="warning sign" size='huge' color='yellow' />
+                        </Segment>
+                        <Segment style={{ paddingLeft: '10px' }}>
+                            <p style={{ fontSize: 24 }}>2,154 <br />
+                                Pages setting cookie</p>
+                        </Segment >
+                        <Segment style={{ margin: 'auto', textAlign: 'center', padding: 0 }}>
+                            <Icon className="file outline" size='huge' color='teal' /></Segment>
+                        <Segment>
+                            <p style={{ fontSize: 24 }}>0<br /> Pages not explaining they use cookie</p>
+                        </Segment>
+
+                    </Segment.Group>
+                    <Button style={{ marginRight: '10px' }} floated='right'><Icon name="print" />Export</Button>
+                    <div style={{ marginBottom: '10px' }}>
+                        <Input icon='search' placeholder='Search...' />
+                    </div>
+                    <Table singleLine style={{ fontSize: '14px' }}>
+                        <Table.Header>
+                            <Table.Row>
+                                <Table.HeaderCell>Cookie</Table.HeaderCell>
+                                <Table.HeaderCell>Example Value</Table.HeaderCell>
+                                <Table.HeaderCell>Host</Table.HeaderCell>
+                                <Table.HeaderCell>Expiry Date</Table.HeaderCell>
+
+                            </Table.Row>
+                        </Table.Header>
+                        <Table.Body>
+                            {this.state.list.length === 0 ? <Table.Row><Table.Cell>This page haven't test yet, please try to test</Table.Cell></Table.Row> : this.state.list}
+                            {/* <Table.Row>
                                         <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>Google Analytics</Table.Cell>
                                         <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>The world most popular analytics tool.</Table.Cell>
                                         <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}><Label circular color='yellow'>_gat</Label><Label circular color='yellow'>ga</Label>
@@ -56,13 +109,13 @@ export default class CookieLaw extends Component {
                                         </Table.Cell>
                                         <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}> 2,154  </Table.Cell>
                                         <Table.Cell style={{ width: '50px', whiteSpace: 'normal', wordBreak: 'break-all' }}>100%</Table.Cell>
-                                    </Table.Row>
+                                    </Table.Row> */}
 
-                                </Table.Body>
-                            </Table>
-                        </Segment>
-                        
-                    </Segment.Group>
+                        </Table.Body>
+                    </Table>
+                </Segment>
+
+            </Segment.Group>
         );
     }
 }

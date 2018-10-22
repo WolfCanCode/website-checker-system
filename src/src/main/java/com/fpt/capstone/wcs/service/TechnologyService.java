@@ -18,9 +18,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URLConnection;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 import java.util.logging.Level;
@@ -356,6 +354,71 @@ public class TechnologyService {
             message="Not Found";
         }
         return message;
+    }
+
+    public List<Cookie> cookieService(Url[] url) throws InterruptedException {
+        System.setProperty("webdriver.chrome.driver", "C:\\Users\\trinhndse62136\\Downloads\\chromedriver_win32\\chromedriver.exe");
+        //Asign list JS info
+        List<Cookie> resultList = new ArrayList<>();
+        final CyclicBarrier gate = new CyclicBarrier(url.length);
+        List<Thread> listThread = new ArrayList<>();
+        for (Url u : url) {
+            listThread.add(new Thread() {
+                public void run() {
+                    try {
+                        gate.await();
+
+                        ChromeOptions chromeOptions = new ChromeOptions();
+                        chromeOptions.addArguments("--headless");
+
+                        WebDriver driver = new ChromeDriver(chromeOptions);//chay an
+
+                        driver.get(u.getUrl());
+
+                        Set<org.openqa.selenium.Cookie> cookies=driver.manage().getCookies();
+
+                        //To find the number of cookies used by this site
+                        System.out.println("Number of cookies in this site "+cookies.size());
+
+                        for(org.openqa.selenium.Cookie cookie:cookies)
+                        {
+                            // System.out.println(cookie.getName()+" "+cookie.getValue());
+                            System.out.println("domain " + cookie.getDomain());
+                            System.out.println("Name " + cookie.getName());
+                            System.out.println("Path " + cookie.getPath());
+                            System.out.println("Value " + cookie.getValue());
+                            System.out.println("Version " + cookie.getExpiry());
+                            System.out.println("");
+                            resultList.add(new Cookie(cookie.getName(),cookie.getValue(),cookie.getDomain(), cookie.getExpiry()));
+                        }
+
+
+                    } catch (InterruptedException | BrokenBarrierException e) {
+                        Logger.getLogger(ExperienceService.class.getName()).log(Level.SEVERE, null, e);
+                    }
+                }
+            });
+        }
+        for (Thread t : listThread) {
+            System.out.println("Threed start");
+            t.start();
+        }
+
+        for (Thread t : listThread) {
+            System.out.println("Threed join");
+            t.join();
+        }
+        System.out.println("Size 1 " + resultList.size());
+        Set<Cookie> primesWithoutDuplicates = new LinkedHashSet<Cookie>(resultList);
+
+        // now let's clear the ArrayList so that we can copy all elements from LinkedHashSet
+        resultList.clear();
+
+        // copying elements but without any duplicates
+        resultList.addAll(primesWithoutDuplicates);
+        System.out.println("Size 12 " + resultList.size());
+        return resultList;
+
     }
 
 }
