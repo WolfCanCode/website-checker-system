@@ -13,8 +13,10 @@ class missingFilesScreen extends Component {
         var comp = [];
         var countPageAffected1=0;
         var countMissingFile1=0;
-        var flag =false;
+        let flag =false;
         var listCom=[];
+        var flagMissingFile=false;
+        var listMissingFileCount =[];
         this.setState({ loadingTable: true });
         var param = [{ "url": "https://www.bhcosmetics.com/" },
         { "url": "https://www.bhcosmetics.com/eyes" },
@@ -29,7 +31,7 @@ class missingFilesScreen extends Component {
         }).then(response => response.json()).then((data) => {
             comp = data.map((item, index) => {
                for(let i=0; i<listCom.length;i++){
-                   if(item.pages===listCom[i].pages){
+                   if(item.pages===listCom[i]){
                     flag=true;
                    }
                }
@@ -38,6 +40,19 @@ class missingFilesScreen extends Component {
                    countPageAffected1++;
                }else{
                    flag=false;
+               }
+
+               for(let i=0;i<listMissingFileCount.length;i++){
+                   if(item.fileMissing===listMissingFileCount[i]){
+                       flagMissingFile=true;
+                   }
+               }
+               if(flagMissingFile===false){
+                   listMissingFileCount.push(item.fileMissing);
+                   countMissingFile1++;
+               }
+               else{
+                    flagMissingFile=false;
                }
 
                 return (<TableRow key={index} fileMissing={item.fileMissing} description={item.description} pages={item.pages} />);
@@ -82,8 +97,16 @@ class missingFilesScreen extends Component {
         return (
             <div style={{ height: 'auto'}}>
                 <Segment.Group>
+                <Segment>
+                        <Button icon labelPosition='right' disabled={this.state.isDisable} onClick={() => this._doMissingFilePagesTest()}>
+                        Check
+                       <Icon name='right arrow' />
+                    </Button>
+                        </Segment>
                     <Segment.Group horizontal>
+                      
                         <Segment basic>
+                        
                             <Segment.Group horizontal >
                                 <Segment style={{ margin: 'auto', textAlign: 'center', padding: 0 }}>
                                     <Icon className="warning sign" size='huge' color='red' />
@@ -129,10 +152,7 @@ class missingFilesScreen extends Component {
                         </Segment> */}
                         
                         <Segment basic>
-                        <Button icon labelPosition='right' disabled={this.state.isDisable} onClick={() => this._doMissingFilePagesTest()}>
-                        Check
-                       <Icon name='right arrow' />
-                    </Button>
+                       
                             <div style={{marginBottom:'50px'}}>
                                 <Button  style={{ float: 'right'}}><Icon name="print" />Export</Button>
 
