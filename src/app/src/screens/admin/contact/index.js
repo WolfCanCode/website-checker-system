@@ -58,6 +58,8 @@ export default class Contact extends Component {
   _doContactDetailTest() {
       this.setState({ loadingTable: true, isDisable: true });
       var comp = [];
+      var rowCount =0;
+      var listTest=[];
       var param = [{ "url": "https://twitter.com/hashtag/hiccupsteahouse?lang=en" },
       { "url": "https://www.facebook.com/hiccupsteahouse" },
       { "url": "https://www.instagram.com/hiccupsteahouse/" },
@@ -78,8 +80,11 @@ export default class Contact extends Component {
           body: JSON.stringify(param)
       }).then(response => response.json()).then((data) => {
           comp = data.map((item, index) => {
-              return (<TableRow key={index} phoneMail={item.phoneMail} url={item.url} type={item.type} />);
+                
+
+              return (<TableRow  key={index} phoneMail={item.phoneMail} url={item.url} type={item.type} />);
           });
+
           let countP = 0;
           data.map((item) => {
              if(item.type==='Phone'){ 
@@ -94,7 +99,9 @@ export default class Contact extends Component {
            }
            return countE;
          })
-         
+         listTest = data.map((item, index)=>{
+           return item.url;
+         });
          
           this.setState({countEmail:countE})
            this.setState({countPhone:countP})
@@ -136,7 +143,7 @@ export default class Contact extends Component {
                   </Table.Row>
                 </Table.Header>
                 <Table.Body>
-                  {this.state.list}
+                {this.state.list.length === 0 ? <Table.Row><Table.Cell>This page haven't test yet, please try to test</Table.Cell></Table.Row> : this.state.list}
                 </Table.Body>
               </Table>
               {/* <Table singleLine>

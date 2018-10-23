@@ -4,10 +4,10 @@ import { Table,Button } from 'semantic-ui-react'
 
 export default class TableRow extends Component {
     render() {
-        return (<Table.Row>
+        return (<Table.Row colSpan='5'>
 
             <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>{this.props.phoneMail}</Table.Cell>
-            <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>{this.props.url}</Table.Cell>
+            <Table.Cell  style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>{this.props.url}</Table.Cell>
             <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}><Button>Edit</Button></Table.Cell>
             
 
