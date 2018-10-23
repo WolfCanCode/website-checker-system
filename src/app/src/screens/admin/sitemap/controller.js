@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Segment, Input, Button } from 'semantic-ui-react';
-import ModelSitemap from './modal';
+// import ModelSitemap from './modal';
 import Canvas from './canvas';
 
 export default class SiteMap extends Component {
@@ -24,6 +24,7 @@ export default class SiteMap extends Component {
     getSitemap() {
         this.setState({ isDisabled: true, isLoading: true });
         var inputParam = { "url": this.state.urlRoot };
+        // eslint-disable-next-line
         var result = [];
 
         fetch("/api/sitemap", {
@@ -38,6 +39,7 @@ export default class SiteMap extends Component {
             // var ex = JSON.parse(JSON.stringify(data));
             // console.log("EX: " + ex);
             // data[9]
+            // eslint-disable-next-line
             result = data.map((item, index) => {
                 console.log("Index: " + index);
                 console.log("Map: " + item.map);
@@ -243,14 +245,14 @@ export default class SiteMap extends Component {
                     alert("Your URL: " + rectCoord[id].url);
                 }
             });
-            
+
         });
 
     }
 
     render() {
         return (
-            <Segment basic style={{ minHeight: '450px' }}>
+            <Segment basic style={{ maxHeight: '60vh' }}>
                 <form onSubmit={this.handleSubmit}>
                     <Input type="text" value={this.state.urlRoot} placeholder='Input your website URL...'
                         onChange={this.handleChange}
@@ -260,9 +262,9 @@ export default class SiteMap extends Component {
                         disabled={this.state.isDisabled} onClick={() => this.getSitemap()} />
                 </form>
                 <Segment loading={this.state.isLoading} secondary style={{ maxHeight: '350px', overflow: 'scroll' }} >
-                   <Canvas/>
+                    <Canvas />
                 </Segment>
-                
+
             </Segment>
         );
 

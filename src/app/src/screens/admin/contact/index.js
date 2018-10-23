@@ -58,8 +58,6 @@ export default class Contact extends Component {
   _doContactDetailTest() {
       this.setState({ loadingTable: true, isDisable: true });
       var comp = [];
-      var rowCount =0;
-      var listTest=[];
       var param = [{ "url": "https://twitter.com/hashtag/hiccupsteahouse?lang=en" },
       { "url": "https://www.facebook.com/hiccupsteahouse" },
       { "url": "https://www.instagram.com/hiccupsteahouse/" },
@@ -99,9 +97,10 @@ export default class Contact extends Component {
            }
            return countE;
          })
-         listTest = data.map((item, index)=>{
-           return item.url;
-         });
+        //  var 
+        //  listTest = data.map((item, index)=>{
+        //    return item.url;
+        //  });
          
           this.setState({countEmail:countE})
            this.setState({countPhone:countP})
