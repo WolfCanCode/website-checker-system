@@ -57,7 +57,7 @@ public class TechnologyService {
                             Matcher matcher = pt.matcher(entry.getMessage().toString());
                             String messages = "";
                             if (matcher.find()) {
-                                messages=entry.getMessage().toString().replace(matcher.group(0), "");
+                                messages = entry.getMessage().toString().replace(matcher.group(0), "");
                             }
 
                             resultList.add(new JavascriptReport(messages, entry.getLevel().toString(), u.getUrl()));
@@ -86,61 +86,91 @@ public class TechnologyService {
     public ServerBehaviorReport checkServerBehavior(Url url) throws IOException {
         ServerBehaviorReport result = new ServerBehaviorReport();
         System.out.println(url.getUrl());
-        boolean isRedirectWWW = checkIsRedirectToWWW(url.getUrl());
-        boolean isAllPageSSL = true;
+        boolean isRedirectWWW = checkIsRedirect(url.getUrl())[0];
+        boolean isRedirectHTTPS = checkIsRedirect(url.getUrl())[1];
 //        boolean is
         result.setRedirectWWW(isRedirectWWW);
         result.setAllPageSSL(true);
         result.setExistErrorPage(true);
-        result.setRedirectHTTPS(true);
+        result.setRedirectHTTPS(isRedirectHTTPS);
         return result;
     }
 
-    private boolean checkIsRedirectToWWW(String url) throws IOException {
-        boolean result = false;
-        if(url.toLowerCase().contains("www."))
-        {
-            url = url.replace("www.","");
+    private boolean[] checkIsRedirect(String url) throws IOException {
+        boolean[] result= new boolean[2];
+        result[0] = false;
+        result[1] = false;
+        String url1=url;
+        String url2=url;
+        if (url.toLowerCase().contains("www.")) {
+            url1 = url1.replace("www.", "");
         }
-        System.out.println(url);
+        System.out.println(url1);
         Url[] urls = new Url[1];
-        urls[0] = new Url(url);
+        urls[0] = new Url(url1);
         ContentService content = new ContentService();
         List<RedirectionReport> redirections = content.redirectionTest(urls);
         RedirectionReport instance = redirections.get(0);
-        String urlRedirect =instance.getDriectToUrl();
+        String urlRedirect = instance.getDriectToUrl();
         System.out.println(urlRedirect);
-        if(urlRedirect.toLowerCase().contains("www"))
-        {
-            url = url.replace("https://","");
-            url = url.replace("http://","");
-            urlRedirect = urlRedirect.replace("https://","");
-            urlRedirect = urlRedirect.replace("http://","");
-            urlRedirect = urlRedirect.replace("www.","");
-            if(urlRedirect.equals(url))
-            {
-                result=true;
+        if (urlRedirect.toLowerCase().contains("www")) {
+            url1 = url1.replace("https://", "");
+            url1 = url1.replace("http://", "");
+            urlRedirect = urlRedirect.replace("https://", "");
+            urlRedirect = urlRedirect.replace("http://", "");
+            urlRedirect = urlRedirect.replace("www.", "");
+            if (urlRedirect.equals(url1)) {
+                result[0] = true;
             }
+        }
+
+        if(!url2.contains("www")){
+            if(url2.contains("https://"))
+            url2 = url2.replace("https://","http://www.");
+            else url2 = url2.replace("http://","https://www.");
+
+        } else {
+            url2 = url2.replace("https://www","http://www");
+        }
+        urls[0] = new Url(url2);
+        ContentService content1 = new ContentService();
+        List<RedirectionReport> redirections1 = content1.redirectionTest(urls);
+        RedirectionReport instance1 = redirections1.get(0);
+        String urlRedirect1 = instance1.getDriectToUrl();
+        System.out.println("==="+urlRedirect1);
+        if(urlRedirect1.toLowerCase().contains("https")) {
+            System.out.println("===="+url2);
+            System.out.println("===="+urlRedirect1);
+            url = url.replace("https://", "");
+            url = url.replace("www.", "");
+            urlRedirect1 = urlRedirect1.replace("www.", "");
+            urlRedirect1 = urlRedirect1.replace("https://", "");
+            System.out.println("===="+"===="+url);
+            System.out.println("===="+"===="+urlRedirect1);
+            if(urlRedirect1.equals(url)){
+                result[1] = true;
+            }
+
         }
         return result;
     }
 
-    public List<MissingFileReport> getMissingFile(Url[] url, String urlNew){
+    public List<MissingFileReport> getMissingFile(Url[] url, String urlNew) {
         List<MissingFileReport> missing = new ArrayList<>();
         String urlRoot = urlNew;
-        for (Url u: url){
+        for (Url u : url) {
             System.out.println(urlRoot);
             try {
                 Document doc = Jsoup.connect(u.getUrl()).get();
-                int i=0;
+                int i = 0;
                 //check missing image
                 Pattern pattern = Pattern.compile("((http\\:|https\\:)?//?([\\w\\-?\\.?]+)?\\.([a-zA-Z]{2,3})?)?(/\\S*)\\.(jpg|gif|jp2|jpeg|pbm|pcx|pgm|png|ppm|psd|tiff|tga|svg)", Pattern.CASE_INSENSITIVE);
-                Matcher matcher= pattern.matcher(doc.html());
+                Matcher matcher = pattern.matcher(doc.html());
                 while (matcher.find()) {
                     i++;
                     String strChcek = matcher.group();
                     String checkCode = verifyHttpMessage(strChcek);
-                    if(checkCode.equals("OK")){
+                    if (checkCode.equals("OK")) {
                         System.out.println("Image: " + strChcek + " - Code:" + checkCode);
 
                     }
@@ -153,14 +183,13 @@ public class TechnologyService {
                         if (!codeCheckAgain.equals("OK")) {
                             String checkLast = "https:" + strChcek;
                             String codeCheclast = verifyHttpMessage(checkLast);
-                            System.out.println("Code Check Last: "+codeCheclast);
+                            System.out.println("Code Check Last: " + codeCheclast);
                             if (codeCheclast.equals("OK")) {
                                 System.out.println("Image Last: " + checkLast + " - Code:" + codeCheclast);
-                            }
-                            else{
+                            } else {
                                 MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheclast, u.getUrl());
                                 missing.add(fileNew);
-                                System.out.println("Image Last Fail: "+strChcek+" -Code: "+codeCheclast);
+                                System.out.println("Image Last Fail: " + strChcek + " -Code: " + codeCheclast);
                             }
                         }
                     }
@@ -174,7 +203,7 @@ public class TechnologyService {
                 while (matcher.find()) {
                     String strChcek = matcher.group();
                     String checkCode = verifyHttpMessage(strChcek);
-                    if(checkCode.equals("OK")){
+                    if (checkCode.equals("OK")) {
                         System.out.println("DOC: " + strChcek + " - Code:" + checkCode);
                     }
                     if (!checkCode.equals("OK")) {
@@ -186,14 +215,13 @@ public class TechnologyService {
                         if (!codeCheckAgain.equals("OK")) {
                             String checkLast = "https:" + strChcek;
                             String codeCheclast = verifyHttpMessage(checkLast);
-                            System.out.println("Code Check Last: "+codeCheclast);
+                            System.out.println("Code Check Last: " + codeCheclast);
                             if (codeCheclast.equals("OK")) {
                                 System.out.println("DOC Last: " + checkLast + " - Code:" + codeCheclast);
-                            }
-                            else{
+                            } else {
                                 MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheclast, u.getUrl());
                                 missing.add(fileNew);
-                                System.out.println("DOC Last Fail: "+strChcek+" -Code: "+codeCheclast);
+                                System.out.println("DOC Last Fail: " + strChcek + " -Code: " + codeCheclast);
                             }
                         }
                     }
@@ -207,7 +235,7 @@ public class TechnologyService {
                 while (matcher.find()) {
                     String strChcek = matcher.group();
                     String checkCode = verifyHttpMessage(strChcek);
-                    if(checkCode.equals("OK")){
+                    if (checkCode.equals("OK")) {
                         System.out.println("ARCHIRE: " + strChcek + " - Code:" + checkCode);
                     }
                     if (!checkCode.equals("OK")) {
@@ -219,14 +247,13 @@ public class TechnologyService {
                         if (!codeCheckAgain.equals("OK")) {
                             String checkLast = "https:" + strChcek;
                             String codeCheclast = verifyHttpMessage(checkLast);
-                            System.out.println("Code Check Last: "+codeCheclast);
+                            System.out.println("Code Check Last: " + codeCheclast);
                             if (codeCheclast.equals("OK")) {
                                 System.out.println("ARCHIVES Last: " + checkLast + " - Code:" + codeCheclast);
-                            }
-                            else{
+                            } else {
                                 MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheclast, u.getUrl());
                                 missing.add(fileNew);
-                                System.out.println("ARCHIVES Last Fail: "+strChcek+" -Code: "+codeCheclast);
+                                System.out.println("ARCHIVES Last Fail: " + strChcek + " -Code: " + codeCheclast);
                             }
                         }
                     }
@@ -241,7 +268,7 @@ public class TechnologyService {
 //            System.out.println(matcher.group());
                     String strChcek = matcher.group();
                     String checkCode = verifyHttpMessage(strChcek);
-                    if(checkCode.equals("OK")){
+                    if (checkCode.equals("OK")) {
                         System.out.println("CSS 2: " + strChcek + " - Code:" + checkCode);
                     }
                     if (!checkCode.equals("OK")) {
@@ -253,14 +280,13 @@ public class TechnologyService {
                         if (!codeCheckAgain.equals("OK")) {
                             String checkLast = "https:" + strChcek;
                             String codeCheclast = verifyHttpMessage(checkLast);
-                            System.out.println("Code Check Last: "+codeCheclast);
+                            System.out.println("Code Check Last: " + codeCheclast);
                             if (codeCheclast.equals("OK")) {
                                 System.out.println("CSS 2 Last: " + checkLast + " - Code:" + codeCheclast);
-                            }
-                            else{
+                            } else {
                                 MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheclast, u.getUrl());
                                 missing.add(fileNew);
-                                System.out.println("CSS 2 Last Fail: "+strChcek+" -Code: "+codeCheclast);
+                                System.out.println("CSS 2 Last Fail: " + strChcek + " -Code: " + codeCheclast);
                             }
                         }
                     }
@@ -273,11 +299,11 @@ public class TechnologyService {
                 while (matcher.find()) {
                     String strChcek = matcher.group();
                     String checkCode = verifyHttpMessage(strChcek);
-                    if(checkCode.equals("OK")){
+                    if (checkCode.equals("OK")) {
                         System.out.println("MP4: " + strChcek + " - Code:" + checkCode);
                     }
                     if (!checkCode.equals("OK")) {
-                        String checkAgain =  urlRoot + strChcek;
+                        String checkAgain = urlRoot + strChcek;
                         String codeCheckAgain = verifyHttpMessage(checkAgain);
                         if (codeCheckAgain.equals("OK")) {
                             System.out.println("MP4 Again: " + checkAgain + " - Code:" + codeCheckAgain);
@@ -285,14 +311,13 @@ public class TechnologyService {
                         if (!codeCheckAgain.equals("OK")) {
                             String checkLast = "https:" + strChcek;
                             String codeCheclast = verifyHttpMessage(checkLast);
-                            System.out.println("Code Check Last: "+codeCheclast);
+                            System.out.println("Code Check Last: " + codeCheclast);
                             if (codeCheclast.equals("OK")) {
                                 System.out.println("MP4 Last: " + checkLast + " - Code:" + codeCheclast);
-                            }
-                            else{
+                            } else {
                                 MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheclast, u.getUrl());
                                 missing.add(fileNew);
-                                System.out.println("MP4 Last Fail: "+strChcek+" -Code: "+codeCheclast);
+                                System.out.println("MP4 Last Fail: " + strChcek + " -Code: " + codeCheclast);
                             }
                         }
                     }
@@ -306,11 +331,11 @@ public class TechnologyService {
                 while (matcher.find()) {
                     String strChcek = matcher.group();
                     String checkCode = verifyHttpMessage(strChcek);
-                    if(checkCode.equals("OK")){
+                    if (checkCode.equals("OK")) {
                         System.out.println("MP3: " + strChcek + " - Code:" + checkCode);
                     }
                     if (!checkCode.equals("OK")) {
-                        String checkAgain =  urlRoot + strChcek;
+                        String checkAgain = urlRoot + strChcek;
                         String codeCheckAgain = verifyHttpMessage(checkAgain);
                         if (codeCheckAgain.equals("OK")) {
                             System.out.println("MP3 Again: " + checkAgain + " - Code:" + codeCheckAgain);
@@ -318,14 +343,13 @@ public class TechnologyService {
                         if (!codeCheckAgain.equals("OK")) {
                             String checkLast = "https:" + strChcek;
                             String codeCheclast = verifyHttpMessage(checkLast);
-                            System.out.println("Code Check Last: "+codeCheclast);
+                            System.out.println("Code Check Last: " + codeCheclast);
                             if (codeCheclast.equals("OK")) {
                                 System.out.println("MP3 Last: " + checkLast + " - Code:" + codeCheclast);
-                            }
-                            else{
+                            } else {
                                 MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheclast, u.getUrl());
                                 missing.add(fileNew);
-                                System.out.println("MP3 Last Fail: "+strChcek+" -Code: "+codeCheclast);
+                                System.out.println("MP3 Last Fail: " + strChcek + " -Code: " + codeCheclast);
                             }
                         }
                     }
@@ -340,7 +364,7 @@ public class TechnologyService {
 
 
     // Function check http message Phúc Anh
-    private  String verifyHttpMessage(String url) {
+    private String verifyHttpMessage(String url) {
         String message = "";
         try {
             URL urlTesst = new URL(url);
@@ -349,7 +373,7 @@ public class TechnologyService {
             connection.setRequestProperty("User-Agent", "Mozilla/5.0 ");
             message = connection.getResponseMessage();
         } catch (Exception e) {
-            message="Not Found";
+            message = "Not Found";
         }
         return message;
     }
@@ -373,13 +397,12 @@ public class TechnologyService {
 
                         driver.get(u.getUrl());
 
-                        Set<org.openqa.selenium.Cookie> cookies=driver.manage().getCookies();
+                        Set<org.openqa.selenium.Cookie> cookies = driver.manage().getCookies();
 
                         //To find the number of cookies used by this site
-                        System.out.println("Number of cookies in this site "+cookies.size());
+                        System.out.println("Number of cookies in this site " + cookies.size());
 
-                        for(org.openqa.selenium.Cookie cookie:cookies)
-                        {
+                        for (org.openqa.selenium.Cookie cookie : cookies) {
                             // System.out.println(cookie.getName()+" "+cookie.getValue());
                             System.out.println("domain " + cookie.getDomain());
                             System.out.println("Name " + cookie.getName());
@@ -387,7 +410,7 @@ public class TechnologyService {
                             System.out.println("Value " + cookie.getValue());
                             System.out.println("Version " + cookie.getExpiry());
                             System.out.println("");
-                            resultList.add(new CookieReport(cookie.getName(),cookie.getValue(),cookie.getDomain(), cookie.getExpiry()));
+                            resultList.add(new CookieReport(cookie.getName(), cookie.getValue(), cookie.getDomain(), cookie.getExpiry()));
                         }
 
 

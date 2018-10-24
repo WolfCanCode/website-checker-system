@@ -19,7 +19,7 @@ public class JavascriptReport{
     @Id
     @GeneratedValue
     private long id;
-    @Column(length = 256)
+    @Column(length = 1000)
     private String messages;
     private String type;
     private String page;
