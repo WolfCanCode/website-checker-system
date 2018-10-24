@@ -1,6 +1,7 @@
 package com.fpt.capstone.wcs.service;
 
 import com.fpt.capstone.wcs.model.*;
+import com.fpt.capstone.wcs.model.entity.*;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.openqa.selenium.WebDriver;
@@ -14,10 +15,7 @@ import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URLConnection;
 import java.util.*;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
@@ -29,10 +27,10 @@ import java.net.URL;
 
 public class TechnologyService {
 
-    public List<JSInfo> jsTestService(Url[] url) throws InterruptedException {
+    public List<JavascriptReport> jsTestService(Url[] url) throws InterruptedException {
         System.setProperty("webdriver.chrome.driver", "C:\\Users\\ngoct\\Downloads\\chromedriver_win32\\chromedriver.exe");
         //Asign list JS info
-        List<JSInfo> resultList = new ArrayList<>();
+        List<JavascriptReport> resultList = new ArrayList<>();
         final CyclicBarrier gate = new CyclicBarrier(url.length);
         List<Thread> listThread = new ArrayList<>();
         for (Url u : url) {
@@ -62,7 +60,7 @@ public class TechnologyService {
                                 messages=entry.getMessage().toString().replace(matcher.group(0), "");
                             }
 
-                            resultList.add(new JSInfo(messages, entry.getLevel().toString(), u.getUrl()));
+                            resultList.add(new JavascriptReport(messages, entry.getLevel().toString(), u.getUrl()));
                         }
                         driver.quit();
                     } catch (InterruptedException | BrokenBarrierException e) {
@@ -85,8 +83,8 @@ public class TechnologyService {
 
     }
 
-    public ServerBehavior checkServerBehavior(Url url) throws IOException {
-        ServerBehavior result = new ServerBehavior();
+    public ServerBehaviorReport checkServerBehavior(Url url) throws IOException {
+        ServerBehaviorReport result = new ServerBehaviorReport();
         System.out.println(url.getUrl());
         boolean isRedirectWWW = checkIsRedirectToWWW(url.getUrl());
         boolean isAllPageSSL = true;
@@ -108,8 +106,8 @@ public class TechnologyService {
         Url[] urls = new Url[1];
         urls[0] = new Url(url);
         ContentService content = new ContentService();
-        List<LinkRedirection> redirections = content.redirectionTest(urls);
-        LinkRedirection instance = redirections.get(0);
+        List<RedirectionReport> redirections = content.redirectionTest(urls);
+        RedirectionReport instance = redirections.get(0);
         String urlRedirect =instance.getDriectToUrl();
         System.out.println(urlRedirect);
         if(urlRedirect.toLowerCase().contains("www"))
@@ -127,8 +125,8 @@ public class TechnologyService {
         return result;
     }
 
-    public List<MissingFilesPages> getMissingFile(Url[] url, String urlNew){
-        List<MissingFilesPages> missing = new ArrayList<>();
+    public List<MissingFileReport> getMissingFile(Url[] url, String urlNew){
+        List<MissingFileReport> missing = new ArrayList<>();
         String urlRoot = urlNew;
         for (Url u: url){
             System.out.println(urlRoot);
@@ -160,7 +158,7 @@ public class TechnologyService {
                                 System.out.println("Image Last: " + checkLast + " - Code:" + codeCheclast);
                             }
                             else{
-                                MissingFilesPages fileNew = new MissingFilesPages(strChcek, codeCheclast, u.getUrl());
+                                MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheclast, u.getUrl());
                                 missing.add(fileNew);
                                 System.out.println("Image Last Fail: "+strChcek+" -Code: "+codeCheclast);
                             }
@@ -193,7 +191,7 @@ public class TechnologyService {
                                 System.out.println("DOC Last: " + checkLast + " - Code:" + codeCheclast);
                             }
                             else{
-                                MissingFilesPages fileNew = new MissingFilesPages(strChcek, codeCheclast, u.getUrl());
+                                MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheclast, u.getUrl());
                                 missing.add(fileNew);
                                 System.out.println("DOC Last Fail: "+strChcek+" -Code: "+codeCheclast);
                             }
@@ -226,7 +224,7 @@ public class TechnologyService {
                                 System.out.println("ARCHIVES Last: " + checkLast + " - Code:" + codeCheclast);
                             }
                             else{
-                                MissingFilesPages fileNew = new MissingFilesPages(strChcek, codeCheclast, u.getUrl());
+                                MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheclast, u.getUrl());
                                 missing.add(fileNew);
                                 System.out.println("ARCHIVES Last Fail: "+strChcek+" -Code: "+codeCheclast);
                             }
@@ -260,7 +258,7 @@ public class TechnologyService {
                                 System.out.println("CSS 2 Last: " + checkLast + " - Code:" + codeCheclast);
                             }
                             else{
-                                MissingFilesPages fileNew = new MissingFilesPages(strChcek, codeCheclast, u.getUrl());
+                                MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheclast, u.getUrl());
                                 missing.add(fileNew);
                                 System.out.println("CSS 2 Last Fail: "+strChcek+" -Code: "+codeCheclast);
                             }
@@ -292,7 +290,7 @@ public class TechnologyService {
                                 System.out.println("MP4 Last: " + checkLast + " - Code:" + codeCheclast);
                             }
                             else{
-                                MissingFilesPages fileNew = new MissingFilesPages(strChcek, codeCheclast, u.getUrl());
+                                MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheclast, u.getUrl());
                                 missing.add(fileNew);
                                 System.out.println("MP4 Last Fail: "+strChcek+" -Code: "+codeCheclast);
                             }
@@ -325,7 +323,7 @@ public class TechnologyService {
                                 System.out.println("MP3 Last: " + checkLast + " - Code:" + codeCheclast);
                             }
                             else{
-                                MissingFilesPages fileNew = new MissingFilesPages(strChcek, codeCheclast, u.getUrl());
+                                MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheclast, u.getUrl());
                                 missing.add(fileNew);
                                 System.out.println("MP3 Last Fail: "+strChcek+" -Code: "+codeCheclast);
                             }
@@ -356,10 +354,10 @@ public class TechnologyService {
         return message;
     }
 
-    public List<Cookie> cookieService(Url[] url) throws InterruptedException {
+    public List<CookieReport> cookieService(Url[] url) throws InterruptedException {
         System.setProperty("webdriver.chrome.driver", "C:\\Users\\trinhndse62136\\Downloads\\chromedriver_win32\\chromedriver.exe");
         //Asign list JS info
-        List<Cookie> resultList = new ArrayList<>();
+        List<CookieReport> resultList = new ArrayList<>();
         final CyclicBarrier gate = new CyclicBarrier(url.length);
         List<Thread> listThread = new ArrayList<>();
         for (Url u : url) {
@@ -389,7 +387,7 @@ public class TechnologyService {
                             System.out.println("Value " + cookie.getValue());
                             System.out.println("Version " + cookie.getExpiry());
                             System.out.println("");
-                            resultList.add(new Cookie(cookie.getName(),cookie.getValue(),cookie.getDomain(), cookie.getExpiry()));
+                            resultList.add(new CookieReport(cookie.getName(),cookie.getValue(),cookie.getDomain(), cookie.getExpiry()));
                         }
 
 
@@ -409,7 +407,7 @@ public class TechnologyService {
             t.join();
         }
         System.out.println("Size 1 " + resultList.size());
-        Set<Cookie> primesWithoutDuplicates = new LinkedHashSet<Cookie>(resultList);
+        Set<CookieReport> primesWithoutDuplicates = new LinkedHashSet<CookieReport>(resultList);
 
         // now let's clear the ArrayList so that we can copy all elements from LinkedHashSet
         resultList.clear();

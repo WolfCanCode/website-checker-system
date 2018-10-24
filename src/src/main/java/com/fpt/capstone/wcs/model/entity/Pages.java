@@ -1,15 +1,17 @@
-package com.fpt.capstone.wcs.model;
+package com.fpt.capstone.wcs.model.entity;
 
 import lombok.*;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Data
 @Entity
 @Getter
 @Setter
+@Table(name="PageReport")
 public class Pages {
     @Id
     @GeneratedValue

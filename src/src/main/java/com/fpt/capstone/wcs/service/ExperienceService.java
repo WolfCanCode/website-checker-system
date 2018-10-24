@@ -1,6 +1,6 @@
 package com.fpt.capstone.wcs.service;
 
-import com.fpt.capstone.wcs.model.SpeedTest;
+import com.fpt.capstone.wcs.model.entity.SpeedTestReport;
 import com.fpt.capstone.wcs.model.Url;
 import com.fpt.capstone.wcs.utils.MathUtil;
 import org.openqa.selenium.JavascriptExecutor;
@@ -25,10 +25,10 @@ import java.util.regex.Pattern;
 
 public class ExperienceService {
 
-    public List<SpeedTest> speedTestService(Url[] url) throws InterruptedException {
+    public List<SpeedTestReport> speedTestService(Url[] url) throws InterruptedException {
         System.setProperty("webdriver.chrome.driver", "C:\\Users\\ngoct\\Downloads\\chromedriver_win32\\chromedriver.exe");
         //Asign list speed info
-        List<SpeedTest> resultList = new ArrayList<>();
+        List<SpeedTestReport> resultList = new ArrayList<>();
         final CyclicBarrier gate = new CyclicBarrier(url.length);
         List<Thread> listThread = new ArrayList<>();
         for (Url u : url) {
@@ -76,7 +76,7 @@ public class ExperienceService {
                         double interactTime = interact;
                         double interactTime1 = Math.floor(interactTime / 1000 * 10) / 10;
                         double sizeTransferred1 = Math.floor(totalByte / 1000000 * 10) / 10;
-                        resultList.add(new SpeedTest(u.getUrl(), interactTime1 + "", loadTime1 + "", sizeTransferred1 + ""));
+                        resultList.add(new SpeedTestReport(u.getUrl(), interactTime1 + "", loadTime1 + "", sizeTransferred1 + ""));
                         driver.quit();
                     } catch (InterruptedException | BrokenBarrierException e) {
                         Logger.getLogger(ExperienceService.class.getName()).log(Level.SEVERE, null, e);

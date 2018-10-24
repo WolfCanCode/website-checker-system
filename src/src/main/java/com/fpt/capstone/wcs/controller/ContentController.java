@@ -1,20 +1,19 @@
 package com.fpt.capstone.wcs.controller;
 
 import com.fpt.capstone.wcs.model.*;
+import com.fpt.capstone.wcs.model.entity.ContactReport;
+import com.fpt.capstone.wcs.model.entity.RedirectionReport;
+import com.fpt.capstone.wcs.model.entity.Pages;
 import com.fpt.capstone.wcs.repository.ContactDetailRepository;
 import com.fpt.capstone.wcs.repository.LinkRedirectionRepository;
 import com.fpt.capstone.wcs.repository.PageTestRepository;
 import com.fpt.capstone.wcs.service.ContentService;
-import com.fpt.capstone.wcs.service.ExperienceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -46,35 +45,35 @@ public class ContentController {
     }
 
     @PostMapping("/api/redirectiontest")
-    public List<LinkRedirection> getDataRedirectTest(@RequestBody Url[] list) throws IOException {
+    public List<RedirectionReport> getDataRedirectTest(@RequestBody Url[] list) throws IOException {
         ContentService con  = new ContentService();
-        List<LinkRedirection> resultList = con.redirectionTest(list);
+        List<RedirectionReport> resultList = con.redirectionTest(list);
        linkRedirectionRepository.deleteAll();
        linkRedirectionRepository.saveAll(resultList);
         return resultList;
     }
 
     @PostMapping("/api/redirectiontest/lastest")
-    public List<LinkRedirection> getLastestLinkRedirection()
+    public List<RedirectionReport> getLastestLinkRedirection()
     {
-        List<LinkRedirection> resultList =  linkRedirectionRepository.findAll();
+        List<RedirectionReport> resultList =  linkRedirectionRepository.findAll();
         return resultList;
     }
 
     @PostMapping("/api/contactDetail")
-    public List<ContactDetail> getDataContactDetail(@RequestBody Url[] list) throws IOException {
+    public List<ContactReport> getDataContactDetail(@RequestBody Url[] list) throws IOException {
         ContentService con  = new ContentService();
-        List<ContactDetail> resultList = con.getContactDetail(list);
+        List<ContactReport> resultList = con.getContactDetail(list);
         contactDetailRepository.deleteAll();
         contactDetailRepository.saveAll(resultList);
         return resultList;
     }
 
     @PostMapping("/api/contactDetail/lastest")
-    public List<ContactDetail> getLastestContactDetail()
+    public List<ContactReport> getLastestContactDetail()
     {
 
-        List<ContactDetail> resultList =  contactDetailRepository.findAll();
+        List<ContactReport> resultList =  contactDetailRepository.findAll();
         return resultList;
     }
 }

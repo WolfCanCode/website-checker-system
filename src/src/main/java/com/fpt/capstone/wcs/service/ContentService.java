@@ -1,6 +1,9 @@
 package com.fpt.capstone.wcs.service;
 
 import com.fpt.capstone.wcs.model.*;
+import com.fpt.capstone.wcs.model.entity.ContactReport;
+import com.fpt.capstone.wcs.model.entity.RedirectionReport;
+import com.fpt.capstone.wcs.model.entity.Pages;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -29,8 +32,8 @@ public class ContentService {
         return pageCheck;
     }
 
-    public  List<LinkRedirection> redirectionTest(Url[] list) throws IOException {
-        List<LinkRedirection> pageCheck = new ArrayList<>();
+    public  List<RedirectionReport> redirectionTest(Url[] list) throws IOException {
+        List<RedirectionReport> pageCheck = new ArrayList<>();
         for(Url url:list){
             int  code =getStatus(url.getUrl());
             if(code== HttpURLConnection.HTTP_MOVED_TEMP || code == HttpURLConnection.HTTP_MOVED_PERM){
@@ -44,13 +47,13 @@ public class ContentService {
                 // get the cookie if need, for lo
                 // open the new connnection again
                 connection = (HttpURLConnection) new URL(newUrl).openConnection();
-//                connection.setRequestProperty("Cookie", cookies);
+//                connection.setRequestProperty("CookieReport", cookies);
                 connection.addRequestProperty("Accept-Language", "en-US,en;q=0.8");
                 connection .addRequestProperty("User-Agent", "Mozilla");
                 connection.addRequestProperty("Referer", "google.com");
 
                 String codeNew = ""+code;
-                LinkRedirection link = new LinkRedirection(code, url.getUrl(), message ,newUrl);
+                RedirectionReport link = new RedirectionReport(code, url.getUrl(), message ,newUrl);
                 pageCheck.add(link);
             }
         }
@@ -119,8 +122,8 @@ public class ContentService {
 
     }
 
-    public List<ContactDetail> getContactDetail(Url[] list)throws IOException{
-        List<ContactDetail> list1 = new ArrayList<>();
+    public List<ContactReport> getContactDetail(Url[] list)throws IOException{
+        List<ContactReport> list1 = new ArrayList<>();
         for (Url newList : list){
             try {
                 String url = newList.getUrl();
@@ -143,7 +146,7 @@ public class ContentService {
                 Matcher matcher = pattern.matcher(doc.wholeText());
                 while (matcher.find()) {
                     System.out.println("Phone0: " + matcher.group());
-                    ContactDetail phoneNumber = new ContactDetail(matcher.group(),url,doc.getElementsContainingOwnText(matcher.group()).toString(),"Phone");
+                    ContactReport phoneNumber = new ContactReport(matcher.group(),url,doc.getElementsContainingOwnText(matcher.group()).toString(),"Phone");
                     list1.add(phoneNumber);
 
                 }
@@ -153,7 +156,7 @@ public class ContentService {
                 // check all occurance
                 while (matcher.find()) {
                     System.out.println("Phone1: " + matcher.group() + " . " + matcher.start() + " " + matcher.end()+" ");
-                    ContactDetail phoneNumber = new ContactDetail(matcher.group(),url,doc.getElementsContainingOwnText(matcher.group()).toString(),"Phone");
+                    ContactReport phoneNumber = new ContactReport(matcher.group(),url,doc.getElementsContainingOwnText(matcher.group()).toString(),"Phone");
                     list1.add(phoneNumber);
                 }
 
@@ -162,7 +165,7 @@ public class ContentService {
                 // check all occurance
                 while (matcher.find()) {
                     System.out.println("PHONE 2:" + matcher.group());
-                    ContactDetail phoneNumber = new ContactDetail(matcher.group(),url,doc.getElementsContainingOwnText(matcher.group()).toString(),"Phone");
+                    ContactReport phoneNumber = new ContactReport(matcher.group(),url,doc.getElementsContainingOwnText(matcher.group()).toString(),"Phone");
                     list1.add(phoneNumber);
                 }
 
@@ -171,7 +174,7 @@ public class ContentService {
                 // check all occurance
                 while (matcher.find()) {
                     System.out.println("PHONE 3:" + matcher.group());
-                    ContactDetail phoneNumber = new ContactDetail(matcher.group(),url,doc.getElementsContainingOwnText(matcher.group()).toString(),"Phone");
+                    ContactReport phoneNumber = new ContactReport(matcher.group(),url,doc.getElementsContainingOwnText(matcher.group()).toString(),"Phone");
                     list1.add(phoneNumber);
                 }
 
@@ -180,7 +183,7 @@ public class ContentService {
                 // check all occurance
                 while (matcher.find()) {
                     System.out.println("PHONE 4:" + matcher.group());
-                    ContactDetail phoneNumber = new ContactDetail(matcher.group(),url,doc.getElementsContainingOwnText(matcher.group()).toString(),"Phone");
+                    ContactReport phoneNumber = new ContactReport(matcher.group(),url,doc.getElementsContainingOwnText(matcher.group()).toString(),"Phone");
                     list1.add(phoneNumber);
                 }
 
@@ -189,7 +192,7 @@ public class ContentService {
                 // check all occurance
                 while (matcher.find()) {
                     System.out.println("PHONE 5:" + matcher.group());
-                    ContactDetail phoneNumber = new ContactDetail(matcher.group(),url,doc.getElementsContainingOwnText(matcher.group()).toString(),"Phone");
+                    ContactReport phoneNumber = new ContactReport(matcher.group(),url,doc.getElementsContainingOwnText(matcher.group()).toString(),"Phone");
                     list1.add(phoneNumber);
                 }
 
@@ -198,7 +201,7 @@ public class ContentService {
                 // check all occurance
                 while (matcher.find()) {
                     System.out.println("PHONE 6:" + matcher.group());
-                    ContactDetail phoneNumber = new ContactDetail(matcher.group(),url,doc.getElementsContainingOwnText(matcher.group()).toString(),"Phone");
+                    ContactReport phoneNumber = new ContactReport(matcher.group(),url,doc.getElementsContainingOwnText(matcher.group()).toString(),"Phone");
                     list1.add(phoneNumber);
                 }
 
@@ -207,7 +210,7 @@ public class ContentService {
                 // check all occurance
                 while (matcher.find()) {
                     System.out.println("PHONE 7:" + matcher.group());
-                    ContactDetail phoneNumber = new ContactDetail(matcher.group(),url,doc.getElementsContainingOwnText(matcher.group()).toString(),"Phone");
+                    ContactReport phoneNumber = new ContactReport(matcher.group(),url,doc.getElementsContainingOwnText(matcher.group()).toString(),"Phone");
                     list1.add(phoneNumber);
                 }
 
@@ -216,7 +219,7 @@ public class ContentService {
                 // check all occurance
                 while (matcher.find()) {
                     System.out.println("PHONE 8:" + matcher.group());
-                    ContactDetail phoneNumber = new ContactDetail(matcher.group(),url,doc.getElementsContainingOwnText(matcher.group()).toString(),"Phone");
+                    ContactReport phoneNumber = new ContactReport(matcher.group(),url,doc.getElementsContainingOwnText(matcher.group()).toString(),"Phone");
                     list1.add(phoneNumber);
                 }
                 pattern = Pattern.compile(patternPhone9);
@@ -224,7 +227,7 @@ public class ContentService {
                 // check all occurance
                 while (matcher.find()) {
                     System.out.println("PHONE 9:" + matcher.group());
-                    ContactDetail phoneNumber = new ContactDetail(matcher.group(),url,doc.getElementsContainingOwnText(matcher.group()).toString(),"Phone");
+                    ContactReport phoneNumber = new ContactReport(matcher.group(),url,doc.getElementsContainingOwnText(matcher.group()).toString(),"Phone");
                     list1.add(phoneNumber);
                 }
                 pattern = Pattern.compile(patternphone10);
@@ -232,7 +235,7 @@ public class ContentService {
                 // check all occurance
                 while (matcher.find()) {
                     System.out.println("PHONE 10:" + matcher.group());
-                    ContactDetail phoneNumber = new ContactDetail(matcher.group(),url,doc.getElementsContainingOwnText(matcher.group()).toString(),"Phone");
+                    ContactReport phoneNumber = new ContactReport(matcher.group(),url,doc.getElementsContainingOwnText(matcher.group()).toString(),"Phone");
                     list1.add(phoneNumber);
                 }
                 pattern = Pattern.compile(patternPhone11);
@@ -240,14 +243,14 @@ public class ContentService {
                 // check all occurance
                 while (matcher.find()) {
                     System.out.println("PHONE 11:" + matcher.group());
-                    ContactDetail phoneNumber = new ContactDetail(matcher.group(),url,doc.getElementsContainingOwnText(matcher.group()).toString(),"Phone");
+                    ContactReport phoneNumber = new ContactReport(matcher.group(),url,doc.getElementsContainingOwnText(matcher.group()).toString(),"Phone");
                     list1.add(phoneNumber);
                 }
                 pattern = Pattern.compile("\\w+([.])?+\\w+@\\w+([-]\\w+)?[.]\\w+([.]\\w+)?+([.]\\w+)?");
                 matcher = pattern.matcher(doc.body().text());
                 while (matcher.find()) {
 //            System.out.println(matcher.group());
-                    ContactDetail phoneNumber = new ContactDetail(matcher.group(),url,doc.getElementsContainingOwnText(matcher.group()).toString(),"Mail");
+                    ContactReport phoneNumber = new ContactReport(matcher.group(),url,doc.getElementsContainingOwnText(matcher.group()).toString(),"Mail");
                     list1.add(phoneNumber);
                 }
                 // so my  ^\\(?(\\d{3,4})\\)?[-.\\s]?(\\d{3,4})[-.\\s]?(\\d{2,4})$

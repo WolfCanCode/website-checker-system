@@ -1,7 +1,7 @@
 package com.fpt.capstone.wcs.controller;
 
 
-import com.fpt.capstone.wcs.model.User;
+import com.fpt.capstone.wcs.model.entity.User;
 import com.fpt.capstone.wcs.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,17 +29,6 @@ public class UserController {
         return result;
     }
 
-    @GetMapping("/api/user")
-    public List<User> test(){
-        List<User> list = new ArrayList<>();
-        list.add(new User("Truong","123","tr","tr"));
-        list.add(new User("Trinh","123","tr","tr"));
-        list.add(new User("Vi","123","tr","tr"));
-        list.add(new User("P.A","123","tr","tr"));
-        list.add(new User("Khanh","123","tr","tr"));
-
-        return list;
-    }
 
 
 }
