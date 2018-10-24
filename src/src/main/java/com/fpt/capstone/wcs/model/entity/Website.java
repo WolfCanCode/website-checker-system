@@ -36,6 +36,16 @@ public class Website {
                     CascadeType.PERSIST,
                     CascadeType.MERGE
             })
+    @JoinTable(name = "website_user",
+            joinColumns = { @JoinColumn(name = "web_id") },
+            inverseJoinColumns = { @JoinColumn(name = "user_id") })
+    private List<User> User = new ArrayList<>();
+
+    @ManyToMany(fetch = FetchType.LAZY,
+            cascade = {
+                    CascadeType.PERSIST,
+                    CascadeType.MERGE
+            })
     @JoinTable(name = "website_page",
             joinColumns = { @JoinColumn(name = "web_id") },
             inverseJoinColumns = { @JoinColumn(name = "page_id") })
