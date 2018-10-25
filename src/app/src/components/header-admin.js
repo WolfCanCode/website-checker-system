@@ -1,38 +1,12 @@
 import React, { Component } from 'react';
 import { Input, Dropdown, Menu } from 'semantic-ui-react';
 import { Redirect } from "react-router-dom";
-import {Cookies} from "react-cookie";
-const cookies = new Cookies();
+
 
  class HeaderAdmin extends Component {
     state = { txtWebpage: "", listWeb:[], logout:false };
 
-    componentWillMount(){
-        console.log("u_id :"+ cookies.get("u_id"));
-        console.log("u_token :"+ cookies.get("u_token"));
-
-        fetch("/api/auth",{
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({"id": cookies.get("u_id"),"token":cookies.get("u_token")})
-        }).then(response => response.json()).then((data)=>{
-            if(data.action ==="SUCCESS")
-            {
-                console.log("get u_token: "+data.token);
-                cookies.set("u_token", data.token);
-            } else{
-                this.setState({
-                    logout: true
-                });
-            }
-        });
-        console.log("u_id :"+ cookies.get("u_id"));
-        console.log("u_token :"+ cookies.get("u_token"));
-
-    }
+    
 
     componentDidMount(){
         fetch("/api/website/all").then(response => response.json()).then((data)=>{

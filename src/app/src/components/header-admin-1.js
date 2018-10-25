@@ -5,7 +5,9 @@ import { Redirect } from "react-router-dom";
 export default class HeaderAdmin extends Component {
     state = { logout:false };
 
-
+    componentWillMount(){
+        
+    }
 
     _doLogout = () => {
         this.setState({

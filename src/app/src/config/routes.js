@@ -49,6 +49,8 @@ export class RouteClient extends Component {
                 <Route path="/login" exact component={LoginScreen} />
                 <Route path="/register" component={RegisterScreen} />
                 <Route path='/authenticate' component={() => window.location = '/admin'} />
+                <Route path="*" component={Error404}/>
+
             </Switch>
         </Router>
         )
