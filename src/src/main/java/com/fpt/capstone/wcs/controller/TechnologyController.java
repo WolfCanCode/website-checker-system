@@ -57,8 +57,11 @@ public class TechnologyController {
     }
 
     @PostMapping("/api/missingtest")
-    public List<MissingFileReport> getMissingFile(@RequestBody Url[] list){
+    public List<MissingFileReport> getMissingFile(@RequestBody Url[] list) throws InterruptedException {
         TechnologyService technologyService = new TechnologyService();
+//        for (MissingFileDTO lisFileDTO:listType){
+//            System.out.println(lisFileDTO);
+//        };
         String urlRoot="";
         for(int i =0; i< list.length;i++ ){
             Pattern pattern = Pattern.compile("(http\\:|https\\:)//([\\w\\-?\\.?]+)?\\.([a-zA-Z]{2,3})?",Pattern.CASE_INSENSITIVE);

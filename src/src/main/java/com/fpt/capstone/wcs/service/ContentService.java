@@ -14,21 +14,47 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ContentService {
-    public List<Pages> getPageInfor(Url[] list) throws IOException {
+    public List<Pages> getPageInfor(Url[] list) throws InterruptedException {
         List<Pages> pageCheck = new ArrayList<>();
+        final CyclicBarrier gate = new CyclicBarrier(list.length);
+        List<Thread> listThread = new ArrayList<>();
         for (Url url:list){
-            String title = getTitle(url.getUrl());
-            int  httpcode = getStatus(url.getUrl());
-            String canoUrl = getCanonicalUrl(url.getUrl());
+            listThread.add(new Thread(){
+                public void run() {
+                    try {
+                        gate.await();
+                        String title = getTitle(url.getUrl());
+                        int  httpcode = getStatus(url.getUrl());
+                        String canoUrl = getCanonicalUrl(url.getUrl());
 
-            Pages page = new Pages(httpcode, url.getUrl(),title,canoUrl);
-            pageCheck.add(page);
+                        Pages page = new Pages(httpcode, url.getUrl(),title,canoUrl);
+                        pageCheck.add(page);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } catch (BrokenBarrierException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+
+        }
+        for (Thread t : listThread) {
+            System.out.println("Threed start");
+            t.start();
         }
 
+        for (Thread t : listThread) {
+            System.out.println("Threed join");
+            t.join();
+        }
         return pageCheck;
     }
 
@@ -249,7 +275,6 @@ public class ContentService {
                 pattern = Pattern.compile("\\w+([.])?+\\w+@\\w+([-]\\w+)?[.]\\w+([.]\\w+)?+([.]\\w+)?");
                 matcher = pattern.matcher(doc.body().text());
                 while (matcher.find()) {
-//            System.out.println(matcher.group());
                     ContactReport phoneNumber = new ContactReport(matcher.group(),url,doc.getElementsContainingOwnText(matcher.group()).toString(),"Mail");
                     list1.add(phoneNumber);
                 }
@@ -259,21 +284,6 @@ public class ContentService {
 
             }
         }
-
-//        Map<ContactDeatil, Integer> hm = new HashMap<ContactDeatil, Integer>();
-//        for (ContactDeatil i : list1) {
-//            Integer j = hm.get(i);
-//            hm.put(i, (j == null) ? 1 : j + 1);
-//        }
-//
-//
-//
-//        // displaying the occurrence of elements in the arraylist
-//        for (Map.Entry<ContactDeatil, Integer> val : hm.entrySet()) {
-//            System.out.println("Element " + val.getKey() + " "
-//                    + "occurs"
-//                    + ": " + val.getValue() + " times");
-//        }
         return  list1;
     }
 
