@@ -106,6 +106,7 @@ export default class Contact extends Component {
            this.setState({countPhone:countP})
           this.setState({ list: comp });
           this.setState({ loadingTable: false });
+          this.setState({ isDisable: false });
       });
   }
   render() {
@@ -136,7 +137,7 @@ export default class Contact extends Component {
               <Table singleLine>
                 <Table.Header>
                   <Table.Row>
-                    <Table.HeaderCell>Phone</Table.HeaderCell>
+                    <Table.HeaderCell>Contact</Table.HeaderCell>
                     <Table.HeaderCell>Page affected</Table.HeaderCell>
                     <Table.HeaderCell>Action</Table.HeaderCell>
                   </Table.Row>

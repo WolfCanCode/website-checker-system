@@ -7,7 +7,18 @@ import TableRow from '../missingFiles/row-table'
 
 
 class missingFilesScreen extends Component {
-    state = { list: [], loadingTable: false, isDisable: false, countMissingFile:0, countPageAffected:0 };
+    state = { list: [], 
+        loadingTable: false, 
+        isDisable: false, 
+        countMissingFile:0, 
+        countPageAffected:0,
+        listType:[],
+       isActiveImg:false,
+       isActiveCss:false,
+       isActiveDoc:false,
+       isActiveARCHIRES:false
+        
+    };
 
     componentDidMount() {
         var comp = [];
@@ -21,6 +32,7 @@ class missingFilesScreen extends Component {
         var param = [{ "url": "https://www.bhcosmetics.com/" },
         { "url": "https://www.bhcosmetics.com/eyes" },
         ];
+        var param2 =this.state.listType;
         fetch("/api/missingtest/lastest", {
             method: 'POST',
             headers: {
@@ -73,6 +85,8 @@ class missingFilesScreen extends Component {
         var param = [{ "url": "https://www.bhcosmetics.com/" },
         { "url": "https://www.bhcosmetics.com/eyes" },
         ];
+        var param2 =this.state.listType;
+        console.log(param2)
         fetch("/api/missingtest", {
             method: 'POST',
             headers: {
@@ -92,6 +106,103 @@ class missingFilesScreen extends Component {
         });
     }
 
+    _doClickImage(){
+        var active= false;
+
+        var flag = false;
+        var listTemp =this.state.listType;
+        for(let i=0; i<listTemp.length; i++){
+            if(listTemp[i].type===1){
+                listTemp.splice(i,1);
+                flag=true;
+                
+            }
+           
+        }
+        if(!flag){
+            listTemp.push({type:1});
+            active=true;
+        }
+        
+
+       
+        this.setState({listType:listTemp, isActiveImg:active})
+        
+            console.log(listTemp);
+        
+    }
+
+    _doClickCSS(){
+        var active=false;
+        var flag = false;
+        var listTemp =this.state.listType;
+        
+        for(let i=0; i<listTemp.length; i++){
+            if(listTemp[i].type===2){
+                listTemp.splice(i,1);
+                flag=true;
+            }
+           
+        }
+        if(!flag){
+            listTemp.push({type:2});
+            active=true;
+        }
+        
+
+       
+        this.setState({listType:listTemp, isActiveCss:active})
+            console.log(listTemp);
+    }
+
+    _doClickDOC(){
+        var active=false;
+        var flag = false;
+        var listTemp =this.state.listType;
+        
+        for(let i=0; i<listTemp.length; i++){
+            if(listTemp[i].type===3){
+                listTemp.splice(i,1);
+                flag=true;
+            }
+           
+        }
+        if(!flag){
+            listTemp.push({type:3});
+            active=true;
+        }
+        
+
+       
+        this.setState({listType:listTemp, isActiveDoc:active})
+            console.log(listTemp);
+    }
+
+    _doClickARCHIRES(){
+        var active=false;
+        var flag = false;
+        var listTemp =this.state.listType;
+        
+        for(let i=0; i<listTemp.length; i++){
+            if(listTemp[i].type===4){
+                listTemp.splice(i,1);
+                flag=true;
+            }
+           
+        }
+        if(!flag){
+            listTemp.push({type:4});
+            active=true;
+        }
+        
+
+       
+        this.setState({listType:listTemp, isActiveARCHIRES:active})
+            console.log(listTemp);
+    }
+
+    
+    
     
     render() {
         return (
@@ -106,7 +217,7 @@ class missingFilesScreen extends Component {
                     <Segment.Group horizontal>
                       
                         <Segment basic>
-                        
+
                             <Segment.Group horizontal >
                                 <Segment style={{ margin: 'auto', textAlign: 'center', padding: 0 }}>
                                     <Icon className="warning sign" size='huge' color='red' />
@@ -152,8 +263,14 @@ class missingFilesScreen extends Component {
                         </Segment> */}
                         
                         <Segment basic>
-                       
+                    
                             <div style={{marginBottom:'50px'}}>
+                            <Button.Group style={{float:'left'}}>
+    <Button onClick={()=>this._doClickImage()} active={this.state.isActiveImg}>Image</Button>
+    <Button onClick={()=>this._doClickCSS()} active={this.state.isActiveCss}>CSS</Button>
+    <Button onClick={()=>this._doClickDOC()} active={this.state.isActiveDoc}>DOC</Button>
+    <Button onClick={()=>this._doClickARCHIRES()} active={this.state.isActiveARCHIRES}>ARCHIRES</Button>
+  </Button.Group>
                                 <Button  style={{ float: 'right'}}><Icon name="print" />Export</Button>
 
                                 <Input icon='search' placeholder='Search...' style={{ float: 'right' }} />

@@ -155,210 +155,232 @@ public class TechnologyService {
         return result;
     }
 
-    public List<MissingFileReport> getMissingFile(Url[] url, String urlNew) {
+    public List<MissingFileReport> getMissingFile(Url[] url, String urlNew) throws InterruptedException {
         List<MissingFileReport> missing = new ArrayList<>();
+        final CyclicBarrier gate = new CyclicBarrier(url.length);
+        List<Thread> listThread = new ArrayList<>();
         String urlRoot = urlNew;
         for (Url u : url) {
-            System.out.println(urlRoot);
-            try {
-                Document doc = Jsoup.connect(u.getUrl()).get();
-                int i = 0;
-                //check missing image
-                Pattern pattern = Pattern.compile("((http\\:|https\\:)?//?([\\w\\-?\\.?]+)?\\.([a-zA-Z]{2,3})?)?(/\\S*)\\.(jpg|gif|jp2|jpeg|pbm|pcx|pgm|png|ppm|psd|tiff|tga|svg)", Pattern.CASE_INSENSITIVE);
-                Matcher matcher = pattern.matcher(doc.html());
-                while (matcher.find()) {
-                    i++;
-                    String strChcek = matcher.group();
-                    String checkCode = verifyHttpMessage(strChcek);
-                    if (checkCode.equals("OK")) {
-                        System.out.println("Image: " + strChcek + " - Code:" + checkCode);
+            listThread.add(new Thread() {
+                public void run() {
+                    try {
+                        gate.await();
+                        Document doc = Jsoup.connect(u.getUrl()).get();
+                        int i = 0;
+                        //check missing image
+                        Pattern pattern = Pattern.compile("((http\\:|https\\:)?//?([\\w\\-?\\.?]+)?\\.([a-zA-Z]{2,3})?)?(/\\S*)\\.(jpg|gif|jp2|jpeg|pbm|pcx|pgm|png|ppm|psd|tiff|tga|svg)", Pattern.CASE_INSENSITIVE);
+                        Matcher matcher = pattern.matcher(doc.html());
+                        while (matcher.find()) {
+                            i++;
+                            String strChcek = matcher.group();
+                            String checkCode = verifyHttpMessage(strChcek);
+                            if (checkCode.equals("OK")) {
+                                System.out.println("Image: " + strChcek + " - Code:" + checkCode);
 
-                    }
-                    if (!checkCode.equals("OK")) {
-                        String checkAgain = urlRoot + strChcek;
-                        String codeCheckAgain = verifyHttpMessage(checkAgain);
-                        if (codeCheckAgain.equals("OK")) {
-                            System.out.println("Image Again: " + checkAgain + " - Code:" + codeCheckAgain);
-                        }
-                        if (!codeCheckAgain.equals("OK")) {
-                            String checkLast = "https:" + strChcek;
-                            String codeCheclast = verifyHttpMessage(checkLast);
-                            System.out.println("Code Check Last: " + codeCheclast);
-                            if (codeCheclast.equals("OK")) {
-                                System.out.println("Image Last: " + checkLast + " - Code:" + codeCheclast);
-                            } else {
-                                MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheclast, u.getUrl());
-                                missing.add(fileNew);
-                                System.out.println("Image Last Fail: " + strChcek + " -Code: " + codeCheclast);
+                            }
+                            if (!checkCode.equals("OK")) {
+                                String checkAgain = urlRoot + strChcek;
+                                String codeCheckAgain = verifyHttpMessage(checkAgain);
+                                if (codeCheckAgain.equals("OK")) {
+                                    System.out.println("Image Again: " + checkAgain + " - Code:" + codeCheckAgain);
+                                }
+                                if (!codeCheckAgain.equals("OK")) {
+                                    String checkLast = "https:" + strChcek;
+                                    String codeCheclast = verifyHttpMessage(checkLast);
+                                    System.out.println("Code Check Last: " + codeCheclast);
+                                    if (codeCheclast.equals("OK")) {
+                                        System.out.println("Image Last: " + checkLast + " - Code:" + codeCheclast);
+                                    } else {
+                                        MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheclast, u.getUrl());
+                                        missing.add(fileNew);
+                                        System.out.println("Image Last Fail: " + strChcek + " -Code: " + codeCheclast);
+                                    }
+                                }
                             }
                         }
-                    }
-                }
-                //End check missing file
+                        //End check missing file
 
 
-                //Check missing doc
-                pattern = Pattern.compile("((http\\:|https\\:)?//?([\\w\\-?\\.?]+)?\\.([a-zA-Z]{2,3})?)?(/\\S*)\\.(csv|doc|docx|djvu|odp|ods|odt|pps|ppsx|ppt|pptx|pdf|ps|eps|rtf|txt|wks|wps|xls|xlsx|xps)");
-                matcher = pattern.matcher(doc.html());
-                while (matcher.find()) {
-                    String strChcek = matcher.group();
-                    String checkCode = verifyHttpMessage(strChcek);
-                    if (checkCode.equals("OK")) {
-                        System.out.println("DOC: " + strChcek + " - Code:" + checkCode);
-                    }
-                    if (!checkCode.equals("OK")) {
-                        String checkAgain = urlRoot + strChcek;
-                        String codeCheckAgain = verifyHttpMessage(checkAgain);
-                        if (codeCheckAgain.equals("OK")) {
-                            System.out.println("DOC Again: " + checkAgain + " - Code:" + codeCheckAgain);
-                        }
-                        if (!codeCheckAgain.equals("OK")) {
-                            String checkLast = "https:" + strChcek;
-                            String codeCheclast = verifyHttpMessage(checkLast);
-                            System.out.println("Code Check Last: " + codeCheclast);
-                            if (codeCheclast.equals("OK")) {
-                                System.out.println("DOC Last: " + checkLast + " - Code:" + codeCheclast);
-                            } else {
-                                MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheclast, u.getUrl());
-                                missing.add(fileNew);
-                                System.out.println("DOC Last Fail: " + strChcek + " -Code: " + codeCheclast);
+                        //Check missing doc
+                        pattern = Pattern.compile("((http\\:|https\\:)?//?([\\w\\-?\\.?]+)?\\.([a-zA-Z]{2,3})?)?(/\\S*)\\.(csv|doc|docx|djvu|odp|ods|odt|pps|ppsx|ppt|pptx|pdf|ps|eps|rtf|txt|wks|wps|xls|xlsx|xps)");
+                        matcher = pattern.matcher(doc.html());
+                        while (matcher.find()) {
+                            String strChcek = matcher.group();
+                            String checkCode = verifyHttpMessage(strChcek);
+                            if (checkCode.equals("OK")) {
+                                System.out.println("DOC: " + strChcek + " - Code:" + checkCode);
                             }
-                        }
-                    }
-
-                }
-                // end check missing doc
-
-                //check missing ARCHIVES
-                pattern = Pattern.compile("((http\\:|https\\:)?//?([\\w\\-?\\.?]+)?\\.([a-zA-Z]{2,3})?)(/\\S*)\\.(7z|zip|rar|jar|tar|tar|gz|cab)", Pattern.CASE_INSENSITIVE);
-                matcher = pattern.matcher(doc.html());
-                while (matcher.find()) {
-                    String strChcek = matcher.group();
-                    String checkCode = verifyHttpMessage(strChcek);
-                    if (checkCode.equals("OK")) {
-                        System.out.println("ARCHIRE: " + strChcek + " - Code:" + checkCode);
-                    }
-                    if (!checkCode.equals("OK")) {
-                        String checkAgain = urlRoot + strChcek;
-                        String codeCheckAgain = verifyHttpMessage(checkAgain);
-                        if (codeCheckAgain.equals("OK")) {
-                            System.out.println("ARCHIVES Again: " + checkAgain + " - Code:" + codeCheckAgain);
-                        }
-                        if (!codeCheckAgain.equals("OK")) {
-                            String checkLast = "https:" + strChcek;
-                            String codeCheclast = verifyHttpMessage(checkLast);
-                            System.out.println("Code Check Last: " + codeCheclast);
-                            if (codeCheclast.equals("OK")) {
-                                System.out.println("ARCHIVES Last: " + checkLast + " - Code:" + codeCheclast);
-                            } else {
-                                MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheclast, u.getUrl());
-                                missing.add(fileNew);
-                                System.out.println("ARCHIVES Last Fail: " + strChcek + " -Code: " + codeCheclast);
+                            if (!checkCode.equals("OK")) {
+                                String checkAgain = urlRoot + strChcek;
+                                String codeCheckAgain = verifyHttpMessage(checkAgain);
+                                if (codeCheckAgain.equals("OK")) {
+                                    System.out.println("DOC Again: " + checkAgain + " - Code:" + codeCheckAgain);
+                                }
+                                if (!codeCheckAgain.equals("OK")) {
+                                    String checkLast = "https:" + strChcek;
+                                    String codeCheclast = verifyHttpMessage(checkLast);
+                                    System.out.println("Code Check Last: " + codeCheclast);
+                                    if (codeCheclast.equals("OK")) {
+                                        System.out.println("DOC Last: " + checkLast + " - Code:" + codeCheclast);
+                                    } else {
+                                        MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheclast, u.getUrl());
+                                        missing.add(fileNew);
+                                        System.out.println("DOC Last Fail: " + strChcek + " -Code: " + codeCheclast);
+                                    }
+                                }
                             }
+
                         }
-                    }
+                        // end check missing doc
 
-                }
-                //end check ARCHIVES
+                        //check missing ARCHIVES
+                        pattern = Pattern.compile("((http\\:|https\\:)?//?([\\w\\-?\\.?]+)?\\.([a-zA-Z]{2,3})?)(/\\S*)\\.(7z|zip|rar|jar|tar|tar|gz|cab)", Pattern.CASE_INSENSITIVE);
+                        matcher = pattern.matcher(doc.html());
+                        while (matcher.find()) {
+                            String strChcek = matcher.group();
+                            String checkCode = verifyHttpMessage(strChcek);
+                            if (checkCode.equals("OK")) {
+                                System.out.println("ARCHIRE: " + strChcek + " - Code:" + checkCode);
+                            }
+                            if (!checkCode.equals("OK")) {
+                                String checkAgain = urlRoot + strChcek;
+                                String codeCheckAgain = verifyHttpMessage(checkAgain);
+                                if (codeCheckAgain.equals("OK")) {
+                                    System.out.println("ARCHIVES Again: " + checkAgain + " - Code:" + codeCheckAgain);
+                                }
+                                if (!codeCheckAgain.equals("OK")) {
+                                    String checkLast = "https:" + strChcek;
+                                    String codeCheclast = verifyHttpMessage(checkLast);
+                                    System.out.println("Code Check Last: " + codeCheclast);
+                                    if (codeCheclast.equals("OK")) {
+                                        System.out.println("ARCHIVES Last: " + checkLast + " - Code:" + codeCheclast);
+                                    } else {
+                                        MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheclast, u.getUrl());
+                                        missing.add(fileNew);
+                                        System.out.println("ARCHIVES Last Fail: " + strChcek + " -Code: " + codeCheclast);
+                                    }
+                                }
+                            }
 
-                //check missing css
-                pattern = Pattern.compile("((http\\:|https\\:)?//?([\\w\\-?\\.?]+)?\\.([a-zA-Z]{2,3})?)?(/\\S*)\\.(css)(([\\?\\.\\=]\\w*)*)?", Pattern.CASE_INSENSITIVE);
-                matcher = pattern.matcher(doc.html());
-                while (matcher.find()) {
+                        }
+                        //end check ARCHIVES
+
+                        //check missing css
+                        pattern = Pattern.compile("((http\\:|https\\:)?//?([\\w\\-?\\.?]+)?\\.([a-zA-Z]{2,3})?)?(/\\S*)\\.(css)(([\\?\\.\\=]\\w*)*)?", Pattern.CASE_INSENSITIVE);
+                        matcher = pattern.matcher(doc.html());
+                        while (matcher.find()) {
 //            System.out.println(matcher.group());
-                    String strChcek = matcher.group();
-                    String checkCode = verifyHttpMessage(strChcek);
-                    if (checkCode.equals("OK")) {
-                        System.out.println("CSS 2: " + strChcek + " - Code:" + checkCode);
-                    }
-                    if (!checkCode.equals("OK")) {
-                        String checkAgain = urlRoot + strChcek;
-                        String codeCheckAgain = verifyHttpMessage(checkAgain);
-                        if (codeCheckAgain.equals("OK")) {
-                            System.out.println("CSS 2 Again: " + checkAgain + " - Code:" + codeCheckAgain);
-                        }
-                        if (!codeCheckAgain.equals("OK")) {
-                            String checkLast = "https:" + strChcek;
-                            String codeCheclast = verifyHttpMessage(checkLast);
-                            System.out.println("Code Check Last: " + codeCheclast);
-                            if (codeCheclast.equals("OK")) {
-                                System.out.println("CSS 2 Last: " + checkLast + " - Code:" + codeCheclast);
-                            } else {
-                                MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheclast, u.getUrl());
-                                missing.add(fileNew);
-                                System.out.println("CSS 2 Last Fail: " + strChcek + " -Code: " + codeCheclast);
+                            String strChcek = matcher.group();
+                            String checkCode = verifyHttpMessage(strChcek);
+                            if (checkCode.equals("OK")) {
+                                System.out.println("CSS 2: " + strChcek + " - Code:" + checkCode);
+                            }
+                            if (!checkCode.equals("OK")) {
+                                String checkAgain = urlRoot + strChcek;
+                                String codeCheckAgain = verifyHttpMessage(checkAgain);
+                                if (codeCheckAgain.equals("OK")) {
+                                    System.out.println("CSS 2 Again: " + checkAgain + " - Code:" + codeCheckAgain);
+                                }
+                                if (!codeCheckAgain.equals("OK")) {
+                                    String checkLast = "https:" + strChcek;
+                                    String codeCheclast = verifyHttpMessage(checkLast);
+                                    System.out.println("Code Check Last: " + codeCheclast);
+                                    if (codeCheclast.equals("OK")) {
+                                        System.out.println("CSS 2 Last: " + checkLast + " - Code:" + codeCheclast);
+                                    } else {
+                                        MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheclast, u.getUrl());
+                                        missing.add(fileNew);
+                                        System.out.println("CSS 2 Last Fail: " + strChcek + " -Code: " + codeCheclast);
+                                    }
+                                }
                             }
                         }
-                    }
-                }
-                //end check missing css
+                        //end check missing css
 
-                //check missing mp4 file
-                pattern = Pattern.compile("(http\\:|https\\:)?//?([\\w\\-?\\.?]+)?\\.([a-zA-Z]{2,3})?(/\\S*)\\.(3gp|avi|flv|m4v|mkv|mov|mp4|mpeg|ogv|wmv|webm)(\\w*)?", Pattern.CASE_INSENSITIVE);
-                matcher = pattern.matcher(doc.html());
-                while (matcher.find()) {
-                    String strChcek = matcher.group();
-                    String checkCode = verifyHttpMessage(strChcek);
-                    if (checkCode.equals("OK")) {
-                        System.out.println("MP4: " + strChcek + " - Code:" + checkCode);
-                    }
-                    if (!checkCode.equals("OK")) {
-                        String checkAgain = urlRoot + strChcek;
-                        String codeCheckAgain = verifyHttpMessage(checkAgain);
-                        if (codeCheckAgain.equals("OK")) {
-                            System.out.println("MP4 Again: " + checkAgain + " - Code:" + codeCheckAgain);
+                        //check missing mp4 file
+                        pattern = Pattern.compile("(http\\:|https\\:)?//?([\\w\\-?\\.?]+)?\\.([a-zA-Z]{2,3})?(/\\S*)\\.(3gp|avi|flv|m4v|mkv|mov|mp4|mpeg|ogv|wmv|webm)(\\w*)?", Pattern.CASE_INSENSITIVE);
+                        matcher = pattern.matcher(doc.html());
+                        while (matcher.find()) {
+                            String strChcek = matcher.group();
+                            String checkCode = verifyHttpMessage(strChcek);
+                            if (checkCode.equals("OK")) {
+                                System.out.println("MP4: " + strChcek + " - Code:" + checkCode);
+                            }
+                            if (!checkCode.equals("OK")) {
+                                String checkAgain = urlRoot + strChcek;
+                                String codeCheckAgain = verifyHttpMessage(checkAgain);
+                                if (codeCheckAgain.equals("OK")) {
+                                    System.out.println("MP4 Again: " + checkAgain + " - Code:" + codeCheckAgain);
+                                }
+                                if (!codeCheckAgain.equals("OK")) {
+                                    String checkLast = "https:" + strChcek;
+                                    String codeCheclast = verifyHttpMessage(checkLast);
+                                    System.out.println("Code Check Last: " + codeCheclast);
+                                    if (codeCheclast.equals("OK")) {
+                                        System.out.println("MP4 Last: " + checkLast + " - Code:" + codeCheclast);
+                                    } else {
+                                        MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheclast, u.getUrl());
+                                        missing.add(fileNew);
+                                        System.out.println("MP4 Last Fail: " + strChcek + " -Code: " + codeCheclast);
+                                    }
+                                }
+                            }
+
                         }
-                        if (!codeCheckAgain.equals("OK")) {
-                            String checkLast = "https:" + strChcek;
-                            String codeCheclast = verifyHttpMessage(checkLast);
-                            System.out.println("Code Check Last: " + codeCheclast);
-                            if (codeCheclast.equals("OK")) {
-                                System.out.println("MP4 Last: " + checkLast + " - Code:" + codeCheclast);
-                            } else {
-                                MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheclast, u.getUrl());
-                                missing.add(fileNew);
-                                System.out.println("MP4 Last Fail: " + strChcek + " -Code: " + codeCheclast);
+                        //end check mp4 file
+
+                        //check missing mp3 file
+                        pattern = Pattern.compile("(http\\:|https\\:)?//?([\\w\\-?\\.?]+)?\\.([a-zA-Z]{2,3})?(/\\S*)\\.(aac|ac3|aiff|amr|ape|flac|m4a|mka|mp3|mpc|ogg|wav|wma)", Pattern.CASE_INSENSITIVE);
+                        matcher = pattern.matcher(doc.html());
+                        while (matcher.find()) {
+                            String strChcek = matcher.group();
+                            String checkCode = verifyHttpMessage(strChcek);
+                            if (checkCode.equals("OK")) {
+                                System.out.println("MP3: " + strChcek + " - Code:" + checkCode);
+                            }
+                            if (!checkCode.equals("OK")) {
+                                String checkAgain = urlRoot + strChcek;
+                                String codeCheckAgain = verifyHttpMessage(checkAgain);
+                                if (codeCheckAgain.equals("OK")) {
+                                    System.out.println("MP3 Again: " + checkAgain + " - Code:" + codeCheckAgain);
+                                }
+                                if (!codeCheckAgain.equals("OK")) {
+                                    String checkLast = "https:" + strChcek;
+                                    String codeCheclast = verifyHttpMessage(checkLast);
+                                    System.out.println("Code Check Last: " + codeCheclast);
+                                    if (codeCheclast.equals("OK")) {
+                                        System.out.println("MP3 Last: " + checkLast + " - Code:" + codeCheclast);
+                                    } else {
+                                        MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheclast, u.getUrl());
+                                        missing.add(fileNew);
+                                        System.out.println("MP3 Last Fail: " + strChcek + " -Code: " + codeCheclast);
+                                    }
+                                }
                             }
                         }
-                    }
-
-                }
-                //end check mp4 file
-
-                //check missing mp3 file
-                pattern = Pattern.compile("(http\\:|https\\:)?//?([\\w\\-?\\.?]+)?\\.([a-zA-Z]{2,3})?(/\\S*)\\.(aac|ac3|aiff|amr|ape|flac|m4a|mka|mp3|mpc|ogg|wav|wma)", Pattern.CASE_INSENSITIVE);
-                matcher = pattern.matcher(doc.html());
-                while (matcher.find()) {
-                    String strChcek = matcher.group();
-                    String checkCode = verifyHttpMessage(strChcek);
-                    if (checkCode.equals("OK")) {
-                        System.out.println("MP3: " + strChcek + " - Code:" + checkCode);
-                    }
-                    if (!checkCode.equals("OK")) {
-                        String checkAgain = urlRoot + strChcek;
-                        String codeCheckAgain = verifyHttpMessage(checkAgain);
-                        if (codeCheckAgain.equals("OK")) {
-                            System.out.println("MP3 Again: " + checkAgain + " - Code:" + codeCheckAgain);
-                        }
-                        if (!codeCheckAgain.equals("OK")) {
-                            String checkLast = "https:" + strChcek;
-                            String codeCheclast = verifyHttpMessage(checkLast);
-                            System.out.println("Code Check Last: " + codeCheclast);
-                            if (codeCheclast.equals("OK")) {
-                                System.out.println("MP3 Last: " + checkLast + " - Code:" + codeCheclast);
-                            } else {
-                                MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheclast, u.getUrl());
-                                missing.add(fileNew);
-                                System.out.println("MP3 Last Fail: " + strChcek + " -Code: " + codeCheclast);
-                            }
-                        }
+                        //end check Missing mp3 file
+                    } catch (IOException e) {
+                        Logger.getLogger(ExperienceService.class.getName()).log(Level.SEVERE, null, e);
+                    } catch (InterruptedException e) {
+                        Logger.getLogger(ExperienceService.class.getName()).log(Level.SEVERE, null, e);
+                    } catch (BrokenBarrierException e) {
+                        Logger.getLogger(ExperienceService.class.getName()).log(Level.SEVERE, null, e);
                     }
                 }
-                //end check Missing mp3 file
-            } catch (IOException e) {
-                Logger.getLogger(ExperienceService.class.getName()).log(Level.SEVERE, null, e);
-            }
+                           });
+            System.out.println(urlRoot);
+
         }
+        for (Thread t : listThread) {
+            System.out.println("Threed start");
+            t.start();
+        }
+
+        for (Thread t : listThread) {
+            System.out.println("Threed join");
+            t.join();
+        }
+
         return missing;
     }
 

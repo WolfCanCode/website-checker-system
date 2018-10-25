@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -30,11 +31,14 @@ public class ContentController {
 
 
     @PostMapping("/api/pagestest")
-    public List<Pages> getDataPagesTest(@RequestBody Url[] list) throws IOException {
-        ContentService contentService = new ContentService();
-        List<Pages> resultList = contentService.getPageInfor(list);
-       pageTestRepository.deleteAll();
-       pageTestRepository.saveAll(resultList);
+    public List<Pages> getDataPagesTest(@RequestBody Url[] list) throws InterruptedException {
+        List<Pages> resultList = new ArrayList<>();
+
+            ContentService contentService = new ContentService();
+            resultList=resultList = contentService.getPageInfor(list);
+            pageTestRepository.deleteAll();
+            pageTestRepository.saveAll(resultList);
+
         return resultList;
     }
     @PostMapping("/api/pagestest/lastest")
