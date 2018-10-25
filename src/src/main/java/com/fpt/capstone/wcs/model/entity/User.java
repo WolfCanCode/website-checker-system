@@ -8,17 +8,17 @@ import java.util.List;
 
 @Data
 @Entity
-@Getter
 @Setter
+@Getter
 @Table(name="User")
 public class User {
     @Id
     @GeneratedValue
-    public Long id;
-    public String name;
-    public String password;
-    public String email;
-    public String token;
+    private Long id;
+    private String name;
+    private String password;
+    private String email;
+    private String token;
 
     public User(Long id, String token)
     {
@@ -30,6 +30,7 @@ public class User {
         this.email = email;
         this.password = password;
     }
+
 
     @ManyToOne()
     @JoinColumn(name="role_id")

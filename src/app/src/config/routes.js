@@ -48,7 +48,7 @@ export class RouteClient extends Component {
                 <Route path="/admin1" component={AdminScreen1} />
                 <Route path="/login" exact component={LoginScreen} />
                 <Route path="/register" component={RegisterScreen} />
-                <Route path='/authenticate' component={() => window.location = 'http://localhost:3000/admin'} />
+                <Route path='/authenticate' component={() => window.location = '/admin'} />
             </Switch>
         </Router>
         )
@@ -82,7 +82,7 @@ export const RouteAdmin = withRouter(({ location }) => (
                 <Route path="/admin/grammar" component={GrammarScreen} />
                 <Route path="/admin/prohibited" component={ProhibitedScreen} />
                 <Route path="/admin/cookielaw" component={CookieLawScreen} />
-                <Route path='/logout' component={() => window.location = 'http://localhost:3000/login'} />
+                <Route path='/logout' component={() => window.location = '../login'} />
                 <Route path="/admin1" exact component={Dashboard1} />
                 <Route path="*" component={Error404}/>
             </Switch>

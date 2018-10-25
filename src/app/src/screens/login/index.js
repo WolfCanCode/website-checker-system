@@ -5,6 +5,8 @@ import bg1 from '../../assets/bg-login-layout1.jpg';
 import bg2 from '../../assets/bg-login-layout2.jpg';
 import divLogin from '../../assets/divider-login.png';
 import { Redirect } from "react-router-dom";
+import {Cookies} from "react-cookie";
+const cookies = new Cookies();
 
 class LoginScreen extends Component {
     constructor(props) {
@@ -103,14 +105,12 @@ class LoginScreen extends Component {
             },
             body: JSON.stringify(param)
         });
-        var user = null;
-        try { user = await response.json(); }
-        catch (e) {
-            alert("Sai email hoặc password");
-        }
-
-        if (user === null) {
+        var user = await response.json(); 
+        if (user.action==="INCORRECT") {
+            alert("Đăng nhập thất bại")
         } else {
+            cookies.set("u_id", user.id, {path:"/"});
+            cookies.set("u_token", user.token, {path:"/"});
             this.setState({ isLogin: true });
         }
         this.setState({ isLoading: false });
