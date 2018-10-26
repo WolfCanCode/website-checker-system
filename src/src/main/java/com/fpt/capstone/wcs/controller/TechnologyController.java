@@ -22,8 +22,8 @@ public class TechnologyController {
     @Autowired
     JSCheckRepository jsCheckRepository;
     ServerBehaviorRepository serverBehaviorRepository;
-    @Autowired
-    MissingFilesPagesRepository missingFilesPagesRepository;
+//    @Autowired
+//    MissingFilesPagesRepository missingFilesPagesRepository;
     @Autowired
     CookieRepository cookieRepository;
 
@@ -56,32 +56,7 @@ public class TechnologyController {
         return result;
     }
 
-    @PostMapping("/api/missingtest")
-    public List<MissingFileReport> getMissingFile(@RequestBody Url[] list) throws InterruptedException {
-        TechnologyService technologyService = new TechnologyService();
-//        for (MissingFileDTO lisFileDTO:listType){
-//            System.out.println(lisFileDTO);
-//        };
-        String urlRoot="";
-        for(int i =0; i< list.length;i++ ){
-            Pattern pattern = Pattern.compile("(http\\:|https\\:)//([\\w\\-?\\.?]+)?\\.([a-zA-Z]{2,3})?",Pattern.CASE_INSENSITIVE);
-            Matcher matcher = pattern.matcher(list[i].getUrl());
-            while (matcher.find()){
-                urlRoot = matcher.group();
-            }
-        }
-        List<MissingFileReport> result =  technologyService.getMissingFile(list, urlRoot);
-        missingFilesPagesRepository.deleteAll();
-        missingFilesPagesRepository.saveAll(result);
-        System.out.println("Ket Thuc check");
-        return result;
-    }
-
-    @PostMapping("/api/missingtest/lastest")
-    public List<MissingFileReport> getLastestMissingFile() {
-        List<MissingFileReport> result = missingFilesPagesRepository.findAll();
-        return result;
-    }
+//
 
 
 

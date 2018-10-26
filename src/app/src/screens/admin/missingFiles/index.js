@@ -30,7 +30,7 @@ class missingFilesScreen extends Component {
         var listMissingFileCount =[];
         this.setState({ loadingTable: true });
         var param = [{ "url": "https://www.bhcosmetics.com/" },
-        { "url": "https://www.bhcosmetics.com/eyes" },
+        { "url": "http://www.sggp.org.vn/" },
         ];
         var param2 =this.state.listType;
         fetch("/api/missingtest/lastest", {
@@ -83,7 +83,7 @@ class missingFilesScreen extends Component {
         this.setState({ loadingTable: true, isDisable: true });
         var comp = [];
         var param = [{ "url": "https://www.bhcosmetics.com/" },
-        { "url": "https://www.bhcosmetics.com/eyes" },
+        { "url": "http://www.sggp.org.vn/" },
         ];
         var param2 =this.state.listType;
         console.log(param2)
