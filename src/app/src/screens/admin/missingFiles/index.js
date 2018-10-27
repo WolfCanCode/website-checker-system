@@ -83,7 +83,12 @@ class missingFilesScreen extends Component {
         this.setState({ loadingTable: true, isDisable: true });
         var comp = [];
         var param = this.state.listType ;
-        
+        var countPageAffected1=0;
+        var countMissingFile1=0;
+        let flag =false;
+        var listCom=[];
+        var flagMissingFile=false;
+        var listMissingFileCount =[];
         console.log(param)
         fetch("/api/missingtest", {
             method: 'POST',
@@ -94,9 +99,34 @@ class missingFilesScreen extends Component {
             body: JSON.stringify(param)
         }).then(response => response.json()).then((data) => {
             comp = data.map((item, index) => {
+                for(let i=0; i<listCom.length;i++){
+                    if(item.pages===listCom[i]){
+                     flag=true;
+                    }
+                }
+                if(flag===false){
+                    listCom.push(item.pages);
+                    countPageAffected1++;
+                }else{
+                    flag=false;
+                }
+ 
+                for(let i=0;i<listMissingFileCount.length;i++){
+                    if(item.fileMissing===listMissingFileCount[i]){
+                        flagMissingFile=true;
+                    }
+                }
+                if(flagMissingFile===false){
+                    listMissingFileCount.push(item.fileMissing);
+                    countMissingFile1++;
+                }
+                else{
+                     flagMissingFile=false;
+                }
                 return (<TableRow key={index} fileMissing={item.fileMissing} description={item.description} pages={item.pages} />);
             });
-            
+            this.setState({countMissingFile: countMissingFile1});
+            this.setState({countPageAffected: countPageAffected1});
             this.setState({ list: comp });
             this.setState({ loadingTable: false });
             this.setState({ isDisable: false });

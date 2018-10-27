@@ -918,17 +918,24 @@ public class QualityService {
     }
 
     //Function get size file
-    private  byte[] getBytes(String url) throws IOException {
-        URL urlTesst = new URL(url);
-        URLConnection uc = urlTesst.openConnection();
-        int len = uc.getContentLength();
-        InputStream in = new BufferedInputStream(uc.getInputStream());
-        byte[] b;
+    private  byte[] getBytes(String url)  {
+        byte[] b = new byte[0];
         try {
-            b = IOUtils.readFully(in, len, true);
-        } finally {
-            in.close();
+            URL urlTesst = new URL(url);
+            URLConnection uc = urlTesst.openConnection();
+            int len = uc.getContentLength();
+            InputStream in = new BufferedInputStream(uc.getInputStream());
+
+            try {
+                b = IOUtils.readFully(in, len, true);
+            } finally {
+                in.close();
+            }
+        }catch (IOException ex){
+            
         }
+        
         return b;
     }
+
 }

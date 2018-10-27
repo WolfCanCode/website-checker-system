@@ -69,10 +69,10 @@ public class QualityController {
     public List<MissingFileReport> getMissingFile(@RequestBody MissingFileDTO[] request) throws InterruptedException {
         QualityService qualityService = new QualityService();
         List<MissingFileReport> result= new ArrayList<>();
-        System.out.println( request);
+        System.out.println( request.length);
         Url[] list = new Url[2];
         list[0]= new Url("https://www.bhcosmetics.com/");
-        list[1]= new Url("https://www.bhcosmetics.com/");
+        list[1]= new Url("https://thanhnien.vn/");
         String urlRoot="";
         for(int i =0; i< list.length;i++ ){
             Pattern pattern = Pattern.compile("(http\\:|https\\:)//([\\w\\-?\\.?]+)?\\.([a-zA-Z]{2,3})?",Pattern.CASE_INSENSITIVE);
@@ -87,19 +87,25 @@ public class QualityController {
         }
         else{
             for (MissingFileDTO missingFileDTO:request){
+               int typeSwicth = missingFileDTO.getType();
+                System.out.println(typeSwicth);
                 switch (missingFileDTO.getType()){
                     case 1:{
                         result.addAll(qualityService.getMissingFileImg(list, urlRoot));
+                        break;
                     }
                     case 2:{
                         result.addAll(qualityService.getMissingFileCss(list,urlRoot));
+                        break;
                     }
                     case 3:{
                         result.addAll(qualityService.getMissingFileDoc(list, urlRoot));
+                        break;
 
                     }
                     case 4:{
                         result.addAll(qualityService.getMissingFileARCHIVES(list, urlRoot));
+                        break;
                     }
                 }
             }

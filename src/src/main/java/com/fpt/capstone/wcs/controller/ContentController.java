@@ -35,7 +35,7 @@ public class ContentController {
         List<Pages> resultList = new ArrayList<>();
 
             ContentService contentService = new ContentService();
-            resultList=resultList = contentService.getPageInfor(list);
+            resultList= contentService.getPageInfor(list);
             pageTestRepository.deleteAll();
             pageTestRepository.saveAll(resultList);
 
