@@ -1,5 +1,6 @@
 package com.fpt.capstone.wcs.controller;
 
+import com.fpt.capstone.wcs.model.MissingFileDTO;
 import com.fpt.capstone.wcs.model.entity.BrokenLinkReport;
 import com.fpt.capstone.wcs.model.entity.BrokenPageReport;
 import com.fpt.capstone.wcs.model.Url;
@@ -14,7 +15,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -62,8 +66,13 @@ public class QualityController {
     }
 
     @PostMapping("/api/missingtest")
-    public List<MissingFileReport> getMissingFile(@RequestBody Url[] list) throws InterruptedException {
-        QualityService technologyService = new QualityService();
+    public List<MissingFileReport> getMissingFile(@RequestBody MissingFileDTO[] request) throws InterruptedException {
+        QualityService qualityService = new QualityService();
+        List<MissingFileReport> result= new ArrayList<>();
+        System.out.println( request);
+        Url[] list = new Url[2];
+        list[0]= new Url("https://www.bhcosmetics.com/");
+        list[1]= new Url("https://www.bhcosmetics.com/");
         String urlRoot="";
         for(int i =0; i< list.length;i++ ){
             Pattern pattern = Pattern.compile("(http\\:|https\\:)//([\\w\\-?\\.?]+)?\\.([a-zA-Z]{2,3})?",Pattern.CASE_INSENSITIVE);
@@ -72,7 +81,31 @@ public class QualityController {
                 urlRoot = matcher.group();
             }
         }
-        List<MissingFileReport> result =  technologyService.getMissingFile(list, urlRoot);
+        if(request.length==0|| request.length==4){
+            System.out.println("Vo ne");
+            result =  qualityService.getMissingFile(list, urlRoot);
+        }
+        else{
+            for (MissingFileDTO missingFileDTO:request){
+                switch (missingFileDTO.getType()){
+                    case 1:{
+                        result.addAll(qualityService.getMissingFileImg(list, urlRoot));
+                    }
+                    case 2:{
+                        result.addAll(qualityService.getMissingFileCss(list,urlRoot));
+                    }
+                    case 3:{
+                        result.addAll(qualityService.getMissingFileDoc(list, urlRoot));
+
+                    }
+                    case 4:{
+                        result.addAll(qualityService.getMissingFileARCHIVES(list, urlRoot));
+                    }
+                }
+            }
+        }
+
+
         missingFilesPagesRepository.deleteAll();
         missingFilesPagesRepository.saveAll(result);
         System.out.println("Ket Thuc check");

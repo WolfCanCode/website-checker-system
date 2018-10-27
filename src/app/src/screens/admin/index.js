@@ -32,7 +32,7 @@ export default class AdminScreen extends Component {
         }).then(response => response.json()).then((data) => {
             if (data.action === "SUCCESS") {
                 console.log("get u_token: " + data.token);
-                cookies.set("u_token", data.token);
+                cookies.set("u_token", data.token,{path:"/"});
             } else {
                 this.setState({
                     redirect: <Redirect to='/logout' />

@@ -82,11 +82,9 @@ class missingFilesScreen extends Component {
     _doMissingFilePagesTest() {
         this.setState({ loadingTable: true, isDisable: true });
         var comp = [];
-        var param = [{ "url": "https://www.bhcosmetics.com/" },
-        { "url": "http://www.sggp.org.vn/" },
-        ];
-        var param2 =this.state.listType;
-        console.log(param2)
+        var param = this.state.listType ;
+        
+        console.log(param)
         fetch("/api/missingtest", {
             method: 'POST',
             headers: {
