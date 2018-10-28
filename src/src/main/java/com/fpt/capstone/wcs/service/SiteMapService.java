@@ -75,7 +75,11 @@ public class SiteMapService {
             int mapId = urlMap.get(curUrl);
             queue.remove();
             List<String> newUrl = crawlHtmlSource(curUrl);
+            int deepLimit = 0;
+
             for (String url : newUrl) {
+                deepLimit++;
+                if (deepLimit > 30) break;
                 url = url.trim();
                 if (!urlMap.containsKey(url)) {
                     // add to map & graph
@@ -95,6 +99,9 @@ public class SiteMapService {
                         graph.get(mapId).add(sl);
                         typeNode.add(2);
                         links.add(url);
+                    }
+                    if (verticesNum >= 200) {
+                        return;
                     }
                 } else {
                     // existed node
@@ -278,6 +285,96 @@ public class SiteMapService {
         for (SiteLink siteLink : invGraph.get(id)) {
             System.out.println("link: " + siteLink.getDesUrl() + " type: " + siteLink.getDesType());
         }
+    }
+
+
+    /**
+     * @return internal link (type: 1 vs 3)
+     */
+    public List<String> getInternalLink() {
+        List<String> result = new ArrayList<String>();
+        for (Map.Entry<String, Integer> entry : urlMap.entrySet()) {
+            String url = entry.getKey();
+            int idNode = entry.getValue();
+
+            int type = typeNode.get(idNode);
+            if (type != 2) {
+                result.add(url);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * @return all  link (type: 1, 2 & 3)
+     */
+    public List<String> getAllLinks() {
+        List<String> result = new ArrayList<String>();
+        for (Map.Entry<String, Integer> entry : urlMap.entrySet()) {
+            String url = entry.getKey();
+            result.add(url);
+        }
+        return result;
+    }
+
+
+    public boolean isChildUrlOf(String parentUrl, String childUrl) {
+        return childUrl.contains(parentUrl);
+    }
+
+    // process
+    List<List<Integer>> subChild;
+
+    public void printTree(int nodeId, int space) {
+        for (int i = 1; i <= space; i++) {
+            System.out.print("---");
+        }
+        System.out.println("URL: " + links.get(nodeId));
+
+        for (int i = 0; i < subChild.get(nodeId).size(); i++) {
+            int desNodeId = subChild.get(nodeId).get(i);
+            printTree(desNodeId, space + 1);
+        }
+    }
+
+
+    public void makeUI() {
+        // initial
+        int parent[] = new int[verticesNum];
+        int diff[] = new int[verticesNum];
+
+        Arrays.fill(parent, -1);
+        subChild = new ArrayList<List<Integer>>();
+        for (int i = 0; i < verticesNum; i++) subChild.add(new ArrayList<Integer>());
+        // process
+        for (int i = 0; i < verticesNum; i++)
+            for (int j = 0; j < verticesNum; j++)
+                if (i != j) {
+                    if (isChildUrlOf(links.get(i), links.get(j))) {
+                        int curDiff = links.get(j).length() - links.get(i).length();
+                        if (parent[j] == -1) {
+                            parent[j] = i;
+                            diff[j] = curDiff;
+                        } else // minimize the difference
+                            if (diff[j] > curDiff) {
+                                diff[j] = curDiff;
+                                parent[j] = i;
+                            }
+
+                    }
+                }
+
+        for (int i = 0; i < verticesNum; i++) {
+            int parentId = parent[i];
+            if (parentId != -1) {
+                subChild.get(parentId).add(i);
+            }
+            //System.out.println("node: " + i + " parent: " + parentId);
+        }
+        // print tree
+        for (int i = 0; i < verticesNum; i++)
+            if (parent[i] == -1)
+                printTree(i, 0);
     }
 
 }
