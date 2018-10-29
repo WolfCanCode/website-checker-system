@@ -23,7 +23,7 @@ class HeaderAdmin extends Component {
         }).then(response => response.json()).then((data) => {
             if (data.action === "SUCCESS") {
                 var list = data.website.map((item, index) => {
-                    return { key: index, value: item.url, text: item.name };
+                    return { key: index, value: item.id, text: item.url };
 
                 });
                 this.setState({ listWeb: list, txtWebpage: list[0].text });
@@ -72,11 +72,15 @@ class HeaderAdmin extends Component {
             }
         }
 
+        _changeWebsite(event){
+            alert(event.target.value);
+        }
+
 
         render() {
             return (
                 <Menu className="top" style={{ background: 'rgb(55, 33, 173)', position: 'absolute', width: '100%', zIndex: '4', margin: '0', height: '50px' }}>
-                    <Menu.Item><Dropdown options={this.state.listWeb} text={this.state.txtWebpage} defaultValue={this.state.listWeb.length === 0 ? "" : this.state.listWeb[0].value} onChange={event => this._changeWebPage(event)} style={{ marginLeft: '160px', color: 'white', fontSize: '18px' }} /></Menu.Item>
+                    <Menu.Item><Dropdown onChange={(event)=>this._changeWebsite(event)} options={this.state.listWeb} text={this.state.txtWebpage} defaultValue={this.state.listWeb.length === 0 ? "" : this.state.listWeb[0].value} style={{ marginLeft: '160px', color: 'white', fontSize: '18px' }} /></Menu.Item>
                     <Menu.Menu position='right'>
                         <Menu.Item>
                             <Input icon='search' placeholder='Search...' />
