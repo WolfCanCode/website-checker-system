@@ -2,6 +2,7 @@ package com.fpt.capstone.wcs.controller;
 
 import com.fpt.capstone.wcs.model.*;
 import com.fpt.capstone.wcs.model.entity.CookieReport;
+import com.fpt.capstone.wcs.model.entity.FaviconReport;
 import com.fpt.capstone.wcs.model.entity.JavascriptReport;
 import com.fpt.capstone.wcs.model.entity.MissingFileReport;
 import com.fpt.capstone.wcs.model.entity.ServerBehaviorReport;
@@ -22,10 +23,13 @@ public class TechnologyController {
     @Autowired
     JSCheckRepository jsCheckRepository;
     ServerBehaviorRepository serverBehaviorRepository;
-//    @Autowired
-//    MissingFilesPagesRepository missingFilesPagesRepository;
+
     @Autowired
     CookieRepository cookieRepository;
+
+    @Autowired
+    FaviconRepository faviconRepository;
+
 
     @PostMapping("/api/jsTest")
     public List<JavascriptReport> getDataPagesTest(@RequestBody Url[] list) throws InterruptedException {
@@ -57,9 +61,6 @@ public class TechnologyController {
     }
 
 //
-
-
-
     @PostMapping("/api/cookie")
     public List<CookieReport> getCookies(@RequestBody Url[] list) throws InterruptedException {
         TechnologyService technologyService = new TechnologyService();
@@ -76,4 +77,27 @@ public class TechnologyController {
         return resultList;
     }
 
+
+    @PostMapping("/api/favicontest")
+    public List<FaviconReport> getDataFaviconTest(@RequestBody Url[] list) throws InterruptedException {
+        TechnologyService technologyService = new TechnologyService();
+        String urlRoot="";
+        for(int i =0; i< list.length;i++ ){
+            Pattern pattern = Pattern.compile("(http\\:|https\\:)//([\\w\\-?\\.?]+)?\\.([a-zA-Z]{2,3})?",Pattern.CASE_INSENSITIVE);
+            Matcher matcher = pattern.matcher(list[i].getUrl());
+            while (matcher.find()){
+                urlRoot = matcher.group();
+            }
+        }
+        List<FaviconReport> resultList = technologyService.checkFavicon(list,urlRoot);
+        faviconRepository.deleteAll();
+        faviconRepository.saveAll(resultList);
+        return resultList;
+    }
+
+    @PostMapping("/api/favicontest/lastest")
+    public List<FaviconReport> getDataFaviconTestLastest() {
+        List<FaviconReport> resultList = faviconRepository.findAll();
+        return resultList;
+    }
 }
