@@ -30,7 +30,6 @@ import MobileLayoutScreen from '../screens/admin/mobileLayout/index';
 import ProhibitedScreen from '../screens/admin/prohibitedcontent/index';
 import serverBehaviorScreen from '../screens/admin/serverBehavior/index';
 import CookieLawScreen from '../screens/admin/cookielaw/index';
-import ConfigScreen from '../screens/admin/config/index';
 
 import Error404 from '../screens/admin/error404/index';
 
@@ -82,7 +81,6 @@ export const RouteAdmin = withRouter(({ location }) => (
                 <Route path="/admin/grammar" component={GrammarScreen} />
                 <Route path="/admin/prohibited" component={ProhibitedScreen} />
                 <Route path="/admin/cookielaw" component={CookieLawScreen} />
-                <Route path="/admin/setting" component={ConfigScreen} />
                 <Route path='/logout' component={() => window.location = '../login'} />
                 <Route path="*" component={Error404}/>
             </Switch>

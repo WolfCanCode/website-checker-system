@@ -1,9 +1,9 @@
 package com.fpt.capstone.wcs.controller;
 
-import com.fpt.capstone.wcs.model.pojo.MissingFile;
+import com.fpt.capstone.wcs.model.MissingFileDTO;
 import com.fpt.capstone.wcs.model.entity.BrokenLinkReport;
 import com.fpt.capstone.wcs.model.entity.BrokenPageReport;
-import com.fpt.capstone.wcs.model.pojo.Url;
+import com.fpt.capstone.wcs.model.Url;
 import com.fpt.capstone.wcs.model.entity.MissingFileReport;
 import com.fpt.capstone.wcs.repository.BrokenLinkRepository;
 import com.fpt.capstone.wcs.repository.BrokenPageRepository;
@@ -16,7 +16,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -64,7 +66,7 @@ public class QualityController {
     }
 
     @PostMapping("/api/missingtest")
-    public List<MissingFileReport> getMissingFile(@RequestBody MissingFile[] request) throws InterruptedException {
+    public List<MissingFileReport> getMissingFile(@RequestBody MissingFileDTO[] request) throws InterruptedException {
         QualityService qualityService = new QualityService();
         List<MissingFileReport> result= new ArrayList<>();
         System.out.println( request.length);
@@ -84,7 +86,7 @@ public class QualityController {
             result =  qualityService.getMissingFile(list, urlRoot);
         }
         else{
-            for (MissingFile missingFileDTO:request){
+            for (MissingFileDTO missingFileDTO:request){
                int typeSwicth = missingFileDTO.getType();
                 System.out.println(typeSwicth);
                 switch (missingFileDTO.getType()){

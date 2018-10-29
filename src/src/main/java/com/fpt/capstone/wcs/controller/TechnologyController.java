@@ -1,10 +1,11 @@
 package com.fpt.capstone.wcs.controller;
 
+import com.fpt.capstone.wcs.model.*;
 import com.fpt.capstone.wcs.model.entity.CookieReport;
 import com.fpt.capstone.wcs.model.entity.FaviconReport;
 import com.fpt.capstone.wcs.model.entity.JavascriptReport;
+import com.fpt.capstone.wcs.model.entity.MissingFileReport;
 import com.fpt.capstone.wcs.model.entity.ServerBehaviorReport;
-import com.fpt.capstone.wcs.model.pojo.Url;
 import com.fpt.capstone.wcs.repository.*;
 import com.fpt.capstone.wcs.service.TechnologyService;
 import org.springframework.beans.factory.annotation.Autowired;

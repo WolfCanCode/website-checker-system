@@ -1,10 +1,9 @@
 package com.fpt.capstone.wcs.service;
 
+import com.fpt.capstone.wcs.model.*;
 import com.fpt.capstone.wcs.model.entity.*;
-import com.fpt.capstone.wcs.model.pojo.Url;
 import org.jsoup.Jsoup;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
+import org.jsoup.nodes.Document;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -20,7 +19,6 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.net.URL;
 import java.net.URLConnection;
 import java.util.*;
 import java.util.concurrent.BrokenBarrierException;
@@ -29,6 +27,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.net.URL;
 
 public class TechnologyService {
 
@@ -224,117 +223,6 @@ public class TechnologyService {
         System.out.println("Size 12 " + resultList.size());
         return resultList;
 
-    }
-
-
-
-    public static List<FaviconReport> checkFavicon(Url[] url, String urlRoot) {
-        List<FaviconReport> fav = new ArrayList();
-        boolean flagMethod1 = false;
-        String urlFaviconMethod1 = urlRoot + "/favicon.ico";
-        int httpMessage = verifyHttpMessage(urlFaviconMethod1);
-        if (httpMessage == 200) {
-            byte[] capacity = getBytes(urlFaviconMethod1);
-            if (capacity.length != 0) {
-                System.out.println("Favicon URL: " + urlFaviconMethod1 + " Message: " + httpMessage + " Capacity: " + capacity.length);
-                flagMethod1 = true;
-            }
-        }
-        for ( Url urlNew : url) {
-            if (flagMethod1 == true) {
-                System.out.println(urlNew.getUrl().startsWith(urlRoot));
-                if(urlNew.getUrl().startsWith(urlRoot)){
-                    FaviconReport faviconMethod1 = new FaviconReport(urlFaviconMethod1, urlNew.getUrl(), "16x16");
-                    fav.add(faviconMethod1);
-                }
-                else{
-                    FaviconReport faviconMethod1 = new FaviconReport("External Link", urlNew.getUrl(), "");
-                    fav.add(faviconMethod1);
-                }
-            } else {
-                try {
-                    org.jsoup.nodes.Document doc = Jsoup.connect(urlNew.getUrl()).ignoreContentType(true).get();
-
-                    Elements elem = doc.head().select("link[rel~=(shortcut icon|icon|apple-touch-icon-precomposed|nokia-touch-icon)]");
-                    System.out.println(elem.size());
-                    if (elem.size() == 0) {
-                        FaviconReport favicon = new FaviconReport("Missing Favicon", urlNew.getUrl(), "undefine");
-                        fav.add(favicon);
-                    }
-                    for (Element element : elem) {
-                        String size = element.attr("sizes");
-
-                        if (size.equals("")) {
-                            size = "undefine";
-                        }
-                        String href = elem.attr("href");
-                        int code = verifyHttpMessage(href);
-                        if (code == 200) {
-                            FaviconReport favicon = new FaviconReport(href, urlNew.getUrl(), size);
-                            fav.add(favicon);
-                            System.out.println("Favicon: " + href + " - Web Address: " + urlNew + " - Size: " + size + " http code: " + code);
-                        }
-                        if (code != 200) {
-                            String urlFavAgain = urlRoot + href;
-                            int checkFaviconResponeAgain = verifyHttpMessage(urlFavAgain);
-                            if (checkFaviconResponeAgain == 200) {
-                                FaviconReport favicon = new FaviconReport(urlFavAgain, urlNew.getUrl(), size);
-                                fav.add(favicon);
-                                System.out.println("Favicon: " + urlFavAgain + " - Web Address: " + urlNew + " - Size: " + size + " http code: " + checkFaviconResponeAgain);
-                            }
-                            if (checkFaviconResponeAgain != 200) {
-                                String urlFavLast = "https:" + href;
-                                int checkFaviconResponeLast = verifyHttpMessage(urlFavLast);
-                                if (checkFaviconResponeLast == 200) {
-                                    FaviconReport favicon = new FaviconReport(urlFavLast, urlNew.getUrl(), size);
-                                    fav.add(favicon);
-                                    System.out.println("Favicon: " + urlFavLast + " - Web Address: " + urlNew + " - Size: " + size + " http code: " + checkFaviconResponeLast);
-                                }
-                            }
-                        }
-
-                    }
-                } catch (IOException ex) {
-                    Logger.getLogger( TechnologyService.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-
-        }
-        return fav;
-    }
-
-    private static byte[] getBytes(String url) {
-        byte[] b = new byte[0];
-        try {
-            URL urlTesst = new URL(url);
-            URLConnection uc = urlTesst.openConnection();
-            int len = uc.getContentLength();
-            InputStream in = new BufferedInputStream(uc.getInputStream());
-
-            try {
-                b = IOUtils.readFully(in, len, true);
-            } finally {
-                in.close();
-            }
-        } catch (IOException ex) {
-
-        }
-
-        return b;
-    }
-
-    public static int verifyHttpMessage(String url) {
-        int message;
-        try {
-            URL urlTesst = new URL(url);
-            HttpURLConnection connection = (HttpURLConnection) urlTesst.openConnection();
-            connection.setRequestMethod("GET");
-            connection.setRequestProperty("User-Agent", "Mozilla/5.0 ");
-            message = connection.getResponseCode();
-        } catch (Exception e) {
-            message = 404;
-        }
-        return message;
     }
 
 }

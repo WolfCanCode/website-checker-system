@@ -6,8 +6,8 @@ import SideMenu from '../../components/side-menu';
 import HeaderContent from '../../components/header-content';
 import HeaderAdmin from '../../components/header-admin';
 import menu from '../../config/menu';
+import ConfirmModal from '../../components/confirm-modal';
 import { Cookies } from "react-cookie";
-
 const cookies = new Cookies();
 
 export default class AdminScreen extends Component {
@@ -15,12 +15,13 @@ export default class AdminScreen extends Component {
         titleHeader: "Dashboard",
         altHeader: "This is Dashboard",
         imgSrc: "",
-        redirect: null,
-        listWeb: [],
-        txtWebpage: ""
+        redirect: null
     }
 
-    componentWillMount() {        
+    componentWillMount() {
+        console.log("u_id :" + cookies.get("u_id"));
+        console.log("u_token :" + cookies.get("u_token"));
+
         fetch("/api/auth", {
             method: 'POST',
             headers: {
@@ -31,7 +32,6 @@ export default class AdminScreen extends Component {
         }).then(response => response.json()).then((data) => {
             if (data.action === "SUCCESS") {
                 cookies.set("u_token", data.token,{path:"/"});
-                
             } else {
                 this.setState({
                     redirect: <Redirect to='/logout' />
@@ -45,6 +45,12 @@ export default class AdminScreen extends Component {
 
     _onUpdateHeader(title, alt, image) {
         this.setState({ titleHeader: title, altHeader: alt, imageSrc: image });
+    }
+
+    __onConfirm(result)
+    {
+        alert(result);
+        this.setState({showConfirmModal:false});
     }
 
     componentDidMount() {
@@ -72,9 +78,9 @@ export default class AdminScreen extends Component {
     render() {
         return (
             <Router>
-                
+
                 <div style={{ height: '100vh' }}>
-                {this.state.redirect} 
+                    {this.state.redirect}
                     <Sidebar.Pushable as={Segment} style={{ background: "#E0E0E0" }}>
                         <SideMenu updateHeader={(title, alt, image) => this._onUpdateHeader(title, alt, image)} />
                         <HeaderAdmin />
@@ -85,7 +91,9 @@ export default class AdminScreen extends Component {
                                 <RouteAdmin />
                             </Segment>
                         </Sidebar.Pusher>
-                    </Sidebar.Pushable></div> 
+                    </Sidebar.Pushable>
+                    <ConfirmModal show={this.state.showConfirmModal} title="Test" icon="server" content="Thử chút coi" choose={(result)=>this.__onConfirm(result)} />
+                </div>
             </Router >
         );
     }

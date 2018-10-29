@@ -6,13 +6,15 @@ import com.fpt.capstone.wcs.repository.UserRepository;
 import com.fpt.capstone.wcs.utils.Constant;
 import com.fpt.capstone.wcs.utils.EncodeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 //email:admin@abc.com
 //password:12345678 : hash ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f
@@ -50,6 +52,7 @@ public class UserController {
     @PostMapping("/api/auth")
     public Map<String, Object> isAuth(@RequestBody User user)
     {
+        String oldToken = user.getToken();
         User result = userRepository.findOneByIdAndToken(user.getId(),user.getToken());
         Map<String, Object> res = new HashMap<>();
         if(result==null)
@@ -67,21 +70,6 @@ public class UserController {
 
     }
 
-    @PostMapping("/api/user/name")
-    public Map<String, Object> getName(@RequestBody User user)
-    {
-        Optional<User> result = userRepository.findById(user.getId());
-        Map<String, Object> res = new HashMap<>();
-        if(result==null)
-        {
-            res.put("action", Constant.INCORRECT);
-            return res;
-        } else {
-            res.put("action", Constant.SUCCESS);
-            res.put("name", result.get().getName());
-            return res;
-        }
 
-    }
 
 }

@@ -1,7 +1,5 @@
 package com.fpt.capstone.wcs.model.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,7 +7,9 @@ import lombok.Setter;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @Entity
@@ -23,10 +23,13 @@ public class Page {
     private int type;
     private String url;
 
-    @ManyToOne()
-    @JoinColumn(name="website_id")
-    @JsonIgnore
-    private Website website;
+    @ManyToMany(fetch = FetchType.LAZY,
+            cascade = {
+                    CascadeType.PERSIST,
+                    CascadeType.MERGE
+            },
+            mappedBy = "Page")
+    private List<Website> Website = new ArrayList<>();
 
     @ManyToMany(fetch = FetchType.LAZY,
             cascade = {
