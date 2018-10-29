@@ -20,7 +20,7 @@ export default class CookieLaw extends Component {
             body: JSON.stringify(param)
         }).then(response => response.json()).then((data) => {
             comp = data.map((item, index) => {
-                return (<TableRow key={index} cookieName={item.cookieName} exampleValue={item.exampleValue} host={item.host} expiryDate={item.expiryDate} />);
+                return (<TableRow key={index} cookieName={item.cookieName} category={item.category} party={item.party} description={item.description} />);
             });
             this.setState({ list: comp });
             this.setState({ loadingTable: false });
@@ -51,7 +51,7 @@ export default class CookieLaw extends Component {
             body: JSON.stringify(param)
         }).then(response => response.json()).then((data) => {
             comp = data.map((item, index) => {
-                return (<TableRow key={index} cookieName={item.cookieName} exampleValue={item.exampleValue} host={item.host} expiryDate={item.expiryDate} />);
+                return (<TableRow key={index} cookieName={item.cookieName} category={item.category} party={item.party} description={item.description} />);
             });
             this.setState({ list: comp });
             this.setState({ loadingTable: false, isDisable: false });
@@ -92,10 +92,10 @@ export default class CookieLaw extends Component {
                     <Table singleLine style={{ fontSize: '14px' }}>
                         <Table.Header>
                             <Table.Row>
-                                <Table.HeaderCell>Cookie</Table.HeaderCell>
-                                <Table.HeaderCell>Example Value</Table.HeaderCell>
-                                <Table.HeaderCell>Host</Table.HeaderCell>
-                                <Table.HeaderCell>Expiry Date</Table.HeaderCell>
+                                <Table.HeaderCell>CookieName</Table.HeaderCell>
+                                <Table.HeaderCell>Category</Table.HeaderCell>
+                                <Table.HeaderCell>Party</Table.HeaderCell>
+                                <Table.HeaderCell>Description</Table.HeaderCell>
 
                             </Table.Row>
                         </Table.Header>
