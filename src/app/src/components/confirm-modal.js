@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-// import { Cookies } from "react-cookie";
+import { Cookies } from "react-cookie";
 import { Button, Header, Icon, Modal } from 'semantic-ui-react';
 
-// const cookies = new Cookies();
+const cookies = new Cookies();
 
 class ConfirmModal extends Component {
 
