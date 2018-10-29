@@ -20,6 +20,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import static java.util.Comparator.*;
+
+import static java.util.Comparator.comparingInt;
+import static java.util.stream.Collectors.collectingAndThen;
+import static java.util.stream.Collectors.toCollection;
 
 public class TechnologyService {
 
@@ -156,9 +161,53 @@ public class TechnologyService {
     public List<CookieReport> cookieService(Url[] url) throws InterruptedException {
         System.setProperty("webdriver.chrome.driver", "C:\\Users\\trinhndse62136\\Downloads\\chromedriver_win32\\chromedriver.exe");
         //Asign list JS info
+        List<Cookie> cookieList = new ArrayList<>();
+        cookieList.add(new Cookie("_ga", "Performance", "Google", "The world's most popular analytics tool."));
+        cookieList.add(new Cookie("_gat", "Performance", "Google", "The world's most popular analytics tool."));
+        cookieList.add(new Cookie("_dc_gtm_UA-72916918-1", "Performance", "Google", "The world's most popular analytics tool."));
+        cookieList.add(new Cookie("_gat_UA-72916918-1", "Performance", "Google", "The world's most popular analytics tool."));
+        cookieList.add(new Cookie("__utmt", "Performance", "Google", "The world's most popular analytics tool."));
+        cookieList.add(new Cookie("__atuvc", "Performance", ".addthis.com", "These third party cookies are used to collect information about how visitors use the site."));
+        cookieList.add(new Cookie("__atuvs", "Performance", ".addthis.com", "They are also used to limit the number of times you see an advertisement."));
+        cookieList.add(new Cookie("DSID", "Performance", ".doubleclick.net", "This cookie is used for re-targeting, optimisation, reporting and attribution of online adverts."));
+        cookieList.add(new Cookie("IDE", "Performance", ".doubleclick.net", "This cookie is used for re-targeting, optimisation, reporting and attribution of online adverts."));
+        cookieList.add(new Cookie("_drt_", "Performance", ".doubleclick.net", "This cookie is used for re-targeting, optimisation, reporting and attribution of online adverts."));
+        cookieList.add(new Cookie("id", "Performance", ".doubleclick.net", "This cookie is used for re-targeting, optimisation, reporting and attribution of online adverts."));
+
+
+        cookieList.add(new Cookie("__utma", "Advertising", "Google", "These third party cookies are used to collect information about how visitors use the site."));
+        cookieList.add(new Cookie("__utmb", "Advertising", "Google", "These third party cookies are used to collect information about how visitors use the site."));
+        cookieList.add(new Cookie("__utmz", "Advertising", "Google", "These third party cookies are used to collect information about how visitors use the site."));
+
+        cookieList.add(new Cookie("__atuvc", "Comfort", ".addthis.com", "We use cookies to grant a more comfortable usage of the website."));
+        cookieList.add(new Cookie("__atuvs", "Comfort", ".addthis.com", "We use cookies to grant a more comfortable usage of the website."));
+        cookieList.add(new Cookie("ana_svc", "Comfort", ".addthis.com", "We use cookies to grant a more comfortable usage of the website."));
+        cookieList.add(new Cookie("di2", "Comfort", ".addthis.com", "We use cookies to grant a more comfortable usage of the website."));
+        cookieList.add(new Cookie("dt", "Comfort", ".addthis.com", "We use cookies to grant a more comfortable usage of the website."));
+        cookieList.add(new Cookie("km_ai", "Comfort", ".addthis.com", "We use cookies to grant a more comfortable usage of the website."));
+        cookieList.add(new Cookie("km_lv", "Comfort", ".addthis.com", "We use cookies to grant a more comfortable usage of the website."));
+        cookieList.add(new Cookie("loc", "Comfort", ".addthis.com", "We use cookies to grant a more comfortable usage of the website."));
+        cookieList.add(new Cookie("siteaud", "Comfort", ".addthis.com", "We use cookies to grant a more comfortable usage of the website."));
+        cookieList.add(new Cookie("uid", "Comfort", ".addthis.com", "We use cookies to grant a more comfortable usage of the website."));
+        cookieList.add(new Cookie("um", "Comfort", ".addthis.com", "We use cookies to grant a more comfortable usage of the website."));
+        cookieList.add(new Cookie("uvc", "Comfort", ".addthis.com", "We use cookies to grant a more comfortable usage of the website."));
+        cookieList.add(new Cookie("vc", "Comfort", ".addthis.com", "We use cookies to grant a more comfortable usage of the website."));
+        cookieList.add(new Cookie("visitor_id92742", "Comfort", ".addthis.com", "We use cookies to grant a more comfortable usage of the website."));
+        cookieList.add(new Cookie("_conv_r", "Comfort", ".addthis.com", "We use cookies to grant a more comfortable usage of the website."));
+        cookieList.add(new Cookie("_conv_v", "Comfort", ".addthis.com", "We use cookies to grant a more comfortable usage of the website."));
+
+
+        cookieList.add(new Cookie("ASP.NET_SeesionId", "Essential", "Miscrosoft", "General purpose platform session cookie, used."));
+        cookieList.add(new Cookie("WSS_FullScreenMode", "Essential", "Miscrosoft", "Microsoft SharePoint cookie for internal use of the application to indicate whether a page is shown in full screen mode."));
+
+
         List<CookieReport> resultList = new ArrayList<>();
+        List<CookieReport> resultList11 = new ArrayList<>();
+
         final CyclicBarrier gate = new CyclicBarrier(url.length);
         List<Thread> listThread = new ArrayList<>();
+        List<String> cookieNames = new ArrayList<String>();
+
         for (Url u : url) {
             listThread.add(new Thread() {
                 public void run() {
@@ -179,14 +228,10 @@ public class TechnologyService {
 
                         for (org.openqa.selenium.Cookie cookie : cookies) {
                             // System.out.println(cookie.getName()+" "+cookie.getValue());
-                            System.out.println("domain " + cookie.getDomain());
-                            System.out.println("Name " + cookie.getName());
-                            System.out.println("Path " + cookie.getPath());
-                            System.out.println("Value " + cookie.getValue());
-                            System.out.println("Version " + cookie.getExpiry());
-                            System.out.println("");
-                            resultList.add(new CookieReport(cookie.getName(), cookie.getValue(), cookie.getDomain(), cookie.getExpiry()));
+                            resultList11.add(new CookieReport(cookie.getName(), cookie.getDomain()));
+
                         }
+                        System.out.println("size 1 " + resultList11.size());
 
 
                     } catch (InterruptedException | BrokenBarrierException e) {
@@ -204,17 +249,28 @@ public class TechnologyService {
             System.out.println("Threed join");
             t.join();
         }
-        System.out.println("Size 1 " + resultList.size());
-        Set<CookieReport> primesWithoutDuplicates = new LinkedHashSet<CookieReport>(resultList);
 
-        // now let's clear the ArrayList so that we can copy all elements from LinkedHashSet
-        resultList.clear();
+        List<CookieReport> resultList1 = resultList11.stream()
+                .collect(collectingAndThen(toCollection(() -> new TreeSet<>(comparing(CookieReport::getCookieName).thenComparing(CookieReport::getParty))),
+                        ArrayList::new));
+        System.out.println("size 2 " + resultList1.size());
+        int a = 0;
+        for (CookieReport cookieName : resultList1) {
+            a = 0;
+            for (int i = 0; i < cookieList.size(); i++) {
+                if (cookieName.getCookieName().equals(cookieList.get(i).getCookieName())) {
+                    resultList.add(new CookieReport(cookieList.get(i).getCookieName(), cookieList.get(i).getCategory(), cookieList.get(i).getParty(), cookieList.get(i).getDescription()));
+                    a = 1;
+                }
+            }
+            if (a == 0) {
+                resultList.add(new CookieReport(cookieName.getCookieName(), "Unknown", cookieName.getParty(), "The purpose of these cookies in unknown."));
 
-        // copying elements but without any duplicates
-        resultList.addAll(primesWithoutDuplicates);
-        System.out.println("Size 12 " + resultList.size());
+            }
+
+        }
+//
         return resultList;
-
     }
 
 }

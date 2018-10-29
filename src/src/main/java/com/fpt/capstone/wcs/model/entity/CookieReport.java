@@ -16,15 +16,20 @@ public class CookieReport {
     @GeneratedValue
     private Long id;
     private String cookieName;
-    private String exampleValue;
-    private String host;
-    private Date expiryDate;
+    private String category;
+    private String party;
+    private String description;
 
-    public CookieReport(String cookieName, String exampleValue, String host, Date expiryDate) {
+    public CookieReport(String cookieName, String category, String party, String description) {
         this.cookieName = cookieName;
-        this.exampleValue = exampleValue;
-        this.host = host;
-        this.expiryDate = expiryDate;
+        this.category = category;
+        this.party = party;
+        this.description = description;
+    }
+
+    public CookieReport(String cookieName, String party) {
+        this.cookieName = cookieName;
+        this.party = party;
     }
 
     @ManyToMany(fetch = FetchType.LAZY,

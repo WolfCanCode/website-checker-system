@@ -20,7 +20,7 @@ export default class CookieLaw extends Component {
             body: JSON.stringify(param)
         }).then(response => response.json()).then((data) => {
             comp = data.map((item, index) => {
-                return (<TableRow key={index} cookieName={item.cookieName} exampleValue={item.exampleValue} host={item.host} expiryDate={item.expiryDate} />);
+                return (<TableRow key={index}  cookieName={item.cookieName} category={item.category} party={item.party} description={item.description} />);
             });
             this.setState({ list: comp });
             this.setState({ loadingTable: false });
@@ -51,7 +51,7 @@ export default class CookieLaw extends Component {
             body: JSON.stringify(param)
         }).then(response => response.json()).then((data) => {
             comp = data.map((item, index) => {
-                return (<TableRow key={index} cookieName={item.cookieName} exampleValue={item.exampleValue} host={item.host} expiryDate={item.expiryDate} />);
+                return (<TableRow key={index}  cookieName={item.cookieName} category={item.category} party={item.party} description={item.description} />);
             });
             this.setState({ list: comp });
             this.setState({ loadingTable: false, isDisable: false });
