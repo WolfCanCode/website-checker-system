@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import 'semantic-ui-css/semantic.min.css';
-import {Segment, Button, Table, Icon, Input} from 'semantic-ui-react'
+import {Segment, Button, Table, Icon, Input, Label } from 'semantic-ui-react'
 import TableRow from '../missingFiles/row-table'
 
 
@@ -16,8 +16,7 @@ class missingFilesScreen extends Component {
        isActiveImg:false,
        isActiveCss:false,
        isActiveDoc:false,
-       isActiveARCHIRES:false,
-       statusNoResult:"",
+       isActiveARCHIRES:false
         
     };
 
@@ -29,11 +28,11 @@ class missingFilesScreen extends Component {
         var listCom=[];
         var flagMissingFile=false;
         var listMissingFileCount =[];
-        var statusResult ="";
         this.setState({ loadingTable: true });
         var param = [{ "url": "https://www.bhcosmetics.com/" },
         { "url": "http://www.sggp.org.vn/" },
         ];
+        var param2 =this.state.listType;
         fetch("/api/missingtest/lastest", {
             method: 'POST',
             headers: {
@@ -71,11 +70,8 @@ class missingFilesScreen extends Component {
                 return (<TableRow key={index} fileMissing={item.fileMissing} description={item.description} pages={item.pages} />);
             });
 
-            if(comp.length===0){
-                statusResult="This page haven't test yet, please try to test";
-            }
+            
             console.log(comp.length)
-            this.setState({statusNoResult:statusResult})
             this.setState({countMissingFile: countMissingFile1})
             this.setState({countPageAffected: countPageAffected1})
             this.setState({ list: comp });
@@ -93,7 +89,6 @@ class missingFilesScreen extends Component {
         var listCom=[];
         var flagMissingFile=false;
         var listMissingFileCount =[];
-        var statusResult ="";
         console.log(param)
         fetch("/api/missingtest", {
             method: 'POST',
@@ -130,11 +125,6 @@ class missingFilesScreen extends Component {
                 }
                 return (<TableRow key={index} fileMissing={item.fileMissing} description={item.description} pages={item.pages} />);
             });
-            if(comp.length===0){
-                statusResult="No Missing File Found";
-            }
-            console.log(comp.length)
-            this.setState({statusNoResult:statusResult})
             this.setState({countMissingFile: countMissingFile1});
             this.setState({countPageAffected: countPageAffected1});
             this.setState({ list: comp });
@@ -315,7 +305,7 @@ class missingFilesScreen extends Component {
                             </div>
                         </Segment>
                             
-                            <Table singleLine textAlign='center' style={{ tableLayout: 'auto' }} loading={this.state.loadingTable}>
+                            <Table singleLine textAlign='center' style={{ tableLayout: 'auto' }}>
                                 <Table.Header >
                                     <Table.Row>
                                         <Table.HeaderCell>Files</Table.HeaderCell>
@@ -326,7 +316,7 @@ class missingFilesScreen extends Component {
                                     </Table.Row>
                                 </Table.Header>
                                 <Table.Body>
-                                {this.state.list.length === 0 ? <Table.Row><Table.Cell>{this.state.statusNoResult}</Table.Cell></Table.Row> : this.state.list}
+                                {this.state.list.length === 0 ? <Table.Row><Table.Cell>This page haven't test yet, please try to test</Table.Cell></Table.Row> : this.state.list}
                                    
                                    
                                     

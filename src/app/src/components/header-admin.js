@@ -1,15 +1,12 @@
 import React, { Component } from 'react';
 import { Input, Dropdown, Menu } from 'semantic-ui-react';
 import { Redirect } from "react-router-dom";
-import { Cookies } from "react-cookie";
-
-const cookies = new Cookies();
 
 
-class HeaderAdmin extends Component {
-    state = { txtWebpage: "", listWeb: [""], logout: false, account_name:"" };
+ class HeaderAdmin extends Component {
+    state = { txtWebpage: "", listWeb:[], logout:false };
 
-
+    
 
     componentDidMount() {
         //binding dropdown
@@ -32,45 +29,28 @@ class HeaderAdmin extends Component {
                     redirect: <Redirect to='/logout' />
                 });
             }
-        });
 
-        fetch("/api/user/name", {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ "id": cookies.get("u_id") })
-        }).then(response => response.json()).then((data) => {
-            if (data.action === "SUCCESS") {
-                this.setState({account_name: data.name});
-            } else {
-                this.setState({
-                    redirect: <Redirect to='/logout' />
-                });
-            }
         });
     }
 
-        _changeWebPage(event) {
-            this.setState({
-                txtWebpage: event.target.text
-            });
-        }
+    _changeWebPage(event) {
+        this.setState({
+            txtWebpage: event.target.text
+        });
+    }
 
 
 
-        _doLogout = () => {
-            cookies.remove("u_token");
-            this.setState({
-                logout: true
-            });
+    _doLogout = () => {
+        this.setState({
+            logout: true
+        });
+    }
+    renderRedirect = () => {
+        if (this.state.logout) {
+            return <Redirect to='/logout' />
         }
-        renderRedirect = () => {
-            if (this.state.logout) {
-                return <Redirect to='/logout' />
-            }
-        }
+    }
 
         _changeWebsite(event){
             alert(event.target.value);
@@ -87,16 +67,20 @@ class HeaderAdmin extends Component {
                         </Menu.Item>
                         <Menu.Item style={{ color: 'white', fontWeight: 'bold' }}>
                             Hi, {this.state.account_name}
-                    </Menu.Item>
-                        {this.renderRedirect()}
-                        <Menu.Item style={{ color: 'white', fontWeight: 'bold' }}
-                            name='logout'
-                            onClick={() => this._doLogout()}
-                        />
-                    </Menu.Menu>
-                </Menu>
-            )
-        }
 
+                    </Menu.Item>
+                    <Menu.Item style={{ color: 'white', fontWeight: 'bold' }}>
+                        Hi, Trường
+                    </Menu.Item>
+                    {this.renderRedirect()}
+                    <Menu.Item style={{ color: 'white', fontWeight: 'bold' }}
+                        name='logout'
+                        onClick={() => this._doLogout()}
+                    />
+                </Menu.Menu>
+            </Menu>
+        )
     }
-    export default HeaderAdmin;
+
+}
+export default HeaderAdmin;

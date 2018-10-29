@@ -2,7 +2,7 @@ package com.fpt.capstone.wcs.service;
 
 import com.fpt.capstone.wcs.model.entity.BrokenLinkReport;
 import com.fpt.capstone.wcs.model.entity.BrokenPageReport;
-import com.fpt.capstone.wcs.model.pojo.Url;
+import com.fpt.capstone.wcs.model.Url;
 import com.fpt.capstone.wcs.model.entity.MissingFileReport;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;

@@ -21,13 +21,7 @@ const menu = [
         alt: "The sitemap of page",
         items : null
     },
-    {
-        name: "Setting",
-        to: "/admin/setting",
-        key: "config",
-        alt: "Configuration and update website",
-        items : null
-    },
+
     {
         name: "Quality",
         items: [

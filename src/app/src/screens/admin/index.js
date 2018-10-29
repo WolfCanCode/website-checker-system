@@ -15,13 +15,13 @@ export default class AdminScreen extends Component {
         titleHeader: "Dashboard",
         altHeader: "This is Dashboard",
         imgSrc: "",
-        redirect: null,
-        listWeb: [],
-        txtWebpage: "",
-        showConfirmModal: false
+        redirect: null
     }
 
     componentWillMount() {
+        console.log("u_id :" + cookies.get("u_id"));
+        console.log("u_token :" + cookies.get("u_token"));
+
         fetch("/api/auth", {
             method: 'POST',
             headers: {
@@ -31,8 +31,7 @@ export default class AdminScreen extends Component {
             body: JSON.stringify({ "id": cookies.get("u_id"), "token": cookies.get("u_token") })
         }).then(response => response.json()).then((data) => {
             if (data.action === "SUCCESS") {
-                cookies.set("u_token", data.token, { path: "/" });
-
+                cookies.set("u_token", data.token,{path:"/"});
             } else {
                 this.setState({
                     redirect: <Redirect to='/logout' />
