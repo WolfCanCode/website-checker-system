@@ -1,8 +1,8 @@
 package com.fpt.capstone.wcs.controller;
 
 import com.fpt.capstone.wcs.service.SiteMapService;
-import com.fpt.capstone.wcs.model.SiteMapOutput;
-import com.fpt.capstone.wcs.model.Url;
+import com.fpt.capstone.wcs.model.pojo.SiteMapOutput;
+import com.fpt.capstone.wcs.model.pojo.Url;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.MalformedURLException;

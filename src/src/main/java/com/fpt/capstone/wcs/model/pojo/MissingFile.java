@@ -1,18 +1,17 @@
-package com.fpt.capstone.wcs.model;
+package com.fpt.capstone.wcs.model.pojo;
 
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
 
 @Data
 @Getter
 @Setter
-public class MissingFileDTO {
+public class MissingFile {
     private Integer type;
 
-    public MissingFileDTO( Integer type) {
+    public MissingFile(Integer type) {
         this.type = type;
     }
 }

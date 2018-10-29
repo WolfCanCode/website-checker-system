@@ -1,9 +1,9 @@
 package com.fpt.capstone.wcs.service;
 
-import com.fpt.capstone.wcs.model.*;
 import com.fpt.capstone.wcs.model.entity.ContactReport;
 import com.fpt.capstone.wcs.model.entity.RedirectionReport;
-import com.fpt.capstone.wcs.model.entity.Pages;
+import com.fpt.capstone.wcs.model.entity.PageReport;
+import com.fpt.capstone.wcs.model.pojo.Url;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -22,8 +22,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ContentService {
-    public List<Pages> getPageInfor(Url[] list) throws InterruptedException {
-        List<Pages> pageCheck = new ArrayList<>();
+    public List<PageReport> getPageInfor(Url[] list) throws InterruptedException {
+        List<PageReport> pageCheck = new ArrayList<>();
         final CyclicBarrier gate = new CyclicBarrier(list.length);
         List<Thread> listThread = new ArrayList<>();
         for (Url url:list){
@@ -35,7 +35,7 @@ public class ContentService {
                         int  httpcode = getStatus(url.getUrl());
                         String canoUrl = getCanonicalUrl(url.getUrl());
 
-                        Pages page = new Pages(httpcode, url.getUrl(),title,canoUrl);
+                        PageReport page = new PageReport(httpcode, url.getUrl(),title,canoUrl);
                         pageCheck.add(page);
                     } catch (InterruptedException e) {
                         e.printStackTrace();

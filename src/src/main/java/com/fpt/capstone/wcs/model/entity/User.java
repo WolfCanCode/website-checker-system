@@ -1,5 +1,6 @@
 package com.fpt.capstone.wcs.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.*;
 
 import javax.persistence.*;
@@ -37,12 +38,12 @@ public class User {
     private Role role;
 
 
-    @ManyToMany(fetch = FetchType.LAZY,
+    @ManyToMany(fetch = FetchType.EAGER,
             cascade = {
                     CascadeType.PERSIST,
                     CascadeType.MERGE
             },
-            mappedBy = "User")
-    private List<Website> Website = new ArrayList<>();
+            mappedBy = "user")
+    private List<Website> website = new ArrayList<>();
 
 }

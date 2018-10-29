@@ -1,9 +1,9 @@
 package com.fpt.capstone.wcs.controller;
 
-import com.fpt.capstone.wcs.model.*;
 import com.fpt.capstone.wcs.model.entity.ContactReport;
 import com.fpt.capstone.wcs.model.entity.RedirectionReport;
-import com.fpt.capstone.wcs.model.entity.Pages;
+import com.fpt.capstone.wcs.model.entity.PageReport;
+import com.fpt.capstone.wcs.model.pojo.Url;
 import com.fpt.capstone.wcs.repository.ContactDetailRepository;
 import com.fpt.capstone.wcs.repository.LinkRedirectionRepository;
 import com.fpt.capstone.wcs.repository.PageTestRepository;
@@ -31,8 +31,8 @@ public class ContentController {
 
 
     @PostMapping("/api/pagestest")
-    public List<Pages> getDataPagesTest(@RequestBody Url[] list) throws InterruptedException {
-        List<Pages> resultList = new ArrayList<>();
+    public List<PageReport> getDataPagesTest(@RequestBody Url[] list) throws InterruptedException {
+        List<PageReport> resultList = new ArrayList<>();
 
             ContentService contentService = new ContentService();
             resultList= contentService.getPageInfor(list);
@@ -42,9 +42,9 @@ public class ContentController {
         return resultList;
     }
     @PostMapping("/api/pagestest/lastest")
-    public List<Pages> getLastestSpeedTest()
+    public List<PageReport> getLastestSpeedTest()
     {
-        List<Pages> resultList =  pageTestRepository.findAll();
+        List<PageReport> resultList =  pageTestRepository.findAll();
         return resultList;
     }
 

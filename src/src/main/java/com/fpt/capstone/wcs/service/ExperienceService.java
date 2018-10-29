@@ -1,7 +1,7 @@
 package com.fpt.capstone.wcs.service;
 
 import com.fpt.capstone.wcs.model.entity.SpeedTestReport;
-import com.fpt.capstone.wcs.model.Url;
+import com.fpt.capstone.wcs.model.pojo.Url;
 import com.fpt.capstone.wcs.utils.MathUtil;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;

@@ -1,5 +1,6 @@
 package com.fpt.capstone.wcs.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;

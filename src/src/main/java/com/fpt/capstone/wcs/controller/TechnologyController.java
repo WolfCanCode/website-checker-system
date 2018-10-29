@@ -1,10 +1,9 @@
 package com.fpt.capstone.wcs.controller;
 
-import com.fpt.capstone.wcs.model.*;
 import com.fpt.capstone.wcs.model.entity.CookieReport;
 import com.fpt.capstone.wcs.model.entity.JavascriptReport;
-import com.fpt.capstone.wcs.model.entity.MissingFileReport;
 import com.fpt.capstone.wcs.model.entity.ServerBehaviorReport;
+import com.fpt.capstone.wcs.model.pojo.Url;
 import com.fpt.capstone.wcs.repository.*;
 import com.fpt.capstone.wcs.service.TechnologyService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,8 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @RestController
 public class TechnologyController {

@@ -12,7 +12,7 @@ import javax.persistence.Table;
 @Getter
 @Setter
 @Table(name="PageReport")
-public class Pages {
+public class PageReport {
     @Id
     @GeneratedValue
     private Long id;
@@ -21,7 +21,7 @@ public class Pages {
     private String titleWeb;
     private String canonicalUrl;
 
-    public Pages(int httpCode, String url, String titleWeb, String canonicalUrl) {
+    public PageReport(int httpCode, String url, String titleWeb, String canonicalUrl) {
         this.httpCode = httpCode;
         this.url = url;
         this.titleWeb = titleWeb;

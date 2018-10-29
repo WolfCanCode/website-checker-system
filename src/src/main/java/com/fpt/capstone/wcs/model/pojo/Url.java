@@ -1,4 +1,4 @@
-package com.fpt.capstone.wcs.model;
+package com.fpt.capstone.wcs.model.pojo;
 
 import lombok.*;
 

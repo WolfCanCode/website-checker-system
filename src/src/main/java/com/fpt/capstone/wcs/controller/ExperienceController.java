@@ -1,7 +1,7 @@
 package com.fpt.capstone.wcs.controller;
 
-import com.fpt.capstone.wcs.model.*;
 import com.fpt.capstone.wcs.model.entity.SpeedTestReport;
+import com.fpt.capstone.wcs.model.pojo.Url;
 import com.fpt.capstone.wcs.repository.SpeedtestRepository;
 import com.fpt.capstone.wcs.service.ExperienceService;
 import org.springframework.beans.factory.annotation.Autowired;

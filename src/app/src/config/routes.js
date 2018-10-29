@@ -9,7 +9,6 @@ import {
 //Import component
 import HomeScreen from '../screens/homepage/index';
 import AdminScreen from '../screens/admin/index';
-import AdminScreen1 from '../screens/admin/index1';
 import LoginScreen from '../screens/login/index';
 import RegisterScreen from '../screens/register/index';
 import Dashboard from '../screens/admin/dashboard/index';
@@ -32,6 +31,7 @@ import MobileLayoutScreen from '../screens/admin/mobileLayout/index';
 import ProhibitedScreen from '../screens/admin/prohibitedcontent/index';
 import serverBehaviorScreen from '../screens/admin/serverBehavior/index';
 import CookieLawScreen from '../screens/admin/cookielaw/index';
+import ConfigScreen from '../screens/admin/config/index';
 
 import Error404 from '../screens/admin/error404/index';
 
@@ -45,7 +45,6 @@ export class RouteClient extends Component {
                 {/* Router for client page*/}
                 <Route path="/" exact component={HomeScreen} />
                 <Route path="/admin" component={AdminScreen} />
-                <Route path="/admin1" component={AdminScreen1} />
                 <Route path="/login" exact component={LoginScreen} />
                 <Route path="/register" component={RegisterScreen} />
                 <Route path='/authenticate' component={() => window.location = '/admin'} />
@@ -84,6 +83,7 @@ export const RouteAdmin = withRouter(({ location }) => (
                 <Route path="/admin/grammar" component={GrammarScreen} />
                 <Route path="/admin/prohibited" component={ProhibitedScreen} />
                 <Route path="/admin/cookielaw" component={CookieLawScreen} />
+                <Route path="/admin/setting" component={ConfigScreen} />
                 <Route path='/logout' component={() => window.location = '../login'} />
                 <Route path="/admin1" exact component={Dashboard1} />
                 <Route path="*" component={Error404}/>

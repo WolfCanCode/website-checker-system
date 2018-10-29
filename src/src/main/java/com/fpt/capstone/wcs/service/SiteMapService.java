@@ -1,6 +1,6 @@
 package com.fpt.capstone.wcs.service;
 
-import com.fpt.capstone.wcs.model.SiteLink;
+import com.fpt.capstone.wcs.model.pojo.SiteLink;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;

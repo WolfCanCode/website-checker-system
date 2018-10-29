@@ -1,5 +1,7 @@
 package com.fpt.capstone.wcs.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,9 +12,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Data
 @Entity
@@ -31,7 +31,7 @@ public class Website {
     @UpdateTimestamp
     private LocalDateTime modifiedTime;
 
-    @ManyToMany(fetch = FetchType.LAZY,
+    @ManyToMany(fetch = FetchType.EAGER,
             cascade = {
                     CascadeType.PERSIST,
                     CascadeType.MERGE
@@ -39,15 +39,10 @@ public class Website {
     @JoinTable(name = "website_user",
             joinColumns = { @JoinColumn(name = "web_id") },
             inverseJoinColumns = { @JoinColumn(name = "user_id") })
-    private List<User> User = new ArrayList<>();
+    @JsonIgnore
+    private List<User> user = new ArrayList<>();
 
-    @ManyToMany(fetch = FetchType.LAZY,
-            cascade = {
-                    CascadeType.PERSIST,
-                    CascadeType.MERGE
-            })
-    @JoinTable(name = "website_page",
-            joinColumns = { @JoinColumn(name = "web_id") },
-            inverseJoinColumns = { @JoinColumn(name = "page_id") })
-    private List<Page> Page = new ArrayList<>();
+    @OneToMany(targetEntity = Page.class, mappedBy = "website", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Page> page= new ArrayList<>();
 }
