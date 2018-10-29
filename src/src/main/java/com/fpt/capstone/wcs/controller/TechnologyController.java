@@ -1,6 +1,7 @@
 package com.fpt.capstone.wcs.controller;
 
 import com.fpt.capstone.wcs.model.entity.CookieReport;
+import com.fpt.capstone.wcs.model.entity.FaviconReport;
 import com.fpt.capstone.wcs.model.entity.JavascriptReport;
 import com.fpt.capstone.wcs.model.entity.ServerBehaviorReport;
 import com.fpt.capstone.wcs.model.pojo.Url;
@@ -13,6 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @RestController
 public class TechnologyController {
@@ -23,6 +26,9 @@ public class TechnologyController {
 //    MissingFilesPagesRepository missingFilesPagesRepository;
     @Autowired
     CookieRepository cookieRepository;
+
+    @Autowired
+    FaviconRepository faviconRepository;
 
     @PostMapping("/api/jsTest")
     public List<JavascriptReport> getDataPagesTest(@RequestBody Url[] list) throws InterruptedException {
@@ -72,5 +78,26 @@ public class TechnologyController {
         List<CookieReport> resultList = cookieRepository.findAll();
         return resultList;
     }
+    @PostMapping("/api/favicontest")
+    public List<FaviconReport> getDataFaviconTest(@RequestBody Url[] list) throws InterruptedException {
+        TechnologyService technologyService = new TechnologyService();
+        String urlRoot="";
+        for(int i =0; i< list.length;i++ ){
+            Pattern pattern = Pattern.compile("(http\\:|https\\:)//([\\w\\-?\\.?]+)?\\.([a-zA-Z]{2,3})?",Pattern.CASE_INSENSITIVE);
+            Matcher matcher = pattern.matcher(list[i].getUrl());
+            while (matcher.find()){
+                urlRoot = matcher.group();
+            }
+        }
+        List<FaviconReport> resultList = technologyService.checkFavicon(list,urlRoot);
+        faviconRepository.deleteAll();
+        faviconRepository.saveAll(resultList);
+        return resultList;
+    }
 
+    @PostMapping("/api/favicontest/lastest")
+    public List<FaviconReport> getDataFaviconTestLastest() {
+        List<FaviconReport> resultList = faviconRepository.findAll();
+        return resultList;
+    }
 }
