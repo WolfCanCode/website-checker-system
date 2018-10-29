@@ -12,7 +12,6 @@ import AdminScreen from '../screens/admin/index';
 import LoginScreen from '../screens/login/index';
 import RegisterScreen from '../screens/register/index';
 import Dashboard from '../screens/admin/dashboard/index';
-import Dashboard1 from '../screens/admin/dashboard/index1';
 
 import SiteMapScreen from '../screens/admin/sitemap/controller';
 import brokenLinksScreen from '../screens/admin/brokenLinks/index';
@@ -85,7 +84,6 @@ export const RouteAdmin = withRouter(({ location }) => (
                 <Route path="/admin/cookielaw" component={CookieLawScreen} />
                 <Route path="/admin/setting" component={ConfigScreen} />
                 <Route path='/logout' component={() => window.location = '../login'} />
-                <Route path="/admin1" exact component={Dashboard1} />
                 <Route path="*" component={Error404}/>
             </Switch>
             </CSSTransition>
