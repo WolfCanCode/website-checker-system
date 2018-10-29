@@ -45,12 +45,14 @@ export default class SiteMap extends Component {
                 console.log("Map: " + item.map);
                 console.log("Type: " + item.typeMap);
                 console.log("Url: " + item.urlMap);
-
+                // eslint-disable-next-line
                 var mapArray = eval("[" + item.map + "]");
                 // console.log("[0]: " + mapArray[0]);
                 // console.log("[1]: " + mapArray[1]);
                 // console.log("[2]: " + mapArray[2]);
+                // eslint-disable-next-line
                 var typeArray = eval("[" + item.typeMap + "]");
+                // eslint-disable-next-line
                 var urlArray = eval("[" + item.urlMap + "]");
 
                 // console.log("Is array: " + Array.isArray(array_of_objects));

@@ -6,8 +6,8 @@ import SideMenu from '../../components/side-menu';
 import HeaderContent from '../../components/header-content';
 import HeaderAdmin from '../../components/header-admin';
 import menu from '../../config/menu';
-import { Cookies } from "react-cookie";
 import ConfirmModal from '../../components/confirm-modal';
+import { Cookies } from "react-cookie";
 const cookies = new Cookies();
 
 export default class AdminScreen extends Component {

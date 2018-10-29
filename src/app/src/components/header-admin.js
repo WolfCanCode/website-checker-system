@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { Input, Dropdown, Menu } from 'semantic-ui-react';
 import { Redirect } from "react-router-dom";
-
+import { Cookies } from "react-cookie";
+const cookies = new Cookies();
 
  class HeaderAdmin extends Component {
     state = { txtWebpage: "", listWeb:[], logout:false };
