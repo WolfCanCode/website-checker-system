@@ -2,12 +2,12 @@ import React, { Component } from 'react';
 import {Segment, Button, Table, Icon} from 'semantic-ui-react'
 import TableRow from './row-table';
 export default class Contact extends Component {
-  state = { list: [], loadingTable: false, isDisable: false, countPhone: 0, countEmail: 0 , statusNoResult:""};
+  state = { list: [], loadingTable: false, isDisable: false, countPhone: 0, countEmail: 0 };
 
 
   componentDidMount() {
       var comp = [];
-      var statusNotFound="";
+      
       this.setState({ loadingTable: true });
       var param = [{ "url": "https://twitter.com/hashtag/hiccupsteahouse?lang=en" },
       { "url": "https://www.facebook.com/hiccupsteahouse" },
@@ -45,12 +45,8 @@ export default class Contact extends Component {
           }
           return countE;
         })
-        if(comp.length===0){
-          statusNotFound="This page haven't test yet, please try to test";
-
-        }
         
-          this.setState({statusNoResult:statusNotFound})
+        
          this.setState({countEmail:countE})
           this.setState({countPhone:countP})
           this.setState({ list: comp });
@@ -62,7 +58,6 @@ export default class Contact extends Component {
   _doContactDetailTest() {
       this.setState({ loadingTable: true, isDisable: true });
       var comp = [];
-      var statusNotFound="";
       var param = [{ "url": "https://twitter.com/hashtag/hiccupsteahouse?lang=en" },
       { "url": "https://www.facebook.com/hiccupsteahouse" },
       { "url": "https://www.instagram.com/hiccupsteahouse/" },
@@ -106,13 +101,6 @@ export default class Contact extends Component {
         //  listTest = data.map((item, index)=>{
         //    return item.url;
         //  });
-
-        if(comp.length===0){
-          statusNotFound="No Contact Detail Found";
-
-        }
-        
-          this.setState({statusNoResult:statusNotFound})
          
           this.setState({countEmail:countE})
            this.setState({countPhone:countP})
@@ -155,7 +143,7 @@ export default class Contact extends Component {
                   </Table.Row>
                 </Table.Header>
                 <Table.Body>
-                {this.state.list.length === 0 ? <Table.Row><Table.Cell>{this.state.statusNoResult}</Table.Cell></Table.Row> : this.state.list}
+                {this.state.list.length === 0 ? <Table.Row><Table.Cell>This page haven't test yet, please try to test</Table.Cell></Table.Row> : this.state.list}
                 </Table.Body>
               </Table>
               {/* <Table singleLine>

@@ -2,25 +2,24 @@ import React, { Component } from 'react';
 import { Segment, Button, Table, Input, Icon } from 'semantic-ui-react'
 import TableRow from './row-table';
 export default class Direction extends Component {
-    state = { list: [], loadingTable: false, isDisable: false, statusNoResult:""};
+    state = { list: [], loadingTable: false, isDisable: false };
 
 
     componentDidMount() {
         var comp = [];
         this.setState({ loadingTable: true });
-        var statusNotFound ="";
         var param = [{ "url": "https://twitter.com/hashtag/hiccupsteahouse?lang=en" },
         { "url": "http://www.cungmua.vn" },
         { "url": "http://www.google.com" },
-        // { "url": "http://www.apple.com/us/shop/go/bag" },
-        // { "url": "http://www.facebook.com" },
+        { "url": "http://www.apple.com/us/shop/go/bag" },
+        { "url": "http://www.facebook.com" },
         { "url": "https://hiccupsteahouse.com/contact-us/" },
         { "url": "https://hiccupsteahouse.com/careers/" },
         { "url": "https://www.churroholic.com/" },
-        // { "url": "https://www.apple.com/us/shop/goto/giftcards" },
-        // { "url": "http://www.apple.com/today/camp/" },
-        // { "url": "https://www.apple.com/retail/camp/notify.html" },
-        // { "url": "https://www.apple.com/us/shop/goto/account" },
+        { "url": "https://www.apple.com/us/shop/goto/giftcards" },
+        { "url": "http://www.apple.com/today/camp/" },
+        { "url": "https://www.apple.com/retail/camp/notify.html" },
+        { "url": "https://www.apple.com/us/shop/goto/account" },
 
         ];
         fetch("/api/redirectiontest/lastest", {
@@ -33,11 +32,7 @@ export default class Direction extends Component {
         }).then(response => response.json()).then((data) => {
             comp = data.map((item, index) => {
                 return (<TableRow key={index} webAddress={item.url} redirectUrl={item.driectToUrl} type={item.type} httpcode={item.httpCode} />);
-            }); 
-            if(comp.length===0){
-                statusNotFound="This page haven't test yet, please try to test";
-            }
-            this.setState({statusNoResult:statusNotFound});
+            });
             this.setState({ list: comp });
             this.setState({ loadingTable: false });
         });
@@ -47,19 +42,18 @@ export default class Direction extends Component {
     _doLinkRedirection() {
         this.setState({ loadingTable: true, isDisable: true });
         var comp = [];
-        var statusNotFound="";
         var param = [{ "url": "https://twitter.com/hashtag/hiccupsteahouse?lang=en" },
         { "url": "http://www.cungmua.vn" },
         { "url": "http://www.google.com" },
-        // { "url": "http://www.apple.com/us/shop/go/bag" },
-        // { "url": "http://www.facebook.com" },
+        { "url": "http://www.apple.com/us/shop/go/bag" },
+        { "url": "http://www.facebook.com" },
         { "url": "https://hiccupsteahouse.com/contact-us/" },
         { "url": "https://hiccupsteahouse.com/careers/" },
         { "url": "https://www.churroholic.com/" },
-        // { "url": "https://www.apple.com/us/shop/goto/giftcards" },
-        // { "url": "http://www.apple.com/today/camp/" },
-        // { "url": "https://www.apple.com/retail/camp/notify.html" },
-        // { "url": "https://www.apple.com/us/shop/goto/account" },
+        { "url": "https://www.apple.com/us/shop/goto/giftcards" },
+        { "url": "http://www.apple.com/today/camp/" },
+        { "url": "https://www.apple.com/retail/camp/notify.html" },
+        { "url": "https://www.apple.com/us/shop/goto/account" },
 
         ];
         fetch("/api/redirectiontest", {
@@ -73,10 +67,7 @@ export default class Direction extends Component {
             comp = data.map((item, index) => {
                 return (<TableRow key={index} webAddress={item.url} redirectUrl={item.driectToUrl} type={item.type} httpcode={item.httpCode} />);
             });
-            if(comp.length===0){
-                statusNotFound="No Redirection Found";
-            }
-            this.setState({statusNoResult:statusNotFound});
+
             this.setState({ list: comp });
             this.setState({ loadingTable: false });
         });
@@ -105,7 +96,7 @@ export default class Direction extends Component {
                             </Table.Row>
                         </Table.Header>
                         <Table.Body>
-                            {this.state.list.length === 0 ? <Table.Row><Table.Cell>{this.state.statusNoResult}</Table.Cell></Table.Row> : this.state.list}
+                            {this.state.list.length === 0 ? <Table.Row><Table.Cell>This page haven't test yet, please try to test</Table.Cell></Table.Row> : this.state.list}
 
                         </Table.Body>
                     </Table>
