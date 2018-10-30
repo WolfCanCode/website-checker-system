@@ -7,8 +7,8 @@ import lombok.*;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class SiteLink {
-    private String srcUrl;
-    private String desUrl;
-    private int desType;
+public class NewVersionPOJO {
+    Long userId;
+    String userToken;
+    Long websiteId;
 }

@@ -1,6 +1,9 @@
 package com.fpt.capstone.wcs.service;
 
-import com.fpt.capstone.wcs.model.pojo.SiteLink;
+import com.fpt.capstone.wcs.model.entity.Page;
+import com.fpt.capstone.wcs.model.entity.Version;
+import com.fpt.capstone.wcs.model.entity.Website;
+import com.fpt.capstone.wcs.model.pojo.SiteLinkPOJO;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -13,8 +16,8 @@ import java.util.*;
 public class SiteMapService {
     private HashMap<String, Integer> urlMap = new HashMap<String, Integer>();
     private String rootDomain = "";
-    private List<List<SiteLink>> graph = new ArrayList<List<SiteLink>>();
-    private List<List<SiteLink>> invGraph = new ArrayList<List<SiteLink>>();
+    private List<List<SiteLinkPOJO>> graph = new ArrayList<List<SiteLinkPOJO>>();
+    private List<List<SiteLinkPOJO>> invGraph = new ArrayList<List<SiteLinkPOJO>>();
     private int verticesNum;
     private List<Integer> typeNode = new ArrayList<Integer>(); //Type link: 1 is internal, 2 is external and 3 is error internal link
     private List<String> links = new ArrayList<String>();
@@ -53,8 +56,8 @@ public class SiteMapService {
     // list all page that url direct to
     public void getLinks(String url) {
         int mapId = urlMap.get(url);
-        List<SiteLink> list = graph.get(mapId);
-        for (SiteLink siteLink : list) {
+        List<SiteLinkPOJO> list = graph.get(mapId);
+        for (SiteLinkPOJO siteLink : list) {
             System.out.println(siteLink.getDesUrl() + " " + siteLink.getDesType());
         }
     }
@@ -67,7 +70,7 @@ public class SiteMapService {
         urlMap.put(rootDomain, verticesNum);
         typeNode.add(1);
         verticesNum++;
-        graph.add(new ArrayList<SiteLink>());
+        graph.add(new ArrayList<SiteLinkPOJO>());
         links.add(rootDomain);
 
         while (!queue.isEmpty()) {
@@ -85,17 +88,17 @@ public class SiteMapService {
                     // add to map & graph
                     urlMap.put(url, verticesNum);
                     verticesNum++;
-                    graph.add(new ArrayList<SiteLink>());
+                    graph.add(new ArrayList<SiteLinkPOJO>());
                     if (url.contains(rootDomain)) {
                         // internal
-                        SiteLink sl = new SiteLink(curUrl, url, 1);
+                        SiteLinkPOJO sl = new SiteLinkPOJO(curUrl, url, 1);
                         graph.get(mapId).add(sl);
                         queue.add(url);
                         typeNode.add(1);
                         links.add(url);
                     } else {
                         // external
-                        SiteLink sl = new SiteLink(curUrl, url, 2);
+                        SiteLinkPOJO sl = new SiteLinkPOJO(curUrl, url, 2);
                         graph.get(mapId).add(sl);
                         typeNode.add(2);
                         links.add(url);
@@ -107,7 +110,7 @@ public class SiteMapService {
                     // existed node
                     int mapCurUrl = urlMap.get(url);
                     int typeCurUrl = typeNode.get(mapCurUrl);
-                    SiteLink sl = new SiteLink(curUrl, url, typeCurUrl);
+                    SiteLinkPOJO sl = new SiteLinkPOJO(curUrl, url, typeCurUrl);
                     graph.get(mapId).add(sl);
                 }
             }
@@ -137,7 +140,7 @@ public class SiteMapService {
             for (int j = 0; j < degList.size(); j++) {
                 int node = degList.get(j);
                 for (int i = 0; i < graph.get(node).size(); i++) {
-                    SiteLink siteLink = graph.get(node).get(i);
+                    SiteLinkPOJO siteLink = graph.get(node).get(i);
                     String toUrl = siteLink.getDesUrl();
                     int toUrlId = urlMap.get(toUrl);
                     if (!hashSet.contains(toUrlId)) {
@@ -249,18 +252,18 @@ public class SiteMapService {
     }
 
     public void buildInverseGraph() {
-        invGraph = new ArrayList<List<SiteLink>>();
+        invGraph = new ArrayList<List<SiteLinkPOJO>>();
         int sz = graph.size();
-        for (int i = 0; i < sz; i++) invGraph.add(new ArrayList<SiteLink>());
+        for (int i = 0; i < sz; i++) invGraph.add(new ArrayList<SiteLinkPOJO>());
         for (int i = 0; i < graph.size(); i++) {
-            List<SiteLink> listSite = graph.get(i);
-            for (SiteLink siteLink : listSite) {
+            List<SiteLinkPOJO> listSite = graph.get(i);
+            for (SiteLinkPOJO siteLink : listSite) {
                 String src = siteLink.getSrcUrl();
                 String des = siteLink.getDesUrl();
                 int desId = urlMap.get(des);
                 int srcId = urlMap.get(src);
                 int srcType = typeNode.get(srcId);
-                SiteLink invSiteLink = new SiteLink(des, src, srcType);
+                SiteLinkPOJO invSiteLink = new SiteLinkPOJO(des, src, srcType);
                 invGraph.get(desId).add(invSiteLink);
             }
         }
@@ -272,9 +275,9 @@ public class SiteMapService {
      * Get all links which are referencing to this url
      *
      * @param url
-     * @return List<SiteLink>
+     * @return List<SiteLinkPOJO>
      */
-    public List<SiteLink> getReferenceLinks(String url) {
+    public List<SiteLinkPOJO> getReferenceLinks(String url) {
         int id = urlMap.get(url);
         return invGraph.get(id);
     }
@@ -282,7 +285,7 @@ public class SiteMapService {
 
     public void printReferenceLinks(String url) {
         int id = urlMap.get(url);
-        for (SiteLink siteLink : invGraph.get(id)) {
+        for (SiteLinkPOJO siteLink : invGraph.get(id)) {
             System.out.println("link: " + siteLink.getDesUrl() + " type: " + siteLink.getDesType());
         }
     }
@@ -315,6 +318,22 @@ public class SiteMapService {
             result.add(url);
         }
         return result;
+    }
+
+    public List<Page> getAllPage(Website web, Version ver){
+        List<Page> pages = new ArrayList<>();
+        for (Map.Entry<String, Integer> entry : urlMap.entrySet()) {
+            String url = entry.getKey();
+            int idNode = entry.getValue();
+            int type = typeNode.get(idNode);
+            Page tmpPage = new Page();
+            tmpPage.setType(type);
+            tmpPage.setUrl(url);
+            tmpPage.setWebsite(web);
+            tmpPage.setVersion(ver);
+            pages.add(tmpPage);
+        }
+        return pages;
     }
 
 

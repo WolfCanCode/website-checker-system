@@ -8,10 +8,10 @@ import lombok.Setter;
 @Data
 @Getter
 @Setter
-public class MissingFile {
+public class MissingFilePOJO {
     private Integer type;
 
-    public MissingFile(Integer type) {
+    public MissingFilePOJO(Integer type) {
         this.type = type;
     }
 }

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import 'semantic-ui-css/semantic.min.css';
-import { Segment, Button, Table, Icon, Input } from 'semantic-ui-react'
+import { Segment, Button, Table, Icon, Input} from 'semantic-ui-react'
 import TableRow from './row-table';
 
 
@@ -135,6 +135,7 @@ class speedTestScreen extends Component {
                             <Input icon='search' placeholder='Search...' style={{ float: 'right' }} />
                         </Segment>
                         <Segment basic style={{ maxHeight: 300, overflow: "auto" }}>
+
                             <Table singleLine textAlign='center' style={{ tableLayout: 'auto' }}>
                                 <Table.Header >
                                     <Table.Row>
@@ -146,12 +147,13 @@ class speedTestScreen extends Component {
                                     </Table.Row>
                                 </Table.Header>
                                 <Table.Body>
-                                    {this.state.list.length === 0 ? <Table.Row><Table.Cell>This page haven't test yet, please try to test</Table.Cell></Table.Row> : this.state.list}
 
+                                        {this.state.list.length === 0 ? <Table.Row><Table.Cell>This page haven't test yet, please try to test</Table.Cell></Table.Row> : this.state.list}
 
 
                                 </Table.Body>
                             </Table>
+
                         </Segment>
                     </Segment>
 

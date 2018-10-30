@@ -1,9 +1,9 @@
 package com.fpt.capstone.wcs.controller;
 
-import com.fpt.capstone.wcs.model.pojo.MissingFile;
+import com.fpt.capstone.wcs.model.pojo.MissingFilePOJO;
 import com.fpt.capstone.wcs.model.entity.BrokenLinkReport;
 import com.fpt.capstone.wcs.model.entity.BrokenPageReport;
-import com.fpt.capstone.wcs.model.pojo.Url;
+import com.fpt.capstone.wcs.model.pojo.UrlPOJO;
 import com.fpt.capstone.wcs.model.entity.MissingFileReport;
 import com.fpt.capstone.wcs.repository.BrokenLinkRepository;
 import com.fpt.capstone.wcs.repository.BrokenPageRepository;
@@ -32,7 +32,7 @@ public class QualityController {
     MissingFilesPagesRepository missingFilesPagesRepository;
 
     @PostMapping("/api/brokenLink")
-    public List<BrokenLinkReport> getDataBrokenLink(@RequestBody Url[] list) throws InterruptedException {
+    public List<BrokenLinkReport> getDataBrokenLink(@RequestBody UrlPOJO[] list) throws InterruptedException {
         QualityService qlt = new QualityService();
         List<BrokenLinkReport> resultList = qlt.brokenLinkService(list);
         brokenLinkRepository.deleteAll();
@@ -48,7 +48,7 @@ public class QualityController {
     }
 
     @PostMapping("/api/brokenPage")
-    public List<BrokenPageReport> getDataBrokenPage(@RequestBody Url[] list) throws InterruptedException {
+    public List<BrokenPageReport> getDataBrokenPage(@RequestBody UrlPOJO[] list) throws InterruptedException {
         QualityService qlt = new QualityService();
         List<BrokenPageReport> resultList = qlt.brokenPageService(list);
         brokenPageRepository.deleteAll();
@@ -64,13 +64,13 @@ public class QualityController {
     }
 
     @PostMapping("/api/missingtest")
-    public List<MissingFileReport> getMissingFile(@RequestBody MissingFile[] request) throws InterruptedException {
+    public List<MissingFileReport> getMissingFile(@RequestBody MissingFilePOJO[] request) throws InterruptedException {
         QualityService qualityService = new QualityService();
         List<MissingFileReport> result= new ArrayList<>();
         System.out.println( request.length);
-        Url[] list = new Url[2];
-        list[0]= new Url("https://www.bhcosmetics.com/");
-        list[1]= new Url("https://thanhnien.vn/");
+        UrlPOJO[] list = new UrlPOJO[2];
+        list[0]= new UrlPOJO("https://www.bhcosmetics.com/");
+        list[1]= new UrlPOJO("https://thanhnien.vn/");
         String urlRoot="";
         for(int i =0; i< list.length;i++ ){
             Pattern pattern = Pattern.compile("(http\\:|https\\:)//([\\w\\-?\\.?]+)?\\.([a-zA-Z]{2,3})?",Pattern.CASE_INSENSITIVE);
@@ -84,10 +84,10 @@ public class QualityController {
             result =  qualityService.getMissingFile(list, urlRoot);
         }
         else{
-            for (MissingFile missingFileDTO:request){
-               int typeSwicth = missingFileDTO.getType();
+            for (MissingFilePOJO missingFilePOJODTO :request){
+               int typeSwicth = missingFilePOJODTO.getType();
                 System.out.println(typeSwicth);
-                switch (missingFileDTO.getType()){
+                switch (missingFilePOJODTO.getType()){
                     case 1:{
                         result.addAll(qualityService.getMissingFileImg(list, urlRoot));
                         break;

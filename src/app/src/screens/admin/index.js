@@ -7,7 +7,6 @@ import HeaderContent from '../../components/header-content';
 import HeaderAdmin from '../../components/header-admin';
 import menu from '../../config/menu';
 import { Cookies } from "react-cookie";
-import ConfirmModal from '../../components/confirm-modal';
 const cookies = new Cookies();
 
 export default class AdminScreen extends Component {
@@ -48,10 +47,15 @@ export default class AdminScreen extends Component {
         this.setState({ titleHeader: title, altHeader: alt, imageSrc: image });
     }
 
-    __onConfirm(result)
+    _onConfirm(result)
     {
         alert(result);
         this.setState({showConfirmModal:false});
+    }
+
+    _changeWebsiteConfirm(id)
+    {
+        cookies.set("u_w_id",id,{path:'/'});
     }
 
     componentDidMount() {
@@ -84,7 +88,7 @@ export default class AdminScreen extends Component {
                     {this.state.redirect}
                     <Sidebar.Pushable as={Segment} style={{ background: "#E0E0E0" }}>
                         <SideMenu updateHeader={(title, alt, image) => this._onUpdateHeader(title, alt, image)} />
-                        <HeaderAdmin />
+                        <HeaderAdmin changeWebsite={(id)=> this._changeWebsiteConfirm(id)}/>
                         <Sidebar.Pusher>
                             <Image src={this.state.imageSrc} size='medium' style={{ margin: 'auto', position: 'absolute', zIndex: '999999', marginLeft: '82vw', marginTop: '8vh', height: 150, width: 'auto', transition: 'all 1s' }} />
                             <Segment style={{ background: "#F5F5F5", marginLeft: '160px', marginRight: '10px', marginTop: '60px', height: '91vh' }}>
@@ -93,7 +97,6 @@ export default class AdminScreen extends Component {
                             </Segment>
                         </Sidebar.Pusher>
                     </Sidebar.Pushable>
-                    <ConfirmModal show={this.state.showConfirmModal} title="Test" icon="server" content="Thử chút coi" choose={(result)=>this.__onConfirm(result)} />
                 </div>
             </Router >
         );

@@ -1,5 +1,6 @@
 package com.fpt.capstone.wcs.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
 import lombok.Getter;
@@ -22,6 +23,7 @@ public class Role {
     private String name;
 
     @OneToMany(targetEntity = User.class, mappedBy = "role", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<User> user= new ArrayList<>();
 
 }

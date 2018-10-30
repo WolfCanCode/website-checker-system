@@ -4,7 +4,7 @@ import com.fpt.capstone.wcs.model.entity.CookieReport;
 import com.fpt.capstone.wcs.model.entity.FaviconReport;
 import com.fpt.capstone.wcs.model.entity.JavascriptReport;
 import com.fpt.capstone.wcs.model.entity.ServerBehaviorReport;
-import com.fpt.capstone.wcs.model.pojo.Url;
+import com.fpt.capstone.wcs.model.pojo.UrlPOJO;
 import com.fpt.capstone.wcs.repository.*;
 import com.fpt.capstone.wcs.service.TechnologyService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +31,7 @@ public class TechnologyController {
     FaviconRepository faviconRepository;
 
     @PostMapping("/api/jsTest")
-    public List<JavascriptReport> getDataPagesTest(@RequestBody Url[] list) throws InterruptedException {
+    public List<JavascriptReport> getDataPagesTest(@RequestBody UrlPOJO[] list) throws InterruptedException {
         TechnologyService technologyService = new TechnologyService();
         List<JavascriptReport> resultList = technologyService.jsTestService(list);
         jsCheckRepository.deleteAll();
@@ -46,7 +46,7 @@ public class TechnologyController {
     }
 
     @PostMapping("/api/svbehavior")
-    public ServerBehaviorReport getServerBehavior(@RequestBody Url url) throws InterruptedException, IOException {
+    public ServerBehaviorReport getServerBehavior(@RequestBody UrlPOJO url) throws InterruptedException, IOException {
         TechnologyService technologyService = new TechnologyService();
         ServerBehaviorReport result = technologyService.checkServerBehavior(url);
 //        serverBehaviorRepository.save(result);
@@ -64,7 +64,7 @@ public class TechnologyController {
 
 
     @PostMapping("/api/cookie")
-    public List<CookieReport> getCookies(@RequestBody Url[] list) throws InterruptedException {
+    public List<CookieReport> getCookies(@RequestBody UrlPOJO[] list) throws InterruptedException {
         TechnologyService technologyService = new TechnologyService();
         List<CookieReport> resultList = technologyService.cookieService(list);
         cookieRepository.deleteAll();
@@ -79,7 +79,7 @@ public class TechnologyController {
         return resultList;
     }
     @PostMapping("/api/favicontest")
-    public List<FaviconReport> getDataFaviconTest(@RequestBody Url[] list) throws InterruptedException {
+    public List<FaviconReport> getDataFaviconTest(@RequestBody UrlPOJO[] list) throws InterruptedException {
         TechnologyService technologyService = new TechnologyService();
         String urlRoot="";
         for(int i =0; i< list.length;i++ ){

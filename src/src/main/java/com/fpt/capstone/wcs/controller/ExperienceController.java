@@ -1,7 +1,7 @@
 package com.fpt.capstone.wcs.controller;
 
 import com.fpt.capstone.wcs.model.entity.SpeedTestReport;
-import com.fpt.capstone.wcs.model.pojo.Url;
+import com.fpt.capstone.wcs.model.pojo.UrlPOJO;
 import com.fpt.capstone.wcs.repository.SpeedtestRepository;
 import com.fpt.capstone.wcs.service.ExperienceService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +18,7 @@ public class ExperienceController {
     SpeedtestRepository speedtestRepository;
 
     @PostMapping("/api/speedTest")
-    public List<SpeedTestReport> getDataSpeedTest(@RequestBody Url[] list) throws InterruptedException {
+    public List<SpeedTestReport> getDataSpeedTest(@RequestBody UrlPOJO[] list) throws InterruptedException {
         ExperienceService exp = new ExperienceService();
         List<SpeedTestReport> resultList = exp.speedTestService(list);
         speedtestRepository.deleteAll();

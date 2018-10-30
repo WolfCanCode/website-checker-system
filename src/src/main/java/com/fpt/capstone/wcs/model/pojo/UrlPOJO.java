@@ -8,7 +8,7 @@ import java.io.Serializable;
 @Getter @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Url {
+public class UrlPOJO {
     private String url;
 
 }

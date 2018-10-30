@@ -2,7 +2,7 @@ package com.fpt.capstone.wcs.service;
 
 import com.fpt.capstone.wcs.model.entity.BrokenLinkReport;
 import com.fpt.capstone.wcs.model.entity.BrokenPageReport;
-import com.fpt.capstone.wcs.model.pojo.Url;
+import com.fpt.capstone.wcs.model.pojo.UrlPOJO;
 import com.fpt.capstone.wcs.model.entity.MissingFileReport;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -25,13 +25,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class QualityService {
-    public List<BrokenLinkReport> brokenLinkService(Url[] url) throws InterruptedException {
+    public List<BrokenLinkReport> brokenLinkService(UrlPOJO[] url) throws InterruptedException {
         //Asign list Broken Link
         List<BrokenLinkReport> resultList = new ArrayList<>();
         final CyclicBarrier gate = new CyclicBarrier(url.length);
         List<Thread> listThread = new ArrayList<>();
 
-        for (Url u : url) {
+        for (UrlPOJO u : url) {
             listThread.add(new Thread() {
                 public void run() {
                     try {
@@ -103,13 +103,13 @@ public class QualityService {
 
     }
 
-    public List<BrokenPageReport> brokenPageService(Url[] url) throws InterruptedException {
+    public List<BrokenPageReport> brokenPageService(UrlPOJO[] url) throws InterruptedException {
         //Asign list Broken Page
         List<BrokenPageReport> resultList = new ArrayList<>();
         final CyclicBarrier gate = new CyclicBarrier(url.length);
         List<Thread> listThread = new ArrayList<>();
 
-        for (Url u : url) {
+        for (UrlPOJO u : url) {
             listThread.add(new Thread() {
                 public void run() {
                     try {
@@ -178,12 +178,12 @@ public class QualityService {
 
 
 
-    public List<MissingFileReport> getMissingFileImg(Url[] url, String urlNew) throws InterruptedException {
+    public List<MissingFileReport> getMissingFileImg(UrlPOJO[] url, String urlNew) throws InterruptedException {
         List<MissingFileReport> missing = new ArrayList<>();
         final CyclicBarrier gate = new CyclicBarrier(url.length);
         List<Thread> listThread = new ArrayList<>();
         String urlRoot = urlNew;
-        for (Url u : url) {
+        for (UrlPOJO u : url) {
             listThread.add(new Thread() {
                 public void run() {
                     try {
@@ -258,12 +258,12 @@ public class QualityService {
         return missing;
     }
 
-    public List<MissingFileReport> getMissingFileDoc(Url[] url, String urlNew) throws InterruptedException {
+    public List<MissingFileReport> getMissingFileDoc(UrlPOJO[] url, String urlNew) throws InterruptedException {
         List<MissingFileReport> missing = new ArrayList<>();
         final CyclicBarrier gate = new CyclicBarrier(url.length);
         List<Thread> listThread = new ArrayList<>();
         String urlRoot = urlNew;
-        for (Url u : url) {
+        for (UrlPOJO u : url) {
             listThread.add(new Thread() {
                 public void run() {
                     try {
@@ -339,12 +339,12 @@ public class QualityService {
         return missing;
     }
 
-    public List<MissingFileReport> getMissingFileCss(Url[] url, String urlNew) throws InterruptedException {
+    public List<MissingFileReport> getMissingFileCss(UrlPOJO[] url, String urlNew) throws InterruptedException {
         List<MissingFileReport> missing = new ArrayList<>();
         final CyclicBarrier gate = new CyclicBarrier(url.length);
         List<Thread> listThread = new ArrayList<>();
         String urlRoot = urlNew;
-        for (Url u : url) {
+        for (UrlPOJO u : url) {
             listThread.add(new Thread() {
                 public void run() {
                     try {
@@ -420,12 +420,12 @@ public class QualityService {
         return missing;
     }
 
-    public List<MissingFileReport> getMissingFileMP3andMP4(Url[] url, String urlNew) throws InterruptedException {
+    public List<MissingFileReport> getMissingFileMP3andMP4(UrlPOJO[] url, String urlNew) throws InterruptedException {
         List<MissingFileReport> missing = new ArrayList<>();
         final CyclicBarrier gate = new CyclicBarrier(url.length);
         List<Thread> listThread = new ArrayList<>();
         String urlRoot = urlNew;
-        for (Url u : url) {
+        for (UrlPOJO u : url) {
             listThread.add(new Thread() {
                 public void run() {
                     try {
@@ -501,12 +501,12 @@ public class QualityService {
         return missing;
     }
 
-    public List<MissingFileReport> getMissingFileARCHIVES(Url[] url, String urlNew) throws InterruptedException {
+    public List<MissingFileReport> getMissingFileARCHIVES(UrlPOJO[] url, String urlNew) throws InterruptedException {
         List<MissingFileReport> missing = new ArrayList<>();
         final CyclicBarrier gate = new CyclicBarrier(url.length);
         List<Thread> listThread = new ArrayList<>();
         String urlRoot = urlNew;
-        for (Url u : url) {
+        for (UrlPOJO u : url) {
             listThread.add(new Thread() {
                 public void run() {
                     try {
@@ -582,12 +582,12 @@ public class QualityService {
         return missing;
     }
 
-    public List<MissingFileReport> getMissingFile(Url[] url, String urlNew) throws InterruptedException {
+    public List<MissingFileReport> getMissingFile(UrlPOJO[] url, String urlNew) throws InterruptedException {
         List<MissingFileReport> missing = new ArrayList<>();
         final CyclicBarrier gate = new CyclicBarrier(url.length);
         List<Thread> listThread = new ArrayList<>();
         String urlRoot = urlNew;
-        for (Url u : url) {
+        for (UrlPOJO u : url) {
             listThread.add(new Thread() {
                 public void run() {
                     try {

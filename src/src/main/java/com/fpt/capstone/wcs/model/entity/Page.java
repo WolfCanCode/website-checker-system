@@ -28,6 +28,10 @@ public class Page {
     @JsonIgnore
     private Website website;
 
+    @ManyToOne()
+    @JoinColumn(name="ver_id")
+    private Version version;
+
     @ManyToMany(fetch = FetchType.LAZY,
             cascade = {
                     CascadeType.PERSIST,

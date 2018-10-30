@@ -22,13 +22,6 @@ const menu = [
         items : null
     },
     {
-        name: "Setting",
-        to: "/admin/setting",
-        key: "config",
-        alt: "Configuration and update website",
-        items : null
-    },
-    {
         name: "Quality",
         items: [
             {
@@ -141,7 +134,13 @@ const menu = [
                 alt: "This for test alt title"
             }
         ]
-    }
+    },{
+        name: "Setting",
+        to: "/admin/setting",
+        key: "config",
+        alt: "Configuration and update website",
+        items : null,
+    },
 
 
 ];

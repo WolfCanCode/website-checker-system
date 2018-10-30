@@ -7,7 +7,7 @@ const cookies = new Cookies();
 
 
 class HeaderAdmin extends Component {
-    state = { txtWebpage: "", listWeb: [""], logout: false, account_name:"" };
+    state = {valWebpage:null, listWeb: null, logout: false, account_name:"" };
 
 
 
@@ -26,7 +26,8 @@ class HeaderAdmin extends Component {
                     return { key: index, value: item.id, text: item.url };
 
                 });
-                this.setState({ listWeb: list, txtWebpage: list[0].text });
+                this.setState({ listWeb: list, valWebpage: list[0].value });
+                this.props.changeWebsite(list[0].value);
             } else {
                 this.setState({
                     redirect: <Redirect to='/logout' />
@@ -52,16 +53,19 @@ class HeaderAdmin extends Component {
         });
     }
 
-        _changeWebPage(event) {
+        _changeWebPage(event,data) {
             this.setState({
-                txtWebpage: event.target.text
+                valWebpage: data.value
             });
+            this.props.changeWebsite(data.value);
         }
 
 
 
         _doLogout = () => {
+            cookies.remove("u_id");
             cookies.remove("u_token");
+            cookies.remove("u_w_id");
             this.setState({
                 logout: true
             });
@@ -72,15 +76,11 @@ class HeaderAdmin extends Component {
             }
         }
 
-        _changeWebsite(event){
-            alert(event.target.value);
-        }
-
 
         render() {
             return (
                 <Menu className="top" style={{ background: 'rgb(55, 33, 173)', position: 'absolute', width: '100%', zIndex: '4', margin: '0', height: '50px' }}>
-                    <Menu.Item><Dropdown onChange={(event)=>this._changeWebsite(event)} options={this.state.listWeb} text={this.state.txtWebpage} defaultValue={this.state.listWeb.length === 0 ? "" : this.state.listWeb[0].value} style={{ marginLeft: '160px', color: 'white', fontSize: '18px' }} /></Menu.Item>
+                    <Menu.Item><Dropdown key="1" onChange={(event,data)=>this._changeWebPage(event,data)} options={this.state.listWeb} value={this.state.valWebpage} style={{ marginLeft: '160px', color: 'white', fontSize: '18px' }} /></Menu.Item>
                     <Menu.Menu position='right'>
                         <Menu.Item>
                             <Input icon='search' placeholder='Search...' />

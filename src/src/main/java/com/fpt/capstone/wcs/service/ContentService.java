@@ -3,7 +3,7 @@ package com.fpt.capstone.wcs.service;
 import com.fpt.capstone.wcs.model.entity.ContactReport;
 import com.fpt.capstone.wcs.model.entity.RedirectionReport;
 import com.fpt.capstone.wcs.model.entity.PageReport;
-import com.fpt.capstone.wcs.model.pojo.Url;
+import com.fpt.capstone.wcs.model.pojo.UrlPOJO;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -22,11 +22,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ContentService {
-    public List<PageReport> getPageInfor(Url[] list) throws InterruptedException {
+    public List<PageReport> getPageInfor(UrlPOJO[] list) throws InterruptedException {
         List<PageReport> pageCheck = new ArrayList<>();
         final CyclicBarrier gate = new CyclicBarrier(list.length);
         List<Thread> listThread = new ArrayList<>();
-        for (Url url:list){
+        for (UrlPOJO url:list){
             listThread.add(new Thread(){
                 public void run() {
                     try {
@@ -60,11 +60,11 @@ public class ContentService {
         return pageCheck;
     }
 
-    public  List<RedirectionReport> redirectionTest(Url[] list) throws IOException {
+    public  List<RedirectionReport> redirectionTest(UrlPOJO[] list) throws IOException {
         List<RedirectionReport> pageCheck = new ArrayList<>();
         final CyclicBarrier gate = new CyclicBarrier(list.length);
         List<Thread> listThread = new ArrayList<>();
-        for(Url url:list){
+        for(UrlPOJO url:list){
             listThread.add(new Thread(){
                 public void run() {
                     try {
@@ -169,11 +169,11 @@ public class ContentService {
 
     }
 
-    public List<ContactReport> getContactDetail(Url[] list){
+    public List<ContactReport> getContactDetail(UrlPOJO[] list){
         List<ContactReport> list1 = new ArrayList<>();
         final CyclicBarrier gate = new CyclicBarrier(list.length);
         List<Thread> listThread = new ArrayList<>();
-        for (Url newList : list){
+        for (UrlPOJO newList : list){
             listThread.add(new Thread(){
                 public void run() {
                     try {

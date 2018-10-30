@@ -1,7 +1,7 @@
 package com.fpt.capstone.wcs.service;
 
 import com.fpt.capstone.wcs.model.entity.*;
-import com.fpt.capstone.wcs.model.pojo.Url;
+import com.fpt.capstone.wcs.model.pojo.UrlPOJO;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -32,19 +32,18 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import static java.util.Comparator.*;
 
-import static java.util.Comparator.comparingInt;
 import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toCollection;
 
 public class TechnologyService {
 
-    public List<JavascriptReport> jsTestService(Url[] url) throws InterruptedException {
+    public List<JavascriptReport> jsTestService(UrlPOJO[] url) throws InterruptedException {
         System.setProperty("webdriver.chrome.driver", "C:\\Users\\ngoct\\Downloads\\chromedriver_win32\\chromedriver.exe");
         //Asign list JS info
         List<JavascriptReport> resultList = new ArrayList<>();
         final CyclicBarrier gate = new CyclicBarrier(url.length);
         List<Thread> listThread = new ArrayList<>();
-        for (Url u : url) {
+        for (UrlPOJO u : url) {
             listThread.add(new Thread() {
                 public void run() {
                     try {
@@ -94,7 +93,7 @@ public class TechnologyService {
 
     }
 
-    public ServerBehaviorReport checkServerBehavior(Url url) throws IOException {
+    public ServerBehaviorReport checkServerBehavior(UrlPOJO url) throws IOException {
         ServerBehaviorReport result = new ServerBehaviorReport();
         System.out.println(url.getUrl());
         boolean isRedirectWWW = checkIsRedirect(url.getUrl())[0];
@@ -117,8 +116,8 @@ public class TechnologyService {
             url1 = url1.replace("www.", "");
         }
         System.out.println(url1);
-        Url[] urls = new Url[1];
-        urls[0] = new Url(url1);
+        UrlPOJO[] urls = new UrlPOJO[1];
+        urls[0] = new UrlPOJO(url1);
         ContentService content = new ContentService();
         List<RedirectionReport> redirections = content.redirectionTest(urls);
         RedirectionReport instance = redirections.get(0);
@@ -143,7 +142,7 @@ public class TechnologyService {
         } else {
             url2 = url2.replace("https://www","http://www");
         }
-        urls[0] = new Url(url2);
+        urls[0] = new UrlPOJO(url2);
         ContentService content1 = new ContentService();
         List<RedirectionReport> redirections1 = content1.redirectionTest(urls);
         RedirectionReport instance1 = redirections1.get(0);
@@ -168,7 +167,7 @@ public class TechnologyService {
 
 
 
-    public List<CookieReport> cookieService(Url[] url) throws InterruptedException {
+    public List<CookieReport> cookieService(UrlPOJO[] url) throws InterruptedException {
         System.setProperty("webdriver.chrome.driver", "C:\\Users\\trinhndse62136\\Downloads\\chromedriver_win32\\chromedriver.exe");
         //Asign list JS info
         List<Cookie> cookieList = new ArrayList<>();
@@ -218,7 +217,7 @@ public class TechnologyService {
         List<Thread> listThread = new ArrayList<>();
         List<String> cookieNames = new ArrayList<String>();
 
-        for (Url u : url) {
+        for (UrlPOJO u : url) {
             listThread.add(new Thread() {
                 public void run() {
                     try {
@@ -283,7 +282,7 @@ public class TechnologyService {
         return resultList;
     }
 
-    public static List<FaviconReport> checkFavicon(Url[] url, String urlRoot) {
+    public static List<FaviconReport> checkFavicon(UrlPOJO[] url, String urlRoot) {
         List<FaviconReport> fav = new ArrayList();
         boolean flagMethod1 = false;
         String urlFaviconMethod1 = urlRoot + "/favicon.ico";
@@ -295,7 +294,7 @@ public class TechnologyService {
                 flagMethod1 = true;
             }
         }
-        for ( Url urlNew : url) {
+        for ( UrlPOJO urlNew : url) {
             if (flagMethod1 == true) {
                 System.out.println(urlNew.getUrl().startsWith(urlRoot));
                 if(urlNew.getUrl().startsWith(urlRoot)){
