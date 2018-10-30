@@ -34,6 +34,7 @@ public class UserController {
         if(result==null)
         {
             res.put("action", Constant.INCORRECT);
+            res.put("messages","The token is invalid");
             return res;
         } else {
             res.put("action", Constant.SUCCESS);
@@ -55,6 +56,7 @@ public class UserController {
         if(result==null)
         {
             res.put("action", Constant.INCORRECT);
+            res.put("messages","The token is invalid");
             return res;
         } else {
             res.put("action", Constant.SUCCESS);

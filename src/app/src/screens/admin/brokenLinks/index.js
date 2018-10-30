@@ -2,7 +2,9 @@ import React, { Component } from 'react';
 import 'semantic-ui-css/semantic.min.css';
 import { Segment, Button, Table, Icon, Input } from 'semantic-ui-react'
 import TableRow from './row-table';
+import { Cookies } from "react-cookie";
 
+const cookies = new Cookies();
 
 
 
@@ -36,22 +38,8 @@ class brokenLinksScreen extends Component {
     _doBrokenLink() {
         var comp = [];
         this.setState({ loadingTable: true, isDisable: true });
-        
-        
-        var param = [{ "url": "https://www.nottingham.ac.uk/about/campuses/campuses.aspx" },
-        { "url": "https://www.nottingham.ac.uk/about/visitorinformation/information.aspx" },
-        { "url": "http://info.block.vn/course-quality-review/" },
-        { "url": "http://fpt.edu.vn/tin-tuc/25509/pv-doc-quyen-hotboy-con-lai-viet-nga-bong-noi-len-sau-mot-dem-gia-gai-nhung-toi-van-chuan-men" },
-        { "url": "http://fpt.edu.vn/tin-tuc/24167/kho%3fi-da%60u-tu%60-con-so%C2%B4-0" },
-        { "url": "https://www.nottingham.ac.uk/about/keydates/index.aspx" },
-        { "url": "https://www.nottingham.ac.uk/about/facilities/facilities.aspx" },
-        { "url": "https://www.nottingham.ac.uk/about/facts/factsandfigures.aspx" },
-        { "url": "https://www.nottingham.ac.uk/about/structure/universitystructure.aspx" },
-        { "url": "https://www.nottingham.ac.uk/about/structure/universitystructure1.aspx" },
-        { "url": "https://www.nottingham.ac.uk/about/facts/factsandfigures1.aspx" },
-        { "url": "https://www.nottingham.ac.uk/about/keydates/index1.aspx" },
+        var param = { "userId": cookies.get("u_id"), "userToken": cookies.get("u_token"), "websiteId": cookies.get("u_w_id") };
 
-        ];
         fetch("/api/brokenLink", {
             method: 'POST',
             headers: {

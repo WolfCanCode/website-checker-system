@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import 'semantic-ui-css/semantic.min.css';
 import {Segment, Button, Table, Icon, Input } from 'semantic-ui-react'
-
-
 import TableRow from './row-table';
+import { Cookies } from "react-cookie";
 
+const cookies = new Cookies();
 
 
 
@@ -28,14 +28,8 @@ class faviconScreen extends Component {
         var faviconMissCount=0;
         var flag =false;
         this.setState({ loadingTable: true });
-        var param = [
-            { "url": "http://hiccupsteahouse.com/" },
-            { "url": "https://insites.com/" },
-            { "url": "https://insites.com/tests/" },
-            { "url": "https://insites.com/content/redirections/" },
-        // { "url": "https://thanhnien.vn/chinh-tri/" },
-        
-        ];
+        var param = { "userId": cookies.get("u_id"), "userToken": cookies.get("u_token"), "websiteId": cookies.get("u_w_id") };
+
         fetch("/api/favicontest/lastest", {
             method: 'POST',
             headers: {

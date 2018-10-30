@@ -1,5 +1,6 @@
 package com.fpt.capstone.wcs.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,6 +24,11 @@ public class Version {
     int version;
     @NotNull
     Date time;
+
+    @ManyToOne()
+    @JoinColumn(name="website_id")
+    @JsonIgnore
+    private Website website;
 
     @OneToMany(targetEntity = Page.class, mappedBy = "version", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Page> pages= new ArrayList<>();

@@ -4,7 +4,7 @@ import com.fpt.capstone.wcs.model.entity.Page;
 import com.fpt.capstone.wcs.model.entity.User;
 import com.fpt.capstone.wcs.model.entity.Version;
 import com.fpt.capstone.wcs.model.entity.Website;
-import com.fpt.capstone.wcs.model.pojo.NewVersionPOJO;
+import com.fpt.capstone.wcs.model.pojo.RequestCommonPOJO;
 import com.fpt.capstone.wcs.repository.PageRepository;
 import com.fpt.capstone.wcs.repository.UserRepository;
 import com.fpt.capstone.wcs.repository.VersionRepository;
@@ -47,24 +47,60 @@ public class SitemapController {
         return res;
     }
 
-    @PostMapping("/api/sitemap/getNewVer")
-    public Map<String, Object> getNewVer(@RequestBody NewVersionPOJO item) throws MalformedURLException {
+    @PostMapping("/api/sitemap/getVer")
+    public Map<String, Object> getLastestVer(@RequestBody RequestCommonPOJO item) {
+        Map<String, Object> res = new HashMap<>();
+        User user = userRepository.findOneByIdAndToken(item.getUserId(), item.getUserToken());
+        Website website = websiteRepository.findOneByUserAndId(user, item.getWebsiteId());
+        if (website != null) {
+            Version ver = versionRepository.findVersionByWebsite(website);
+            if(ver==null)
+            {
+                res.put("action", Constant.SUCCESS);
+                res.put("version",0);
+                res.put("time",0);
+                return res;
+            } else {
+                res.put("action", Constant.SUCCESS);
+                res.put("version",ver.getVersion());
+                res.put("time",ver.getTime());
+
+                return  res;
+            }
+        } else {
+            res.put("action", Constant.INCORRECT);
+            res.put("messages","The token is invalid");
+            return res;
+        }
+    }
+
+    @PostMapping("/api/sitemap/makeVer")
+    public Map<String, Object> makeNewVer(@RequestBody RequestCommonPOJO item) throws MalformedURLException {
         Map<String, Object> res = new HashMap<>();
         User user = userRepository.findOneByIdAndToken(item.getUserId(),item.getUserToken());
         Website website = websiteRepository.findOneByUserAndId(user,item.getWebsiteId());
         //Temp version
-        Version ver = new Version();
-        ver.setTime(new Date());
-        ver.setVersion(1);
-        versionRepository.save(ver);
-        ver = versionRepository.findAll().get(0);
+        Version ver = versionRepository.findVersionByWebsite(website);
+        Version verTmp = new Version();
+        if(ver==null) {
+            verTmp.setTime(new Date());
+            verTmp.setVersion(1);
+            verTmp.setWebsite(website);
+            versionRepository.save(verTmp);
+        } else
+        {
+            verTmp = new Version();
+            verTmp.setTime(new Date());
+            verTmp.setVersion(ver.getVersion()+1);
+            verTmp.setWebsite(website);
+            versionRepository.save(verTmp);
+        }
+        ver = versionRepository.findVersionByWebsiteAndVersion(website,verTmp.getVersion());
         if(website!=null) {
             SiteMapService sms = new SiteMapService(website.getUrl());
             sms.buildSiteMap();
             List<Page> pages = sms.getAllPage(website,ver);
             pageRepository.saveAll(pages);
-            pages = pageRepository.findAllByWebsite(website);
-
             res.put("action", Constant.SUCCESS);
             return res;
         } else {

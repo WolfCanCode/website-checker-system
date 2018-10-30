@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import {Segment, SegmentGroup } from 'semantic-ui-react'
+// import { Cookies } from "react-cookie";
 
+// const cookies = new Cookies();
 export default class Dashboard extends Component {
 
     render() {

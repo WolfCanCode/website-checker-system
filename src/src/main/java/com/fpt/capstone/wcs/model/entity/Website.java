@@ -45,4 +45,8 @@ public class Website {
     @OneToMany(targetEntity = Page.class, mappedBy = "website", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Page> page= new ArrayList<>();
+
+    @OneToMany(targetEntity = Version.class, mappedBy = "website", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Version> version= new ArrayList<>();
 }

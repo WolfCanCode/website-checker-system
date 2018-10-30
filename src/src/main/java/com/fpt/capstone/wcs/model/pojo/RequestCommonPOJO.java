@@ -7,7 +7,7 @@ import lombok.*;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class NewVersionPOJO {
+public class RequestCommonPOJO {
     Long userId;
     String userToken;
     Long websiteId;

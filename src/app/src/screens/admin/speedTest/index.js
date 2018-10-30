@@ -2,7 +2,9 @@ import React, { Component } from 'react';
 import 'semantic-ui-css/semantic.min.css';
 import { Segment, Button, Table, Icon, Input} from 'semantic-ui-react'
 import TableRow from './row-table';
+import { Cookies } from "react-cookie";
 
+const cookies = new Cookies();
 
 
 
@@ -58,13 +60,8 @@ class speedTestScreen extends Component {
         this.setState({ loadingTable: true });
         this.setState({ isDisable: true });
         var comp = [];
-        var param = [{ "url": "http://fpt.edu.vn/" },
-        { "url": "https://gaana.com/discover" },
-        { "url": "https://gaana.com/browser" },
-        { "url": "https://www.dcpxsuvi.com" },
-        { "url": "https://www.dcpxsuvi.com/tê-phun-xăm/54-63/tê-becabela-tê-đức.catalog" },
-        { "url": "https://www.dcpxsuvi.com/t%E1%BA%A5t-c%E1%BA%A3-c%C3%A1c-s%E1%BA%A3n-ph%E1%BA%A9m/52/dao-c%E1%BA%A1o-li%E1%BB%81n-c%C3%A1n.catalog" },
-        { "url": "https://www.dcpxsuvi.com/t%E1%BA%A5t-c%E1%BA%A3-c%C3%A1c-s%E1%BA%A3n-ph%E1%BA%A9m/51/da-gi%E1%BA%A3.catalog" }];
+        var param = { "userId": cookies.get("u_id"), "userToken": cookies.get("u_token"), "websiteId": cookies.get("u_w_id") };
+
         fetch("/api/speedTest", {
             method: 'POST',
             headers: {

@@ -1,11 +1,9 @@
 import React, { Component } from 'react';
 import 'semantic-ui-css/semantic.min.css';
 import {Segment, Button, Table, Icon, Input,Label } from 'semantic-ui-react'
+// import { Cookies } from "react-cookie";
 
-
-
-
-
+// const cookies = new Cookies();
 
 class spellingScreen extends Component {
 

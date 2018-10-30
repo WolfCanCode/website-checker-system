@@ -28,9 +28,9 @@ export default class AdminScreen extends Component {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({ "id": cookies.get("u_id"), "token": cookies.get("u_token") })
-        }).then(response => response.json()).then((data) => {
+        }).then(async response => response.json()).then( async (data) => {
             if (data.action === "SUCCESS") {
-                cookies.set("u_token", data.token, { path: "/" });
+                await cookies.set("u_token", data.token, { path: "/" });
 
             } else {
                 this.setState({

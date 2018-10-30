@@ -1,15 +1,10 @@
 import React, { Component } from 'react';
 import 'semantic-ui-css/semantic.min.css';
 import {Segment, Button, Image, Icon, Input,  } from 'semantic-ui-react'
-
+// import { Cookies } from "react-cookie";
 import image from '../../../assets/mobile.png';
 
-
-
-
-
-
-
+// const cookies = new Cookies();
 
 
 class mobileLayoutScreen extends Component {

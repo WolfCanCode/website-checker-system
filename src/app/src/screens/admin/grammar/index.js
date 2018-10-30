@@ -1,5 +1,8 @@
 import React, { Component } from 'react';
 import {Segment, Button, SegmentGroup, Icon, Table, Label, Input} from 'semantic-ui-react'
+// import { Cookies } from "react-cookie";
+
+// const cookies = new Cookies();
 export default class Grammar extends Component {
 
     render() {

@@ -2,7 +2,9 @@ import React, { Component } from 'react';
 import 'semantic-ui-css/semantic.min.css';
 import {Segment, Button, Table, Icon, Input} from 'semantic-ui-react'
 import TableRow from '../missingFiles/row-table'
+import { Cookies } from "react-cookie";
 
+const cookies = new Cookies();
 
 
 
@@ -31,9 +33,8 @@ class missingFilesScreen extends Component {
         var listMissingFileCount =[];
         var statusResult ="";
         this.setState({ loadingTable: true });
-        var param = [{ "url": "https://www.bhcosmetics.com/" },
-        { "url": "http://www.sggp.org.vn/" },
-        ];
+        var param = { "userId": cookies.get("u_id"), "userToken": cookies.get("u_token"), "websiteId": cookies.get("u_w_id") };
+
         fetch("/api/missingtest/lastest", {
             method: 'POST',
             headers: {

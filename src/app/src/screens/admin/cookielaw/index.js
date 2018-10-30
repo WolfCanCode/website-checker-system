@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import { Segment, Button, Icon, Table, Input } from 'semantic-ui-react'
 import TableRow from './row-table';
+import { Cookies } from "react-cookie";
 
+const cookies = new Cookies();
 export default class CookieLaw extends Component {
 
     state = { list: [], loadingTable: false, isDisable: false };
@@ -32,16 +34,8 @@ export default class CookieLaw extends Component {
     _doCookies() {
         var comp = [];
         this.setState({ loadingTable: true, isDisable: true });
+        var param = { "userId": cookies.get("u_id"), "userToken": cookies.get("u_token"), "websiteId": cookies.get("u_w_id") };
 
-
-        var param = [{ "url": "https://www.nottingham.ac.uk/about/campuses/campuses.aspx" },
-        { "url": "https://www.nottingham.ac.uk/about/keydates/index.aspx" },
-        { "url": "https://www.nottingham.ac.uk/about/facilities/facilities.aspx" },
-        { "url": "https://www.nottingham.ac.uk/about/facts/factsandfigures.aspx" },
-        { "url": "https://www.nottingham.ac.uk/about/structure/universitystructure.aspx" },
-
-
-        ];
         fetch("/api/cookie", {
             method: 'POST',
             headers: {

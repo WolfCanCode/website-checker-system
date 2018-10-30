@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import { Segment, Button, Table, Input, Icon } from 'semantic-ui-react'
 import TableRow from './row-table';
+import { Cookies } from "react-cookie";
+
+const cookies = new Cookies();
 export default class Direction extends Component {
     state = { list: [], loadingTable: false, isDisable: false, statusNoResult:""};
 
@@ -9,20 +12,8 @@ export default class Direction extends Component {
         var comp = [];
         this.setState({ loadingTable: true });
         var statusNotFound ="";
-        var param = [{ "url": "https://twitter.com/hashtag/hiccupsteahouse?lang=en" },
-        { "url": "http://www.cungmua.vn" },
-        { "url": "http://www.google.com" },
-        // { "url": "http://www.apple.com/us/shop/go/bag" },
-        // { "url": "http://www.facebook.com" },
-        { "url": "https://hiccupsteahouse.com/contact-us/" },
-        { "url": "https://hiccupsteahouse.com/careers/" },
-        { "url": "https://www.churroholic.com/" },
-        // { "url": "https://www.apple.com/us/shop/goto/giftcards" },
-        // { "url": "http://www.apple.com/today/camp/" },
-        // { "url": "https://www.apple.com/retail/camp/notify.html" },
-        // { "url": "https://www.apple.com/us/shop/goto/account" },
+        var param = { "userId": cookies.get("u_id"), "userToken": cookies.get("u_token"), "websiteId": cookies.get("u_w_id") };
 
-        ];
         fetch("/api/redirectiontest/lastest", {
             method: 'POST',
             headers: {

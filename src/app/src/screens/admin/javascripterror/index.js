@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import { Segment, Button, SegmentGroup, Table, Input, Icon } from 'semantic-ui-react'
 import TableRow from './row-table';
+import { Cookies } from "react-cookie";
 
+const cookies = new Cookies();
 export default class JavascriptErrorScreen extends Component {
   state = { list: [], loadingTable: false, isDisable: false };
 
@@ -35,11 +37,8 @@ export default class JavascriptErrorScreen extends Component {
     this.setState({ loadingTable: true });
     this.setState({ isDisable: true });
     var comp = [];
-    var param = [{ "url": "http://fpt.edu.vn/" },
-    { "url": "https://dcpxsuvi.com/" },
-    { "url": "https://gaana.com/browser" },
-    { "url": "https://tuoitre.vn/" },
-    { "url": "genk.vn" }];
+    var param = { "userId": cookies.get("u_id"), "userToken": cookies.get("u_token"), "websiteId": cookies.get("u_w_id") };
+
     fetch("/api/jsTest", {
       method: 'POST',
       headers: {

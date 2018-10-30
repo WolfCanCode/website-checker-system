@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import { Segment, Button, Table, Input, Icon } from 'semantic-ui-react'
 import TableRow from '../pages/row-table';
+import { Cookies } from "react-cookie";
+
+const cookies = new Cookies();
 export default class Pages extends Component {
     state = { list: [], loadingTable: false, isDisable: false };
 
@@ -8,17 +11,8 @@ export default class Pages extends Component {
     componentDidMount() {
         var comp = [];
         this.setState({ loadingTable: true });
-        var param = [{ "url": "https://twitter.com/hashtag/hiccupsteahouse?lang=en" },
-        { "url": "https://www.facebook.com/hiccupsteahouse" },
-        { "url": "https://www.instagram.com/hiccupsteahouse/" },
-        { "url": "http://hiccupsteahouse.com/" },
-        { "url": "https://www.orderhiccupsteahouse.com/" },
-        { "url": "http://hiccupsteahouse.com/wp-content/uploads/Hiccups-TeaHouse-Menu-9-18.pdf" },
-        { "url": "http://hiccupsteahouse.com/hiccups-locations/" },
-        { "url": "http://hiccupsteahouse.com/contact-us/" },
-        { "url": "http://hiccupsteahouse.com/careers/" },
-        { "url": "http://www.churroholic.com/" },
-        ];
+        var param = { "userId": cookies.get("u_id"), "userToken": cookies.get("u_token"), "websiteId": cookies.get("u_w_id") };
+
         fetch("/api/pagestest/lastest", {
             method: 'POST',
             headers: {
