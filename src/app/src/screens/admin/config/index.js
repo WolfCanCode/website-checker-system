@@ -69,8 +69,8 @@ class ConfigScreen extends Component {
                                         </font>
                                     </Statistic.Label>
                                     <Statistic.Value>{this.state.version}</Statistic.Value>
+                                    <Icon circular inverted name='redo' size="small" style={{ margin: "auto" }} loading={this.state.isLoading} onClick={() => this._refreshVer()} />
                                 </Statistic>
-                                <Icon circular inverted name='redo' size="small" style={{ margin: "auto" }} loading={this.state.isLoading} onClick={() => this._refreshVer()} />
 
                                 <Button animated color='green' loading={this.state.isLoading} disabled={this.state.isLoading} onClick={()=>this._getNewVer()}>
                                     <Button.Content visible>Get new version</Button.Content>

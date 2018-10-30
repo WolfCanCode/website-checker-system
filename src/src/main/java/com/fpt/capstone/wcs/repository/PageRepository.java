@@ -11,4 +11,5 @@ import java.util.List;
 @Repository
 public interface PageRepository extends JpaRepository<Page,Long> {
     List<Page> findAllByWebsiteAndVersion(Website website, Version version);
+    List<Page> findAllByWebsite(Website website);
 }

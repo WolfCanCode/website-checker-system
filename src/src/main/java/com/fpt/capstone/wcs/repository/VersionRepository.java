@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface VersionRepository extends JpaRepository<Version,Long> {
-    Version findVersionByWebsite(Website web);
+    Version findFirstByWebsiteOrderByVersionDesc(Website web);
     Version findVersionByWebsiteAndVersion(Website web, int version);
 }

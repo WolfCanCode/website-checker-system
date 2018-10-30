@@ -1,5 +1,6 @@
 package com.fpt.capstone.wcs.service;
 
+import com.fpt.capstone.wcs.model.entity.Page;
 import com.fpt.capstone.wcs.model.entity.SpeedTestReport;
 import com.fpt.capstone.wcs.model.pojo.UrlPOJO;
 import com.fpt.capstone.wcs.utils.MathUtil;
@@ -25,18 +26,18 @@ import java.util.regex.Pattern;
 
 public class ExperienceService {
 
-    public List<SpeedTestReport> speedTestService(UrlPOJO[] url) throws InterruptedException {
+    public List<SpeedTestReport> speedTestService(List<Page> list) throws InterruptedException {
         System.setProperty("webdriver.chrome.driver", "C:\\Users\\ngoct\\Downloads\\chromedriver_win32\\chromedriver.exe");
         //Asign list speed info
         List<SpeedTestReport> resultList = new ArrayList<>();
-        final CyclicBarrier gate = new CyclicBarrier(url.length);
+        final CyclicBarrier gate = new CyclicBarrier(list.size());
         List<Thread> listThread = new ArrayList<>();
-        for (UrlPOJO u : url) {
+        for (Page p : list) {
             listThread.add(new Thread() {
                 public void run() {
                     try {
                         gate.await();
-                        System.out.println("start testing url= " + u.getUrl());
+                        System.out.println("start testing url= " + p.getUrl());
                         //DesiredCapabilities
                         DesiredCapabilities capabilities = DesiredCapabilities.chrome();
                         LoggingPreferences logPrefs = new LoggingPreferences();
@@ -46,7 +47,7 @@ public class ExperienceService {
                         chromeOptions.setCapability(CapabilityType.LOGGING_PREFS, logPrefs);
                         WebDriver driver = new ChromeDriver(chromeOptions);//chay an
 
-                        driver.get(u.getUrl());
+                        driver.get(p.getUrl());
 
                         List<LogEntry> entries = driver.manage().logs().get(LogType.PERFORMANCE).getAll();
                         List<Double> entrySize = new ArrayList<>();
@@ -76,7 +77,7 @@ public class ExperienceService {
                         double interactTime = interact;
                         double interactTime1 = Math.floor(interactTime / 1000 * 10) / 10;
                         double sizeTransferred1 = Math.floor(totalByte / 1000000 * 10) / 10;
-                        resultList.add(new SpeedTestReport(u.getUrl(), interactTime1 + "", loadTime1 + "", sizeTransferred1 + ""));
+                        resultList.add(new SpeedTestReport(p.getUrl(), interactTime1 + "", loadTime1 + "", sizeTransferred1 + ""));
                         driver.quit();
                     } catch (InterruptedException | BrokenBarrierException e) {
                         Logger.getLogger(ExperienceService.class.getName()).log(Level.SEVERE, null, e);

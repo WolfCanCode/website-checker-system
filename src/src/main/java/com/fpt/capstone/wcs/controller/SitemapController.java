@@ -53,7 +53,7 @@ public class SitemapController {
         User user = userRepository.findOneByIdAndToken(item.getUserId(), item.getUserToken());
         Website website = websiteRepository.findOneByUserAndId(user, item.getWebsiteId());
         if (website != null) {
-            Version ver = versionRepository.findVersionByWebsite(website);
+            Version ver = versionRepository.findFirstByWebsiteOrderByVersionDesc(website);
             if(ver==null)
             {
                 res.put("action", Constant.SUCCESS);
@@ -63,7 +63,7 @@ public class SitemapController {
             } else {
                 res.put("action", Constant.SUCCESS);
                 res.put("version",ver.getVersion());
-                res.put("time",ver.getTime());
+                res.put("time",ver.getTime().getDate()+"/"+ver.getTime().getMonth()+"/"+ver.getTime().getYear());
 
                 return  res;
             }
@@ -80,7 +80,7 @@ public class SitemapController {
         User user = userRepository.findOneByIdAndToken(item.getUserId(),item.getUserToken());
         Website website = websiteRepository.findOneByUserAndId(user,item.getWebsiteId());
         //Temp version
-        Version ver = versionRepository.findVersionByWebsite(website);
+        Version ver = versionRepository.findFirstByWebsiteOrderByVersionDesc(website);
         Version verTmp = new Version();
         if(ver==null) {
             verTmp.setTime(new Date());
