@@ -31,7 +31,7 @@ public class Website {
     @UpdateTimestamp
     private LocalDateTime modifiedTime;
 
-    @ManyToMany(fetch = FetchType.EAGER,
+    @ManyToMany(fetch = FetchType.LAZY,
             cascade = {
                     CascadeType.PERSIST,
                     CascadeType.MERGE
@@ -49,4 +49,8 @@ public class Website {
     @OneToMany(targetEntity = Version.class, mappedBy = "website", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Version> version= new ArrayList<>();
+
+    @OneToMany(targetEntity = PageOption.class, mappedBy = "website", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<PageOption> pageOptions= new ArrayList<>();
 }

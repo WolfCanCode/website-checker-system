@@ -1,5 +1,6 @@
 package com.fpt.capstone.wcs.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -29,11 +30,9 @@ public class SpeedTestReport {
         this.size = size;
     }
 
-    @ManyToMany(fetch = FetchType.LAZY,
-            cascade = {
-                    CascadeType.PERSIST,
-                    CascadeType.MERGE
-            },
-            mappedBy = "SpeedTestReport")
-    private List<Page> Page = new ArrayList<>();
+    @ManyToOne()
+    @JoinColumn(name="page_option_id")
+    @JsonIgnore
+    private PageOption pageOption;
+
 }

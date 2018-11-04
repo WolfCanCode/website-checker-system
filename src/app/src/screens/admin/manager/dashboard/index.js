@@ -3,14 +3,14 @@ import {Segment, SegmentGroup } from 'semantic-ui-react'
 // import { Cookies } from "react-cookie";
 
 // const cookies = new Cookies();
-export default class Dashboard extends Component {
+export default class DashboardManager extends Component {
 
     render() {
         return (
             <div>
 
                 <SegmentGroup vertical='true'>
-                    <Segment><h3>Staff</h3></Segment>
+                    <Segment><h3>Manager</h3></Segment>
                     <Segment.Group horizontal>
                         <Segment basic>
                             <Segment.Group horizontal>

@@ -24,7 +24,7 @@ export default class JavascriptErrorScreen extends Component {
           var msg = item.messages.replace("-", "");
           msg = msg.replace(msg.split(" ")[0], "");
           var messages = msg.split(" at");
-          return (<TableRow key={index} page={item.page} type={item.type} messages={messages} />);
+          return (<TableRow key={index} page={item.pages} type={item.type} messages={messages} />);
         });
         this.setState({ list: comp });
       }
@@ -52,7 +52,7 @@ export default class JavascriptErrorScreen extends Component {
           var msg = item.messages.replace("-", "");
           msg = msg.replace(msg.split(" ")[0], "");
           var messages = msg.split(" at");
-          return (<TableRow key={index} page={item.page} type={item.type} messages={messages} />);
+          return (<TableRow key={index} page={item.pages} type={item.type} messages={messages} />);
         });
         this.setState({ list: comp });
       }

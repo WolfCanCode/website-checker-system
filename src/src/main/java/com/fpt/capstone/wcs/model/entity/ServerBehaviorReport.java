@@ -1,5 +1,6 @@
 package com.fpt.capstone.wcs.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,11 +24,9 @@ public class ServerBehaviorReport {
     private boolean isExistErrorPage;
     private boolean isRedirectHTTPS;
 
-    @ManyToMany(fetch = FetchType.LAZY,
-            cascade = {
-                    CascadeType.PERSIST,
-                    CascadeType.MERGE
-            },
-            mappedBy = "ServerBehaviorReport")
-    private List<Page> Page = new ArrayList<>();
+    @ManyToOne()
+    @JoinColumn(name="page_option_id")
+    @JsonIgnore
+    private PageOption pageOption;
+
 }

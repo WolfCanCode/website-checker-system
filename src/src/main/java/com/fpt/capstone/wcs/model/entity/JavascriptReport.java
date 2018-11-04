@@ -1,6 +1,7 @@
 package com.fpt.capstone.wcs.model.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,19 +23,17 @@ public class JavascriptReport{
     @Column(length = 1000)
     private String messages;
     private String type;
-    private String page;
+    private String pages;
 
-    public JavascriptReport(String messages, String type, String page) {
+    public JavascriptReport(String messages, String type, String pages) {
         this.messages = messages;
         this.type = type;
-        this.page = page;
+        this.pages = pages;
     }
 
-    @ManyToMany(fetch = FetchType.LAZY,
-            cascade = {
-                    CascadeType.PERSIST,
-                    CascadeType.MERGE
-            },
-            mappedBy = "JavascriptReport")
-    private List<Page> Page = new ArrayList<>();
+    @ManyToOne()
+    @JoinColumn(name="page_option_id")
+    @JsonIgnore
+    private PageOption pageOption;
+
 }

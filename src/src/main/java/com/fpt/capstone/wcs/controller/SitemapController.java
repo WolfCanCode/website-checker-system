@@ -63,7 +63,7 @@ public class SitemapController {
             } else {
                 res.put("action", Constant.SUCCESS);
                 res.put("version",ver.getVersion());
-                res.put("time",ver.getTime().getDate()+"/"+ver.getTime().getMonth()+"/"+ver.getTime().getYear());
+                res.put("time",ver.getTime().getDate()+"/"+(ver.getTime().getMonth()+1)+"/2018");
 
                 return  res;
             }

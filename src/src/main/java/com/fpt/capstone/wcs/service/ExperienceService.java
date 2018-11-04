@@ -15,6 +15,7 @@ import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BrokenBarrierException;
@@ -33,68 +34,74 @@ public class ExperienceService {
         final CyclicBarrier gate = new CyclicBarrier(list.size());
         List<Thread> listThread = new ArrayList<>();
         for (Page p : list) {
-            listThread.add(new Thread() {
-                public void run() {
-                    try {
-                        gate.await();
-                        System.out.println("start testing url= " + p.getUrl());
-                        //DesiredCapabilities
-                        DesiredCapabilities capabilities = DesiredCapabilities.chrome();
-                        LoggingPreferences logPrefs = new LoggingPreferences();
-                        logPrefs.enable(LogType.PERFORMANCE, Level.INFO);
-                        ChromeOptions chromeOptions = new ChromeOptions();
-                        chromeOptions.addArguments("--headless");
-                        chromeOptions.setCapability(CapabilityType.LOGGING_PREFS, logPrefs);
-                        WebDriver driver = new ChromeDriver(chromeOptions);//chay an
+            if (p.getType() == 1) {
+                listThread.add(new Thread() {
+                    public void run() {
+                        try {
+                            gate.await();
+                            System.out.println("start testing url= " + p.getUrl());
+                            //DesiredCapabilities
+                            DesiredCapabilities capabilities = DesiredCapabilities.chrome();
+                            LoggingPreferences logPrefs = new LoggingPreferences();
+                            logPrefs.enable(LogType.PERFORMANCE, Level.INFO);
+                            ChromeOptions chromeOptions = new ChromeOptions();
+                            chromeOptions.addArguments("--headless");
+                            chromeOptions.setCapability(CapabilityType.LOGGING_PREFS, logPrefs);
+                            WebDriver driver = new ChromeDriver(chromeOptions);//chay an
 
-                        driver.get(p.getUrl());
+                            driver.get(p.getUrl());
 
-                        List<LogEntry> entries = driver.manage().logs().get(LogType.PERFORMANCE).getAll();
-                        List<Double> entrySize = new ArrayList<>();
-                        for (LogEntry entry : entries) {
-                            Matcher dataLengthMatcher = Pattern.compile("encodedDataLength\":(.*?),").matcher(entry.getMessage());
-                            if(dataLengthMatcher.find()) {
-                                entrySize.add(Double.parseDouble(dataLengthMatcher.group().split(":")[1].split(",")[0]));
+                            List<LogEntry> entries = driver.manage().logs().get(LogType.PERFORMANCE).getAll();
+                            List<Double> entrySize = new ArrayList<>();
+                            for (LogEntry entry : entries) {
+                                Matcher dataLengthMatcher = Pattern.compile("encodedDataLength\":(.*?),").matcher(entry.getMessage());
+                                if (dataLengthMatcher.find()) {
+                                    entrySize.add(Double.parseDouble(dataLengthMatcher.group().split(":")[1].split(",")[0]));
+                                }
                             }
+
+                            double totalByte = new MathUtil().calculateSumDoubleList(entrySize);
+                            //page load page interact
+                            WebDriverWait myWait = new WebDriverWait(driver, 60);
+                            ExpectedCondition<Boolean> conditionCheck = new ExpectedCondition<Boolean>() {
+                                public Boolean apply(WebDriver input) {
+                                    return ((((JavascriptExecutor) input).executeScript("return document.readyState").equals("complete")));
+                                }
+                            };
+                            myWait.until(conditionCheck);
+
+                            Long loadPage = (Long) ((JavascriptExecutor) driver).executeScript(
+                                    "return performance.timing.loadEventEnd  - performance.timing.navigationStart;");
+                            double loadTime = loadPage;
+                            double loadTime1 = Math.floor(loadTime / 1000 * 10) / 10;
+                            Long interact = (Long) ((JavascriptExecutor) driver).executeScript(
+                                    "return performance.timing.domContentLoadedEventEnd  - performance.timing.navigationStart;");
+                            double interactTime = interact;
+                            double interactTime1 = Math.floor(interactTime / 1000 * 10) / 10;
+                            double sizeTransferred1 = Math.floor(totalByte / 1000000 * 10) / 10;
+                            SpeedTestReport speedTestReport = new SpeedTestReport(p.getUrl(), interactTime1 + "", loadTime1 + "", sizeTransferred1 + "");
+//                            speedTestReport.setPageOption(p);
+                            resultList.add(speedTestReport);
+                            driver.quit();
+                        } catch (InterruptedException | BrokenBarrierException e) {
+                            Logger.getLogger(ExperienceService.class.getName()).log(Level.SEVERE, null, e);
                         }
-
-                        double totalByte =  new MathUtil().calculateSumDoubleList(entrySize);
-                        //page load page interact
-                        WebDriverWait myWait = new WebDriverWait(driver, 60);
-                        ExpectedCondition<Boolean> conditionCheck = new ExpectedCondition<Boolean>() {
-                            public Boolean apply(WebDriver input) {
-                                return ((((JavascriptExecutor) input).executeScript("return document.readyState").equals("complete")));
-                            }
-                        };
-                        myWait.until(conditionCheck);
-
-                        Long loadPage = (Long) ((JavascriptExecutor) driver).executeScript(
-                                "return performance.timing.loadEventEnd  - performance.timing.navigationStart;");
-                        double loadTime = loadPage;
-                        double loadTime1 = Math.floor(loadTime / 1000 * 10) / 10;
-                        Long interact = (Long) ((JavascriptExecutor) driver).executeScript(
-                                "return performance.timing.domContentLoadedEventEnd  - performance.timing.navigationStart;");
-                        double interactTime = interact;
-                        double interactTime1 = Math.floor(interactTime / 1000 * 10) / 10;
-                        double sizeTransferred1 = Math.floor(totalByte / 1000000 * 10) / 10;
-                        resultList.add(new SpeedTestReport(p.getUrl(), interactTime1 + "", loadTime1 + "", sizeTransferred1 + ""));
-                        driver.quit();
-                    } catch (InterruptedException | BrokenBarrierException e) {
-                        Logger.getLogger(ExperienceService.class.getName()).log(Level.SEVERE, null, e);
                     }
-                }
-            });
+                });
+            }
         }
-        for (Thread t : listThread) {
-            System.out.println("Threed start");
-            t.start();
-        }
+        int flag = 1;
+        while (flag < listThread.size()) {
+            for (Thread t : listThread) {
+                System.out.println("Threed start");
+                t.start();
+            }
 
-        for (Thread t : listThread) {
-            System.out.println("Threed join");
-            t.join();
+            for (Thread t : listThread) {
+                System.out.println("Threed join");
+                t.join();
+            }
         }
-
         return resultList;
     }
 }

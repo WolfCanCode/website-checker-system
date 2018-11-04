@@ -1,4 +1,5 @@
 package com.fpt.capstone.wcs.model.entity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -32,11 +33,9 @@ public class CookieReport {
         this.party = party;
     }
 
-    @ManyToMany(fetch = FetchType.LAZY,
-            cascade = {
-                    CascadeType.PERSIST,
-                    CascadeType.MERGE
-            },
-            mappedBy = "CookieReport")
-    private List<Page> Page = new ArrayList<>();
+    @ManyToOne()
+    @JoinColumn(name="page_option_id")
+    @JsonIgnore
+    private PageOption pageOption;
+
 }

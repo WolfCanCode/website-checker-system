@@ -7,7 +7,7 @@ import MissingFile from '../assets/missingFile.png';
 import Favicons from '../assets/favicon.png';
 import Prohibited from '../assets/prohibited.PNG';
 
-const menu = [
+export const menu = [
     {
         name: "Dashboard",
         to: "/admin",
@@ -145,4 +145,13 @@ const menu = [
 
 ];
 
-export default menu;
+export const menuMan = [
+    {
+        name: "Dashboard",
+        to: "/manager",
+        key: "d",
+        items : null
+    },
+]
+
+export default [menu,menuMan];

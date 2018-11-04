@@ -66,13 +66,15 @@ class HeaderAdmin extends Component {
             cookies.remove("u_id");
             cookies.remove("u_token");
             cookies.remove("u_w_id");
+            cookies.remove("u_isManager");
             this.setState({
                 logout: true
             });
         }
         renderRedirect = () => {
             if (this.state.logout) {
-                return <Redirect to='/logout' />
+                return  window.location = './login';
+
             }
         }
 

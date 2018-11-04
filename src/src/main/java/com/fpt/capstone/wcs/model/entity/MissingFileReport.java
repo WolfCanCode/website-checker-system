@@ -1,5 +1,6 @@
 package com.fpt.capstone.wcs.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,6 +21,7 @@ public class MissingFileReport {
     private String fileMissing;
     private String description;
     private String pages;
+    private boolean isSave = false;
 
     public MissingFileReport(String fileMissing, String description, String pages) {
         this.fileMissing = fileMissing;
@@ -27,11 +29,9 @@ public class MissingFileReport {
         this.pages = pages;
     }
 
-    @ManyToMany(fetch = FetchType.LAZY,
-            cascade = {
-                    CascadeType.PERSIST,
-                    CascadeType.MERGE
-            },
-            mappedBy = "MissingFileReport")
-    private List<Page> Page = new ArrayList<>();
+    @ManyToOne()
+    @JoinColumn(name="page_option_id")
+    @JsonIgnore
+    private PageOption pageOption;
+
 }

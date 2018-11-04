@@ -4,7 +4,6 @@ import 'semantic-ui-css/semantic.min.css';
 import bg1 from '../../assets/bg-login-layout1.jpg';
 import bg2 from '../../assets/bg-login-layout2.jpg';
 import divLogin from '../../assets/divider-login.png';
-import { Redirect } from "react-router-dom";
 import {Cookies} from "react-cookie";
 const cookies = new Cookies();
 
@@ -90,7 +89,7 @@ class LoginScreen extends Component {
 
     renderRedirect = () => {
         if (this.state.isLogin) {
-            return <Redirect to='/authenticate' />
+            return window.location.href = './authenticate';
         }
     }
 
@@ -111,6 +110,7 @@ class LoginScreen extends Component {
         } else {
             cookies.set("u_id", user.id, {path:"/"});
             cookies.set("u_token", user.token, {path:"/"});
+            cookies.set("u_isManager", user.isManager, {path:"/"});
             this.setState({ isLogin: true });
         }
         this.setState({ isLoading: false });

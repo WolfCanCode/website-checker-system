@@ -3,9 +3,12 @@ import {
     Link
 } from "react-router-dom";
 import { Menu, Sidebar, Image } from 'semantic-ui-react';
-import menu from '../config/menu';
+import { menu , menuMan} from '../config/menu';
 import logo from '../assets/icon-wsc.png';
 import sidebarBg from '../assets/sidebar.jpg';
+import { Cookies } from "react-cookie";
+
+const cookies = new Cookies();
 
 export default class SideMenu extends Component {
     constructor(props) {
@@ -18,7 +21,13 @@ export default class SideMenu extends Component {
     }
 
     async _mapItem() {
-        this.listMenuItem = menu.map((item, index) => {
+        var menuList = null;
+        if(cookies.get("u_isManager")==="true"){
+            menuList = menuMan;
+        }  else {
+            menuList = menu;
+        }
+        this.listMenuItem = menuList.map((item, index) => {
             if (item.items === null) {
                 return (
                     <Menu.Item style={{fontSize:15,fontWeight:'bold'}} key={index} as={Link} to={item.to} active={this.state.menuActive === item.key ? true : false} onClick={() => this._doActiveChange(item)}>
