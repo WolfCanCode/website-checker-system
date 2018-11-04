@@ -1,7 +1,7 @@
 import BrokenLinks from '../assets/BrokenLinks.png';
 import BrokenPage from '../assets/brokenPage.png';
 import Spelling from '../assets/spelling.png';
-import Grammar from '../assets/grammar.png';
+import Grammar from '../assets/grammar.PNG';
 import SpeedTest from '../assets/desktopSpeed.png';
 import MissingFile from '../assets/missingFile.png';
 import Favicons from '../assets/favicon.png';
@@ -150,6 +150,24 @@ export const menuMan = [
         name: "Dashboard",
         to: "/manager",
         key: "d",
+        items : null
+    },
+    {
+        name: "Manage Staff",
+        to: "/manager/managestaff",
+        key: "managestaff",
+        items : null
+    },
+    {
+        name: "Manage Website",
+        to: "/manager/managewebsite",
+        key: "managewebsite",
+        items : null
+    },
+    {
+        name: "Manage Wordlist",
+        to: "/manager/managewordlist",
+        key: "manageworldlist",
         items : null
     },
 ]

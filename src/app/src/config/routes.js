@@ -32,7 +32,9 @@ import CookieLawScreen from '../screens/admin/cookielaw/index';
 import ConfigScreen from '../screens/admin/config/index';
 
 import DashboardManager from '../screens/admin/manager/dashboard/index';
-
+import ManageStaffManagerScreen from '../screens/admin/manager/managestaff/index';
+import ManageWebsiteManagerScreen from '../screens/admin/manager/managewebsite/index';
+import ManageWordListManagerScreen from '../screens/admin/manager/managewordlist/index';
 
 import Error404 from '../screens/admin/error404/index';
 import { Cookies } from "react-cookie";
@@ -160,9 +162,9 @@ export const RouteManager = withRouter(({ location }) => (
                     {/* Router for admin page*/}
 
                     <Route path="/manager" exact component={DashboardManager} />
-                    <Route path="/manager/sitemap" component={SiteMapScreen} />
-                    <Route path="/manager/brokenLinks" component={brokenLinksScreen} />
-                    <Route path="/manager/brokenPages" component={brokenPagesScreen} />
+                    <Route path="/manager/managestaff" component={ManageStaffManagerScreen} />
+                    <Route path="/manager/managewebsite" component={ManageWebsiteManagerScreen} />
+                    <Route path="/manager/managewordlist" component={ManageWordListManagerScreen} />
                     <Route path='/manager/logout' component={() => window.location = '../login'} />
 
                     <Route path="*" component={Error404} />
