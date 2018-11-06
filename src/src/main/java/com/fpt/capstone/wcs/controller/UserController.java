@@ -3,8 +3,10 @@ package com.fpt.capstone.wcs.controller;
 
 import com.fpt.capstone.wcs.model.entity.Role;
 import com.fpt.capstone.wcs.model.entity.User;
+import com.fpt.capstone.wcs.model.entity.Website;
 import com.fpt.capstone.wcs.repository.RoleRepository;
 import com.fpt.capstone.wcs.repository.UserRepository;
+import com.fpt.capstone.wcs.repository.WebsiteRepository;
 import com.fpt.capstone.wcs.utils.Constant;
 import com.fpt.capstone.wcs.utils.EncodeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,9 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 //email:admin@abc.com
 //password:12345678 : hash ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f
@@ -23,6 +23,8 @@ public class UserController {
     //scan repository
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    RoleRepository roleRepository;
 
     @PostMapping("/api/login")
     public Map<String, Object> doLogin(@RequestBody User user) {
@@ -92,4 +94,18 @@ public class UserController {
 
     }
 
+    @PostMapping("/api/user/getstaff")
+    public Map<String, Object> getAllStaff(@RequestBody User user) {
+        Optional<User> result = userRepository.findById(user.getId());
+        Map<String, Object> res = new HashMap<>();
+        if (result!= null) {
+            List<User> staff = userRepository.findAllByManager(result.get());
+            res.put("action", Constant.SUCCESS);
+            res.put("liststaff",staff);
+            return res;
+        } else {
+            res.put("action", Constant.INCORRECT);
+            return res;
+        }
+    }
 }
