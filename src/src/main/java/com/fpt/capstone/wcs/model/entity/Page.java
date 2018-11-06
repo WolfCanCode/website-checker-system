@@ -17,7 +17,8 @@ import java.util.List;
 @Setter
 @Table(name = "Page")
 public class Page {
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue
     private long id;
     @NotNull
     private int type;

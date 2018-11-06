@@ -1,7 +1,6 @@
 package com.fpt.capstone.wcs.model.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.*;
 import lombok.*;
 
 import javax.persistence.*;
@@ -13,13 +12,16 @@ import java.util.List;
 @Setter
 @Getter
 @Table(name="User")
+@JsonIgnoreProperties( value = {"password","token"}, allowSetters= true)
 public class User {
     @Id
     @GeneratedValue
     private Long id;
     private String name;
+    @JsonProperty("password")
     private String password;
     private String email;
+    @JsonProperty("token")
     private String token;
 
     public User(Long id, String token)

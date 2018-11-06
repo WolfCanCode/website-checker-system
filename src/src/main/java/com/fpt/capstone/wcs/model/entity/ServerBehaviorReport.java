@@ -17,7 +17,8 @@ import java.util.List;
 @NoArgsConstructor
 @Table(name="ServerBehaviorReport")
 public class ServerBehaviorReport {
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue
     private long id;
     private boolean isRedirectWWW;
     private boolean isAllPageSSL;

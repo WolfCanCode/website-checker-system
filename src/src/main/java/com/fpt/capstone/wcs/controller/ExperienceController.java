@@ -47,7 +47,7 @@ public class ExperienceController {
                    tmp.setWebsite(website);
                    pageOptionRepository.save(tmp);
                    pageOption = pageOptionRepository.findFirstByWebsite(website);
-                   List<Page> pages = pageRepository.findAllByWebsiteAndVersion(website, version);
+                   List<Page> pages = pageRepository.findAllByWebsiteAndVersionAndTypeEquals(website, version,1);
                     for (int i = 0; i < pages.size(); i++) {
                        Page pageTmp = pages.get(i);
                        List<PageOption> listOption = new ArrayList<>();

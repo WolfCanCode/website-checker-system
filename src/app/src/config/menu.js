@@ -10,16 +10,16 @@ import Prohibited from '../assets/prohibited.PNG';
 export const menu = [
     {
         name: "Dashboard",
-        to: "/admin",
+        to: "/admin/home",
         key: "d",
-        items : null
+        items: null
     },
     {
         name: "SiteMap",
         to: "/admin/sitemap",
         key: "sitemap",
         alt: "The sitemap of page",
-        items : null
+        items: null
     },
     {
         name: "Quality",
@@ -37,25 +37,25 @@ export const menu = [
                 key: "test 2",
                 alt: "This for test alt title",
                 image: Grammar
-            },{
+            }, {
                 name: "Broken links test",
                 to: "/admin/brokenLinks",
                 key: "test3",
                 alt: "This for test alt title",
                 image: BrokenLinks
-            },{
+            }, {
                 name: "Broken pages test",
                 to: "/admin/brokenPages",
                 key: "test4",
                 alt: "This for test alt title",
                 image: BrokenPage
-            },{
+            }, {
                 name: "Missing files test",
                 to: "/admin/missingFiles",
                 key: "test5",
                 alt: "This for test alt title",
                 image: MissingFile
-            },{
+            }, {
                 name: "Prohibited content test",
                 to: "/admin/prohibited",
                 key: "test6",
@@ -84,7 +84,7 @@ export const menu = [
 
         ]
     },
-    
+
     {
         name: "Technology Test",
         items: [
@@ -106,14 +106,14 @@ export const menu = [
                 to: "/admin/cookielaw",
                 key: "test11",
                 alt: "This for test alt title"
-            },{
+            }, {
                 name: "Server Behavior Test",
                 to: "/admin/serverBehavior",
                 key: "test12",
                 alt: "This for test alt title"
             },
         ]
-    },{
+    }, {
         name: "Content Test",
         items: [
             {
@@ -127,20 +127,14 @@ export const menu = [
                 to: "/admin/direction",
                 key: "test14",
                 alt: "This for test alt title"
-            },{
+            }, {
                 name: "Pages Test",
                 to: "/admin/pages",
                 key: "test15",
                 alt: "This for test alt title"
             }
         ]
-    },{
-        name: "Setting",
-        to: "/admin/setting",
-        key: "config",
-        alt: "Configuration and update website",
-        items : null,
-    },
+    }
 
 
 ];
@@ -148,28 +142,35 @@ export const menu = [
 export const menuMan = [
     {
         name: "Dashboard",
-        to: "/manager",
+        to: "/manager/home",
         key: "d",
-        items : null
+        items: null
     },
     {
         name: "Manage Staff",
         to: "/manager/managestaff",
         key: "managestaff",
-        items : null
+        items: null
     },
     {
         name: "Manage Website",
         to: "/manager/managewebsite",
         key: "managewebsite",
-        items : null
+        items: null
     },
     {
         name: "Manage Wordlist",
         to: "/manager/managewordlist",
         key: "manageworldlist",
-        items : null
+        items: null
     },
+    // {
+    //     name: "Setting",
+    //     to: "/manager/setting",
+    //     key: "config",
+    //     alt: "Configuration and update website",
+    //     items: null,
+    // },
 ]
 
-export default [menu,menuMan];
+export default [menu, menuMan];

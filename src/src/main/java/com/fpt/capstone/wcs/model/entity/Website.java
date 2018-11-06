@@ -20,7 +20,8 @@ import java.util.List;
 @Setter
 @Table(name = "Website")
 public class Website {
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue
     private long id;
     @NotNull
     private String name;

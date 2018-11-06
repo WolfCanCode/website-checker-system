@@ -98,8 +98,9 @@ public class UserController {
     public Map<String, Object> getAllStaff(@RequestBody User user) {
         Optional<User> result = userRepository.findById(user.getId());
         Map<String, Object> res = new HashMap<>();
-        if (result!= null) {
+        if (result.isPresent()) {
             List<User> staff = userRepository.findAllByManager(result.get());
+
             res.put("action", Constant.SUCCESS);
             res.put("liststaff",staff);
             return res;

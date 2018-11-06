@@ -30,6 +30,7 @@ public class Version {
     @JsonIgnore
     private Website website;
 
+    @JsonIgnore
     @OneToMany(targetEntity = Page.class, mappedBy = "version", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Page> pages= new ArrayList<>();
 }

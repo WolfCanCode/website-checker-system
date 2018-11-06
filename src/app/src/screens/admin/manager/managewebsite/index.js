@@ -1,46 +1,51 @@
 import React, { Component } from 'react';
-import { Segment, Button, SegmentGroup, Input, Table, TableCell, Header, Icon, Modal } from 'semantic-ui-react'
+import { Segment, Button, SegmentGroup, Input, Table, Modal } from 'semantic-ui-react'
 
 import TableRow from './row-table';
-import logo1 from './images/mobile.png';
+// import logo1 from './images/mobile.png';
 
 import { Cookies } from "react-cookie";
 
 const cookies = new Cookies();
 
 export default class managewebsitescreen extends Component {
-    
 
-    state = { open: false }
+
+    state = { open: false, isLoading: false, listWeb: null }
 
     show = size => () => this.setState({ size, open: true })
     close = () => this.setState({ open: false })
 
 
-    state = { listWeb: null };
 
 
     componentDidMount() {
+        this._refreshTable();
+    }
 
-        fetch("/api/website/all", {
+    _loadingTable(isLoading) {
+        this.setState({ isLoading: isLoading })
+    }
+
+    _refreshTable() {
+        fetch("/api/website/manage", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ "id": cookies.get("u_id") })
+            body: JSON.stringify({ "userId": cookies.get("u_id"), "userToken": cookies.get("u_token") })
         }).then(response => response.json()).then((data) => {
             if (data.action === "SUCCESS") {
                 var list = data.website.map((item, index) => {
-                    return (<TableRow key={index} id={item.id} name={item.name} url={item.url} />);
+                    return (<TableRow key={index} id={item.id} name={item.name} url={item.url} version={item.version} time={item.time} loadingTable={(isLoading) => this._loadingTable(isLoading)} refreshTable={() => this._refreshTable()} />);
                     // { key: index, value: item.id, text: item.url };
 
                 });
-                this.setState({ listWeb: list });
+                this.setState({ listWeb: list, isLoading: false });
 
             }
         });
-
 
     }
 
@@ -60,11 +65,11 @@ export default class managewebsitescreen extends Component {
                                 <Modal.Content >
                                     <p >Website Name</p>
                                 </Modal.Content>
-                                <Input type="text" style={{marginLeft : '20px', width : '90%'}} required></Input>
+                                <Input type="text" style={{ marginLeft: '20px', width: '90%' }} required></Input>
                                 <Modal.Content>
                                     <p>Website URL</p>
                                 </Modal.Content>
-                                <Input type="text" style={{marginLeft : '20px', marginBottom : '20px', width : '90%'}}></Input>
+                                <Input type="text" style={{ marginLeft: '20px', marginBottom: '20px', width: '90%' }}></Input>
                                 <Modal.Actions>
                                     <Button onClick={this.close}>Cancel</Button>
                                     <Button content='Done' color='blue' />
@@ -74,13 +79,16 @@ export default class managewebsitescreen extends Component {
                         </div>
                     </Segment>
                     <Segment.Group horizontal style={{ maxHeight: '63vh', overflow: "auto" }}>
-                        <Segment basic>
+                        <Segment basic loading={this.state.isLoading}>
                             <Table singleLine>
                                 <Table.Header>
                                     <Table.Row>
                                         <Table.HeaderCell>ID</Table.HeaderCell>
                                         <Table.HeaderCell>Name</Table.HeaderCell>
                                         <Table.HeaderCell>URL</Table.HeaderCell>
+                                        <Table.HeaderCell>Version</Table.HeaderCell>
+                                        <Table.HeaderCell>Lastest updated</Table.HeaderCell>
+                                        <Table.HeaderCell>New version</Table.HeaderCell>
                                         <Table.HeaderCell>Action</Table.HeaderCell>
 
                                     </Table.Row>

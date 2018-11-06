@@ -12,6 +12,7 @@ import com.fpt.capstone.wcs.repository.WebsiteRepository;
 import com.fpt.capstone.wcs.service.SiteMapService;
 import com.fpt.capstone.wcs.model.pojo.SiteMapOutputPOJO;
 import com.fpt.capstone.wcs.model.pojo.UrlPOJO;
+import com.fpt.capstone.wcs.utils.Authenticate;
 import com.fpt.capstone.wcs.utils.Constant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -30,6 +31,8 @@ public class SitemapController {
     PageRepository pageRepository;
     @Autowired
     VersionRepository versionRepository;
+    @Autowired
+    Authenticate authenticate;
 
     @PostMapping("/api/sitemap")
     public List<SiteMapOutputPOJO> getSiteMap(@RequestBody UrlPOJO url) throws MalformedURLException {
@@ -48,63 +51,74 @@ public class SitemapController {
     }
 
     @PostMapping("/api/sitemap/getVer")
-    public Map<String, Object> getLastestVer(@RequestBody RequestCommonPOJO item) {
+    public Map<String, Object> getLastestVer(@RequestBody RequestCommonPOJO request) {
         Map<String, Object> res = new HashMap<>();
-        User user = userRepository.findOneByIdAndToken(item.getUserId(), item.getUserToken());
-        Website website = websiteRepository.findOneByUserAndId(user, item.getWebsiteId());
-        if (website != null) {
-            Version ver = versionRepository.findFirstByWebsiteOrderByVersionDesc(website);
-            if(ver==null)
-            {
-                res.put("action", Constant.SUCCESS);
-                res.put("version",0);
-                res.put("time",0);
-                return res;
-            } else {
-                res.put("action", Constant.SUCCESS);
-                res.put("version",ver.getVersion());
-                res.put("time",ver.getTime().getDate()+"/"+(ver.getTime().getMonth()+1)+"/2018");
+        Optional<User> user = userRepository.findById(request.getUserId());
+        if(user.isPresent()) {
+            Website website = websiteRepository.findOneByUserAndId(user.get(), request.getWebsiteId());
+            if (website != null) {
+                Version ver = versionRepository.findFirstByWebsiteOrderByVersionDesc(website);
+                if (ver == null) {
+                    res.put("action", Constant.SUCCESS);
+                    res.put("version", 0);
+                    res.put("time", 0);
+                    return res;
+                } else {
+                    res.put("action", Constant.SUCCESS);
+                    res.put("version", ver.getVersion());
+                    res.put("time", ver.getTime().getDate() + "/" + (ver.getTime().getMonth() + 1) + "/2018");
 
-                return  res;
+                    return res;
+                }
+            } else {
+                res.put("action", Constant.INCORRECT);
+                res.put("messages", "Something went wrong");
+                return res;
             }
         } else {
             res.put("action", Constant.INCORRECT);
-            res.put("messages","The token is invalid");
+            res.put("messages", "Something went wrong");
             return res;
         }
     }
 
     @PostMapping("/api/sitemap/makeVer")
-    public Map<String, Object> makeNewVer(@RequestBody RequestCommonPOJO item) throws MalformedURLException {
+    public Map<String, Object> makeNewVer(@RequestBody RequestCommonPOJO request) throws MalformedURLException {
         Map<String, Object> res = new HashMap<>();
-        User user = userRepository.findOneByIdAndToken(item.getUserId(),item.getUserToken());
-        Website website = websiteRepository.findOneByUserAndId(user,item.getWebsiteId());
-        //Temp version
-        Version ver = versionRepository.findFirstByWebsiteOrderByVersionDesc(website);
-        Version verTmp = new Version();
-        if(ver==null) {
-            verTmp.setTime(new Date());
-            verTmp.setVersion(1);
-            verTmp.setWebsite(website);
-            versionRepository.save(verTmp);
-        } else
-        {
-            verTmp = new Version();
-            verTmp.setTime(new Date());
-            verTmp.setVersion(ver.getVersion()+1);
-            verTmp.setWebsite(website);
-            versionRepository.save(verTmp);
-        }
-        ver = versionRepository.findVersionByWebsiteAndVersion(website,verTmp.getVersion());
-        if(website!=null) {
-            SiteMapService sms = new SiteMapService(website.getUrl());
-            sms.buildSiteMap();
-            List<Page> pages = sms.getAllPage(website,ver);
-            pageRepository.saveAll(pages);
-            res.put("action", Constant.SUCCESS);
-            return res;
+        User user = userRepository.findOneByIdAndToken(request.getUserId(),request.getUserToken());
+        if(user.getManager()==null) {
+            Website website = websiteRepository.findOneByUserAndId(user, request.getWebsiteId());
+            //Temp version
+            Version ver = versionRepository.findFirstByWebsiteOrderByVersionDesc(website);
+            Version verTmp = new Version();
+            if (ver == null) {
+                verTmp.setTime(new Date());
+                verTmp.setVersion(1);
+                verTmp.setWebsite(website);
+                versionRepository.save(verTmp);
+            } else {
+                verTmp = new Version();
+                verTmp.setTime(new Date());
+                verTmp.setVersion(ver.getVersion() + 1);
+                verTmp.setWebsite(website);
+                versionRepository.save(verTmp);
+            }
+            ver = versionRepository.findVersionByWebsiteAndVersion(website, verTmp.getVersion());
+            if (website != null) {
+                SiteMapService sms = new SiteMapService(website.getUrl());
+                sms.buildSiteMap();
+                List<Page> pages = sms.getAllPage(website, ver);
+                pageRepository.saveAll(pages);
+                res.put("action", Constant.SUCCESS);
+                res.put("version", ver.getVersion());
+                res.put("time",ver.getTime().getDate()+"/"+(ver.getTime().getMonth()+1)+"/2018");
+                return res;
+            } else {
+                res.put("action", Constant.INCORRECT);
+                return res;
+            }
         } else {
-            res.put("action", Constant.INCORRECT);
+            res.put("action", Constant.PERMISSION_ERROR);
             return res;
         }
     }

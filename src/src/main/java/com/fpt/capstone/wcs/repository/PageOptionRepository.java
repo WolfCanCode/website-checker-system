@@ -13,4 +13,5 @@ public interface PageOptionRepository extends JpaRepository<PageOption,Long> {
     PageOption findFirstByWebsiteOrderByTimeDesc(Website website);
     PageOption findFirstByWebsite(Website website);
     PageOption findByPages(List<Page> pages);
+    PageOption findAllByWebsite(Website website);
 }

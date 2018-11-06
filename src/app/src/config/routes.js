@@ -49,12 +49,11 @@ const cookies = new Cookies();
 const PrivateRoute = ({ component: Component, ...rest }) => {
     var isManager = cookies.get("u_isManager");
     console.log(isManager);
-    if(isManager==="true")
-    {
-        window.location = './manager';
+    if (isManager === "true") {
+        window.location = './manager/home';
     }
     else {
-        window.location = './admin'
+        window.location = './admin/home'
     }
 }
 
@@ -85,7 +84,7 @@ const PrivateRoute = ({ component: Component, ...rest }) => {
 //         return(<Route {...rest} render={(props) => (
 //         <Component {...props} />)} />);
 
-  
+
 
 
 
@@ -121,7 +120,7 @@ export const RouteStaff = withRouter(({ location }) => (
                 <Switch>
                     {/* Router for admin page*/}
 
-                    <Route path="/admin" exact component={Dashboard} />
+                    <Route path="/admin/home" exact component={Dashboard} />
                     <Route path="/admin/sitemap" component={SiteMapScreen} />
                     <Route path="/admin/brokenLinks" component={brokenLinksScreen} />
                     <Route path="/admin/brokenPages" component={brokenPagesScreen} />
@@ -138,7 +137,6 @@ export const RouteStaff = withRouter(({ location }) => (
                     <Route path="/admin/grammar" component={GrammarScreen} />
                     <Route path="/admin/prohibited" component={ProhibitedScreen} />
                     <Route path="/admin/cookielaw" component={CookieLawScreen} />
-                    <Route path="/admin/setting" component={ConfigScreen} />
                     <Route path='/admin/logout' component={() => window.location = './../login'} />
                     <Route path="*" component={Error404} />
                 </Switch>
@@ -157,16 +155,16 @@ export const RouteManager = withRouter(({ location }) => (
                 key={location.key}
                 classNames='fade'
                 timeout={800}
-            >   
+            >
                 <Switch>
                     {/* Router for admin page*/}
 
-                    <Route path="/manager" exact component={DashboardManager} />
+                    <Route path="/manager/home" exact component={DashboardManager} />
                     <Route path="/manager/managestaff" component={ManageStaffManagerScreen} />
                     <Route path="/manager/managewebsite" component={ManageWebsiteManagerScreen} />
                     <Route path="/manager/managewordlist" component={ManageWordListManagerScreen} />
-                    <Route path='/manager/logout' component={() => window.location = '../login'} />
-
+                    <Route path="/manager/setting" component={ConfigScreen} />
+                    <Route path='/manager/logout' component={() => window.location = '../../login'} />
                     <Route path="*" component={Error404} />
                 </Switch>
             </CSSTransition>

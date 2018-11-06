@@ -9,7 +9,7 @@ const cookies = new Cookies();
 
 class ConfigScreen extends Component {
 
-    state = { isLoading: false, isDisable: true, time: null, version: 0};
+    state = { isLoading: false, isDisable: true, time: null, version: 0 };
 
 
     componentDidMount() {
@@ -29,8 +29,10 @@ class ConfigScreen extends Component {
         }).then(response => response.json()).then((data) => {
             if (data.action === "SUCCESS") {
                 this.setState({ version: data.version, time: data.time, isLoading: false });
-            } else {
+            } else if (data.action === "INCORRECT") {
                 console.info("Something went wrong!!")
+            } else if (data.action === "PERMISSION ERROR") {
+                alert("You don't have permission to do this");
             }
         });
     }
@@ -47,7 +49,7 @@ class ConfigScreen extends Component {
             body: JSON.stringify(param)
         }).then(response => response.json()).then((data) => {
             if (data.action === "SUCCESS") {
-                this.setState({ isLoading: false });
+                this.setState({ version: data.version, time: data.time, isLoading: false });
             } else {
                 alert("Thất bại");
             }
@@ -65,14 +67,14 @@ class ConfigScreen extends Component {
                                 <Statistic size="huge">
                                     <Statistic.Label>SITEMAP VERSION
                             <font style={{ color: 'gray', fontStyle: 'italic', fontSize: '12px' }}>
-                                            {this.state.time !== 0 && this.state.time !== null ? `(Last updated ${this.state.time})` : ''}
+                                            {this.state.time !== 0 && this.state.time !== null ? <p>(Last updated {this.state.time})</p> : ''}
                                         </font>
                                     </Statistic.Label>
                                     <Statistic.Value>{this.state.version}</Statistic.Value>
                                     <Icon circular inverted name='redo' size="small" style={{ margin: "auto" }} loading={this.state.isLoading} onClick={() => this._refreshVer()} />
                                 </Statistic>
 
-                                <Button animated color='green' loading={this.state.isLoading} disabled={this.state.isLoading} onClick={()=>this._getNewVer()}>
+                                <Button animated color='green' loading={this.state.isLoading} disabled={this.state.isLoading} onClick={() => this._getNewVer()}>
                                     <Button.Content visible>Get new version</Button.Content>
                                     <Button.Content hidden>
                                         <Icon name='download' />

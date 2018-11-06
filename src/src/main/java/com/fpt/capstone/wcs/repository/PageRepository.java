@@ -13,6 +13,6 @@ import java.util.List;
 public interface PageRepository extends JpaRepository<Page,Long> {
     List<Page> findAllByWebsiteAndVersionAndPageOptions(Website website, Version version, PageOption pageOption);
     List<Page> findAllByWebsite(Website website);
-    List<Page> findAllByWebsiteAndVersion(Website website, Version version);
+    List<Page> findAllByWebsiteAndVersionAndTypeEquals(Website website, Version version, int type);
 
 }

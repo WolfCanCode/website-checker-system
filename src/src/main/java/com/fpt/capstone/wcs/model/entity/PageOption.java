@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -18,11 +19,13 @@ import java.util.List;
 @NoArgsConstructor
 @Table(name = "PageOption")
 public class PageOption {
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue
     long id;
     long optionNumber;
     Date time;
 
+    @NotNull
     @ManyToOne()
     @JoinColumn(name="website_id")
     private Website website;

@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+import java.util.Optional;
+
 @Service
 public class Authenticate {
     @Autowired
@@ -20,9 +23,21 @@ public class Authenticate {
 
     public Website isAuth(RequestCommonPOJO request) {
 
-        User user = userRepository.findOneByIdAndToken(request.getUserId(), request.getUserToken());
-        if (user != null) {
-            Website website = websiteRepository.findOneByUserAndId(user, request.getWebsiteId());
+        Optional<User> user = userRepository.findById(request.getUserId());
+        if (user.isPresent()) {
+            Website website = websiteRepository.findOneByUserAndId(user.get(), request.getWebsiteId());
+            if (website != null) {
+                return website;
+            }
+        }
+        return null;
+    }
+
+    public List<Website> isAuthList(RequestCommonPOJO request) {
+
+        Optional<User> user = userRepository.findById(request.getUserId());
+        if (user.isPresent()) {
+            List<Website> website = websiteRepository.findAllByUser(user.get());
             if (website != null) {
                 return website;
             }

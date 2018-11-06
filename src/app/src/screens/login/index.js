@@ -4,13 +4,13 @@ import 'semantic-ui-css/semantic.min.css';
 import bg1 from '../../assets/bg-login-layout1.jpg';
 import bg2 from '../../assets/bg-login-layout2.jpg';
 import divLogin from '../../assets/divider-login.png';
-import {Cookies} from "react-cookie";
+import { Cookies } from "react-cookie";
 const cookies = new Cookies();
 
 class LoginScreen extends Component {
     constructor(props) {
         super(props);
-        this.state = { userName: "", password: "", isLoading: false, isLogin: false };
+        this.state = { userName: "", password: "", isLoading: false, isLogin: false, msg: "" };
     }
 
     render() {
@@ -25,7 +25,7 @@ class LoginScreen extends Component {
                 `}
                 </style>
                 <Segment.Group horizontal style={{ height: '100%', margin: 0 }}>
-                    <Segment basic style={{ flex: 1, background: `url(${bg1})`, backgroundSize: 'cover' }}>
+                    <Segment basic style={{ flex: 1, background: `url(${bg1})`, backgroundSize: 'cover' }} loading={this.state.isLogin}>
                         <Grid style={{ height: 150 }}></Grid>
                         <Grid style={{ height: 'auto' }} >
                             <Grid.Column style={{ width: '100%', height: 'auto' }}>
@@ -61,7 +61,7 @@ class LoginScreen extends Component {
                                             Login
                                 </Button>
                                         <div style={{ height: 30 }}>
-
+                                            <font color="red">{this.state.msg}</font>
                                             <a style={{ float: 'right', marginTop: 15 }}>Forgot Password</a>
                                         </div>
 
@@ -104,14 +104,15 @@ class LoginScreen extends Component {
             },
             body: JSON.stringify(param)
         });
-        var user = await response.json(); 
-        if (user.action==="INCORRECT") {
-            alert("Đăng nhập thất bại")
+        var user = await response.json();
+        if (user.action === "INCORRECT") {
+            this.setState({ msg: "Sai tên đăng nhập hoặc mật khẩu" });
         } else {
-            cookies.set("u_id", user.id, {path:"/"});
-            cookies.set("u_token", user.token, {path:"/"});
-            cookies.set("u_isManager", user.isManager, {path:"/"});
+            cookies.set("u_id", user.id, { path: "/" });
+            cookies.set("u_token", user.token, { path: "/" });
+            cookies.set("u_isManager", user.isManager, { path: "/" });
             this.setState({ isLogin: true });
+            window.location.href = "../login";
         }
         this.setState({ isLoading: false });
     }

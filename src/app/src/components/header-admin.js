@@ -71,16 +71,10 @@ class HeaderAdmin extends Component {
         cookies.remove("u_token");
         cookies.remove("u_w_id");
         cookies.remove("u_isManager");
-        this.setState({
-            logout: true
-        });
-    }
-    renderRedirect = () => {
-        if (this.state.logout) {
-            return window.location = './login';
+        this.props.logout(true);
 
-        }
     }
+
 
 
     render() {
@@ -94,7 +88,7 @@ class HeaderAdmin extends Component {
                     <Menu.Item style={{ color: 'white', fontWeight: 'bold' }}>
                         Hi, {this.state.account_name}
                     </Menu.Item>
-                    {this.renderRedirect()}
+                    {/* {this.renderRedirect()} */}
                     <Menu.Item style={{ color: 'white', fontWeight: 'bold' }}
                         name='logout'
                         onClick={() => this._doLogout()}
