@@ -38,9 +38,9 @@ public class UserController {
         } else {
             res.put("action", Constant.SUCCESS);
             res.put("id", result.getId());
-            if (result.getStaff() == null) {
+            if (result.getManager() == null) {
                 res.put("isManager", true);
-            } else if (result.getRole().getId() == 2) {
+            } else {
                 res.put("isManager", false);
             }
             String token = new EncodeUtil().generateAuthToken();
@@ -65,9 +65,9 @@ public class UserController {
             res.put("action", Constant.SUCCESS);
             String token = new EncodeUtil().generateAuthToken();
             res.put("token", token);
-            if (result.getRole().getId() == 1) {
+            if (result.getManager() == null) {
                 res.put("isManager", true);
-            } else if (result.getRole().getId() == 2) {
+            } else{
                 res.put("isManager", false);
             }
             result.setToken(token);
