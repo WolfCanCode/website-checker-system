@@ -10,5 +10,6 @@ import java.util.List;
 @Repository
 public interface WebsiteRepository extends JpaRepository<Website,Long> {
     List<Website> findAllByUser(User user);
+    List<Website> findAllByUserId_Website(long id);
     Website findOneByUserAndId(User user, Long id);
 }

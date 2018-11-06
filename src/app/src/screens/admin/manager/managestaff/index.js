@@ -1,17 +1,51 @@
 import React, { Component } from 'react';
 import {Segment , Button, Icon, Input, Table, TableCell} from 'semantic-ui-react'
-import TableRow from '../../javascripterror/row-table';
-// import { Cookies } from "react-cookie";
+import ModalExampleTopAligned from'./modal';
+ import { Cookies } from "react-cookie";
+ import TableRow from "./row-table";
 
-// const cookies = new Cookies();
+const cookies = new Cookies();
 export default class managestaffscreen extends Component {
+    state = { list: [], loadingTable: false, isDisable: false };
 
+  
+    componentDidMount() {
+        var comp = [];
+        this.setState({ loadingTable: true });
+        var param = { "id": cookies.get("u_id"), "userToken": cookies.get("u_token"), "websiteId": cookies.get("u_w_id") };
+console.log(cookies.get("u_id"));
+        fetch("/api/user/getstaff", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(param)
+        }).then(response => response.json()).then((data) => {
+            comp = data.liststaff.map((item, index) => {
+                
+                return (<TableRow key={index} idStaff={item.id} nameStaff={item.name} emailStaff={item.email} webStaff={item.website} passwordStaff={item.password}/>);
+            });
+            this.setState({ list: comp });
+           
+        });
+
+
+    }
+
+    
+       
+        
+
+
+    
     render() {
         return (
             <Segment.Group>
+               
                 <Segment basic>
                 <div style={{marginBottom : '30px'}}>
-                                
+                {/* <ModalExampleTopAligned/> */}
 
                                 <Input icon='search' placeholder='Search...' style={{ float: 'right' }} />
                             </div>
@@ -29,18 +63,23 @@ export default class managestaffscreen extends Component {
                                 </Table.Row>
                             </Table.Header>
                             <Table.Body>
-                               <Table.Row>
-                                   <TableCell>SE1111</TableCell>
-                                   <TableCell>Name: John<br/>Username: staff1 </TableCell>
-                                   <TableCell>WWW.ABC.COM</TableCell>
-                                   <TableCell><Button> Edit </Button><Button primary> New Assign</Button></TableCell>
-                               </Table.Row>
-                               <Table.Row>
-                                   <TableCell>SE1112</TableCell>
-                                   <TableCell>Name: Henry<br/>Username: staff2</TableCell>
-                                   <TableCell>WWW.ABC.COM<br/> WWW.ACB.COM</TableCell>
-                                   <TableCell><Button> Edit </Button><Button primary> New Assign</Button></TableCell>
-                               </Table.Row>
+                                {this.state.list}
+                            {/* <Table.Row>
+           
+            
+           <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>SE61789</Table.Cell>
+           <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>Name: anh <br/> Username:staff</Table.Cell>
+            <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>www.thanhnien.vn</Table.Cell>
+           <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}><Button> Edit </Button><Button primary> New Assign</Button></Table.Cell> 
+           </Table.Row>
+              <Table.Row>
+           
+            
+           <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>SE61789</Table.Cell>
+           <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>Name: anh <br/> Username:staff</Table.Cell>
+            <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>www.thanhnien.vn</Table.Cell>
+           <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}><Button> Edit </Button><Button primary> New Assign</Button></Table.Cell> 
+           </Table.Row> */}
                             </Table.Body>
                         </Table>
                     </Segment>

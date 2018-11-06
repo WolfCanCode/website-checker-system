@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -23,6 +24,8 @@ public class UserController {
     //scan repository
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    RoleRepository roleRepository;
 
     @PostMapping("/api/login")
     public Map<String, Object> doLogin(@RequestBody User user) {
@@ -92,4 +95,35 @@ public class UserController {
 
     }
 
+    @PostMapping("/api/user/getstaff")
+    public Map<String, Object> getAllStaff(@RequestBody User user) {
+        Optional<User> result = userRepository.findById(user.getId());
+        Map<String, Object> res = new HashMap<>();
+        if (result!= null) {
+            List<User> staff = userRepository.findAllByManager(result.get());
+            res.put("action", Constant.SUCCESS);
+            res.put("liststaff",staff);
+            return res;
+        } else {
+            res.put("action", Constant.INCORRECT);
+            return res;
+        }
+    }
+
+//    @PostMapping("/api/user/getstaff")
+//    public Map<String, Object> getStaff() {
+//
+//        Map<String, Object> res = new HashMap<>();
+//
+//        if (result == null) {
+//            res.put("action", Constant.INCORRECT);
+//            return res;
+//        } else {
+//            res.put("action", Constant.SUCCESS);
+//            res.put("liststaff", result);
+//
+//            return res;
+//        }
+//
+//    }
 }
