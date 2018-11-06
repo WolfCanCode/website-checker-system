@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import {Segment , Button, Icon, Input, Table, TableCell} from 'semantic-ui-react'
-import ModalExampleTopAligned from'./modal';
+import {Segment , Input, Table} from 'semantic-ui-react'
+
  import { Cookies } from "react-cookie";
  import TableRow from "./row-table";
 
