@@ -58,38 +58,38 @@ const PrivateRoute = ({ component: Component, ...rest }) => {
     }
 }
 
-const _doLogout = () => {
-    cookies.remove("u_id");
-    cookies.remove("u_token");
-    cookies.remove("u_w_id");
-    cookies.remove("u_isManager");
-    return window.location = "/"
-}
+// const _doLogout = () => {
+//     cookies.remove("u_id");
+//     cookies.remove("u_token");
+//     cookies.remove("u_w_id");
+//     cookies.remove("u_isManager");
+//     return window.location = "/"
+// }
 
-const StaffRoute = ({ component: Component, ...rest })  => {
-    fetch("/api/auth", {
-        method: 'POST',
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ "id": cookies.get("u_id"), "token": cookies.get("u_token") })
-    }).then(async response => response.json()).then(async (data) => {
-        if (data.action === "SUCCESS") {
-            await cookies.set("u_token", data.token, { path: "/" });
-            await cookies.set("u_isManager", data.isManager, { path: "/" });
-        } else {
-            _doLogout();
-        }
-    });
-        return(<Route {...rest} render={(props) => (
-        <Component {...props} />)} />);
+// const StaffRoute = ({ component: Component, ...rest })  => {
+//     fetch("/api/auth", {
+//         method: 'POST',
+//         headers: {
+//             'Accept': 'application/json',
+//             'Content-Type': 'application/json'
+//         },
+//         body: JSON.stringify({ "id": cookies.get("u_id"), "token": cookies.get("u_token") })
+//     }).then(async response => response.json()).then(async (data) => {
+//         if (data.action === "SUCCESS") {
+//             await cookies.set("u_token", data.token, { path: "/" });
+//             await cookies.set("u_isManager", data.isManager, { path: "/" });
+//         } else {
+//             _doLogout();
+//         }
+//     });
+//         return(<Route {...rest} render={(props) => (
+//         <Component {...props} />)} />);
 
   
 
 
 
-}
+// }
 
 export class RouteClient extends Component {
     render() {
