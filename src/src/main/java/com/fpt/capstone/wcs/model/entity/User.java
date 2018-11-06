@@ -1,6 +1,7 @@
 package com.fpt.capstone.wcs.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -32,10 +33,18 @@ public class User {
         this.password = password;
     }
 
-
     @ManyToOne()
     @JoinColumn(name="role_id")
     private Role role;
+
+    @OneToMany(targetEntity = User.class, mappedBy = "manager", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<User> staff= new ArrayList<>();
+
+    @ManyToOne()
+    @JoinColumn(name="manager_id")
+    private User manager;
+
 
 
     @ManyToMany(fetch = FetchType.LAZY,

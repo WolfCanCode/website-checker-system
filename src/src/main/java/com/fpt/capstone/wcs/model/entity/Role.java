@@ -25,5 +25,4 @@ public class Role {
     @OneToMany(targetEntity = User.class, mappedBy = "role", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<User> user= new ArrayList<>();
-
 }

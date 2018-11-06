@@ -27,7 +27,6 @@ public class UserController {
     @PostMapping("/api/login")
     public Map<String, Object> doLogin(@RequestBody User user) {
         String email = user.getEmail();
-        System.out.println(email);
         String password = user.getPassword();
         password = new EncodeUtil().doEncode(password);
         User result = userRepository.findOneByEmailAndPassword(email, password);
@@ -39,7 +38,7 @@ public class UserController {
         } else {
             res.put("action", Constant.SUCCESS);
             res.put("id", result.getId());
-            if (result.getRole().getId() == 1) {
+            if (result.getStaff() == null) {
                 res.put("isManager", true);
             } else if (result.getRole().getId() == 2) {
                 res.put("isManager", false);
