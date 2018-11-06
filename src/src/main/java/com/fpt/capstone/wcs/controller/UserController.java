@@ -3,8 +3,10 @@ package com.fpt.capstone.wcs.controller;
 
 import com.fpt.capstone.wcs.model.entity.Role;
 import com.fpt.capstone.wcs.model.entity.User;
+import com.fpt.capstone.wcs.model.entity.Website;
 import com.fpt.capstone.wcs.repository.RoleRepository;
 import com.fpt.capstone.wcs.repository.UserRepository;
+import com.fpt.capstone.wcs.repository.WebsiteRepository;
 import com.fpt.capstone.wcs.utils.Constant;
 import com.fpt.capstone.wcs.utils.EncodeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,10 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 //email:admin@abc.com
 //password:12345678 : hash ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f
@@ -109,21 +108,4 @@ public class UserController {
             return res;
         }
     }
-
-//    @PostMapping("/api/user/getstaff")
-//    public Map<String, Object> getStaff() {
-//
-//        Map<String, Object> res = new HashMap<>();
-//
-//        if (result == null) {
-//            res.put("action", Constant.INCORRECT);
-//            return res;
-//        } else {
-//            res.put("action", Constant.SUCCESS);
-//            res.put("liststaff", result);
-//
-//            return res;
-//        }
-//
-//    }
 }

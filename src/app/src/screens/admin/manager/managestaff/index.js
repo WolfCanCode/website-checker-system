@@ -22,23 +22,13 @@ console.log(cookies.get("u_id"));
             },
             body: JSON.stringify(param)
         }).then(response => response.json()).then((data) => {
+            console.log(data.liststaff[0].website)
             comp = data.liststaff.map((item, index) => {
-                
-                return (<TableRow key={index} idStaff={item.id} nameStaff={item.name} emailStaff={item.email} webStaff={item.website} passwordStaff={item.password}/>);
-            });
+                    return (<TableRow key={index} idStaff={item.id} nameStaff={item.name} emailStaff={item.email} webStaff={item.website} passwordStaff={item.password}/>);
+            }); 
             this.setState({ list: comp });
-           
         });
-
-
     }
-
-    
-       
-        
-
-
-    
     render() {
         return (
             <Segment.Group>
@@ -64,22 +54,6 @@ console.log(cookies.get("u_id"));
                             </Table.Header>
                             <Table.Body>
                                 {this.state.list}
-                            {/* <Table.Row>
-           
-            
-           <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>SE61789</Table.Cell>
-           <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>Name: anh <br/> Username:staff</Table.Cell>
-            <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>www.thanhnien.vn</Table.Cell>
-           <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}><Button> Edit </Button><Button primary> New Assign</Button></Table.Cell> 
-           </Table.Row>
-              <Table.Row>
-           
-            
-           <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>SE61789</Table.Cell>
-           <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>Name: anh <br/> Username:staff</Table.Cell>
-            <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>www.thanhnien.vn</Table.Cell>
-           <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}><Button> Edit </Button><Button primary> New Assign</Button></Table.Cell> 
-           </Table.Row> */}
                             </Table.Body>
                         </Table>
                     </Segment>

@@ -15,6 +15,10 @@ import {Table,Button, Modal,Input, Dropdown} from 'semantic-ui-react'
     close = () => this.setState({ open: false })
       
     render() {
+    //     const option=[{key:0, text:'', value:0}];
+    //    option= this.props.webStaff.map((item,index)=>{
+    //        return(key={index}, text={item},value={index})
+    //    })
         const options = [
             { key: 1, text: 'www.thanhnien.vn', value: 1 },
             { key: 2, text: 'vnexpress.net', value: 2 },
@@ -64,6 +68,15 @@ import {Table,Button, Modal,Input, Dropdown} from 'semantic-ui-react'
                     <p>Staff password</p>
                 </Modal.Content>
                 <Input type="text" style={{ marginLeft: '20px', marginBottom: '20px', width: '90%' }} defaultValue={this.props.passwordStaff}></Input>
+                <Modal.Content>
+                    <p>Website Asigned</p>
+                    {this.props.webStaff.map((item, index)=>{
+                        return(<div>
+                            {item.url}
+                        </div>);
+                    })}
+                </Modal.Content>
+               
                 <Modal.Actions>
                     <Button onClick={this.close}>Cancel</Button>
                     <Button content='Done' color='blue' />
@@ -73,7 +86,11 @@ import {Table,Button, Modal,Input, Dropdown} from 'semantic-ui-react'
             <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>{this.props.idStaff}</Table.Cell>
             <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>Name: {this.props.nameStaff}<br/> Username: {this.props.emailStaff}</Table.Cell>
              <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>
-           
+                    {this.props.webStaff.map((item, index)=>{
+                        return(<div>
+                            {item.url}
+                        </div>);
+                    })}
              </Table.Cell>
             <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}><Button onClick={this.show('mini')} > Edit </Button><Button onClick={this.closeConfigShow(false, true)}> New Assign</Button></Table.Cell> 
             </Table.Row>
