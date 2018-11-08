@@ -22,7 +22,7 @@ export default class CookieLaw extends Component {
             body: JSON.stringify(param)
         }).then(response => response.json()).then((data) => {
             comp = data.map((item, index) => {
-                return (<TableRow key={index}  cookieName={item.cookieName} category={item.category} party={item.party} description={item.description} />);
+                return (<TableRow key={index} cookieName={item.cookieName} category={item.category} party={item.party} description={item.description} />);
             });
             this.setState({ list: comp });
             this.setState({ loadingTable: false });
@@ -45,7 +45,7 @@ export default class CookieLaw extends Component {
             body: JSON.stringify(param)
         }).then(response => response.json()).then((data) => {
             comp = data.map((item, index) => {
-                return (<TableRow key={index}  cookieName={item.cookieName} category={item.category} party={item.party} description={item.description} />);
+                return (<TableRow key={index} cookieName={item.cookieName} category={item.category} party={item.party} description={item.description} />);
             });
             this.setState({ list: comp });
             this.setState({ loadingTable: false, isDisable: false });
@@ -83,7 +83,7 @@ export default class CookieLaw extends Component {
                     <div style={{ marginBottom: '10px' }}>
                         <Input icon='search' placeholder='Search...' />
                     </div>
-                    <Table singleLine style={{ fontSize: '14px' }}>
+                    <Table singleLine unstackable style={{ fontSize: '14px' }}>
                         <Table.Header>
                             <Table.Row>
                                 <Table.HeaderCell>Cookie</Table.HeaderCell>

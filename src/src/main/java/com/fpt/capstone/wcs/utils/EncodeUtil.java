@@ -6,7 +6,7 @@ import java.util.Random;
 public class EncodeUtil {
     private static final String ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
-    public String doEncode(String string) {
+    public static String doEncode(String string) {
         try{
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] hash = digest.digest(string.getBytes("UTF-8"));
@@ -24,7 +24,7 @@ public class EncodeUtil {
         }
     }
 
-    public String generateAuthToken() {
+    public static String generateAuthToken() {
         Random random = new Random();
         StringBuilder builder = new StringBuilder(20);
 

@@ -71,7 +71,7 @@ export default class SideMenu extends Component {
 
     render() {
         return (
-            <Sidebar as={Menu} animation='overlay' inverted vertical visible width='thin' style={{ background: `url(${sidebarBg})`, backgroundSize: 'cover' }}>
+            <Sidebar as={Menu} animation='overlay' inverted vertical visible={this.props.visible} width='thin' style={{ background: `url(${sidebarBg})`, backgroundSize: 'cover' }}>
                 <Menu.Item>
                     <Image src={logo} style={{ width: '65px', height: 'auto', margin: 'auto' }} />
                 </Menu.Item>

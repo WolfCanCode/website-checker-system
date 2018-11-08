@@ -8,27 +8,29 @@ export default class HeaderContent extends Component {
     state = { openPageOption: false, pageNum: 0, message: null, listPage: null, currPage: null, pageCheck: [] };
 
     componentDidMount() {
-        fetch("/api/page/page-option", {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ "userId": cookies.get("u_id"), "userToken": cookies.get("u_token"), "websiteId": cookies.get("u_w_id") })
-        }).then(async response => response.json()).then(async (data) => {
-            if (data.action === "SUCCESS") {
-                if (data.pageNum === 0) {
-                } else {
-                    this.setState({ pageNum: data.pageNum, currPage: data.currentPageOption });
+        if (cookies.get("u_isManager") !== "true") {
+            fetch("/api/page/pageOption", {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ "userId": cookies.get("u_id"), "userToken": cookies.get("u_token"), "websiteId": cookies.get("u_w_id") })
+            }).then(async response => response.json()).then(async (data) => {
+                if (data.action === "SUCCESS") {
+                    if (data.pageNum === 0) {
+                    } else {
+                        this.setState({ pageNum: data.pageNum, currPage: data.currentPageOption });
+                    }
+                    var list = data.listPage.map((item, index) => {
+                        return (<div key={index}> <Checkbox toggle onClick={() => this._addPage(item.id)} /> <a href={item.url}>{item.url}</a> </div>);
+                    });
+                    this.setState({ listPage: list });
+                } else if (data.action === "INCORRECT") {
+                    this.state.message = data.message;
                 }
-                var list = data.listPage.map((item, index) => {
-                    return (<p key={index}> <Checkbox toggle onClick={() => this._addPage(item.id)} /> <a href={item.url}>{item.url}</a> </p>);
-                });
-                this.setState({ listPage: list });
-            } else if (data.action === "INCORRECT") {
-                this.state.message = data.message;
-            }
-        });
+            });
+        }
     }
 
     _addPage(id) {

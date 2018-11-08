@@ -1,59 +1,58 @@
 import React, { Component } from 'react';
-import { Input, Dropdown, Menu } from 'semantic-ui-react';
-import { Redirect } from "react-router-dom";
+import { Input, Dropdown, Menu, Icon } from 'semantic-ui-react';
+// import { Redirect } from "react-router-dom";
 import { Cookies } from "react-cookie";
 
 const cookies = new Cookies();
 
 
 class HeaderAdmin extends Component {
-    state = { valWebpage: null, listWeb: null, logout: false, account_name: "" };
+    state = { valWebpage: null, listWeb: null, logout: false, account_name: "", marginBody: 160 };
 
 
 
     componentDidMount() {
         if (cookies.get("u_isManager") !== "true") {
             //binding dropdown
-            fetch("/api/website/all", {
+            fetch("/api/headerStaff", {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ "id": cookies.get("u_id") })
+                body: JSON.stringify({ "userId": cookies.get("u_id"), "userToken": cookies.get("u_token") })
             }).then(response => response.json()).then((data) => {
                 if (data.action === "SUCCESS") {
+                    if (data.website.length === 0) {
+                        this._doLogout();
+                    }
                     var list = data.website.map((item, index) => {
                         return { key: index, value: item.id, text: item.url };
 
                     });
-                    this.setState({ listWeb: list, valWebpage: list[0].value });
+                    this.setState({ listWeb: list, valWebpage: list[0].value, account_name: data.fullname });
                     this.props.changeWebsite(list[0].value);
                 } else {
-                    this.setState({
-                        redirect: <Redirect to='/logout' />
-                    });
+                    this._doLogout();
                 }
             });
         }
-
-        fetch("/api/user/name", {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ "id": cookies.get("u_id") })
-        }).then(response => response.json()).then((data) => {
-            if (data.action === "SUCCESS") {
-                this.setState({ account_name: data.name });
-            } else {
-                this.setState({
-                    redirect: <Redirect to='/logout' />
-                });
-            }
-        });
-
+        else {
+            fetch("/api/headerManager", {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ "userId": cookies.get("u_id"), "userToken": cookies.get("u_token") })
+            }).then(response => response.json()).then((data) => {
+                if (data.action === "SUCCESS") {
+                    this.setState({ account_name: data.fullname });
+                } else {
+                    this._doLogout();
+                }
+            });
+        }
 
     }
 
@@ -75,12 +74,22 @@ class HeaderAdmin extends Component {
 
     }
 
+    _hideShowSideBar() {
+        if (this.state.marginBody === 10) {
+            this.setState({ marginBody: 160 });
+        } else {
+            this.setState({ marginBody: 10 });
+        }
+        this.props.hideShowSideBar();
+    }
+
 
 
     render() {
         return (
             <Menu className="top" style={{ background: 'rgb(55, 33, 173)', position: 'absolute', width: '100%', zIndex: '4', margin: '0', height: '50px' }}>
-                {cookies.get("u_isManager") !== "true" ? <Menu.Item><Dropdown key="1" onChange={(event, data) => this._changeWebPage(event, data)} options={this.state.listWeb} value={this.state.valWebpage} style={{ marginLeft: '160px', color: 'white', fontSize: '18px' }} /></Menu.Item> : ""}
+                <Menu.Item><Icon className='bars' style={{ color: "white", cursor: "pointer", marginLeft: `${this.state.marginBody}px`, transition: "all 0.6s" }} onClick={() => this._hideShowSideBar()} /></Menu.Item>
+                {cookies.get("u_isManager") !== "true" ? <Menu.Item><Dropdown key="1" onChange={(event, data) => this._changeWebPage(event, data)} options={this.state.listWeb} value={this.state.valWebpage} style={{ color: 'white', fontSize: '18px' }} /></Menu.Item> : ""}
                 <Menu.Menu position='right'>
                     <Menu.Item>
                         <Input icon='search' placeholder='Search...' />
@@ -88,7 +97,6 @@ class HeaderAdmin extends Component {
                     <Menu.Item style={{ color: 'white', fontWeight: 'bold' }}>
                         Hi, {this.state.account_name}
                     </Menu.Item>
-                    {/* {this.renderRedirect()} */}
                     <Menu.Item style={{ color: 'white', fontWeight: 'bold' }}
                         name='logout'
                         onClick={() => this._doLogout()}

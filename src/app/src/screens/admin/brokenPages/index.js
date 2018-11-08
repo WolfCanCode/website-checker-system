@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import 'semantic-ui-css/semantic.min.css';
-import { Segment, Button, Table,Icon, Input } from 'semantic-ui-react'
+import { Segment, Button, Table, Icon, Input } from 'semantic-ui-react'
 import TableRow from './row-table';
 import { Cookies } from "react-cookie";
 
@@ -96,7 +96,7 @@ class brokenPagesScreen extends Component {
                         </Segment>
                         <Segment style={{ maxHeight: '30vh', overflow: "auto" }}>
 
-                            <Table singleLine textAlign='center' style={{ tableLayout: 'auto' }}>
+                            <Table singleLine unstackable textAlign='center' style={{ tableLayout: 'auto' }}>
                                 <Table.Header >
                                     <Table.Row>
                                         <Table.HeaderCell>Page</Table.HeaderCell>

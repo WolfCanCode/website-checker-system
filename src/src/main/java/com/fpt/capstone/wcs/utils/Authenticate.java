@@ -2,6 +2,7 @@ package com.fpt.capstone.wcs.utils;
 
 import com.fpt.capstone.wcs.model.entity.User;
 import com.fpt.capstone.wcs.model.entity.Website;
+import com.fpt.capstone.wcs.model.pojo.ManagerRequestPOJO;
 import com.fpt.capstone.wcs.model.pojo.RequestCommonPOJO;
 import com.fpt.capstone.wcs.repository.UserRepository;
 import com.fpt.capstone.wcs.repository.WebsiteRepository;
@@ -21,11 +22,11 @@ public class Authenticate {
     @Autowired
     WebsiteRepository websiteRepository;
 
-    public Website isAuth(RequestCommonPOJO request) {
+    public Website isAuthGetSingleSite(RequestCommonPOJO request) {
 
-        Optional<User> user = userRepository.findById(request.getUserId());
-        if (user.isPresent()) {
-            Website website = websiteRepository.findOneByUserAndId(user.get(), request.getWebsiteId());
+        User user = userRepository.findOneByIdAndTokenAndDelFlagEquals(request.getUserId(),request.getUserToken(),false);
+        if (user!=null) {
+            Website website = websiteRepository.findOneByUserAndIdAndDelFlagEquals(user, request.getWebsiteId(),false);
             if (website != null) {
                 return website;
             }
@@ -33,16 +34,34 @@ public class Authenticate {
         return null;
     }
 
-    public List<Website> isAuthList(RequestCommonPOJO request) {
+    public List<Website> isAuthGetListSite(RequestCommonPOJO request) {
 
-        Optional<User> user = userRepository.findById(request.getUserId());
-        if (user.isPresent()) {
-            List<Website> website = websiteRepository.findAllByUser(user.get());
+        User user = userRepository.findOneByIdAndTokenAndDelFlagEquals(request.getUserId(),request.getUserToken(),false);
+        if (user!=null) {
+            List<Website> website = websiteRepository.findAllByUserAndDelFlagEquals(user,false);
             if (website != null) {
                 return website;
             }
         }
         return null;
     }
+
+    public User isAuthGetSingleUser(RequestCommonPOJO request)
+    {
+        User user = userRepository.findOneByIdAndTokenAndDelFlagEquals(request.getUserId(),request.getUserToken(),false);
+        return  user;
+    }
+
+    public User isAuthAndManagerGet(ManagerRequestPOJO request)
+    {
+        User user = userRepository.findOneByIdAndTokenAndDelFlagEquals(request.getManagerId(),request.getManagerToken(),false);
+        if(user.getManager()==null)
+        {
+            return  user;
+        } else {
+            return null;
+        }
+    }
+
 
 }

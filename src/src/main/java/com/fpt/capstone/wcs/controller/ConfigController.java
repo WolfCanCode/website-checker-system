@@ -29,14 +29,15 @@ public class ConfigController {
     @Autowired
     VersionRepository versionRepository;
 
-    @PostMapping("/api/website/all")
-    public Map<String, Object> getAllWebsite4Test(@RequestBody User user) {
-        Optional<User> result = userRepository.findById(user.getId());
+    @PostMapping("/api/headerStaff")
+    public Map<String, Object> getHeaderWebsiteStaff(@RequestBody RequestCommonPOJO request) {
+        List<Website> websites = authenticate.isAuthGetListSite(request);
+        User user = userRepository.findById(request.getUserId()).get();
         Map<String, Object> res = new HashMap<>();
-        if (result.isPresent()) {
-            List<Website> websites = websiteRepository.findAllByUser(result.get());
+        if (websites!= null) {
             res.put("action", Constant.SUCCESS);
             res.put("website", websites);
+            res.put("fullname",user.getName());
             return res;
         } else {
             res.put("action", Constant.INCORRECT);
@@ -44,36 +45,14 @@ public class ConfigController {
         }
     }
 
-    @PostMapping("/api/website/manage")
-    public Map<String, Object> getmanageWesite(@RequestBody RequestCommonPOJO request) {
+    @PostMapping("/api/headerManager")
+    public Map<String, Object> getHeaderWebsiteManager(@RequestBody RequestCommonPOJO request) {
+        List<Website> websites = authenticate.isAuthGetListSite(request);
+        User user = userRepository.findById(request.getUserId()).get();
         Map<String, Object> res = new HashMap<>();
-        List<Website> websites = authenticate.isAuthList(request);
-        if(websites!=null){
-            List<WebsitePojo> websitePojos = new ArrayList<>();
-            for (Website website : websites)
-            {
-                WebsitePojo web = new WebsitePojo();
-                web.setId(website.getId());
-                web.setName(website.getName());
-                web.setUrl(website.getUrl());
-                List<Version> versions = website.getVersion();
-                if(versions!=null) {
-                    if(versions.size()!=0) {
-                        Date time = versions.get(versions.size() - 1).getTime();
-                        web.setVersion(versions.get(versions.size() - 1).getVersion());
-                        web.setTime(time.getDate() + "/" + (time.getMonth() + 1) + "/2018");
-                    } else {
-                        web.setVersion(0);
-                        web.setTime("Haven't get yet");
-                    }
-                } else {
-                    web.setVersion(0);
-                    web.setTime("Haven't Test yet");
-                }
-                websitePojos.add(web);
-            }
+        if (websites!= null) {
             res.put("action", Constant.SUCCESS);
-            res.put("website", websitePojos);
+            res.put("fullname",user.getName());
             return res;
         } else {
             res.put("action", Constant.INCORRECT);
@@ -81,10 +60,10 @@ public class ConfigController {
         }
     }
 
-    @PostMapping("/api/page/page-option")
+    @PostMapping("/api/page/pageOption")
     public Map<String, Object> getPageOption(@RequestBody RequestCommonPOJO request) {
         Map<String, Object> res = new HashMap<>();
-        Website website = authenticate.isAuth(request);
+        Website website = authenticate.isAuthGetSingleSite(request);
         if (website != null) {
             PageOption pageOption = pageOptionRepository.findFirstByWebsiteOrderByTimeDesc(website);
             Version version = versionRepository.findFirstByWebsiteOrderByVersionDesc(website);

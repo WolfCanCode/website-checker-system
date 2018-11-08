@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import 'semantic-ui-css/semantic.min.css';
-import {Segment, Button, Table, Icon, Input } from 'semantic-ui-react'
+import { Segment, Button, Table, Icon, Input } from 'semantic-ui-react'
 import TableRow from './row-table';
 import { Cookies } from "react-cookie";
 
@@ -14,19 +14,19 @@ const cookies = new Cookies();
 
 
 class faviconScreen extends Component {
-    state = { list: [], loadingTable: false, isDisable: false , faviconCount:0, faviconMissingCount:0};
-//"http://hiccupsteahouse.com/","http://hiccupsteahouse.com/franchising/","http://hiccupsteahouse.com/hiccups-locations/"
-        //"https://vnexpress.net/", "https://vnexpress.net/tin-tuc/thoi-su", "https://vnexpress.net/tin-tuc/goc-nhin", "https://giaitri.vnexpress.net/"
-        //"https://insites.com/" , "https://insites.com/tests/","https://insites.com/content/redirections/"
-        //"https://thanhnien.vn","https://thanhnien.vn/thoi-su/" "https://vnexpress.net/", "https://vnexpress.net/tin-tuc/thoi-su", "https://vnexpress.net/tin-tuc/goc-nhin", "https://giaitri.vnexpress.net/"
+    state = { list: [], loadingTable: false, isDisable: false, faviconCount: 0, faviconMissingCount: 0 };
+    //"http://hiccupsteahouse.com/","http://hiccupsteahouse.com/franchising/","http://hiccupsteahouse.com/hiccups-locations/"
+    //"https://vnexpress.net/", "https://vnexpress.net/tin-tuc/thoi-su", "https://vnexpress.net/tin-tuc/goc-nhin", "https://giaitri.vnexpress.net/"
+    //"https://insites.com/" , "https://insites.com/tests/","https://insites.com/content/redirections/"
+    //"https://thanhnien.vn","https://thanhnien.vn/thoi-su/" "https://vnexpress.net/", "https://vnexpress.net/tin-tuc/thoi-su", "https://vnexpress.net/tin-tuc/goc-nhin", "https://giaitri.vnexpress.net/"
 
 
     componentDidMount() {
         var comp = [];
         var listCom = [];
-        var favUrlCount=0;
-        var faviconMissCount=0;
-        var flag =false;
+        var favUrlCount = 0;
+        var faviconMissCount = 0;
+        var flag = false;
         this.setState({ loadingTable: true });
         var param = { "userId": cookies.get("u_id"), "userToken": cookies.get("u_token"), "websiteId": cookies.get("u_w_id") };
 
@@ -39,26 +39,26 @@ class faviconScreen extends Component {
             body: JSON.stringify(param)
         }).then(response => response.json()).then((data) => {
             comp = data.map((item, index) => {
-                for(let i=0; i<listCom.length;i++){
-                    if(item.faviconUrl===listCom[i]){
+                for (let i = 0; i < listCom.length; i++) {
+                    if (item.faviconUrl === listCom[i]) {
                         flag = true;
                     }
                 }
-                if(flag===false && item.faviconUrl!=="Missing Favicon"){
+                if (flag === false && item.faviconUrl !== "Missing Favicon") {
                     listCom.push(item.faviconUrl);
                     favUrlCount++;
                 }
-                else{
-                    flag=false;
+                else {
+                    flag = false;
                 }
-                if(item.faviconUrl==="Missing Favicon"){
+                if (item.faviconUrl === "Missing Favicon") {
                     faviconMissCount++;
                 }
 
                 return (<TableRow key={index} image={item.faviconUrl} url={item.faviconUrl} sizeFav={item.sizeFavicon} webAddress={item.webAddress} />);
             });
-            this.setState({faviconMissingCount:faviconMissCount})
-            this.setState({faviconCount:favUrlCount});
+            this.setState({ faviconMissingCount: faviconMissCount })
+            this.setState({ faviconCount: favUrlCount });
             this.setState({ list: comp });
             this.setState({ loadingTable: false });
         });
@@ -69,10 +69,10 @@ class faviconScreen extends Component {
         this.setState({ loadingTable: true, isDisable: true });
         var comp = [];
         var listCom = [];
-        var favUrlCount =0;
-        var flag =false;
-        var faviconMissCount=0;
-        var param = [ { "url": "http://hiccupsteahouse.com/" },
+        var favUrlCount = 0;
+        var flag = false;
+        var faviconMissCount = 0;
+        var param = [{ "url": "http://hiccupsteahouse.com/" },
         { "url": "https://insites.com/" },
         { "url": "https://insites.com/tests/" },
         { "url": "https://insites.com/content/redirections/" },
@@ -86,40 +86,40 @@ class faviconScreen extends Component {
             body: JSON.stringify(param)
         }).then(response => response.json()).then((data) => {
             comp = data.map((item, index) => {
-                for(let i=0; i<listCom.length;i++){
-                    if(item.faviconUrl===listCom[i]){
+                for (let i = 0; i < listCom.length; i++) {
+                    if (item.faviconUrl === listCom[i]) {
                         flag = true;
                     }
                 }
-                if(flag===false && item.faviconUrl!=="Missing Favicon"){
+                if (flag === false && item.faviconUrl !== "Missing Favicon") {
                     listCom.push(item.faviconUrl);
                     favUrlCount++;
                 }
-                else{
-                    flag=false;
+                else {
+                    flag = false;
                 }
-                if(item.faviconUrl==="Missing Favicon"){
+                if (item.faviconUrl === "Missing Favicon") {
                     faviconMissCount++;
                 }
                 return (<TableRow key={index} image={item.faviconUrl} url={item.faviconUrl} sizeFav={item.sizeFavicon} webAddress={item.webAddress} />);
             });
-            this.setState({faviconCount:favUrlCount});
-            this.setState({faviconMissingCount:faviconMissCount});
+            this.setState({ faviconCount: favUrlCount });
+            this.setState({ faviconMissingCount: faviconMissCount });
             this.setState({ list: comp });
             this.setState({ loadingTable: false });
-            this.setState({isDisable:false})
+            this.setState({ isDisable: false })
         });
     }
     render() {
         return (
             <div>
                 <Segment.Group>
-                <Segment>
+                    <Segment>
                         <Button icon labelPosition='right' disabled={this.state.isDisable} onClick={() => this._doFaviconTest()}>
-                        Check
+                            Check
                        <Icon name='right arrow' />
-                    </Button>
-                        </Segment>
+                        </Button>
+                    </Segment>
                     <Segment.Group horizontal >
                         <Segment style={{ margin: 'auto', textAlign: 'center', padding: 0, size: 'mini' }}>
                             <Icon className="star" size='huge' color='violet' /></Segment>
@@ -143,7 +143,7 @@ class faviconScreen extends Component {
                     </Segment.Group>
                     <Segment.Group horizontal>
 
-                        <Segment basic style={{ minWidth:"auto" }}>
+                        <Segment basic style={{ minWidth: "auto" }}>
                             <h4>All Favicons</h4>
                             {/* <Segment basic style={{ minWidth:"350px" }}>
                                 <Button floated='right' ><Icon name="print" />Export</Button>
@@ -151,15 +151,15 @@ class faviconScreen extends Component {
                                 <Input icon='search' placeholder='Search...' />
                             </Segment> */}
                             <Segment basic>
-                    
-                    <div style={{marginBottom:'50px'}}>
-                 
-                        <Button  style={{ float: 'right'}}><Icon name="print" />Export</Button>
 
-                        <Input icon='search' placeholder='Search...' style={{ float: 'right' }} />
-                    </div>
-                </Segment>
-                            <Table singleLine textAlign='center' style={{ tableLayout: 'auto' }} loading={this.state.loadingTable}>
+                                <div style={{ marginBottom: '50px' }}>
+
+                                    <Button style={{ float: 'right' }}><Icon name="print" />Export</Button>
+
+                                    <Input icon='search' placeholder='Search...' style={{ float: 'right' }} />
+                                </div>
+                            </Segment>
+                            <Table unstackable singleLine textAlign='center' style={{ tableLayout: 'auto' }} loading={this.state.loadingTable}>
                                 <Table.Header >
                                     <Table.Row>
                                         <Table.HeaderCell>Favicon</Table.HeaderCell>
@@ -179,7 +179,7 @@ class faviconScreen extends Component {
 
                                     </Table.Row> */}
 
-                                      {this.state.list.length === 0 ? <Table.Row><Table.Cell>This page haven't test yet, please try to test</Table.Cell></Table.Row> : this.state.list}
+                                    {this.state.list.length === 0 ? <Table.Row><Table.Cell>This page haven't test yet, please try to test</Table.Cell></Table.Row> : this.state.list}
 
 
                                 </Table.Body>

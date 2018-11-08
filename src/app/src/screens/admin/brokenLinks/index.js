@@ -85,13 +85,13 @@ class brokenLinksScreen extends Component {
                             </Segment>
                         </Segment.Group>
                         <Segment basic style={{ marginBottom: '60px', marginRight: '20px' }}>
-                                <Button floated='right' ><Icon name="print" />Export</Button>
+                            <Button floated='right' ><Icon name="print" />Export</Button>
 
-                                <Input icon='search' placeholder='Search...' style={{ float: 'right' }} />
-                            </Segment>
+                            <Input icon='search' placeholder='Search...' style={{ float: 'right' }} />
+                        </Segment>
                         <Segment style={{ maxHeight: '40vh', overflow: "auto" }}>
-                            
-                            <Table singleLine textAlign='center' style={{ tableLayout: 'auto' }}>
+
+                            <Table singleLine unstackable textAlign='center' style={{ tableLayout: 'auto' }}>
                                 <Table.Header >
                                     <Table.Row>
                                         <Table.HeaderCell>Page</Table.HeaderCell>

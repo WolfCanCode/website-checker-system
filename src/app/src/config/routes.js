@@ -48,12 +48,13 @@ const cookies = new Cookies();
 
 const PrivateRoute = ({ component: Component, ...rest }) => {
     var isManager = cookies.get("u_isManager");
-    console.log(isManager);
     if (isManager === "true") {
-        window.location = './manager/home';
+        return (
+            window.location = './manager/home');
     }
     else {
-        window.location = './admin/home'
+        return (
+            window.location = './admin/home');
     }
 }
 

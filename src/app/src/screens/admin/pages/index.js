@@ -74,11 +74,11 @@ export default class Pages extends Component {
                     </div>
                     <Button style={{ marginRight: '10px' }} floated='right'><Icon name="print" />Export</Button>
                 </Segment>
-                <Segment.Group horizontal style={{ maxHeight: '63vh', overflow: "auto"}}>
+                <Segment.Group horizontal style={{ maxHeight: '63vh', overflow: "auto" }}>
                     <Segment basic loading={this.state.loadingTable}>
 
 
-                        <Table singleLine>
+                        <Table singleLine unstackable>
                             <Table.Header>
                                 <Table.Row>
                                     <Table.HeaderCell>Title</Table.HeaderCell>

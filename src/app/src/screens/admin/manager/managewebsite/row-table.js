@@ -1,11 +1,13 @@
 import React, { Component } from 'react';
-import { Table, Button, Input, Modal, Transition } from 'semantic-ui-react'
+import { Table, Button, Input, Modal, Transition, Dropdown } from 'semantic-ui-react'
 import { Cookies } from "react-cookie";
 
 const cookies = new Cookies();
 
 export default class TableRow extends Component {
-    state = { open: false, open1: false }
+    state = {
+        open: false, open1: false, oldWebName: this.props.name, webName: this.props.name, isDisable: true, editLoading: false, options: [], userAssign: [], defValue: []
+    }
     constructor(props) {
         super(props);
         this._makeNewver = this._makeNewver.bind(this);
@@ -38,55 +40,207 @@ export default class TableRow extends Component {
         });
     }
 
+    _editWebsite() {
+        this.setState({ editLoading: true, isDisable: false });
+        var param = {
+            "managerId": cookies.get("u_id"), "managerToken": cookies.get("u_token"), website: {
+                "id": this.props.id, "name": this.state.webName
+            }
+        };
+        fetch("/api/manager/editWebsite", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(param)
+        }).then(response => response.json()).then((data) => {
+            if (data.action === "SUCCESS") {
+                this.setState({ editLoading: false });
+                this.setState({ open: false });
+                this._refreshTable();
+            } if (data.action === "DUPLICATE ERROR") {
+                alert("This website is existed");
+            }
+        });
+    }
+
+    _deleteWebsite(id) {
+        var param = {
+            "managerId": cookies.get("u_id"), "managerToken": cookies.get("u_token"), website: {
+                "id": this.props.id
+            }
+        };
+        fetch("/api/manager/deleteWebsite", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(param)
+        }).then(response => response.json()).then((data) => {
+            if (data.action === "SUCCESS") {
+                this.setState({ open1: false });
+                this._refreshTable();
+            }
+        });
+    }
+
+    _assignModal() {
+        var param = {
+            "managerId": cookies.get("u_id"), "managerToken": cookies.get("u_token"), website: {
+                "id": this.props.id
+            }
+        };
+        fetch("/api/manager/defaultAssign", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(param)
+        }).then(response => response.json()).then((data) => {
+            var op = data.staffs.map((item, index) => {
+                return { key: item.name, value: item.id, text: item.email };
+            })
+            var def = data.defStaffs.map((item, index) => {
+                return item.id;
+            });
+            // var defAss = [];
+            // for (let i = 0; i < op.length; i++) {
+            //     for (let j = 0; j < def.length; j++) {
+            //         if (op[i].value === def[j].value) {
+            //             defAss.push(op[i]);
+            //         }
+            //     }
+            // }
+            this.setState({ options: op, assignModal: true, userAssign: def });
+        });
+    }
+
+    _changeAssign(event, data) {
+        this.setState({
+            userAssign: data.value
+        }, () => this._checkAssignBtn());
+    }
+
+    _checkAssignBtn() {
+        if (this.state.userAssign.length === 0) {
+            this.setState({ isDisable: true });
+        } else {
+            this.setState({ isDisable: false });
+        }
+    }
+
+    _doAssignUser() {
+        var param = {
+            "managerId": cookies.get("u_id"), "managerToken": cookies.get("u_token"), website: {
+                "id": this.props.id
+            }, listStaffId: this.state.userAssign
+        };
+        fetch("/api/manager/assignWebsite", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(param)
+        }).then(response => response.json()).then((data) => {
+            if (data.action === "SUCCESS") {
+                this.setState({ assignModal: false });
+            }
+        });
+    }
+
+    _onchangeName(event) {
+        this.setState({ webName: event.target.value }, () => this._checkAddBtn());
+    }
+
+    _checkAddBtn() {
+        var result = false;
+        if (this.state.webName === "" || this.state.webName === this.state.oldWebName) {
+            result = true;
+        }
+        this.setState({ isDisable: result });
+    }
     render() {
-        const { open, size } = this.state
-        const { open1, closeOnEscape, closeOnDimmerClick } = this.state
+        const { open, size } = this.state;
+        const { open1, closeOnEscape, closeOnDimmerClick } = this.state;
+        const renderLabel = label => ({
+            color: 'blue',
+            content: `Staff: ${label.key} - ${label.text}`,
+            icon: 'check',
+        })
         return (<Table.Row>
             {/* Delete */}
-            <Modal
-                open={open1}
-                closeOnEscape={closeOnEscape}
-                closeOnDimmerClick={closeOnDimmerClick}
-                onClose={this.close1}
-            >
-                <Modal.Header>Delete Your Website</Modal.Header>
-                <Modal.Content>
-                    <p>Are you sure to delete this website ?</p>
-                </Modal.Content>
-                <Modal.Actions>
-                    <Button onClick={this.close1}>No</Button>
-                    <Button color="blue" content='Yes' />
-                </Modal.Actions>
-            </Modal>
-
+            <Transition duration={600} divided size='huge' verticalAlign='middle' visible={open}>
+                <Modal
+                    open={open1}
+                    closeOnEscape={closeOnEscape}
+                    closeOnDimmerClick={closeOnDimmerClick}
+                    onClose={this.close1}
+                >
+                    <Modal.Header>Delete Your Website</Modal.Header>
+                    <Modal.Content>
+                        <p>Are you sure to delete this website ?</p>
+                    </Modal.Content>
+                    <Modal.Actions>
+                        <Button onClick={this.close1}>No</Button>
+                        <Button color="blue" content='Yes' />
+                    </Modal.Actions>
+                </Modal>
+            </Transition>
             {/* Edit */}
-            <Transition duration={200} divided size='huge' verticalAlign='middle' visible={open}>
-                <Modal size={size} open={open} onClose={this.close}>
+            <Transition duration={600} divided size='huge' verticalAlign='middle' visible={open}>
+                <Modal size={size} open={open} >
                     <Modal.Header>Edit Website</Modal.Header>
                     <Modal.Content >
                         <p >Website Name</p>
                     </Modal.Content>
-                    <Input type="text" style={{ marginLeft: '20px', width: '90%' }} defaultValue={this.props.name}></Input>
+                    <Input type="text" style={{ marginLeft: '20px', width: '90%' }} onChange={(event) => this._onchangeName(event)} value={this.state.webName}></Input>
                     <Modal.Content>
                         <p>Website URL</p>
                     </Modal.Content>
-                    <Input type="text" style={{ marginLeft: '20px', marginBottom: '20px', width: '90%' }} defaultValue={this.props.url}></Input>
+                    <Input type="text" style={{ marginLeft: '20px', marginBottom: '20px', width: '90%' }} defaultValue={this.props.url} disabled={true}></Input>
                     <Modal.Actions>
                         <Button onClick={this.close}>Cancel</Button>
-                        <Button content='Done' color='blue' />
+                        <Button content='Done' color='blue' disabled={this.state.isDisable} onClick={() => this._editWebsite()} />
+                    </Modal.Actions>
+                </Modal>
+            </Transition>
+
+            {/* Assign */}
+            <Transition duration={600} divided size='huge' verticalAlign='middle' visible={this.state.assignModal}>
+                <Modal size={"large"} open={this.state.assignModal} >
+                    <Modal.Header>Assign Website</Modal.Header>
+                    <Modal.Content >
+                        <p >Staffs:</p>
+                    </Modal.Content>
+                    <Dropdown
+                        multiple
+                        selection
+                        fluid
+                        options={this.state.options}
+                        placeholder='Choose an option'
+                        renderLabel={renderLabel}
+                        onChange={(event, data) => this._changeAssign(event, data)}
+                        value={this.state.userAssign}
+                    />                    <Modal.Actions>
+                        <Button onClick={() => this.setState({ assignModal: false })}>Cancel</Button>
+                        <Button content='Done' color='blue' disabled={this.state.isDisable} onClick={() => this._doAssignUser()} />
                     </Modal.Actions>
                 </Modal>
             </Transition>
 
             {/* <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}><a href={this.props.urlPage}>{this.props.urlPage.split("www.")[1]}</a></Table.Cell>
             <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}><a href={this.props.urlLink}>{this.props.urlLink.split("www.")[1]}</a></Table.Cell> */}
-            <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}><a >{this.props.id}</a></Table.Cell>
-            <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}><a >{this.props.name}</a></Table.Cell>
-            <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}><a >{this.props.url}</a></Table.Cell>
-            <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}><a >{this.props.version}</a></Table.Cell>
-            <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}><a >{this.props.time}</a></Table.Cell>
-            <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}><Button onClick={() => this._makeNewver(this.props.id)} color="blue">Make</Button></Table.Cell>
-            <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}><Button onClick={this.show('mini')} > Edit </Button><Button onClick={this.closeConfigShow(false, true)}> Delete</Button></Table.Cell>
+            <Table.Cell ><a >{this.props.id}</a></Table.Cell>
+            <Table.Cell ><a >{this.props.name}</a></Table.Cell>
+            <Table.Cell ><a >{this.props.url}</a></Table.Cell>
+            <Table.Cell ><a >{this.props.version}</a></Table.Cell>
+            <Table.Cell ><a >{this.props.time}</a></Table.Cell>
+            <Table.Cell ><Button onClick={() => this._makeNewver(this.props.id)} color="blue">Make</Button></Table.Cell>
+            <Table.Cell ><Button onClick={() => this._assignModal()} > Assign </Button><Button onClick={this.show('mini')} > Edit </Button><Button onClick={this.closeConfigShow(false, true)}> Delete</Button></Table.Cell>
             {/* <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>{this.props.httpcode}</Table.Cell> */}
         </Table.Row >
         );

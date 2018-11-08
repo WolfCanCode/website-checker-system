@@ -133,7 +133,7 @@ class speedTestScreen extends Component {
                         </Segment>
                         <Segment basic style={{ maxHeight: 300, overflow: "auto" }}>
 
-                            <Table singleLine textAlign='center' style={{ tableLayout: 'auto' }}>
+                            <Table singleLine unstackable textAlign='center' style={{ tableLayout: 'auto' }}>
                                 <Table.Header >
                                     <Table.Row>
                                         <Table.HeaderCell>Page</Table.HeaderCell>

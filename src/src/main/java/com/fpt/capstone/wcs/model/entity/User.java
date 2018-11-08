@@ -23,6 +23,8 @@ public class User {
     private String email;
     @JsonProperty("token")
     private String token;
+    @JsonIgnore
+    private boolean delFlag;
 
     public User(Long id, String token)
     {

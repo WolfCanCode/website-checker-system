@@ -5,13 +5,13 @@ import { Cookies } from "react-cookie";
 
 const cookies = new Cookies();
 export default class Direction extends Component {
-    state = { list: [], loadingTable: false, isDisable: false, statusNoResult:""};
+    state = { list: [], loadingTable: false, isDisable: false, statusNoResult: "" };
 
 
     componentDidMount() {
         var comp = [];
         this.setState({ loadingTable: true });
-        var statusNotFound ="";
+        var statusNotFound = "";
         var param = { "userId": cookies.get("u_id"), "userToken": cookies.get("u_token"), "websiteId": cookies.get("u_w_id") };
 
         fetch("/api/redirectiontest/lastest", {
@@ -24,11 +24,11 @@ export default class Direction extends Component {
         }).then(response => response.json()).then((data) => {
             comp = data.map((item, index) => {
                 return (<TableRow key={index} webAddress={item.url} redirectUrl={item.driectToUrl} type={item.type} httpcode={item.httpCode} />);
-            }); 
-            if(comp.length===0){
-                statusNotFound="This page haven't test yet, please try to test";
+            });
+            if (comp.length === 0) {
+                statusNotFound = "This page haven't test yet, please try to test";
             }
-            this.setState({statusNoResult:statusNotFound});
+            this.setState({ statusNoResult: statusNotFound });
             this.setState({ list: comp });
             this.setState({ loadingTable: false });
         });
@@ -38,7 +38,7 @@ export default class Direction extends Component {
     _doLinkRedirection() {
         this.setState({ loadingTable: true, isDisable: true });
         var comp = [];
-        var statusNotFound="";
+        var statusNotFound = "";
         var param = [{ "url": "https://twitter.com/hashtag/hiccupsteahouse?lang=en" },
         { "url": "http://www.cungmua.vn" },
         { "url": "http://www.google.com" },
@@ -47,10 +47,10 @@ export default class Direction extends Component {
         { "url": "https://hiccupsteahouse.com/contact-us/" },
         { "url": "https://hiccupsteahouse.com/careers/" },
         { "url": "https://www.churroholic.com/" },
-        // { "url": "https://www.apple.com/us/shop/goto/giftcards" },
-        // { "url": "http://www.apple.com/today/camp/" },
-        // { "url": "https://www.apple.com/retail/camp/notify.html" },
-        // { "url": "https://www.apple.com/us/shop/goto/account" },
+            // { "url": "https://www.apple.com/us/shop/goto/giftcards" },
+            // { "url": "http://www.apple.com/today/camp/" },
+            // { "url": "https://www.apple.com/retail/camp/notify.html" },
+            // { "url": "https://www.apple.com/us/shop/goto/account" },
 
         ];
         fetch("/api/redirectiontest", {
@@ -64,10 +64,10 @@ export default class Direction extends Component {
             comp = data.map((item, index) => {
                 return (<TableRow key={index} webAddress={item.url} redirectUrl={item.driectToUrl} type={item.type} httpcode={item.httpCode} />);
             });
-            if(comp.length===0){
-                statusNotFound="No Redirection Found";
+            if (comp.length === 0) {
+                statusNotFound = "No Redirection Found";
             }
-            this.setState({statusNoResult:statusNotFound});
+            this.setState({ statusNoResult: statusNotFound });
             this.setState({ list: comp });
             this.setState({ loadingTable: false });
         });
@@ -75,7 +75,7 @@ export default class Direction extends Component {
     render() {
         return (
 
-            <Segment.Group horizontal style={{margin:0}}>
+            <Segment.Group horizontal style={{ margin: 0 }}>
 
                 <Segment basic loading={this.state.loadingTable} >
                     <Button icon labelPosition='right' disabled={this.state.isDisable} onClick={() => this._doLinkRedirection()}>
@@ -86,7 +86,7 @@ export default class Direction extends Component {
                         <Input icon='search' placeholder='Search...' />
                     </div>
                     <Button style={{ marginRight: '10px' }} floated='right'><Icon name="print" />Export</Button>
-                    <Table singleLine>
+                    <Table singleLine unstackable>
                         <Table.Header>
                             <Table.Row>
                                 <Table.HeaderCell>Web Address</Table.HeaderCell>

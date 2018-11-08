@@ -9,8 +9,10 @@ import java.util.List;
 
 @Repository
 public interface UserRepository extends JpaRepository<User,Long> {
-    User findOneByEmailAndPassword (String email, String password);
-    User findOneByIdAndToken(Long id, String token);
-    List<User> findAllByManager(User user);
-    List<User> findAllByManager_Id(long id);
+    User findOneByEmailAndPasswordAndDelFlagEquals (String email, String password, boolean delFlag);
+    User findOneByIdAndTokenAndDelFlagEquals(Long id, String token, boolean delFlag);
+    User findOneByIdAndDelFlagEquals(Long id, boolean delFlag);
+    User findOneByEmailAndDelFlagEquals(String email, boolean delFlag);
+    List<User> findAllByManagerAndDelFlagEquals(User user, boolean delFlag);
+    User findOneById(Long id);
 }

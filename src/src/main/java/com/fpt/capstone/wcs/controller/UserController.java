@@ -4,9 +4,11 @@ package com.fpt.capstone.wcs.controller;
 import com.fpt.capstone.wcs.model.entity.Role;
 import com.fpt.capstone.wcs.model.entity.User;
 import com.fpt.capstone.wcs.model.entity.Website;
+import com.fpt.capstone.wcs.model.pojo.RequestCommonPOJO;
 import com.fpt.capstone.wcs.repository.RoleRepository;
 import com.fpt.capstone.wcs.repository.UserRepository;
 import com.fpt.capstone.wcs.repository.WebsiteRepository;
+import com.fpt.capstone.wcs.utils.Authenticate;
 import com.fpt.capstone.wcs.utils.Constant;
 import com.fpt.capstone.wcs.utils.EncodeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,14 +26,16 @@ public class UserController {
     @Autowired
     UserRepository userRepository;
     @Autowired
+    Authenticate authenticate;
+    @Autowired
     RoleRepository roleRepository;
 
     @PostMapping("/api/login")
     public Map<String, Object> doLogin(@RequestBody User user) {
         String email = user.getEmail();
         String password = user.getPassword();
-        password = new EncodeUtil().doEncode(password);
-        User result = userRepository.findOneByEmailAndPassword(email, password);
+        password = EncodeUtil.doEncode(password);
+        User result = userRepository.findOneByEmailAndPasswordAndDelFlagEquals(email, password, false);
         Map<String, Object> res = new HashMap<>();
         if (result == null) {
             res.put("action", Constant.INCORRECT);
@@ -45,7 +49,7 @@ public class UserController {
             } else {
                 res.put("isManager", false);
             }
-            String token = new EncodeUtil().generateAuthToken();
+            String token = EncodeUtil.generateAuthToken();
             res.put("token", token);
             result.setToken(token);
             userRepository.save(result);
@@ -55,58 +59,27 @@ public class UserController {
     }
 
     @PostMapping("/api/auth")
-    public Map<String, Object> isAuth(@RequestBody User user) {
-        User result = userRepository.findOneByIdAndToken(user.getId(), user.getToken());
-
+    public Map<String, Object> isAuth(@RequestBody RequestCommonPOJO request) {
         Map<String, Object> res = new HashMap<>();
-        if (result == null) {
+        User user = authenticate.isAuthGetSingleUser(request);
+        if (user == null) {
             res.put("action", Constant.INCORRECT);
             res.put("messages", "The token is invalid");
             return res;
         } else {
             res.put("action", Constant.SUCCESS);
-            String token = new EncodeUtil().generateAuthToken();
+            String token = EncodeUtil.generateAuthToken();
             res.put("token", token);
-            if (result.getManager() == null) {
+            if (user.getManager() == null) {
                 res.put("isManager", true);
             } else{
                 res.put("isManager", false);
             }
-            result.setToken(token);
-            userRepository.save(result);
+            user.setToken(token);
+            userRepository.save(user);
             return res;
         }
 
     }
 
-    @PostMapping("/api/user/name")
-    public Map<String, Object> getName(@RequestBody User user) {
-        Optional<User> result = userRepository.findById(user.getId());
-        Map<String, Object> res = new HashMap<>();
-        if (result == null) {
-            res.put("action", Constant.INCORRECT);
-            return res;
-        } else {
-            res.put("action", Constant.SUCCESS);
-            res.put("name", result.get().getName());
-            return res;
-        }
-
-    }
-
-    @PostMapping("/api/user/getstaff")
-    public Map<String, Object> getAllStaff(@RequestBody User user) {
-        Optional<User> result = userRepository.findById(user.getId());
-        Map<String, Object> res = new HashMap<>();
-        if (result.isPresent()) {
-            List<User> staff = userRepository.findAllByManager(result.get());
-
-            res.put("action", Constant.SUCCESS);
-            res.put("liststaff",staff);
-            return res;
-        } else {
-            res.put("action", Constant.INCORRECT);
-            return res;
-        }
-    }
 }

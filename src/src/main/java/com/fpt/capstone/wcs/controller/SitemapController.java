@@ -33,29 +33,28 @@ public class SitemapController {
     VersionRepository versionRepository;
     @Autowired
     Authenticate authenticate;
-
-    @PostMapping("/api/sitemap")
-    public List<SiteMapOutputPOJO> getSiteMap(@RequestBody UrlPOJO url) throws MalformedURLException {
-        String urlRoot = url.getUrl();
-        System.out.println("ROOT: " + urlRoot);
-        SiteMapService sitemap = new SiteMapService(urlRoot);
-        sitemap.buildSiteMap();
-        List<String> rs = sitemap.getDecodeGraph();
-        SiteMapOutputPOJO sm = new SiteMapOutputPOJO();
-        sm.setMap(rs.get(0));
-        sm.setTypeMap(rs.get(1));
-        sm.setUrlMap(rs.get(2));
-        List<SiteMapOutputPOJO> res = new ArrayList<>();
-        res.add(sm);
-        return res;
-    }
+//
+//    @PostMapping("/api/sitemap")
+//    public List<SiteMapOutputPOJO> getSiteMap(@RequestBody UrlPOJO url) throws MalformedURLException {
+//        String urlRoot = url.getUrl();
+//        System.out.println("ROOT: " + urlRoot);
+//        SiteMapService sitemap = new SiteMapService(urlRoot);
+//        sitemap.buildSiteMap();
+//        List<String> rs = sitemap.getDecodeGraph();
+//        SiteMapOutputPOJO sm = new SiteMapOutputPOJO();
+//        sm.setMap(rs.get(0));
+//        sm.setTypeMap(rs.get(1));
+//        sm.setUrlMap(rs.get(2));
+//        List<SiteMapOutputPOJO> res = new ArrayList<>();
+//        res.add(sm);
+//        return res;
+//    }
 
     @PostMapping("/api/sitemap/getVer")
     public Map<String, Object> getLastestVer(@RequestBody RequestCommonPOJO request) {
         Map<String, Object> res = new HashMap<>();
-        Optional<User> user = userRepository.findById(request.getUserId());
-        if(user.isPresent()) {
-            Website website = websiteRepository.findOneByUserAndId(user.get(), request.getWebsiteId());
+        Website website = authenticate.isAuthGetSingleSite(request);
+        if(website!=null) {
             if (website != null) {
                 Version ver = versionRepository.findFirstByWebsiteOrderByVersionDesc(website);
                 if (ver == null) {
@@ -77,7 +76,7 @@ public class SitemapController {
             }
         } else {
             res.put("action", Constant.INCORRECT);
-            res.put("messages", "Something went wrong");
+            res.put("messages", "Auth is invalid");
             return res;
         }
     }
@@ -85,9 +84,9 @@ public class SitemapController {
     @PostMapping("/api/sitemap/makeVer")
     public Map<String, Object> makeNewVer(@RequestBody RequestCommonPOJO request) throws MalformedURLException {
         Map<String, Object> res = new HashMap<>();
-        User user = userRepository.findOneByIdAndToken(request.getUserId(),request.getUserToken());
+        User user = authenticate.isAuthGetSingleUser(request);
         if(user.getManager()==null) {
-            Website website = websiteRepository.findOneByUserAndId(user, request.getWebsiteId());
+            Website website = websiteRepository.findOneByUserAndIdAndDelFlagEquals(user, request.getWebsiteId(),false);
             //Temp version
             Version ver = versionRepository.findFirstByWebsiteOrderByVersionDesc(website);
             Version verTmp = new Version();

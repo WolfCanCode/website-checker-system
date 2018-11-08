@@ -73,7 +73,7 @@ export default class JavascriptErrorScreen extends Component {
             <div style={{ marginBottom: '10px', float: 'right' }}>
               <Input icon='search' placeholder='Search...' />
             </div>
-            <Table singleLine style={{ fontSize: '14px' }}>
+            <Table unstackable singleLine style={{ fontSize: '14px' }}>
               <Table.Header>
                 <Table.Row>
                   <Table.HeaderCell>Error Message</Table.HeaderCell>

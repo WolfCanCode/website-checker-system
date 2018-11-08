@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import 'semantic-ui-css/semantic.min.css';
-import {Segment, Button, Table, Icon, Input,Label } from 'semantic-ui-react'
+import { Segment, Button, Table, Icon, Input, Label } from 'semantic-ui-react'
 // import { Cookies } from "react-cookie";
 
 // const cookies = new Cookies();
@@ -31,12 +31,12 @@ class spellingScreen extends Component {
                                     <p style={{ fontSize: 24 }}>2 <br /> Affected Pages</p>
                                 </Segment>
                             </Segment.Group>
-                            <div style={{marginBottom : '60px', marginRight : '20px'}}>
+                            <div style={{ marginBottom: '60px', marginRight: '20px' }}>
                                 <Button floated='right' ><Icon name="print" />Export</Button>
 
                                 <Input icon='search' placeholder='Search...' style={{ float: 'right' }} />
                             </div>
-                            <Table singleLine textAlign='center' style={{ tableLayout: 'auto' }}>
+                            <Table singleLine unstackable textAlign='center' style={{ tableLayout: 'auto' }}>
                                 <Table.Header >
                                     <Table.Row>
                                         <Table.HeaderCell>Word</Table.HeaderCell>
@@ -52,7 +52,7 @@ class spellingScreen extends Component {
                                         <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>suberd</Table.Cell>
                                         <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>suburd superd subduer</Table.Cell>
                                         <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>Text</Table.Cell>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}> <Label style={{fontSize:'13px'}} >1</Label></Table.Cell>   
+                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}> <Label style={{ fontSize: '13px' }} >1</Label></Table.Cell>
                                         <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}><Button color='blue'>Learn Spelling</Button> </Table.Cell>
 
                                     </Table.Row>
@@ -60,7 +60,7 @@ class spellingScreen extends Component {
                                         <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>suberd</Table.Cell>
                                         <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>suburd superd subduer</Table.Cell>
                                         <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>Text</Table.Cell>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}> <Label style={{fontSize:'13px'}} >1</Label></Table.Cell>   
+                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}> <Label style={{ fontSize: '13px' }} >1</Label></Table.Cell>
                                         <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}><Button color='blue'>Learn Spelling</Button> </Table.Cell>
 
                                     </Table.Row>
@@ -68,7 +68,7 @@ class spellingScreen extends Component {
                                         <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>suberd</Table.Cell>
                                         <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>suburd superd subduer</Table.Cell>
                                         <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>Text</Table.Cell>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}> <Label style={{fontSize:'13px'}} >1</Label></Table.Cell>   
+                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}> <Label style={{ fontSize: '13px' }} >1</Label></Table.Cell>
                                         <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}><Button color='blue'>Learn Spelling</Button> </Table.Cell>
 
                                     </Table.Row>
@@ -76,13 +76,13 @@ class spellingScreen extends Component {
                                         <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>suberd</Table.Cell>
                                         <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>suburd superd subduer</Table.Cell>
                                         <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>Text</Table.Cell>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}> <Label style={{fontSize:'13px'}} >1</Label></Table.Cell>   
+                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}> <Label style={{ fontSize: '13px' }} >1</Label></Table.Cell>
                                         <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}><Button color='blue'>Learn Spelling</Button> </Table.Cell>
 
                                     </Table.Row>
-                            
-                                   
-                                    
+
+
+
 
                                 </Table.Body>
                             </Table>

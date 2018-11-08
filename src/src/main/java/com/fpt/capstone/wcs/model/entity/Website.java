@@ -31,6 +31,8 @@ public class Website {
     private LocalDateTime createdTime;
     @UpdateTimestamp
     private LocalDateTime modifiedTime;
+    @JsonIgnore
+    private boolean delFlag;
 
     @ManyToMany(fetch = FetchType.LAZY,
             cascade = {

@@ -35,7 +35,7 @@ public class ExperienceController {
     @PostMapping("/api/speedTest")
     public Map<String, Object> getDataSpeedTest(@RequestBody RequestCommonPOJO request) throws InterruptedException {
         Map<String, Object> res = new HashMap<>();
-        Website website = authenticate.isAuth(request);
+        Website website = authenticate.isAuthGetSingleSite(request);
         System.out.println(website.getUrl());
             if (website != null) {
                 Version version = versionRepository.findFirstByWebsiteOrderByVersionDesc(website);

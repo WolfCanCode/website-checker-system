@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Segment, Button, SegmentGroup, Input, Table, Modal } from 'semantic-ui-react'
+import { Segment, Button, SegmentGroup, Input, Table, Modal, Form } from 'semantic-ui-react'
 
 import TableRow from './row-table';
 // import logo1 from './images/mobile.png';
@@ -11,10 +11,8 @@ const cookies = new Cookies();
 export default class managewebsitescreen extends Component {
 
 
-    state = { open: false, isLoading: false, listWeb: null }
+    state = { addModal: false, isLoading: false, listWeb: null, webName: "", webUrl: "", isDisable: true, addLoading: false }
 
-    show = size => () => this.setState({ size, open: true })
-    close = () => this.setState({ open: false })
 
 
 
@@ -34,13 +32,11 @@ export default class managewebsitescreen extends Component {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ "userId": cookies.get("u_id"), "userToken": cookies.get("u_token") })
+            body: JSON.stringify({ "managerId": cookies.get("u_id"), "managerToken": cookies.get("u_token") })
         }).then(response => response.json()).then((data) => {
             if (data.action === "SUCCESS") {
                 var list = data.website.map((item, index) => {
                     return (<TableRow key={index} id={item.id} name={item.name} url={item.url} version={item.version} time={item.time} loadingTable={(isLoading) => this._loadingTable(isLoading)} refreshTable={() => this._refreshTable()} />);
-                    // { key: index, value: item.id, text: item.url };
-
                 });
                 this.setState({ listWeb: list, isLoading: false });
 
@@ -49,8 +45,48 @@ export default class managewebsitescreen extends Component {
 
     }
 
+    _onchangeName(event) {
+        this.setState({ webName: event.target.value }, () => this._checkAddBtn());
+    }
+
+    _onchangeUrl(event) {
+        this.setState({ webUrl: event.target.value }, () => this._checkAddBtn());
+    }
+
+    _checkAddBtn() {
+        var result = false;
+        if (this.state.webName === "" || this.state.webUrl === "") {
+            result = true;
+        }
+        this.setState({ isDisable: result });
+    }
+
+    _addWebsite() {
+        this.setState({ addLoading: true, isDisable: false });
+        var param = {
+            "managerId": cookies.get("u_id"), "managerToken": cookies.get("u_token"), website: {
+                "name": this.state.webName, "url": this.state.webUrl
+            }
+        };
+        fetch("/api/manager/addWebsite", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(param)
+        }).then(response => response.json()).then((data) => {
+            if (data.action === "SUCCESS") {
+                this.setState({ addLoading: false });
+                this.setState({ addModal: false });
+                this._refreshTable();
+            } if (data.action === "DUPLICATE ERROR") {
+                alert("This website is existed");
+            }
+        });
+    }
+
     render() {
-        const { open, size } = this.state
         return (
             <div>
 
@@ -59,20 +95,24 @@ export default class managewebsitescreen extends Component {
                     <Segment basic>
                         <div style={{ marginBottom: '30px' }}>
 
-                            <Button style={{ float: 'right' }} onClick={this.show('mini')}> Add </Button>
-                            <Modal size={size} open={open} onClose={this.close}>
+                            <Button style={{ float: 'right' }} onClick={() => this.setState({ addModal: true })}> Add </Button>
+                            <Modal open={this.state.addModal}>
                                 <Modal.Header>Add Website</Modal.Header>
-                                <Modal.Content >
-                                    <p >Website Name</p>
-                                </Modal.Content>
-                                <Input type="text" style={{ marginLeft: '20px', width: '90%' }} required></Input>
                                 <Modal.Content>
-                                    <p>Website URL</p>
+                                    <Form>
+                                        <Form.Field>
+                                            <label>Website name</label>
+                                            <Input type="text" placeholder="Website Name" onChange={(event) => this._onchangeName(event)} value={this.state.webName}></Input>
+                                        </Form.Field>
+                                        <Form.Field>
+                                            <label>Website URL</label>
+                                            <Input type="text" placeholder="Website URL" onChange={(event) => this._onchangeUrl(event)} value={this.state.webUrl}></Input>
+                                        </Form.Field>
+                                    </Form>
                                 </Modal.Content>
-                                <Input type="text" style={{ marginLeft: '20px', marginBottom: '20px', width: '90%' }}></Input>
                                 <Modal.Actions>
-                                    <Button onClick={this.close}>Cancel</Button>
-                                    <Button content='Done' color='blue' />
+                                    <Button onClick={() => this.setState({ addModal: false })}>Cancel</Button>
+                                    <Button content='Done' color='blue' loading={this.state.addLoading} disabled={this.state.isDisable} onClick={() => this._addWebsite()} />
                                 </Modal.Actions>
                             </Modal>
 
@@ -80,7 +120,7 @@ export default class managewebsitescreen extends Component {
                     </Segment>
                     <Segment.Group horizontal style={{ maxHeight: '63vh', overflow: "auto" }}>
                         <Segment basic loading={this.state.isLoading}>
-                            <Table singleLine>
+                            <Table singleLine unstackable>
                                 <Table.Header>
                                     <Table.Row>
                                         <Table.HeaderCell>ID</Table.HeaderCell>
@@ -94,21 +134,7 @@ export default class managewebsitescreen extends Component {
                                     </Table.Row>
                                 </Table.Header>
                                 <Table.Body>
-                                    {/* <Table.Row>
-                                   <TableCell>1</TableCell>
-                                   <TableCell>Genk </TableCell>
-                                   <TableCell>http://genk.vn/</TableCell>
-                                   <TableCell><Button> Edit </Button><Button> Delete</Button></TableCell>
-                               </Table.Row>
-
-                               <Table.Row>
-                                   <TableCell>2</TableCell>
-                                   <TableCell>Gamek </TableCell>
-                                   <TableCell>http://gamek.vn/</TableCell>
-                                   <TableCell><Button> Edit </Button><Button> Delete</Button></TableCell>
-                               </Table.Row> */}
                                     {this.state.listWeb}
-
                                 </Table.Body>
                             </Table>
                         </Segment>

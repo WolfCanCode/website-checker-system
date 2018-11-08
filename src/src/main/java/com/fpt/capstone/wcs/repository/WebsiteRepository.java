@@ -9,6 +9,8 @@ import java.util.List;
 
 @Repository
 public interface WebsiteRepository extends JpaRepository<Website,Long> {
-    List<Website> findAllByUser(User user);
-    Website findOneByUserAndId(User user, Long id);
+    List<Website> findAllByUserAndDelFlagEquals(User user, boolean isDel);
+    Website findOneByUserAndIdAndDelFlagEquals(User user, Long id, boolean isDel);
+    Website findFirstByUserAndUrlAndDelFlagEqualsOrUserAndNameAndDelFlagEquals(User manager1 , String url, boolean isDel1, User manager2, String name, boolean isDel2);
+    Website findOneByUserAndUrlAndDelFlagEquals(User user, String url, boolean isDel);
 }

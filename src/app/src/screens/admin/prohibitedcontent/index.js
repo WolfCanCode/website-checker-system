@@ -30,7 +30,7 @@ export default class ProhibitedContent extends Component {
                             <div style={{ marginBottom: '10px' }}>
                                 <Input icon='search' placeholder='Search...' />
                             </div>
-                            <Table singleLine style={{ fontSize: '14px' }}>
+                            <Table singleLine unstackable style={{ fontSize: '14px' }}>
                                 <Table.Header>
                                     <Table.Row>
                                         <Table.HeaderCell></Table.HeaderCell>
