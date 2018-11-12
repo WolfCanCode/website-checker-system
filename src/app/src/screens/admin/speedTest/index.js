@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import 'semantic-ui-css/semantic.min.css';
-import { Segment, Button, Table, Icon, Input} from 'semantic-ui-react'
+import { Segment, Button, Table, Icon, Input } from 'semantic-ui-react'
 import TableRow from './row-table';
 import { Cookies } from "react-cookie";
 
@@ -16,7 +16,12 @@ class speedTestScreen extends Component {
     componentDidMount() {
         var comp = [];
         this.setState({ loadingTable: true });
-        var param = [];
+        var param = {
+            "userId": cookies.get("u_id"),
+            "userToken": cookies.get("u_token"),
+            "websiteId": cookies.get("u_w_id"),
+            "pageOptionId": cookies.get("u_option"),
+        }
         fetch("/api/speedTest/lastest", {
             method: 'POST',
             headers: {
@@ -25,19 +30,19 @@ class speedTestScreen extends Component {
             },
             body: JSON.stringify(param)
         }).then(response => response.json()).then((data) => {
-            comp = data.map((item, index) => {
+            comp = data.speedtestReport.map((item, index) => {
                 return (<TableRow key={index} url={item.url} interactiveTime={item.interactiveTime} pageLoadTime={item.pageLoadTime} size={item.size} />);
             });
 
-            let totalInteractiveTime = data.reduce((interactiveTime, item) => {
+            let totalInteractiveTime = data.speedtestReport.reduce((interactiveTime, item) => {
                 return interactiveTime = +interactiveTime + +item.interactiveTime
             }, 0)
 
-            let totalPageLoadTime = data.reduce((pageLoadTime, item) => {
+            let totalPageLoadTime = data.speedtestReport.reduce((pageLoadTime, item) => {
                 return pageLoadTime = +pageLoadTime + +item.pageLoadTime
             }, 0)
 
-            let totalSize = data.reduce((sizePage, item) => {
+            let totalSize = data.speedtestReport.reduce((sizePage, item) => {
                 return sizePage = +sizePage + +item.size
             }, 0)
 
@@ -60,7 +65,12 @@ class speedTestScreen extends Component {
         this.setState({ loadingTable: true });
         this.setState({ isDisable: true });
         var comp = [];
-        var param = { "userId": cookies.get("u_id"), "userToken": cookies.get("u_token"), "websiteId": cookies.get("u_w_id") };
+        var param = {
+            "userId": cookies.get("u_id"),
+            "userToken": cookies.get("u_token"),
+            "websiteId": cookies.get("u_w_id"),
+            "pageOptionId": cookies.get("u_option"),
+        };
 
         fetch("/api/speedTest", {
             method: 'POST',
@@ -70,19 +80,19 @@ class speedTestScreen extends Component {
             },
             body: JSON.stringify(param)
         }).then(response => response.json()).then((data) => {
-            comp = data.list.map((item, index) => {
+            comp = data.speedtestReport.map((item, index) => {
                 return (<TableRow key={index} url={item.url} interactiveTime={item.interactiveTime} pageLoadTime={item.pageLoadTime} size={item.size} />);
             });
 
-            let totalInteractiveTime = data.reduce((interactiveTime, item) => {
+            let totalInteractiveTime = data.speedtestReport.reduce((interactiveTime, item) => {
                 return interactiveTime = +interactiveTime + +item.interactiveTime
             }, 0)
 
-            let totalPageLoadTime = data.reduce((pageLoadTime, item) => {
+            let totalPageLoadTime = data.speedtestReport.reduce((pageLoadTime, item) => {
                 return pageLoadTime = +pageLoadTime + +item.pageLoadTime
             }, 0)
 
-            let totalSize = data.reduce((sizePage, item) => {
+            let totalSize = data.speedtestReport.reduce((sizePage, item) => {
                 return sizePage = +sizePage + +item.size
             }, 0)
 
@@ -145,7 +155,7 @@ class speedTestScreen extends Component {
                                 </Table.Header>
                                 <Table.Body>
 
-                                        {this.state.list.length === 0 ? <Table.Row><Table.Cell>This page haven't test yet, please try to test</Table.Cell></Table.Row> : this.state.list}
+                                    {this.state.list.length === 0 ? <Table.Row><Table.Cell>This page haven't test yet, please try to test</Table.Cell></Table.Row> : this.state.list}
 
 
                                 </Table.Body>

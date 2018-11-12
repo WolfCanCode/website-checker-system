@@ -22,8 +22,9 @@ public class PageOption {
     @Id
     @GeneratedValue
     long id;
-    long optionNumber;
+    String name;
     Date time;
+    boolean delFlag=false;
 
     @NotNull
     @ManyToOne()

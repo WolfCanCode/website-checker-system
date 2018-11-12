@@ -202,6 +202,7 @@ public class ManagerController {
             Website tmp = websiteRepository.findOneByUserAndIdAndDelFlagEquals(manager, request.getWebsite().getId(), false);
             if (tmp != null) {
                 List<User> staff = userRepository.findAllByManagerAndDelFlagEquals(manager, false);
+
                 res.put("staffs",staff);
                 res.put("defStaffs", tmp.getUser());
                 res.put("action", Constant.SUCCESS);
@@ -222,6 +223,10 @@ public class ManagerController {
             User manager = authenticate.isAuthAndManagerGet(request);
             if (manager != null) {
                 List<User> staff = userRepository.findAllByManagerAndDelFlagEquals(manager, false);
+                for (int i = 0 ; i< staff.size(); i++)
+                {
+                    staff.get(i).setWebsite(websiteRepository.findAllByUserAndDelFlagEquals(staff.get(i),false));
+                }
                 res.put("action", Constant.SUCCESS);
                 res.put("listStaff", staff);
                 return res;

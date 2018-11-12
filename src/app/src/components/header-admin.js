@@ -30,8 +30,14 @@ class HeaderAdmin extends Component {
                         return { key: index, value: item.id, text: item.url };
 
                     });
-                    this.setState({ listWeb: list, valWebpage: list[0].value, account_name: data.fullname });
-                    this.props.changeWebsite(list[0].value);
+                    this.setState({ listWeb: list, account_name: data.fullname }, () => {
+                        for (let i = 0; i < list.length; i++) {
+                            // eslint-disable-next-line
+                            if (list[i].value === parseInt(cookies.get('u_w_id'), 10)) {
+                                this.setState({ valWebpage: list[i].value, })
+                            }
+                        }
+                    });
                 } else {
                     this._doLogout();
                 }

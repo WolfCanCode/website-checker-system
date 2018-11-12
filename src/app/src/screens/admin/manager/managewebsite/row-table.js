@@ -6,7 +6,7 @@ const cookies = new Cookies();
 
 export default class TableRow extends Component {
     state = {
-        open: false, open1: false, oldWebName: this.props.name, webName: this.props.name, isDisable: true, editLoading: false, options: [], userAssign: [], defValue: []
+        open: false, open1: false, oldWebName: this.props.name, webName: this.props.name, isDisable: true, editLoading: false, options: [], userAssign: [], defValue: [], loadingDelete: false
     }
     constructor(props) {
         super(props);
@@ -58,14 +58,15 @@ export default class TableRow extends Component {
             if (data.action === "SUCCESS") {
                 this.setState({ editLoading: false });
                 this.setState({ open: false });
-                this._refreshTable();
+                this.props.refreshTable();
             } if (data.action === "DUPLICATE ERROR") {
                 alert("This website is existed");
             }
         });
     }
 
-    _deleteWebsite(id) {
+    _deleteWebsite() {
+        this.setState({ loadingDelete: true });
         var param = {
             "managerId": cookies.get("u_id"), "managerToken": cookies.get("u_token"), website: {
                 "id": this.props.id
@@ -80,8 +81,8 @@ export default class TableRow extends Component {
             body: JSON.stringify(param)
         }).then(response => response.json()).then((data) => {
             if (data.action === "SUCCESS") {
-                this.setState({ open1: false });
-                this._refreshTable();
+                this.setState({ open1: false, close1: true, loadingDelete: true });
+                this.props.refreshTable();
             }
         });
     }
@@ -173,7 +174,7 @@ export default class TableRow extends Component {
         })
         return (<Table.Row>
             {/* Delete */}
-            <Transition duration={600} divided size='huge' verticalAlign='middle' visible={open}>
+            <Transition duration={600} divided size='huge' verticalAlign='middle' visible={open1}>
                 <Modal
                     open={open1}
                     closeOnEscape={closeOnEscape}
@@ -186,7 +187,8 @@ export default class TableRow extends Component {
                     </Modal.Content>
                     <Modal.Actions>
                         <Button onClick={this.close1}>No</Button>
-                        <Button color="blue" content='Yes' />
+                        <Button color="blue" content='Yes' onClick={() => this._deleteWebsite()} loading={this.state.loadingDelete}
+                        />
                     </Modal.Actions>
                 </Modal>
             </Transition>

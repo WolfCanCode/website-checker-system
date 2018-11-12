@@ -1,6 +1,7 @@
 package com.fpt.capstone.wcs.service;
 
 import com.fpt.capstone.wcs.model.entity.Page;
+import com.fpt.capstone.wcs.model.entity.PageOption;
 import com.fpt.capstone.wcs.model.entity.SpeedTestReport;
 import com.fpt.capstone.wcs.model.pojo.UrlPOJO;
 import com.fpt.capstone.wcs.utils.MathUtil;
@@ -27,7 +28,7 @@ import java.util.regex.Pattern;
 
 public class ExperienceService {
 
-    public List<SpeedTestReport> speedTestService(List<Page> list) throws InterruptedException {
+    public List<SpeedTestReport> speedTestService(List<Page> list, PageOption option) throws InterruptedException {
         System.setProperty("webdriver.chrome.driver", "C:\\Users\\ngoct\\Downloads\\chromedriver_win32\\chromedriver.exe");
         //Asign list speed info
         List<SpeedTestReport> resultList = new ArrayList<>();
@@ -80,7 +81,7 @@ public class ExperienceService {
                             double interactTime1 = Math.floor(interactTime / 1000 * 10) / 10;
                             double sizeTransferred1 = Math.floor(totalByte / 1000000 * 10) / 10;
                             SpeedTestReport speedTestReport = new SpeedTestReport(p.getUrl(), interactTime1 + "", loadTime1 + "", sizeTransferred1 + "");
-//                            speedTestReport.setPageOption(p);
+                            speedTestReport.setPageOption(option);
                             resultList.add(speedTestReport);
                             driver.quit();
                         } catch (InterruptedException | BrokenBarrierException e) {
@@ -90,8 +91,6 @@ public class ExperienceService {
                 });
             }
         }
-        int flag = 1;
-        while (flag < listThread.size()) {
             for (Thread t : listThread) {
                 System.out.println("Threed start");
                 t.start();
@@ -101,7 +100,7 @@ public class ExperienceService {
                 System.out.println("Threed join");
                 t.join();
             }
-        }
+
         return resultList;
     }
 }

@@ -36,53 +36,58 @@ public class ExperienceController {
     public Map<String, Object> getDataSpeedTest(@RequestBody RequestCommonPOJO request) throws InterruptedException {
         Map<String, Object> res = new HashMap<>();
         Website website = authenticate.isAuthGetSingleSite(request);
-        System.out.println(website.getUrl());
-            if (website != null) {
-                Version version = versionRepository.findFirstByWebsiteOrderByVersionDesc(website);
-                PageOption pageOption = pageOptionRepository.findFirstByWebsiteOrderByTimeDesc(website);
-                if (pageOption == null) {
-                    PageOption tmp = new PageOption();
-                    tmp.setOptionNumber(1);
-                   tmp.setTime(new Date());
-                   tmp.setWebsite(website);
-                   pageOptionRepository.save(tmp);
-                   pageOption = pageOptionRepository.findFirstByWebsite(website);
-                   List<Page> pages = pageRepository.findAllByWebsiteAndVersionAndTypeEquals(website, version,1);
-                    for (int i = 0; i < pages.size(); i++) {
-                       Page pageTmp = pages.get(i);
-                       List<PageOption> listOption = new ArrayList<>();
-                       listOption.add(pageOption);
-                       pageTmp.setPageOptions(listOption);
-                       pages.set(i, pageTmp);
-                    }
-                   ExperienceService exp = new ExperienceService();
-                 List<SpeedTestReport> resultList = exp.speedTestService(pages);
-                    speedtestRepository.saveAll(resultList);
-                    res.put("action", Constant.SUCCESS);
-                    res.put("speedtestReport", resultList);
-                   res.put("action", Constant.SUCCESS);
-                    res.put("speedtestReport", resultList);
-                   return res;
-               } else {
-                   List<Page> pages = pageRepository.findAllByWebsiteAndVersionAndPageOptions(website, version, pageOption);
-                    ExperienceService exp = new ExperienceService();
-                    List<SpeedTestReport> resultList = exp.speedTestService(pages);
-                   speedtestRepository.saveAll(resultList);
-                    res.put("action", Constant.SUCCESS);
-                    res.put("test", website);
-                    res.put("speedtestReport", resultList);
-                    return res;
-               }
-            } else {
-                res.put("action", Constant.INCORRECT);
+        if (website != null) {
+            if(request.getPageOptionId()!=-1) { //page option list is null
+                PageOption pageOption = pageOptionRepository.findOneByIdAndWebsiteAndDelFlagEquals(request.getPageOptionId(), website, false);
+                List<Page> pages = pageOption.getPages();
+                ExperienceService exp = new ExperienceService();
+                List<SpeedTestReport> resultList = exp.speedTestService(pages, pageOption);
+                speedtestRepository.removeAllByPageOption(pageOption);
+                speedtestRepository.saveAll(resultList);
+                res.put("action", Constant.SUCCESS);
+                res.put("speedtestReport", resultList);
                 return res;
-           }
+            }
+            else {
+                List<Page> pages = new ArrayList<>();
+                Page page = new Page();
+                page.setUrl(website.getUrl());
+                page.setType(1);
+                pages.add(page);
+                ExperienceService exp = new ExperienceService();
+                List<SpeedTestReport> resultList = exp.speedTestService(pages, null);
+                speedtestRepository.saveAll(resultList);
+                res.put("action", Constant.SUCCESS);
+                res.put("speedtestReport", resultList);
+                return res;
+            }
+        } else {
+            res.put("action", Constant.INCORRECT);
+            return res;
+        }
     }
 
     @PostMapping("/api/speedTest/lastest")
-    public List<SpeedTestReport> getLastestSpeedTest() {
-        List<SpeedTestReport> resultList = speedtestRepository.findAll();
-        return resultList;
+    public Map<String, Object> getLastestSpeedTest(@RequestBody RequestCommonPOJO request) {
+        Map<String, Object> res = new HashMap<>();
+        Website website = authenticate.isAuthGetSingleSite(request);
+        if (website != null) {
+            if(request.getPageOptionId()!=-1) {
+                PageOption pageOption = pageOptionRepository.findOneByIdAndWebsiteAndDelFlagEquals(request.getPageOptionId(), website, false);
+                List<SpeedTestReport> resultList = speedtestRepository.findAllByPageOption(pageOption);
+                res.put("speedtestReport", resultList);
+                res.put("action", Constant.SUCCESS);
+                return res;
+            } else {
+                List<SpeedTestReport> resultList = speedtestRepository.findAllByPageOption(null);
+                res.put("speedtestReport", resultList);
+                res.put("action", Constant.SUCCESS);
+                return res;
+            }
+        } else {
+            res.put("action", Constant.INCORRECT);
+            return res;
+        }
     }
 
     @GetMapping("/api/speedTest/isExist")

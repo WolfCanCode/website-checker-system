@@ -35,7 +35,6 @@ public class Authenticate {
     }
 
     public List<Website> isAuthGetListSite(RequestCommonPOJO request) {
-
         User user = userRepository.findOneByIdAndTokenAndDelFlagEquals(request.getUserId(),request.getUserToken(),false);
         if (user!=null) {
             List<Website> website = websiteRepository.findAllByUserAndDelFlagEquals(user,false);
@@ -62,6 +61,4 @@ public class Authenticate {
             return null;
         }
     }
-
-
 }

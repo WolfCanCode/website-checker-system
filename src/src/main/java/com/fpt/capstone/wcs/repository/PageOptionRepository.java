@@ -10,8 +10,9 @@ import java.util.List;
 
 @Repository
 public interface PageOptionRepository extends JpaRepository<PageOption,Long> {
-    PageOption findFirstByWebsiteOrderByTimeDesc(Website website);
-    PageOption findFirstByWebsite(Website website);
-    PageOption findByPages(List<Page> pages);
-    PageOption findAllByWebsite(Website website);
+    PageOption findFirstByWebsiteAndDelFlagEqualsOrderByTimeDesc(Website website, boolean delFlag);
+    PageOption findFirstByWebsiteAndDelFlagEquals(Website website, boolean delFlag);
+    PageOption findByPagesAndDelFlagEquals(List<Page> pages, boolean delFlag);
+    List<PageOption> findAllByWebsiteAndDelFlagEqualsOrderByTimeDesc(Website website, boolean delFlag);
+    PageOption findOneByIdAndWebsiteAndDelFlagEquals(Long id, Website website, boolean delFlag);
 }
