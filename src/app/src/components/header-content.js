@@ -521,7 +521,7 @@ export default class HeaderContent extends Component {
         this.setState({ activeItem: item.id, isLoading: true })
         this._selectPageOption(item.id);
         if (!this._delayedClick) {
-            this._delayedClick = _.debounce(this.doClick, 100);
+            this._delayedClick = _.debounce(this.doClick, 200);
         }
         if (this.clickedOnce) {
             this._delayedClick.cancel();
@@ -572,7 +572,7 @@ export default class HeaderContent extends Component {
                         <Modal.Content style={{ margin: 0, padding: 0, border: 0 }}>
                             <Segment.Group vertical="true" style={{ margin: 0, padding: 0, border: 0 }}>
 
-                                <Segment basic style={{ margin: 0, padding: 0, border: 0 }} loading={this.state.isLoading}>
+                                <Segment basic style={{ margin: 0, padding: 0, border: 0 }} >
 
                                     {/* Edit page option */}
                                     <Transition animation="scale" duration={500} divided size='huge' verticalAlign='middle' visible={this.state.editPageOption}>
