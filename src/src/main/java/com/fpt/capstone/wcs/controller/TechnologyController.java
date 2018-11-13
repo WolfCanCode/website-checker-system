@@ -31,8 +31,7 @@ public class TechnologyController {
 //    MissingFilesPagesRepository missingFilesPagesRepository;
     @Autowired
     CookieRepository cookieRepository;
-    @Autowired
-    CookieDataRepository cookieDataRepository ;
+
 
     @Autowired
     FaviconRepository faviconRepository;
