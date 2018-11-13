@@ -11,5 +11,6 @@ import java.util.List;
 @Repository
 public interface SpeedtestRepository extends JpaRepository<SpeedTestReport,Long> {
     List<SpeedTestReport> findAllByPageOption(PageOption pageOption);
+    List<SpeedTestReport> findAllByPageOptionAndUrl(PageOption pageOption, String url);
     void removeAllByPageOption(PageOption pageOption);
 }

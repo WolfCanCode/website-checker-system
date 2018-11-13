@@ -495,12 +495,13 @@ export default class HeaderContent extends Component {
         });
     }
 
-    /* proceed dbclick */
+    /* proceed */
     _proceedPageOption() {
         this.setState({ openPageOption: false });
-        cookies.set("u_option", this.state.activeItem, { path: '/' });
-        if (this.state.pageOptionsList.length === 0) {
+        if (this.state.pageOptionsList.length === 0 || isNaN(this.state.activeItem)) {
             cookies.set('u_option', -1, { path: '/' });
+        } else {
+            cookies.set("u_option", this.state.activeItem, { path: '/' });
         }
         window.location.reload();
     }
@@ -554,60 +555,64 @@ export default class HeaderContent extends Component {
                             onClick={() => this._onOpenPageOptionMode()}
                         />
                     </Segment> : ""}
-                <Transition duration={600} divided size='huge' verticalAlign='middle' visible={this.state.openPageOption}>
+                <Transition animation="scale" duration={500} divided size='huge' verticalAlign='middle' visible={this.state.openPageOption}>
                     <Modal open={this.state.openPageOption} dimmer="blurring" onClose={() => this.setState({ openPageOption: false })} >
                         <Modal.Header>Page Option - <Label color='grey'>{this.state.websiteName}</Label></Modal.Header>
                         <Modal.Content style={{ margin: 0, padding: 0, border: 0 }}>
                             <Segment.Group vertical="true" style={{ margin: 0, padding: 0, border: 0 }}>
 
                                 <Segment basic style={{ margin: 0, padding: 0, border: 0 }} loading={this.state.isLoading}>
+                                    
                                     {/* Edit page option */}
-                                    <Modal
-                                        open={this.state.editPageOption}
-                                        dimmer="blurring"
-                                        size="tiny"
-                                        onClose={() => this.setState({ editPageOption: false })}
-                                        style={{ width: 265 }}>
-                                        <Modal.Header>Edit name</Modal.Header>
-                                        <Modal.Content >
-                                            <Modal.Description>
-                                                <Input type='text' value={this.state.editPOName} onChange={(event) => this._changeEditPOName(event)} style={{ width: '100%' }}></Input>
+                                    <Transition animation="scale" duration={500} divided size='huge' verticalAlign='middle' visible={this.state.editPageOption}>
+                                        <Modal
+                                            open={this.state.editPageOption}
+                                            dimmer="blurring"
+                                            size="tiny"
+                                            onClose={() => this.setState({ editPageOption: false })}
+                                            style={{ width: 265 }}>
+                                            <Modal.Header>Edit name</Modal.Header>
+                                            <Modal.Content >
+                                                <Modal.Description>
+                                                    <Input type='text' value={this.state.editPOName} onChange={(event) => this._changeEditPOName(event)} style={{ width: '100%' }}></Input>
 
-                                            </Modal.Description>
+                                                </Modal.Description>
 
-                                        </Modal.Content>
-                                        <Modal.Actions>
-                                            <Button primary onClick={() => this._editPageOption()}>
-                                                Apply <Icon name='right chevron' />
-                                            </Button>
-                                            <Button negative onClick={() => this._deletePageOption()}>
-                                                Delete <Icon name='right chevron' />
-                                            </Button>
-                                        </Modal.Actions>
-                                    </Modal>
+                                            </Modal.Content>
+                                            <Modal.Actions>
+                                                <Button primary onClick={() => this._editPageOption()}>
+                                                    Apply <Icon name='right chevron' />
+                                                </Button>
+                                                <Button negative onClick={() => this._deletePageOption()}>
+                                                    Delete <Icon name='right chevron' />
+                                                </Button>
+                                            </Modal.Actions>
+                                        </Modal>
+                                    </Transition>
 
                                     {/* Add page option */}
-                                    <Modal
-                                        open={this.state.addPageOption}
-                                        dimmer="blurring"
-                                        size="tiny"
-                                        onClose={() => this.setState({ addPageOption: false })}
-                                        style={{ width: 225 }}>
-                                        <Modal.Header>Add Page Option</Modal.Header>
-                                        <Modal.Content >
-                                            <Modal.Description>
-                                                <Input type='text' value={this.state.addPOName} onChange={(event) => this._changeAddPOName(event)}></Input>
+                                    <Transition animation="scale" duration={500} divided size='huge' verticalAlign='middle' visible={this.state.addPageOption}>
+                                        <Modal
+                                            open={this.state.addPageOption}
+                                            dimmer="blurring"
+                                            size="tiny"
+                                            onClose={() => this.setState({ addPageOption: false })}
+                                            style={{ width: 225 }}>
+                                            <Modal.Header>Add Page Option</Modal.Header>
+                                            <Modal.Content >
+                                                <Modal.Description>
+                                                    <Input type='text' value={this.state.addPOName} onChange={(event) => this._changeAddPOName(event)}></Input>
 
-                                            </Modal.Description>
+                                                </Modal.Description>
 
-                                        </Modal.Content>
-                                        <Modal.Actions>
-                                            <Button primary onClick={() => this._addPageOption()}>
-                                                Apply <Icon name='right chevron' />
-                                            </Button>
-                                        </Modal.Actions>
-                                    </Modal>
-
+                                            </Modal.Content>
+                                            <Modal.Actions>
+                                                <Button primary onClick={() => this._addPageOption()}>
+                                                    Apply <Icon name='right chevron' />
+                                                </Button>
+                                            </Modal.Actions>
+                                        </Modal>
+                                    </Transition>
                                     <Menu secondary style={{ background: '#F5F5F5', margin: '0vw' }}>
                                         <Menu.Item name='Add' as={Button} onClick={() => this.setState({ addPageOption: true })}>
                                             <Icon name='plus' circular color='green' inverted style={{ margin: 0, fontSize: 18 }} />
@@ -636,6 +641,7 @@ export default class HeaderContent extends Component {
                             </Button>
                         </Modal.Actions>
                     </Modal>
+
                 </Transition>
 
             </Segment >

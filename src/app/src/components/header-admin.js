@@ -31,11 +31,16 @@ class HeaderAdmin extends Component {
 
                     });
                     this.setState({ listWeb: list, account_name: data.fullname }, () => {
-                        for (let i = 0; i < list.length; i++) {
-                            // eslint-disable-next-line
-                            if (list[i].value === parseInt(cookies.get('u_w_id'), 10)) {
-                                this.setState({ valWebpage: list[i].value, })
+                        if (cookies.get('u_w_id') !== null && cookies.get('u_w_id') !== undefined) {
+                            for (let i = 0; i < list.length; i++) {
+                                // eslint-disable-next-line
+                                if (list[i].value === parseInt(cookies.get('u_w_id'), 10)) {
+                                    this.setState({ valWebpage: list[i].value, });
+                                }
                             }
+                        } else {
+                            cookies.set('u_w_id', list[0].value, { path: '/' });
+                            this.setState({ valWebpage: list[0].value, });
                         }
                     });
                 } else {

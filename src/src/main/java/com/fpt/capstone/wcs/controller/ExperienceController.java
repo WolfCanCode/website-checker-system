@@ -37,8 +37,11 @@ public class ExperienceController {
         Map<String, Object> res = new HashMap<>();
         Website website = authenticate.isAuthGetSingleSite(request);
         if (website != null) {
+            PageOption pageOption = pageOptionRepository.findOneByIdAndWebsiteAndDelFlagEquals(request.getPageOptionId(), website, false);
+            if(pageOption==null){
+                request.setPageOptionId((long)-1);
+            }
             if(request.getPageOptionId()!=-1) { //page option list is null
-                PageOption pageOption = pageOptionRepository.findOneByIdAndWebsiteAndDelFlagEquals(request.getPageOptionId(), website, false);
                 List<Page> pages = pageOption.getPages();
                 ExperienceService exp = new ExperienceService();
                 List<SpeedTestReport> resultList = exp.speedTestService(pages, pageOption);
@@ -72,14 +75,17 @@ public class ExperienceController {
         Map<String, Object> res = new HashMap<>();
         Website website = authenticate.isAuthGetSingleSite(request);
         if (website != null) {
+            PageOption pageOption = pageOptionRepository.findOneByIdAndWebsiteAndDelFlagEquals(request.getPageOptionId(), website, false);
+            if(pageOption==null){
+                request.setPageOptionId((long)-1);
+            }
             if(request.getPageOptionId()!=-1) {
-                PageOption pageOption = pageOptionRepository.findOneByIdAndWebsiteAndDelFlagEquals(request.getPageOptionId(), website, false);
                 List<SpeedTestReport> resultList = speedtestRepository.findAllByPageOption(pageOption);
                 res.put("speedtestReport", resultList);
                 res.put("action", Constant.SUCCESS);
                 return res;
             } else {
-                List<SpeedTestReport> resultList = speedtestRepository.findAllByPageOption(null);
+                List<SpeedTestReport> resultList = speedtestRepository.findAllByPageOptionAndUrl(null, website.getUrl());
                 res.put("speedtestReport", resultList);
                 res.put("action", Constant.SUCCESS);
                 return res;
