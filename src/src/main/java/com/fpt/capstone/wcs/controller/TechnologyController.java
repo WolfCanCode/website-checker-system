@@ -1,19 +1,24 @@
 package com.fpt.capstone.wcs.controller;
 
-import com.fpt.capstone.wcs.model.entity.CookieReport;
-import com.fpt.capstone.wcs.model.entity.FaviconReport;
-import com.fpt.capstone.wcs.model.entity.JavascriptReport;
-import com.fpt.capstone.wcs.model.entity.ServerBehaviorReport;
+import com.fpt.capstone.wcs.model.entity.*;
+import com.fpt.capstone.wcs.model.pojo.RequestCommonPOJO;
 import com.fpt.capstone.wcs.model.pojo.UrlPOJO;
 import com.fpt.capstone.wcs.repository.*;
 import com.fpt.capstone.wcs.service.TechnologyService;
+import com.fpt.capstone.wcs.utils.Authenticate;
+import com.fpt.capstone.wcs.utils.Constant;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.transaction.Transactional;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,9 +31,20 @@ public class TechnologyController {
 //    MissingFilesPagesRepository missingFilesPagesRepository;
     @Autowired
     CookieRepository cookieRepository;
+    @Autowired
+    CookieDataRepository cookieDataRepository ;
 
     @Autowired
     FaviconRepository faviconRepository;
+
+    @Autowired
+    PageRepository pageRepository;
+    @Autowired
+    VersionRepository versionRepository;
+    @Autowired
+    PageOptionRepository pageOptionRepository;
+    @Autowired
+    Authenticate authenticate;
 
     @PostMapping("/api/jsTest")
     public List<JavascriptReport> getDataPagesTest(@RequestBody UrlPOJO[] list) throws InterruptedException {
@@ -63,21 +79,85 @@ public class TechnologyController {
 
 
 
+
+
+    @Transactional
     @PostMapping("/api/cookie")
-    public List<CookieReport> getCookies(@RequestBody UrlPOJO[] list) throws InterruptedException {
-        TechnologyService technologyService = new TechnologyService();
-        List<CookieReport> resultList = technologyService.cookieService(list);
-        cookieRepository.deleteAll();
-        cookieRepository.saveAll(resultList);
-        return resultList;
+    public Map<String, Object> getCookies(@RequestBody RequestCommonPOJO request) throws InterruptedException {
+        Map<String, Object> res = new HashMap<>();
+        Website website = authenticate.isAuthGetSingleSite(request);
+        if (website != null) {
+            PageOption pageOption = pageOptionRepository.findOneByIdAndWebsiteAndDelFlagEquals(request.getPageOptionId(), website, false);
+            if(pageOption==null){
+                request.setPageOptionId((long)-1);
+            }
+
+
+
+            if(request.getPageOptionId()!=-1) { //page option list is null
+                List<Page> pages = pageOption.getPages();
+                TechnologyService technologyService = new TechnologyService();
+                List<CookieReport> resultList = technologyService.cookieService(pages, pageOption);
+                cookieRepository.removeAllByPageOption(pageOption);
+                cookieRepository.saveAll(resultList);
+                res.put("action", Constant.SUCCESS);
+                res.put("cookieReport", resultList);
+                return res;
+            }
+            else {
+                List<Page> pages = new ArrayList<>();
+                Page page = new Page();
+                page.setUrl(website.getUrl());
+                page.setType(1);
+                pages.add(page);
+                TechnologyService technologyService = new TechnologyService();
+                List<CookieReport> resultList = technologyService.cookieService(pages, null);
+                cookieRepository.saveAll(resultList);
+                res.put("action", Constant.SUCCESS);
+                res.put("cookieReport", resultList);
+                return res;
+            }
+        } else {
+            res.put("action", Constant.INCORRECT);
+            return res;
+        }
     }
 
     @PostMapping("/api/cookie/lastest")
-    public List<CookieReport> getLastestCookies()
+    public Map<String, Object> getLastestCookies(@RequestBody RequestCommonPOJO request)
     {
-        List<CookieReport> resultList = cookieRepository.findAll();
-        return resultList;
+        Map<String, Object> res = new HashMap<>();
+        Website website = authenticate.isAuthGetSingleSite(request);
+        if (website != null) {
+            PageOption pageOption = pageOptionRepository.findOneByIdAndWebsiteAndDelFlagEquals(request.getPageOptionId(), website, false);
+            if(pageOption==null){
+                request.setPageOptionId((long)-1);
+            }
+
+            if(request.getPageOptionId()!=-1) {
+
+                List<CookieReport> resultList = cookieRepository.findAllByPageOption(pageOption);
+                res.put("cookieReport", resultList);
+                res.put("action", Constant.SUCCESS);
+                return res;
+            } else {
+                List<CookieReport> resultList = cookieRepository.findAllByPageOption(null);
+                res.put("cookieReport", resultList);
+                res.put("action", Constant.SUCCESS);
+                return res;
+            }
+        } else {
+            res.put("action", Constant.INCORRECT);
+            return res;
+        }
     }
+
+    @GetMapping("/api/cookie/isExist")
+    public boolean checkAlreadyCookieCheck() {
+        boolean success = cookieRepository.findAll().isEmpty();
+        return success;
+    }
+
     @PostMapping("/api/favicontest")
     public List<FaviconReport> getDataFaviconTest(@RequestBody UrlPOJO[] list) throws InterruptedException {
         TechnologyService technologyService = new TechnologyService();

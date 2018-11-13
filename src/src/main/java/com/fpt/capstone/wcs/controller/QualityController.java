@@ -1,22 +1,26 @@
 package com.fpt.capstone.wcs.controller;
 
+import com.fpt.capstone.wcs.model.entity.*;
 import com.fpt.capstone.wcs.model.pojo.MissingFilePOJO;
-import com.fpt.capstone.wcs.model.entity.BrokenLinkReport;
-import com.fpt.capstone.wcs.model.entity.BrokenPageReport;
+import com.fpt.capstone.wcs.model.pojo.RequestCommonPOJO;
 import com.fpt.capstone.wcs.model.pojo.UrlPOJO;
-import com.fpt.capstone.wcs.model.entity.MissingFileReport;
-import com.fpt.capstone.wcs.repository.BrokenLinkRepository;
-import com.fpt.capstone.wcs.repository.BrokenPageRepository;
-import com.fpt.capstone.wcs.repository.MissingFilesPagesRepository;
+import com.fpt.capstone.wcs.repository.*;
+import com.fpt.capstone.wcs.service.ExperienceService;
 import com.fpt.capstone.wcs.service.QualityService;
 
+import com.fpt.capstone.wcs.utils.Authenticate;
+import com.fpt.capstone.wcs.utils.Constant;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.transaction.Transactional;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,40 +31,171 @@ public class QualityController {
     BrokenPageRepository brokenPageRepository;
     @Autowired
     BrokenLinkRepository brokenLinkRepository;
+    @Autowired
+    PageRepository pageRepository;
+    @Autowired
+    VersionRepository versionRepository;
+    @Autowired
+    PageOptionRepository pageOptionRepository;
 
     @Autowired
     MissingFilesPagesRepository missingFilesPagesRepository;
 
+    @Autowired
+    Authenticate authenticate;
+    @Transactional
     @PostMapping("/api/brokenLink")
-    public List<BrokenLinkReport> getDataBrokenLink(@RequestBody UrlPOJO[] list) throws InterruptedException {
-        QualityService qlt = new QualityService();
-        List<BrokenLinkReport> resultList = qlt.brokenLinkService(list);
-        brokenLinkRepository.deleteAll();
-        brokenLinkRepository.saveAll(resultList);
-        return resultList;
+    public Map<String, Object> getDataBrokenLink(@RequestBody RequestCommonPOJO request) throws InterruptedException {
+        Map<String, Object> res = new HashMap<>();
+        Website website = authenticate.isAuthGetSingleSite(request);
+        if (website != null) {
+            PageOption pageOption = pageOptionRepository.findOneByIdAndWebsiteAndDelFlagEquals(request.getPageOptionId(), website, false);
+            if(pageOption==null){
+                request.setPageOptionId((long)-1);
+            }
+
+
+
+            if(request.getPageOptionId()!=-1) { //page option list is null
+                List<Page> pages = pageOption.getPages();
+                QualityService qlt = new QualityService();
+                List<BrokenLinkReport> resultList = qlt.brokenLinkService(pages, pageOption);
+                brokenLinkRepository.removeAllByPageOption(pageOption);
+                brokenLinkRepository.saveAll(resultList);
+                res.put("action", Constant.SUCCESS);
+                res.put("brokenLinkReport", resultList);
+                return res;
+            }
+            else {
+                List<Page> pages = new ArrayList<>();
+                Page page = new Page();
+                page.setUrl(website.getUrl());
+                page.setType(1);
+                pages.add(page);
+                QualityService qlt = new QualityService();
+                List<BrokenLinkReport> resultList = qlt.brokenLinkService(pages, null);
+                brokenLinkRepository.saveAll(resultList);
+                res.put("action", Constant.SUCCESS);
+                res.put("brokenLinkReport", resultList);
+                return res;
+            }
+        } else {
+            res.put("action", Constant.INCORRECT);
+            return res;
+        }
+
+
+
     }
 
     @PostMapping("/api/brokenLink/lastest")
-    public List<BrokenLinkReport> getLastestBrokenLink()
-    {
-        List<BrokenLinkReport> resultList = brokenLinkRepository.findAll();
-        return resultList;
+    public Map<String, Object> getLastestBrokenLink(@RequestBody RequestCommonPOJO request) {
+        Map<String, Object> res = new HashMap<>();
+        Website website = authenticate.isAuthGetSingleSite(request);
+        if (website != null) {
+            PageOption pageOption = pageOptionRepository.findOneByIdAndWebsiteAndDelFlagEquals(request.getPageOptionId(), website, false);
+            if(pageOption==null){
+                request.setPageOptionId((long)-1);
+            }
+
+            if(request.getPageOptionId()!=-1) {
+
+                List<BrokenLinkReport> resultList = brokenLinkRepository.findAllByPageOption(pageOption);
+                res.put("brokenLinkReport", resultList);
+                res.put("action", Constant.SUCCESS);
+                return res;
+            } else {
+                List<BrokenLinkReport> resultList = brokenLinkRepository.findAllByPageOption(null);
+                res.put("brokenLinkReport", resultList);
+                res.put("action", Constant.SUCCESS);
+                return res;
+            }
+        } else {
+            res.put("action", Constant.INCORRECT);
+            return res;
+        }
     }
 
+    @GetMapping("/api/brokenLink/isExist")
+    public boolean checkAlreadyBrokenLinkCheck() {
+        boolean success = brokenLinkRepository.findAll().isEmpty();
+        return success;
+    }
+    @Transactional
     @PostMapping("/api/brokenPage")
-    public List<BrokenPageReport> getDataBrokenPage(@RequestBody UrlPOJO[] list) throws InterruptedException {
-        QualityService qlt = new QualityService();
-        List<BrokenPageReport> resultList = qlt.brokenPageService(list);
-        brokenPageRepository.deleteAll();
-        brokenPageRepository.saveAll(resultList);
-        return resultList;
+    public Map<String, Object> getDataBrokenPage(@RequestBody RequestCommonPOJO request) throws InterruptedException {
+        Map<String, Object> res = new HashMap<>();
+        Website website = authenticate.isAuthGetSingleSite(request);
+        if (website != null) {
+            PageOption pageOption = pageOptionRepository.findOneByIdAndWebsiteAndDelFlagEquals(request.getPageOptionId(), website, false);
+            if(pageOption==null){
+                request.setPageOptionId((long)-1);
+            }
+
+
+
+            if(request.getPageOptionId()!=-1) { //page option list is null
+                List<Page> pages = pageOption.getPages();
+                QualityService qlt = new QualityService();
+                List<BrokenPageReport> resultList = qlt.brokenPageService(pages, pageOption);
+                brokenPageRepository.removeAllByPageOption(pageOption);
+                brokenPageRepository.saveAll(resultList);
+                res.put("action", Constant.SUCCESS);
+                res.put("brokenPageReport", resultList);
+                return res;
+            }
+            else {
+                List<Page> pages = new ArrayList<>();
+                Page page = new Page();
+                page.setUrl(website.getUrl());
+                page.setType(1);
+                pages.add(page);
+                QualityService qlt = new QualityService();
+                List<BrokenPageReport> resultList = qlt.brokenPageService(pages, null);
+                brokenPageRepository.saveAll(resultList);
+                res.put("action", Constant.SUCCESS);
+                res.put("brokenPageReport", resultList);
+                return res;
+            }
+        } else {
+            res.put("action", Constant.INCORRECT);
+            return res;
+        }
     }
 
     @PostMapping("/api/brokenPage/lastest")
-    public List<BrokenPageReport> getLastestBrokenPage()
+    public Map<String, Object> getLastestBrokenPage(@RequestBody RequestCommonPOJO request)
     {
-        List<BrokenPageReport> resultList = brokenPageRepository.findAll();
-        return resultList;
+        Map<String, Object> res = new HashMap<>();
+        Website website = authenticate.isAuthGetSingleSite(request);
+        if (website != null) {
+            PageOption pageOption = pageOptionRepository.findOneByIdAndWebsiteAndDelFlagEquals(request.getPageOptionId(), website, false);
+            if(pageOption==null){
+                request.setPageOptionId((long)-1);
+            }
+
+            if(request.getPageOptionId()!=-1) {
+
+                List<BrokenPageReport> resultList = brokenPageRepository.findAllByPageOption(pageOption);
+                res.put("brokenPageReport", resultList);
+                res.put("action", Constant.SUCCESS);
+                return res;
+            } else {
+                List<BrokenPageReport> resultList = brokenPageRepository.findAllByPageOption(null);
+                res.put("brokenPageReport", resultList);
+                res.put("action", Constant.SUCCESS);
+                return res;
+            }
+        } else {
+            res.put("action", Constant.INCORRECT);
+            return res;
+        }
+    }
+
+    @GetMapping("/api/brokenPage/isExist")
+    public boolean checkAlreadyBrokenPageCheck() {
+        boolean success = brokenPageRepository.findAll().isEmpty();
+        return success;
     }
 
     @PostMapping("/api/missingtest")

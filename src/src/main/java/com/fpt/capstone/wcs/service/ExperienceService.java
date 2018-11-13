@@ -29,7 +29,7 @@ import java.util.regex.Pattern;
 public class ExperienceService {
 
     public List<SpeedTestReport> speedTestService(List<Page> list, PageOption option) throws InterruptedException {
-        System.setProperty("webdriver.chrome.driver", "C:\\Users\\ngoct\\Downloads\\chromedriver_win32\\chromedriver.exe");
+        System.setProperty("webdriver.chrome.driver", "C:\\Users\\trinhndse62136\\Downloads\\chromedriver_win32\\chromedriver.exe");
         //Asign list speed info
         List<SpeedTestReport> resultList = new ArrayList<>();
         final CyclicBarrier gate = new CyclicBarrier(list.size());

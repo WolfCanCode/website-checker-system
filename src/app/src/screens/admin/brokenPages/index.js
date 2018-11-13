@@ -18,7 +18,12 @@ class brokenPagesScreen extends Component {
     componentDidMount() {
         var comp = [];
         this.setState({ loadingTable: true });
-        var param = [];
+        var param = {
+            "userId": cookies.get("u_id"),
+            "userToken": cookies.get("u_token"),
+            "websiteId": cookies.get("u_w_id"),
+            "pageOptionId": cookies.get("u_option"),
+        }
         fetch("/api/brokenPage/lastest", {
             method: 'POST',
             headers: {
@@ -27,7 +32,7 @@ class brokenPagesScreen extends Component {
             },
             body: JSON.stringify(param)
         }).then(response => response.json()).then((data) => {
-            comp = data.map((item, index) => {
+            comp = data.brokenPageReport.map((item, index) => {
                 return (<TableRow key={index} urlPage={item.urlPage} stt={item.stt} httpCode={item.httpCode} httpMessage={item.httpMessage} />);
             });
             this.setState({ list: comp });
@@ -40,7 +45,12 @@ class brokenPagesScreen extends Component {
     _doBrokenPage() {
         var comp = [];
         this.setState({ loadingTable: true, isDisable: true });
-        var param = { "userId": cookies.get("u_id"), "userToken": cookies.get("u_token"), "websiteId": cookies.get("u_w_id") };
+        var param = {
+            "userId": cookies.get("u_id"),
+            "userToken": cookies.get("u_token"),
+            "websiteId": cookies.get("u_w_id"),
+            "pageOptionId": cookies.get("u_option"),
+        }
 
         fetch("/api/brokenPage", {
             method: 'POST',
@@ -50,7 +60,7 @@ class brokenPagesScreen extends Component {
             },
             body: JSON.stringify(param)
         }).then(response => response.json()).then((data) => {
-            comp = data.map((item, index) => {
+            comp = data.brokenPageReport.map((item, index) => {
                 return (<TableRow key={index} urlPage={item.urlPage} stt={item.stt} httpCode={item.httpCode} httpMessage={item.httpMessage} />);
             });
             this.setState({ list: comp });

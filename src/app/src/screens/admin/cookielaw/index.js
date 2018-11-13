@@ -12,7 +12,12 @@ export default class CookieLaw extends Component {
     componentDidMount() {
         var comp = [];
         this.setState({ loadingTable: true });
-        var param = [];
+        var param = {
+            "userId": cookies.get("u_id"),
+            "userToken": cookies.get("u_token"),
+            "websiteId": cookies.get("u_w_id"),
+            "pageOptionId": cookies.get("u_option"),
+        }
         fetch("/api/cookie/lastest", {
             method: 'POST',
             headers: {
@@ -21,7 +26,7 @@ export default class CookieLaw extends Component {
             },
             body: JSON.stringify(param)
         }).then(response => response.json()).then((data) => {
-            comp = data.map((item, index) => {
+            comp = data.cookieReport.map((item, index) => {
                 return (<TableRow key={index} cookieName={item.cookieName} category={item.category} party={item.party} description={item.description} />);
             });
             this.setState({ list: comp });
@@ -34,7 +39,12 @@ export default class CookieLaw extends Component {
     _doCookies() {
         var comp = [];
         this.setState({ loadingTable: true, isDisable: true });
-        var param = { "userId": cookies.get("u_id"), "userToken": cookies.get("u_token"), "websiteId": cookies.get("u_w_id") };
+        var param = {
+            "userId": cookies.get("u_id"),
+            "userToken": cookies.get("u_token"),
+            "websiteId": cookies.get("u_w_id"),
+            "pageOptionId": cookies.get("u_option"),
+        }
 
         fetch("/api/cookie", {
             method: 'POST',
@@ -44,7 +54,7 @@ export default class CookieLaw extends Component {
             },
             body: JSON.stringify(param)
         }).then(response => response.json()).then((data) => {
-            comp = data.map((item, index) => {
+            comp = data.cookieReport.map((item, index) => {
                 return (<TableRow key={index} cookieName={item.cookieName} category={item.category} party={item.party} description={item.description} />);
             });
             this.setState({ list: comp });
@@ -86,10 +96,10 @@ export default class CookieLaw extends Component {
                     <Table singleLine unstackable style={{ fontSize: '14px' }}>
                         <Table.Header>
                             <Table.Row>
-                                <Table.HeaderCell>Cookie</Table.HeaderCell>
-                                <Table.HeaderCell>Example Value</Table.HeaderCell>
-                                <Table.HeaderCell>Host</Table.HeaderCell>
-                                <Table.HeaderCell>Expiry Date</Table.HeaderCell>
+                                <Table.HeaderCell>Cookie Name</Table.HeaderCell>
+                                <Table.HeaderCell>Category</Table.HeaderCell>
+                                <Table.HeaderCell>Party</Table.HeaderCell>
+                                <Table.HeaderCell>Description</Table.HeaderCell>
 
                             </Table.Row>
                         </Table.Header>

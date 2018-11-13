@@ -1,7 +1,9 @@
 package com.fpt.capstone.wcs.service;
 
 import com.fpt.capstone.wcs.model.entity.*;
+import com.fpt.capstone.wcs.controller.*;
 import com.fpt.capstone.wcs.model.pojo.UrlPOJO;
+import com.fpt.capstone.wcs.repository.CookieDataRepository;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -15,6 +17,8 @@ import org.openqa.selenium.logging.LogType;
 import org.openqa.selenium.logging.LoggingPreferences;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import sun.misc.IOUtils;
 
 import java.io.BufferedInputStream;
@@ -35,8 +39,9 @@ import static java.util.Comparator.*;
 import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toCollection;
 
+@Service
 public class TechnologyService {
-
+    
     public List<JavascriptReport> jsTestService(UrlPOJO[] url) throws InterruptedException {
         System.setProperty("webdriver.chrome.driver", "C:\\Users\\ngoct\\Downloads\\chromedriver_win32\\chromedriver.exe");
         //Asign list JS info
@@ -167,57 +172,59 @@ public class TechnologyService {
 
 
 
-    public List<CookieReport> cookieService(UrlPOJO[] url) throws InterruptedException {
+    public List<CookieReport> cookieService(List<Page> list, PageOption option) throws InterruptedException {
         System.setProperty("webdriver.chrome.driver", "C:\\Users\\trinhndse62136\\Downloads\\chromedriver_win32\\chromedriver.exe");
         //Asign list JS info
-        List<Cookie> cookieList = new ArrayList<>();
-        cookieList.add(new Cookie("_ga", "Performance", "Google", "The world's most popular analytics tool."));
-        cookieList.add(new Cookie("_gat", "Performance", "Google", "The world's most popular analytics tool."));
-        cookieList.add(new Cookie("_dc_gtm_UA-72916918-1", "Performance", "Google", "The world's most popular analytics tool."));
-        cookieList.add(new Cookie("_gat_UA-72916918-1", "Performance", "Google", "The world's most popular analytics tool."));
-        cookieList.add(new Cookie("__utmt", "Performance", "Google", "The world's most popular analytics tool."));
-        cookieList.add(new Cookie("__atuvc", "Performance", ".addthis.com", "These third party cookies are used to collect information about how visitors use the site."));
-        cookieList.add(new Cookie("__atuvs", "Performance", ".addthis.com", "They are also used to limit the number of times you see an advertisement."));
-        cookieList.add(new Cookie("DSID", "Performance", ".doubleclick.net", "This cookie is used for re-targeting, optimisation, reporting and attribution of online adverts."));
-        cookieList.add(new Cookie("IDE", "Performance", ".doubleclick.net", "This cookie is used for re-targeting, optimisation, reporting and attribution of online adverts."));
-        cookieList.add(new Cookie("_drt_", "Performance", ".doubleclick.net", "This cookie is used for re-targeting, optimisation, reporting and attribution of online adverts."));
-        cookieList.add(new Cookie("id", "Performance", ".doubleclick.net", "This cookie is used for re-targeting, optimisation, reporting and attribution of online adverts."));
+        List<CookieData> cookieList = new ArrayList<>();
+       // System.out.println(cookieDataRepository.getOne(Long.parseLong(2+"")).getCookieName());
+        //cookieList = cookieDataRepository.findAll();
+        cookieList.add(new CookieData("_ga", "Performance", "Google", "The world's most popular analytics tool."));
+        cookieList.add(new CookieData("_gat", "Performance", "Google", "The world's most popular analytics tool."));
+        cookieList.add(new CookieData("_dc_gtm_UA-72916918-1", "Performance", "Google", "The world's most popular analytics tool."));
+        cookieList.add(new CookieData("_gat_UA-72916918-1", "Performance", "Google", "The world's most popular analytics tool."));
+        cookieList.add(new CookieData("__utmt", "Performance", "Google", "The world's most popular analytics tool."));
+        cookieList.add(new CookieData("__atuvc", "Performance", ".addthis.com", "These third party cookies are used to collect information about how visitors use the site."));
+        cookieList.add(new CookieData("__atuvs", "Performance", ".addthis.com", "They are also used to limit the number of times you see an advertisement."));
+        cookieList.add(new CookieData("DSID", "Performance", ".doubleclick.net", "This cookie is used for re-targeting, optimisation, reporting and attribution of online adverts."));
+        cookieList.add(new CookieData("IDE", "Performance", ".doubleclick.net", "This cookie is used for re-targeting, optimisation, reporting and attribution of online adverts."));
+        cookieList.add(new CookieData("_drt_", "Performance", ".doubleclick.net", "This cookie is used for re-targeting, optimisation, reporting and attribution of online adverts."));
+        cookieList.add(new CookieData("id", "Performance", ".doubleclick.net", "This cookie is used for re-targeting, optimisation, reporting and attribution of online adverts."));
 
 
-        cookieList.add(new Cookie("__utma", "Advertising", "Google", "These third party cookies are used to collect information about how visitors use the site."));
-        cookieList.add(new Cookie("__utmb", "Advertising", "Google", "These third party cookies are used to collect information about how visitors use the site."));
-        cookieList.add(new Cookie("__utmz", "Advertising", "Google", "These third party cookies are used to collect information about how visitors use the site."));
+        cookieList.add(new CookieData("__utma", "Advertising", "Google", "These third party cookies are used to collect information about how visitors use the site."));
+        cookieList.add(new CookieData("__utmb", "Advertising", "Google", "These third party cookies are used to collect information about how visitors use the site."));
+        cookieList.add(new CookieData("__utmz", "Advertising", "Google", "These third party cookies are used to collect information about how visitors use the site."));
 
-        cookieList.add(new Cookie("__atuvc", "Comfort", ".addthis.com", "We use cookies to grant a more comfortable usage of the website."));
-        cookieList.add(new Cookie("__atuvs", "Comfort", ".addthis.com", "We use cookies to grant a more comfortable usage of the website."));
-        cookieList.add(new Cookie("ana_svc", "Comfort", ".addthis.com", "We use cookies to grant a more comfortable usage of the website."));
-        cookieList.add(new Cookie("di2", "Comfort", ".addthis.com", "We use cookies to grant a more comfortable usage of the website."));
-        cookieList.add(new Cookie("dt", "Comfort", ".addthis.com", "We use cookies to grant a more comfortable usage of the website."));
-        cookieList.add(new Cookie("km_ai", "Comfort", ".addthis.com", "We use cookies to grant a more comfortable usage of the website."));
-        cookieList.add(new Cookie("km_lv", "Comfort", ".addthis.com", "We use cookies to grant a more comfortable usage of the website."));
-        cookieList.add(new Cookie("loc", "Comfort", ".addthis.com", "We use cookies to grant a more comfortable usage of the website."));
-        cookieList.add(new Cookie("siteaud", "Comfort", ".addthis.com", "We use cookies to grant a more comfortable usage of the website."));
-        cookieList.add(new Cookie("uid", "Comfort", ".addthis.com", "We use cookies to grant a more comfortable usage of the website."));
-        cookieList.add(new Cookie("um", "Comfort", ".addthis.com", "We use cookies to grant a more comfortable usage of the website."));
-        cookieList.add(new Cookie("uvc", "Comfort", ".addthis.com", "We use cookies to grant a more comfortable usage of the website."));
-        cookieList.add(new Cookie("vc", "Comfort", ".addthis.com", "We use cookies to grant a more comfortable usage of the website."));
-        cookieList.add(new Cookie("visitor_id92742", "Comfort", ".addthis.com", "We use cookies to grant a more comfortable usage of the website."));
-        cookieList.add(new Cookie("_conv_r", "Comfort", ".addthis.com", "We use cookies to grant a more comfortable usage of the website."));
-        cookieList.add(new Cookie("_conv_v", "Comfort", ".addthis.com", "We use cookies to grant a more comfortable usage of the website."));
+        cookieList.add(new CookieData("__atuvc", "Comfort", ".addthis.com", "We use cookies to grant a more comfortable usage of the website."));
+        cookieList.add(new CookieData("__atuvs", "Comfort", ".addthis.com", "We use cookies to grant a more comfortable usage of the website."));
+        cookieList.add(new CookieData("ana_svc", "Comfort", ".addthis.com", "We use cookies to grant a more comfortable usage of the website."));
+        cookieList.add(new CookieData("di2", "Comfort", ".addthis.com", "We use cookies to grant a more comfortable usage of the website."));
+        cookieList.add(new CookieData("dt", "Comfort", ".addthis.com", "We use cookies to grant a more comfortable usage of the website."));
+        cookieList.add(new CookieData("km_ai", "Comfort", ".addthis.com", "We use cookies to grant a more comfortable usage of the website."));
+        cookieList.add(new CookieData("km_lv", "Comfort", ".addthis.com", "We use cookies to grant a more comfortable usage of the website."));
+        cookieList.add(new CookieData("loc", "Comfort", ".addthis.com", "We use cookies to grant a more comfortable usage of the website."));
+        cookieList.add(new CookieData("siteaud", "Comfort", ".addthis.com", "We use cookies to grant a more comfortable usage of the website."));
+        cookieList.add(new CookieData("uid", "Comfort", ".addthis.com", "We use cookies to grant a more comfortable usage of the website."));
+        cookieList.add(new CookieData("um", "Comfort", ".addthis.com", "We use cookies to grant a more comfortable usage of the website."));
+        cookieList.add(new CookieData("uvc", "Comfort", ".addthis.com", "We use cookies to grant a more comfortable usage of the website."));
+        cookieList.add(new CookieData("vc", "Comfort", ".addthis.com", "We use cookies to grant a more comfortable usage of the website."));
+        cookieList.add(new CookieData("visitor_id92742", "Comfort", ".addthis.com", "We use cookies to grant a more comfortable usage of the website."));
+        cookieList.add(new CookieData("_conv_r", "Comfort", ".addthis.com", "We use cookies to grant a more comfortable usage of the website."));
+        cookieList.add(new CookieData("_conv_v", "Comfort", ".addthis.com", "We use cookies to grant a more comfortable usage of the website."));
 
 
-        cookieList.add(new Cookie("ASP.NET_SeesionId", "Essential", "Miscrosoft", "General purpose platform session cookie, used."));
-        cookieList.add(new Cookie("WSS_FullScreenMode", "Essential", "Miscrosoft", "Microsoft SharePoint cookie for internal use of the application to indicate whether a page is shown in full screen mode."));
+        cookieList.add(new CookieData("ASP.NET_SessionId", "Essential", "Miscrosoft", "General purpose platform session cookie, used."));
+        cookieList.add(new CookieData("WSS_FullScreenMode", "Essential", "Miscrosoft", "Microsoft SharePoint cookie for internal use of the application to indicate whether a page is shown in full screen mode."));
 
 
         List<CookieReport> resultList = new ArrayList<>();
         List<CookieReport> resultList11 = new ArrayList<>();
 
-        final CyclicBarrier gate = new CyclicBarrier(url.length);
+        final CyclicBarrier gate = new CyclicBarrier(list.size());
         List<Thread> listThread = new ArrayList<>();
         List<String> cookieNames = new ArrayList<String>();
 
-        for (UrlPOJO u : url) {
+        for (Page p : list) {
             listThread.add(new Thread() {
                 public void run() {
                     try {
@@ -228,7 +235,7 @@ public class TechnologyService {
 
                         WebDriver driver = new ChromeDriver(chromeOptions);//chay an
 
-                        driver.get(u.getUrl());
+                        driver.get(p.getUrl());
 
                         Set<org.openqa.selenium.Cookie> cookies = driver.manage().getCookies();
 
@@ -259,6 +266,7 @@ public class TechnologyService {
             t.join();
         }
 
+        //delete duplicate cookie
         List<CookieReport> resultList1 = resultList11.stream()
                 .collect(collectingAndThen(toCollection(() -> new TreeSet<>(comparing(CookieReport::getCookieName).thenComparing(CookieReport::getParty))),
                         ArrayList::new));
@@ -267,13 +275,19 @@ public class TechnologyService {
         for (CookieReport cookieName : resultList1) {
             a = 0;
             for (int i = 0; i < cookieList.size(); i++) {
-                if (cookieName.getCookieName().equals(cookieList.get(i).getCookieName())) {
-                    resultList.add(new CookieReport(cookieList.get(i).getCookieName(), cookieList.get(i).getCategory(), cookieList.get(i).getParty(), cookieList.get(i).getDescription()));
+                if (cookieName.getCookieName().equalsIgnoreCase(cookieList.get(i).getCookieName())) {
+                    CookieReport cookieReport =  new CookieReport(cookieList.get(i).getCookieName(), cookieList.get(i).getCategory(), cookieList.get(i).getParty(), cookieList.get(i).getDescription());
+                    cookieReport.setPageOption(option);
+                    resultList.add(cookieReport);
+                    //resultList.add(new CookieReport(cookieList.get(i).getCookieName(), cookieList.get(i).getCategory(), cookieList.get(i).getParty(), cookieList.get(i).getDescription()));
                     a = 1;
                 }
             }
             if (a == 0) {
-                resultList.add(new CookieReport(cookieName.getCookieName(), "Unknown", cookieName.getParty(), "The purpose of these cookies in unknown."));
+                CookieReport cookieReport = new CookieReport(cookieName.getCookieName(), "Unknown", cookieName.getParty(), "The purpose of these cookies in unknown.");
+                cookieReport.setPageOption(option);
+                resultList.add(cookieReport);
+                //resultList.add(new CookieReport(cookieName.getCookieName(), "Unknown", cookieName.getParty(), "The purpose of these cookies in unknown."));
 
             }
 
