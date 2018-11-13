@@ -628,7 +628,7 @@ export default class HeaderContent extends Component {
                                         <Menu.Item name='Add' as={Button} onClick={() => this.setState({ addPageOption: true })}>
                                             <Icon name='plus' circular color='green' inverted style={{ margin: 0, fontSize: 18 }} />
                                         </Menu.Item>
-                                        <Menu style={{ overflowX: 'scroll', padding: 5 }}>
+                                        <Menu style={{ overflowX: 'scroll', padding: 5 , width: '100%'}}>
                                             {this.state.pageOptions}
                                         </Menu></Menu>
                                 </Segment>
