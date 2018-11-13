@@ -1,9 +1,14 @@
-package com.fpt.capstone.wcs.service;
+package com.fpt.capstone.wcs.service.Experience;
 
 import com.fpt.capstone.wcs.model.entity.Page;
 import com.fpt.capstone.wcs.model.entity.PageOption;
 import com.fpt.capstone.wcs.model.entity.SpeedTestReport;
-import com.fpt.capstone.wcs.model.pojo.UrlPOJO;
+import com.fpt.capstone.wcs.model.entity.Website;
+import com.fpt.capstone.wcs.model.pojo.RequestCommonPOJO;
+import com.fpt.capstone.wcs.repository.PageOptionRepository;
+import com.fpt.capstone.wcs.repository.SpeedtestRepository;
+import com.fpt.capstone.wcs.utils.Authenticate;
+import com.fpt.capstone.wcs.utils.Constant;
 import com.fpt.capstone.wcs.utils.MathUtil;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -16,9 +21,13 @@ import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 import java.util.logging.Level;
@@ -26,10 +35,87 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class ExperienceService {
+@Service
+public class ExperienceImpl implements ExperienceService {
+
+    final
+    Authenticate authenticate;
+    final
+    PageOptionRepository pageOptionRepository;
+    final
+    SpeedtestRepository speedtestRepository;
+
+    @Autowired
+    public ExperienceImpl(Authenticate authenticate, PageOptionRepository pageOptionRepository, SpeedtestRepository speedtestRepository) {
+        this.authenticate = authenticate;
+        this.pageOptionRepository = pageOptionRepository;
+        this.speedtestRepository = speedtestRepository;
+    }
+
+    @Override
+    public Map<String, Object> doSpeedTest(RequestCommonPOJO request) throws InterruptedException {
+        Map<String, Object> res = new HashMap<>();
+        Website website = authenticate.isAuthGetSingleSite(request);
+        if (website != null) {
+            PageOption pageOption = pageOptionRepository.findOneByIdAndWebsiteAndDelFlagEquals(request.getPageOptionId(), website, false);
+            if(pageOption==null){
+                request.setPageOptionId((long)-1);
+            }
+            if(request.getPageOptionId()!=-1) { //page option list is null
+                List<Page> pages = pageOption.getPages();
+                List<SpeedTestReport> resultList = speedTestService(pages, pageOption);
+                speedtestRepository.removeAllByPageOption(pageOption);
+                speedtestRepository.saveAll(resultList);
+                res.put("action", Constant.SUCCESS);
+                res.put("speedtestReport", resultList);
+                return res;
+            }
+            else {
+                List<Page> pages = new ArrayList<>();
+                Page page = new Page();
+                page.setUrl(website.getUrl());
+                page.setType(1);
+                pages.add(page);
+                List<SpeedTestReport> resultList = speedTestService(pages, null);
+                speedtestRepository.saveAll(resultList);
+                res.put("action", Constant.SUCCESS);
+                res.put("speedtestReport", resultList);
+                return res;
+            }
+        } else {
+            res.put("action", Constant.INCORRECT);
+            return res;
+        }
+    }
+
+    @Override
+    public Map<String, Object> getLastestSpeedTest(RequestCommonPOJO request) {
+        Map<String, Object> res = new HashMap<>();
+        Website website = authenticate.isAuthGetSingleSite(request);
+        if (website != null) {
+            PageOption pageOption = pageOptionRepository.findOneByIdAndWebsiteAndDelFlagEquals(request.getPageOptionId(), website, false);
+            if(pageOption==null){
+                request.setPageOptionId((long)-1);
+            }
+            if(request.getPageOptionId()!=-1) {
+                List<SpeedTestReport> resultList = speedtestRepository.findAllByPageOption(pageOption);
+                res.put("speedtestReport", resultList);
+                res.put("action", Constant.SUCCESS);
+                return res;
+            } else {
+                List<SpeedTestReport> resultList = speedtestRepository.findAllByPageOptionAndUrl(null, website.getUrl());
+                res.put("speedtestReport", resultList);
+                res.put("action", Constant.SUCCESS);
+                return res;
+            }
+        } else {
+            res.put("action", Constant.INCORRECT);
+            return res;
+        }
+    }
 
     public List<SpeedTestReport> speedTestService(List<Page> list, PageOption option) throws InterruptedException {
-        System.setProperty("webdriver.chrome.driver", "C:\\Users\\trinhndse62136\\Downloads\\chromedriver_win32\\chromedriver.exe");
+        System.setProperty("webdriver.chrome.driver", "C:\\Users\\ngoct\\Downloads\\chromedriver_win32\\chromedriver.exe");
         //Asign list speed info
         List<SpeedTestReport> resultList = new ArrayList<>();
         final CyclicBarrier gate = new CyclicBarrier(list.size());
@@ -85,7 +171,7 @@ public class ExperienceService {
                             resultList.add(speedTestReport);
                             driver.quit();
                         } catch (InterruptedException | BrokenBarrierException e) {
-                            Logger.getLogger(ExperienceService.class.getName()).log(Level.SEVERE, null, e);
+                            Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
                         }
                     }
                 });
@@ -103,4 +189,5 @@ public class ExperienceService {
 
         return resultList;
     }
+
 }

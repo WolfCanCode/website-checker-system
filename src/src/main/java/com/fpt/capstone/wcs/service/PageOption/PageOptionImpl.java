@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 @Service
-public class PageOptionImpl implements PageOptionInterface{
+public class PageOptionImpl implements PageOptionService {
     final
     WebsiteRepository websiteRepository;
     final

@@ -4,6 +4,7 @@ import com.fpt.capstone.wcs.model.entity.Page;
 import com.fpt.capstone.wcs.model.entity.PageOption;
 import com.fpt.capstone.wcs.model.entity.*;
 import com.fpt.capstone.wcs.model.pojo.UrlPOJO;
+import com.fpt.capstone.wcs.service.Experience.ExperienceImpl;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import sun.misc.IOUtils;
@@ -71,7 +72,7 @@ public class QualityService {
                             resultList.add(brokenLinkReport);
                             //resultList.add(new BrokenLinkReport(HttpURLConnection.HTTP_BAD_REQUEST, ,"https://www.nottingham.ac.uk/about", p.getUrl()));
                         }
-                       // Logger.getLogger(ExperienceService.class.getName()).log(Level.SEVERE, null, e);
+                       // Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
                     } catch (IOException e) {
                         e.printStackTrace();
                         System.out.println("hihi 2");
@@ -88,15 +89,15 @@ public class QualityService {
 //                            resultList.add(new BrokenLinkReport(HttpURLConnection.HTTP_GATEWAY_TIMEOUT, "Gateway Timeout","https://www.nottingham.ac.uk/about", u.getUrl()));
 //                        }
 
-                        //Logger.getLogger(ExperienceService.class.getName()).log(Level.SEVERE, null, e);
+                        //Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
                     } catch (InterruptedException e) {
                         System.out.println("hihi 3");
                         System.out.println("message 3" + e.getMessage());
-                        //Logger.getLogger(ExperienceService.class.getName()).log(Level.SEVERE, null, e);
+                        //Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
                     } catch (BrokenBarrierException e) {
                         System.out.println("hihi 4");
                         System.out.println("message 4" + e.getMessage());
-                       // Logger.getLogger(ExperienceService.class.getName()).log(Level.SEVERE, null, e);
+                       // Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
                     }
                 }
             });
@@ -158,7 +159,7 @@ public class QualityService {
 
 
                     }  catch (MalformedURLException e) {
-                        Logger.getLogger(ExperienceService.class.getName()).log(Level.SEVERE, null, e);
+                        Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
                         if(e.toString().contains("java.net.MalformedURLException")){
                             BrokenPageReport brokenPageReport = new BrokenPageReport(p.getUrl(), "Error Page", HttpURLConnection.HTTP_BAD_REQUEST , "Bad Request");
                             brokenPageReport.setPageOption(option);
@@ -166,7 +167,7 @@ public class QualityService {
                            // resultList.add(new BrokenPageReport(u.getUrl(), "Error Page", HttpURLConnection.HTTP_BAD_REQUEST , "Bad Request"));
                         }
                     } catch (IOException e) {
-                        Logger.getLogger(ExperienceService.class.getName()).log(Level.SEVERE, null, e);
+                        Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
                         if(e.toString().contains("java.net.UnknownHostException")){
                             BrokenPageReport brokenPageReport = new BrokenPageReport(p.getUrl(), "Error Page", HttpURLConnection.HTTP_BAD_REQUEST , "Bad Request");
                             brokenPageReport.setPageOption(option);
@@ -182,9 +183,9 @@ public class QualityService {
                             //resultList.add(new BrokenPageReport(u.getUrl(), "Error Page", HttpURLConnection.HTTP_GATEWAY_TIMEOUT , "Gateway Timeout"));
                         }
                     } catch (InterruptedException e) {
-                        Logger.getLogger(ExperienceService.class.getName()).log(Level.SEVERE, null, e);
+                        Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
                     } catch (BrokenBarrierException e) {
-                        Logger.getLogger(ExperienceService.class.getName()).log(Level.SEVERE, null, e);
+                        Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
                     }
                 }
             });
@@ -263,11 +264,11 @@ public class QualityService {
                             }
                         }
                     } catch (IOException e) {
-                        Logger.getLogger(ExperienceService.class.getName()).log(Level.SEVERE, null, e);
+                        Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
                     } catch (InterruptedException e) {
-                        Logger.getLogger(ExperienceService.class.getName()).log(Level.SEVERE, null, e);
+                        Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
                     } catch (BrokenBarrierException e) {
-                        Logger.getLogger(ExperienceService.class.getName()).log(Level.SEVERE, null, e);
+                        Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
                     }
                 }
             });
@@ -344,11 +345,11 @@ public class QualityService {
 
                         }
                     } catch (IOException e) {
-                        Logger.getLogger(ExperienceService.class.getName()).log(Level.SEVERE, null, e);
+                        Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
                     } catch (InterruptedException e) {
-                        Logger.getLogger(ExperienceService.class.getName()).log(Level.SEVERE, null, e);
+                        Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
                     } catch (BrokenBarrierException e) {
-                        Logger.getLogger(ExperienceService.class.getName()).log(Level.SEVERE, null, e);
+                        Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
                     }
                 }
             });
@@ -425,11 +426,11 @@ public class QualityService {
                             }
                         }
                     } catch (IOException e) {
-                        Logger.getLogger(ExperienceService.class.getName()).log(Level.SEVERE, null, e);
+                        Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
                     } catch (InterruptedException e) {
-                        Logger.getLogger(ExperienceService.class.getName()).log(Level.SEVERE, null, e);
+                        Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
                     } catch (BrokenBarrierException e) {
-                        Logger.getLogger(ExperienceService.class.getName()).log(Level.SEVERE, null, e);
+                        Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
                     }
                 }
             });
@@ -506,11 +507,11 @@ public class QualityService {
 
                         }
                     } catch (IOException e) {
-                        Logger.getLogger(ExperienceService.class.getName()).log(Level.SEVERE, null, e);
+                        Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
                     } catch (InterruptedException e) {
-                        Logger.getLogger(ExperienceService.class.getName()).log(Level.SEVERE, null, e);
+                        Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
                     } catch (BrokenBarrierException e) {
-                        Logger.getLogger(ExperienceService.class.getName()).log(Level.SEVERE, null, e);
+                        Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
                     }
                 }
             });
@@ -587,11 +588,11 @@ public class QualityService {
 
                         }
                     } catch (IOException e) {
-                        Logger.getLogger(ExperienceService.class.getName()).log(Level.SEVERE, null, e);
+                        Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
                     } catch (InterruptedException e) {
-                        Logger.getLogger(ExperienceService.class.getName()).log(Level.SEVERE, null, e);
+                        Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
                     } catch (BrokenBarrierException e) {
-                        Logger.getLogger(ExperienceService.class.getName()).log(Level.SEVERE, null, e);
+                        Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
                     }
                 }
             });
@@ -905,11 +906,11 @@ public class QualityService {
                         }
                         //end check Missing mp3 file
                     } catch (IOException e) {
-                        Logger.getLogger(ExperienceService.class.getName()).log(Level.SEVERE, null, e);
+                        Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
                     } catch (InterruptedException e) {
-                        Logger.getLogger(ExperienceService.class.getName()).log(Level.SEVERE, null, e);
+                        Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
                     } catch (BrokenBarrierException e) {
-                        Logger.getLogger(ExperienceService.class.getName()).log(Level.SEVERE, null, e);
+                        Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
                     }
                 }
             });

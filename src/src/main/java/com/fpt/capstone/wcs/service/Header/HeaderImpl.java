@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class HeaderImpl implements HeaderInterFace {
+public class HeaderImpl implements HeaderService {
     final
     UserRepository userRepository;
     final

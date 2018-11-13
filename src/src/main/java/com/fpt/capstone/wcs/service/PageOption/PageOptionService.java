@@ -5,7 +5,7 @@ import com.fpt.capstone.wcs.model.pojo.RequestCommonPOJO;
 
 import java.util.Map;
 
-public interface PageOptionInterface {
+public interface PageOptionService {
 
     public Map<String, Object> init(RequestCommonPOJO request);
     public Map<String, Object> selectPageOption(PageOptionPojo request);

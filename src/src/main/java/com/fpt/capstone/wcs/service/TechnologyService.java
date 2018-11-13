@@ -1,9 +1,8 @@
 package com.fpt.capstone.wcs.service;
 
 import com.fpt.capstone.wcs.model.entity.*;
-import com.fpt.capstone.wcs.controller.*;
 import com.fpt.capstone.wcs.model.pojo.UrlPOJO;
-import com.fpt.capstone.wcs.repository.CookieDataRepository;
+import com.fpt.capstone.wcs.service.Experience.ExperienceImpl;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -77,7 +76,7 @@ public class TechnologyService {
                         }
                         driver.quit();
                     } catch (InterruptedException | BrokenBarrierException e) {
-                        Logger.getLogger(ExperienceService.class.getName()).log(Level.SEVERE, null, e);
+                        Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
                     }
                 }
             });
@@ -249,7 +248,7 @@ public class TechnologyService {
 
 
                     } catch (InterruptedException | BrokenBarrierException e) {
-                        Logger.getLogger(ExperienceService.class.getName()).log(Level.SEVERE, null, e);
+                        Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
                     }
                 }
             });
