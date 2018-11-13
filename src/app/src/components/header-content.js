@@ -461,7 +461,7 @@ export default class HeaderContent extends Component {
                         } else return (
                             <Table.Row key={index}>
                                 <Table.Cell collapsing>
-                                    <Checkbox toggle onClick={() => this._addPage(item.id)} checked={true} />
+                                    <Checkbox toggle onClick={() => this._addPage(item.id)} defaultChecked />
                                 </Table.Cell>
                                 <Table.Cell>
                                     <a href={item.url} style={{ fontSize: 16 }}>{item.url}</a>
@@ -562,7 +562,7 @@ export default class HeaderContent extends Component {
                             <Segment.Group vertical="true" style={{ margin: 0, padding: 0, border: 0 }}>
 
                                 <Segment basic style={{ margin: 0, padding: 0, border: 0 }} loading={this.state.isLoading}>
-                                    
+
                                     {/* Edit page option */}
                                     <Transition animation="scale" duration={500} divided size='huge' verticalAlign='middle' visible={this.state.editPageOption}>
                                         <Modal

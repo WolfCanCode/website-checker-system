@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.transaction.Transactional;
 import java.util.*;
 
 @RestController
@@ -32,6 +33,7 @@ public class ExperienceController {
     @Autowired
     Authenticate authenticate;
 
+    @Transactional
     @PostMapping("/api/speedTest")
     public Map<String, Object> getDataSpeedTest(@RequestBody RequestCommonPOJO request) throws InterruptedException {
         Map<String, Object> res = new HashMap<>();
