@@ -26,6 +26,10 @@ export default class HeaderContent extends Component {
     };
 
     componentDidMount() {
+        this._getPageNum();
+    }
+
+    _getPageNum() {
         fetch("/api/page/pageOption/size", {
             method: 'POST',
             headers: {
@@ -56,11 +60,17 @@ export default class HeaderContent extends Component {
         for (let i = 0; i < pages.length; i++) {
             if (pages[i] === id) {
                 pages.splice(i, 1);
+                if (this.state.activeItem === parseInt(cookies.get('u_option'), 10)) {
+                    this.setState({ pageNum: this.state.pageNum - 1 })
+                }
                 flag = true;
             }
         }
         if (!flag) {
             pages.push(id);
+            if (this.state.activeItem === parseInt(cookies.get('u_option'), 10)) {
+                this.setState({ pageNum: this.state.pageNum + 1 })
+            }
         }
         fetch("/api/page/pageOption/updatePage", {
             method: 'POST',
@@ -411,6 +421,7 @@ export default class HeaderContent extends Component {
 
     /* select page option */
     _selectPageOption(id) {
+        this._getPageNum();
         fetch("/api/page/pageOption/select", {
             method: 'POST',
             headers: {
