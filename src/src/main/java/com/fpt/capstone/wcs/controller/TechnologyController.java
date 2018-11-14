@@ -35,7 +35,8 @@ public class TechnologyController {
 
     @Autowired
     FaviconRepository faviconRepository;
-
+    @Autowired
+    TechnologyService technologyService;
     @Autowired
     PageRepository pageRepository;
     @Autowired
@@ -95,7 +96,6 @@ public class TechnologyController {
 
             if(request.getPageOptionId()!=-1) { //page option list is null
                 List<Page> pages = pageOption.getPages();
-                TechnologyService technologyService = new TechnologyService();
                 List<CookieReport> resultList = technologyService.cookieService(pages, pageOption);
                 cookieRepository.removeAllByPageOption(pageOption);
                 cookieRepository.saveAll(resultList);

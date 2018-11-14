@@ -10,9 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
+@Entity
 @Getter
 @Setter
-@Entity
 @Table(name = "ContactReport")
 public class ContactReport {
     @Id

@@ -2,6 +2,7 @@ package com.fpt.capstone.wcs.service;
 
 import com.fpt.capstone.wcs.model.entity.*;
 import com.fpt.capstone.wcs.model.pojo.UrlPOJO;
+import com.fpt.capstone.wcs.repository.CookieDataRepository;
 import com.fpt.capstone.wcs.service.Experience.ExperienceImpl;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -16,6 +17,8 @@ import org.openqa.selenium.logging.LogType;
 import org.openqa.selenium.logging.LoggingPreferences;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import sun.misc.IOUtils;
 
 import java.io.BufferedInputStream;
@@ -36,8 +39,11 @@ import static java.util.Comparator.*;
 import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toCollection;
 
-
+@Service
 public class TechnologyService {
+
+    @Autowired
+    CookieDataRepository cookieDataRepository;
 
     public List<JavascriptReport> jsTestService(UrlPOJO[] url) throws InterruptedException {
         System.setProperty("webdriver.chrome.driver", "C:\\Users\\ngoct\\Downloads\\chromedriver_win32\\chromedriver.exe");
@@ -174,7 +180,6 @@ public class TechnologyService {
         //Asign list JS info
         List<CookieData> cookieList = new ArrayList<>();
        // System.out.println(cookieDataRepository.getOne(Long.parseLong(2+"")).getCookieName());
-        //cookieList = cookieDataRepository.findAll();
         cookieList.add(new CookieData("_ga", "Performance", "Google", "The world's most popular analytics tool."));
         cookieList.add(new CookieData("_gat", "Performance", "Google", "The world's most popular analytics tool."));
         cookieList.add(new CookieData("_dc_gtm_UA-72916918-1", "Performance", "Google", "The world's most popular analytics tool."));
@@ -212,7 +217,8 @@ public class TechnologyService {
 
         cookieList.add(new CookieData("ASP.NET_SessionId", "Essential", "Miscrosoft", "General purpose platform session cookie, used."));
         cookieList.add(new CookieData("WSS_FullScreenMode", "Essential", "Miscrosoft", "Microsoft SharePoint cookie for internal use of the application to indicate whether a page is shown in full screen mode."));
-
+        cookieDataRepository.saveAll(cookieList);
+        List<CookieData> result = cookieDataRepository.findAll();
 
         List<CookieReport> resultList = new ArrayList<>();
         List<CookieReport> resultList11 = new ArrayList<>();
