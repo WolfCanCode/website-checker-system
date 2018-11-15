@@ -12,7 +12,7 @@ const cookies = new Cookies();
 
 class brokenPagesScreen extends Component {
 
-    state = { list: [], loadingTable: false, isDisable: false };
+    state = { list: [], loadingTable: false, isDisable: false, tested:false  };
 
 
     componentDidMount() {
@@ -64,6 +64,9 @@ class brokenPagesScreen extends Component {
                 return (<TableRow key={index} urlPage={item.urlPage} stt={item.stt} httpCode={item.httpCode} httpMessage={item.httpMessage} />);
             });
             this.setState({ list: comp });
+            if(this.state.list.length === 0){
+                this.setState({ tested : true });
+            } 
             this.setState({ loadingTable: false, isDisable: false });
         });
 
@@ -115,7 +118,7 @@ class brokenPagesScreen extends Component {
                                     </Table.Row>
                                 </Table.Header>
                                 <Table.Body>
-                                    {this.state.list.length === 0 ? <Table.Row><Table.Cell>This page haven't test yet, please try to test</Table.Cell> </Table.Row> : this.state.list}
+                                    {this.state.list.length === 0 ? <Table.Row><Table.Cell>{this.state.tested?"This site has no broken pages!":"This page haven't test yet, please try to test!"}</Table.Cell> </Table.Row> : this.state.list}
                                 </Table.Body>
                             </Table>
                         </Segment>

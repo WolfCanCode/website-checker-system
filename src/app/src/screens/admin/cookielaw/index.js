@@ -73,28 +73,13 @@ export default class CookieLaw extends Component {
                         Check
                        <Icon name='right arrow' />
                     </Button>
-                    <Segment.Group horizontal >
-
-                        <Segment style={{ margin: 'auto', textAlign: 'center', padding: 0 }}>
-                            <Icon className="warning sign" size='huge' color='yellow' />
-                        </Segment>
-                        <Segment style={{ paddingLeft: '10px' }}>
-                            <p style={{ fontSize: 24 }}>2,154 <br />
-                                Pages setting cookie</p>
-                        </Segment >
-                        <Segment style={{ margin: 'auto', textAlign: 'center', padding: 0 }}>
-                            <Icon className="file outline" size='huge' color='teal' /></Segment>
-                        <Segment>
-                            <p style={{ fontSize: 24 }}>0<br /> Pages not explaining they use cookie</p>
-                        </Segment>
-
-                    </Segment.Group>
-                    <Button style={{ marginRight: '10px' }} floated='right'><Icon name="print" />Export</Button>
-                    <div style={{ marginBottom: '10px' }}>
-                        <Input icon='search' placeholder='Search...' />
-                    </div>
-                    <Table singleLine unstackable style={{ fontSize: '14px' }}>
-                        <Table.Header>
+                    
+                    <Button style={{ marginLeft: '10px' }} floated='right'><Icon name="print" />Export</Button>
+            <div style={{ marginBottom: '10px', float: 'right' }}>
+              <Input icon='search' placeholder='Search...' />
+            </div>
+                    <Table singleLine unstackable  style={{ fontSize: '16px',  }}>
+                        <Table.Header textAlign='center'>
                             <Table.Row>
                                 <Table.HeaderCell>Cookie Name</Table.HeaderCell>
                                 <Table.HeaderCell>Category</Table.HeaderCell>

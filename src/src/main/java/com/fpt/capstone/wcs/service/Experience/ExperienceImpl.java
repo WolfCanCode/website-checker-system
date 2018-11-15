@@ -1,17 +1,18 @@
 package com.fpt.capstone.wcs.service.Experience;
 
-import com.fpt.capstone.wcs.model.entity.Page;
-import com.fpt.capstone.wcs.model.entity.PageOption;
-import com.fpt.capstone.wcs.model.entity.SpeedTestReport;
-import com.fpt.capstone.wcs.model.entity.Website;
+import com.fpt.capstone.wcs.model.entity.*;
 import com.fpt.capstone.wcs.model.pojo.RequestCommonPOJO;
+import com.fpt.capstone.wcs.repository.MobileLayoutRepository;
 import com.fpt.capstone.wcs.repository.PageOptionRepository;
 import com.fpt.capstone.wcs.repository.SpeedtestRepository;
 import com.fpt.capstone.wcs.utils.Authenticate;
 import com.fpt.capstone.wcs.utils.Constant;
 import com.fpt.capstone.wcs.utils.MathUtil;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.WebDriver;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.time.StopWatch;
+import org.cloudinary.json.JSONObject;
+import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.logging.LogEntry;
@@ -24,16 +25,25 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 
 @Service
 public class ExperienceImpl implements ExperienceService {
@@ -44,12 +54,16 @@ public class ExperienceImpl implements ExperienceService {
     PageOptionRepository pageOptionRepository;
     final
     SpeedtestRepository speedtestRepository;
+    final
+    MobileLayoutRepository mobileLayoutRepository;
 
     @Autowired
-    public ExperienceImpl(Authenticate authenticate, PageOptionRepository pageOptionRepository, SpeedtestRepository speedtestRepository) {
+    public ExperienceImpl(Authenticate authenticate, PageOptionRepository pageOptionRepository, SpeedtestRepository speedtestRepository, MobileLayoutRepository mobileLayoutRepository) {
         this.authenticate = authenticate;
         this.pageOptionRepository = pageOptionRepository;
         this.speedtestRepository = speedtestRepository;
+        this.mobileLayoutRepository = mobileLayoutRepository;
+
     }
 
     @Override
@@ -58,10 +72,10 @@ public class ExperienceImpl implements ExperienceService {
         Website website = authenticate.isAuthGetSingleSite(request);
         if (website != null) {
             PageOption pageOption = pageOptionRepository.findOneByIdAndWebsiteAndDelFlagEquals(request.getPageOptionId(), website, false);
-            if(pageOption==null){
-                request.setPageOptionId((long)-1);
+            if (pageOption == null) {
+                request.setPageOptionId((long) -1);
             }
-            if(request.getPageOptionId()!=-1) { //page option list is null
+            if (request.getPageOptionId() != -1) { //page option list is null
                 List<Page> pages = pageOption.getPages();
                 List<SpeedTestReport> resultList = speedTestService(pages, pageOption);
                 speedtestRepository.removeAllByPageOption(pageOption);
@@ -69,8 +83,7 @@ public class ExperienceImpl implements ExperienceService {
                 res.put("action", Constant.SUCCESS);
                 res.put("speedtestReport", resultList);
                 return res;
-            }
-            else {
+            } else {
                 List<Page> pages = new ArrayList<>();
                 Page page = new Page();
                 page.setUrl(website.getUrl());
@@ -94,10 +107,10 @@ public class ExperienceImpl implements ExperienceService {
         Website website = authenticate.isAuthGetSingleSite(request);
         if (website != null) {
             PageOption pageOption = pageOptionRepository.findOneByIdAndWebsiteAndDelFlagEquals(request.getPageOptionId(), website, false);
-            if(pageOption==null){
-                request.setPageOptionId((long)-1);
+            if (pageOption == null) {
+                request.setPageOptionId((long) -1);
             }
-            if(request.getPageOptionId()!=-1) {
+            if (request.getPageOptionId() != -1) {
                 List<SpeedTestReport> resultList = speedtestRepository.findAllByPageOption(pageOption);
                 res.put("speedtestReport", resultList);
                 res.put("action", Constant.SUCCESS);
@@ -114,8 +127,9 @@ public class ExperienceImpl implements ExperienceService {
         }
     }
 
+
     public List<SpeedTestReport> speedTestService(List<Page> list, PageOption option) throws InterruptedException {
-        System.setProperty("webdriver.chrome.driver", "C:\\Users\\ngoct\\Downloads\\chromedriver_win32\\chromedriver.exe");
+        System.setProperty("webdriver.chrome.driver", "C:\\Users\\trinhndse62136\\Downloads\\chromedriver_win32\\chromedriver.exe");
         //Asign list speed info
         List<SpeedTestReport> resultList = new ArrayList<>();
         final CyclicBarrier gate = new CyclicBarrier(list.size());
@@ -177,15 +191,286 @@ public class ExperienceImpl implements ExperienceService {
                 });
             }
         }
-            for (Thread t : listThread) {
-                System.out.println("Threed start");
-                t.start();
-            }
+        for (Thread t : listThread) {
+            System.out.println("Threed start");
+            t.start();
+        }
 
-            for (Thread t : listThread) {
-                System.out.println("Threed join");
-                t.join();
+        for (Thread t : listThread) {
+            System.out.println("Threed join");
+            t.join();
+        }
+
+        return resultList;
+    }
+
+    @Override
+    public Map<String, Object> getDataMobileLayout(RequestCommonPOJO request) throws InterruptedException {
+        Map<String, Object> res = new HashMap<>();
+        Website website = authenticate.isAuthGetSingleSite(request);
+        if (website != null) {
+            PageOption pageOption = pageOptionRepository.findOneByIdAndWebsiteAndDelFlagEquals(request.getPageOptionId(), website, false);
+            if (pageOption == null) {
+                request.setPageOptionId((long) -1);
             }
+            if (request.getPageOptionId() != -1) { //page option list is null
+                List<Page> pages = pageOption.getPages();
+                List<MobileLayoutReport> resultList = mobileLayoutTestService(pages, pageOption);
+                mobileLayoutRepository.removeAllByPageOption(pageOption);
+                mobileLayoutRepository.saveAll(resultList);
+                res.put("action", Constant.SUCCESS);
+                res.put("mobileLayoutTestReport", resultList);
+                return res;
+            } else {
+                List<Page> pages = new ArrayList<>();
+                Page page = new Page();
+                page.setUrl(website.getUrl());
+                page.setType(1);
+                pages.add(page);
+                List<MobileLayoutReport> resultList = mobileLayoutTestService(pages, null);
+                mobileLayoutRepository.saveAll(resultList);
+                res.put("action", Constant.SUCCESS);
+                res.put("mobileLayoutTestReport", resultList);
+                return res;
+            }
+        } else {
+            res.put("action", Constant.INCORRECT);
+            return res;
+        }
+    }
+
+    @Override
+    public Map<String, Object> getLastestDataMobileLayout(RequestCommonPOJO request) {
+        Map<String, Object> res = new HashMap<>();
+        Website website = authenticate.isAuthGetSingleSite(request);
+        if (website != null) {
+            PageOption pageOption = pageOptionRepository.findOneByIdAndWebsiteAndDelFlagEquals(request.getPageOptionId(), website, false);
+            if (pageOption == null) {
+                request.setPageOptionId((long) -1);
+            }
+            if (request.getPageOptionId() != -1) {
+                List<MobileLayoutReport> resultList = mobileLayoutRepository.findAllByPageOption(pageOption);
+                res.put("mobileLayoutTestReport", resultList);
+                res.put("action", Constant.SUCCESS);
+                return res;
+            } else {
+                List<MobileLayoutReport> resultList = mobileLayoutRepository.findAllByPageOptionAndUrl(null, website.getUrl());
+                res.put("mobileLayoutTestReport", resultList);
+                res.put("action", Constant.SUCCESS);
+                return res;
+            }
+        } else {
+            res.put("action", Constant.INCORRECT);
+            return res;
+        }
+
+    }
+
+    public List<MobileLayoutReport> mobileLayoutTestService(List<Page> list, PageOption option) throws InterruptedException {
+        final Cloudinary cloudinary = new Cloudinary(ObjectUtils.asMap("cloud_name", "nguyenductrinh", "api_key", "492747556868815", "api_secret", "TOCMGp7qPI_ifjDCnFMt02T8kWY"));
+
+        System.setProperty("webdriver.chrome.driver", "C:\\Users\\trinhndse62136\\Downloads\\chromedriver_win32\\chromedriver.exe");
+        List<MobileLayoutReport> resultList = new ArrayList<>();
+        final CyclicBarrier gate = new CyclicBarrier(list.size());
+        List<Thread> listThread = new ArrayList<>();
+        for (Page p : list) {
+            if (p.getType() == 1) {
+                listThread.add(new Thread() {
+                    public void run() {
+                        try {
+                            gate.await();
+                            Map<String, String> mobileEmulation = new HashMap<>();
+                            mobileEmulation.put("deviceName", "Nexus 5");
+                            ChromeOptions chromeOptions = new ChromeOptions();
+                            chromeOptions.addArguments("--headless");
+                            chromeOptions.setExperimentalOption("mobileEmulation", mobileEmulation);
+                            WebDriver driver = new ChromeDriver(chromeOptions);
+
+                            driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+                            StopWatch stopWatch = new StopWatch();
+                            stopWatch.start();
+                            String mainDomain = null;
+                            if (p.getUrl().contains("http://www.") || p.getUrl().contains("https://www.")) {
+                                mainDomain = p.getUrl().split("www.")[1];
+                            } else if (p.getUrl().contains("http://")) {
+                                mainDomain = p.getUrl().split("http://")[1];
+                            } else if (p.getUrl().contains("https://")) {
+                                mainDomain = p.getUrl().split("https://")[1];
+
+                            }
+                            driver.get(p.getUrl());
+                            String title = driver.getTitle();
+                            boolean isSupport = false;
+                            if (driver.getCurrentUrl().contains("m." + mainDomain)) {
+                                isSupport = true;
+                            }
+
+                            gate.await();
+                            //TakesScreenshot
+                            TakesScreenshot screenshot = (TakesScreenshot) driver;
+                            File source = screenshot.getScreenshotAs(OutputType.FILE);
+                            FileUtils.copyFile(source, new File("./image.png"));
+                            File file = new File("./image.png");
+                            Map uploadResult = cloudinary.uploader().upload(file, ObjectUtils.emptyMap());
+                            String screenShot = uploadResult.get("url").toString();
+                            //System.out.println(uploadResult.get("url"));
+                            file.delete();
+
+
+                            java.util.List<WebElement> manifest = driver.findElements(By.cssSelector("link[rel='manifest'][href*='.json']"));
+                            System.out.println("size manifest : " + manifest.size());
+                            String valueDisplay = null;
+                            if (manifest.size() != 0 && isSupport == false) {
+//                                System.out.println("manifest" + manifest.size());
+//                                System.out.println("manifest" + manifest.get(0).getAttribute("href"));
+                                JSONObject json = new JSONObject(IOUtils.toString(new URL("" + manifest.get(0).getAttribute("href") + ""), Charset.forName("UTF-8")));
+
+                                if (json.keySet().contains("display") == true) {
+                                    valueDisplay = json.getString("display");
+                                }
+                                if (valueDisplay == "standalone") {
+                                    isSupport = true;
+                                }
+
+                            }
+
+
+                            java.util.List<WebElement> links1 = driver.findElements(By.cssSelector("meta[name='viewport'][content*='width=device-width'][content*='initial-scale=1']"));
+                            System.out.println("size viewport " + links1.size());
+
+
+                            //<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+                            //Get view port css content
+
+                            String content = null;
+                            if (links1.size() != 0) {
+                                isSupport = true;
+                                content = links1.get(0).getAttribute("content");
+                                System.out.println("content : " + content);
+                            }
+
+                            //Get overflow css of html tag
+                            WebElement htmlElememt = driver.findElement(By.tagName("html"));
+                            String htmlOverflowXValue = htmlElememt.getCssValue("overflow-x");
+                            String htmlOverflowValue = htmlElememt.getCssValue("overflow");
+                            System.out.println("htmlx : " + htmlOverflowXValue);
+                            System.out.println("html : " + htmlOverflowValue);
+
+                            //Get overflow css of body tag
+                            WebElement bodyElement = driver.findElement(By.tagName("body"));
+                            String bodyOverflowXValue = bodyElement.getCssValue("overflow-x");
+                            String bodyOverflowValue = bodyElement.getCssValue("overflow");
+                            System.out.println("bodyx : " + bodyOverflowXValue);
+                            System.out.println("body : " + bodyOverflowValue);
+
+
+                            //Check support mobile
+                            String issue = "";
+                            if (isSupport == false) {
+                                //System.out.println("That page is not Optimize for Mobile!");
+                                issue = "Not Optimize for Mobile!,";
+                                 MobileLayoutReport mobileLayoutReport = new MobileLayoutReport(p.getUrl(),title,screenShot, issue  );
+                                mobileLayoutReport.setPageOption(option);
+                                  resultList.add(mobileLayoutReport);
+
+                            } else {
+
+
+                                //Check pinch to zoom
+                                if (content != null) {
+                                    if (content.contains("user-scalable=no") || content.contains("user-scalable=0")
+                                            || (content.contains("minimum-scale=1") && content.contains("maximum-scale=1"))) {
+                                       // System.out.println("That page not support pinch to zoom!");
+                                        issue = issue + "Not support pinch to zoom!,";
+                                    }
+                                }
+
+
+                                //Check The page does not scroll horizontally
+                                if (htmlOverflowXValue.matches("scroll|hidden") || htmlOverflowValue.equals("scroll|hidden")) {
+                                    if (bodyOverflowXValue.equals("hidden") || bodyOverflowValue.equals("hidden")) {
+                                        //System.out.println("That page not support scroll horizontally!");
+                                        issue = issue + "Not support scroll horizontally!,";
+                                    }
+
+                                }
+
+                                //Test big enough to press with a finger
+                                java.util.List<WebElement> listLink = driver.findElements(By.tagName("a"));
+                                int link = 0;
+                                int linkBigEnough = 0;
+                                for (int i = 0; i < listLink.size() && listLink.size() != 0; i++) {
+                                    if (listLink.get(i).getSize().getHeight() != 0 && listLink.get(i).getSize().getHeight() != 0) {
+                                        link = link + 1;
+                                        if (listLink.get(i).getSize().getWidth() >= 44 && listLink.get(i).getSize().getHeight() >= 44) {
+                                            linkBigEnough = linkBigEnough + 1;
+                                        }
+                                    }
+                                }
+                                System.out.println("link size : " + link);
+                                System.out.println("link enough size : " + linkBigEnough);
+                                if (link != 0) {
+                                    float a = (float)linkBigEnough/link;
+                                    if (a > 0.1) {
+                                        //System.out.println("Links too small!");
+                                        issue = issue + "Links too small!,";
+                                    }
+                                }
+
+
+                                java.util.List<WebElement> listButton = driver.findElements(By.tagName("button"));
+                                int button = 0;
+                                int buttonBigEnough = 0;
+                                for (int i = 0; i < listButton.size() && listButton.size() != 0; i++) {
+                                    if (listButton.get(i).getSize().getHeight() != 0 && listButton.get(i).getSize().getHeight() != 0) {
+                                        button = button + 1;
+                                        if (listButton.get(i).getSize().getWidth() >= 44 && listButton.get(i).getSize().getHeight() >= 44) {
+                                            buttonBigEnough = buttonBigEnough + 1;
+                                        }
+                                    }
+                                }
+                                System.out.println("button size : " + button);
+                                System.out.println("button enough size : " + buttonBigEnough);
+                                if (button != 0) {
+                                    float a = (float)buttonBigEnough/button;
+                                    if (a > 0.1) {
+                                       // System.out.println("Buttons too small!");
+                                        issue = issue + "Buttons too small!,";
+                                    }
+                                }
+                                if(issue == null){
+                                    issue = "The Page is optimized for the phone!,";
+                                }
+                                MobileLayoutReport mobileLayoutReport = new MobileLayoutReport(p.getUrl(),title,screenShot, issue  );
+                                mobileLayoutReport.setPageOption(option);
+                                resultList.add(mobileLayoutReport);
+
+
+                            }
+
+
+                            // SpeedTestReport speedTestReport = new SpeedTestReport(p.getUrl(), interactTime1 + "", loadTime1 + "", sizeTransferred1 + "");
+                            //speedTestReport.setPageOption(option);
+                            //  resultList.add(speedTestReport);
+                            driver.quit();
+                        } catch (InterruptedException | BrokenBarrierException e) {
+                            Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            }
+        }
+        for (Thread t : listThread) {
+            System.out.println("Threed start");
+            t.start();
+        }
+
+        for (Thread t : listThread) {
+            System.out.println("Threed join");
+            t.join();
+        }
 
         return resultList;
     }

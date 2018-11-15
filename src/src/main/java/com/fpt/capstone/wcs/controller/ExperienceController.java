@@ -15,6 +15,7 @@ public class ExperienceController {
     @Autowired
     ExperienceService experienceService;
 
+
     @Transactional
     @PostMapping("/api/speedTest")
     public Map<String, Object> doSpeedTest(@RequestBody RequestCommonPOJO request) throws InterruptedException {
@@ -24,6 +25,17 @@ public class ExperienceController {
     @PostMapping("/api/speedTest/lastest")
     public Map<String, Object> getLastestSpeedTest(@RequestBody RequestCommonPOJO request) {
         return experienceService.getLastestSpeedTest(request);
+    }
+
+    @Transactional
+    @PostMapping("/api/mobileLayoutTest")
+    public Map<String, Object> getDataMobileLayout(@RequestBody RequestCommonPOJO request) throws InterruptedException {
+        return experienceService.getDataMobileLayout(request);
+    }
+
+    @PostMapping("/api/mobileLayoutTest/lastest")
+    public Map<String, Object> getLastestDataMobileLayout(@RequestBody RequestCommonPOJO request) {
+        return experienceService.getLastestDataMobileLayout(request);
     }
 
 }

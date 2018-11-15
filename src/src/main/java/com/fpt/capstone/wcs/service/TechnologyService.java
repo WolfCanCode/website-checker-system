@@ -176,17 +176,17 @@ public class TechnologyService {
 
 
     public List<CookieReport> cookieService(List<Page> list, PageOption option) throws InterruptedException {
-        System.setProperty("webdriver.chrome.driver", "C:\\Users\\ngoct\\Downloads\\chromedriver_win32\\chromedriver.exe");
+        System.setProperty("webdriver.chrome.driver", "C:\\Users\\trinhndse62136\\Downloads\\chromedriver_win32\\chromedriver.exe");
         //Asign list JS info
         List<CookieData> cookieList = new ArrayList<>();
        // System.out.println(cookieDataRepository.getOne(Long.parseLong(2+"")).getCookieName());
-//        cookieList.add(new CookieData("_ga", "Performance", "Google", "The world's most popular analytics tool."));
-//        cookieList.add(new CookieData("_gat", "Performance", "Google", "The world's most popular analytics tool."));
-//        cookieList.add(new CookieData("_dc_gtm_UA-72916918-1", "Performance", "Google", "The world's most popular analytics tool."));
+//        cookieList.add(new CookieData("_ga", "Performance", "Google", "This cookie is used to distinguish unique users by assigning a randomly generated number as a client identifier.."));
+//        cookieList.add(new CookieData("_gat", "Performance", "Google", "This cookie is used to throttle the request rate - limiting the collection of data on high traffic sites."));
+//        cookieList.add(new CookieData("_dc_gtm_UA-72916918-1", "Performance", "Google", "This cookie is used to distinguish unique users and throttle the request rate."));
 //        cookieList.add(new CookieData("_gat_UA-72916918-1", "Performance", "Google", "The world's most popular analytics tool."));
-//        cookieList.add(new CookieData("__utmt", "Performance", "Google", "The world's most popular analytics tool."));
-//        cookieList.add(new CookieData("__atuvc", "Performance", ".addthis.com", "These third party cookies are used to collect information about how visitors use the site."));
-//        cookieList.add(new CookieData("__atuvs", "Performance", ".addthis.com", "They are also used to limit the number of times you see an advertisement."));
+//        cookieList.add(new CookieData("__utmt", "Performance", "Google", "These third party cookies are used to collect information about how visitors use the site."));
+//        cookieList.add(new CookieData("__atuvc", "Performance", ".addthis.com", "This cookie is used to deliver adverts more relevant to user based on information about user's visit to this site and other sites."));
+//        cookieList.add(new CookieData("__atuvs", "Performance", ".addthis.com", "This cookie is used to deliver adverts more relevant to user based on information about user's visit to this site and other sites."));
 //        cookieList.add(new CookieData("DSID", "Performance", ".doubleclick.net", "This cookie is used for re-targeting, optimisation, reporting and attribution of online adverts."));
 //        cookieList.add(new CookieData("IDE", "Performance", ".doubleclick.net", "This cookie is used for re-targeting, optimisation, reporting and attribution of online adverts."));
 //        cookieList.add(new CookieData("_drt_", "Performance", ".doubleclick.net", "This cookie is used for re-targeting, optimisation, reporting and attribution of online adverts."));
@@ -197,27 +197,28 @@ public class TechnologyService {
 //        cookieList.add(new CookieData("__utmb", "Advertising", "Google", "These third party cookies are used to collect information about how visitors use the site."));
 //        cookieList.add(new CookieData("__utmz", "Advertising", "Google", "These third party cookies are used to collect information about how visitors use the site."));
 //
-//        cookieList.add(new CookieData("__atuvc", "Comfort", ".addthis.com", "We use cookies to grant a more comfortable usage of the website."));
-//        cookieList.add(new CookieData("__atuvs", "Comfort", ".addthis.com", "We use cookies to grant a more comfortable usage of the website."));
-//        cookieList.add(new CookieData("ana_svc", "Comfort", ".addthis.com", "We use cookies to grant a more comfortable usage of the website."));
-//        cookieList.add(new CookieData("di2", "Comfort", ".addthis.com", "We use cookies to grant a more comfortable usage of the website."));
-//        cookieList.add(new CookieData("dt", "Comfort", ".addthis.com", "We use cookies to grant a more comfortable usage of the website."));
-//        cookieList.add(new CookieData("km_ai", "Comfort", ".addthis.com", "We use cookies to grant a more comfortable usage of the website."));
-//        cookieList.add(new CookieData("km_lv", "Comfort", ".addthis.com", "We use cookies to grant a more comfortable usage of the website."));
-//        cookieList.add(new CookieData("loc", "Comfort", ".addthis.com", "We use cookies to grant a more comfortable usage of the website."));
-//        cookieList.add(new CookieData("siteaud", "Comfort", ".addthis.com", "We use cookies to grant a more comfortable usage of the website."));
-//        cookieList.add(new CookieData("uid", "Comfort", ".addthis.com", "We use cookies to grant a more comfortable usage of the website."));
-//        cookieList.add(new CookieData("um", "Comfort", ".addthis.com", "We use cookies to grant a more comfortable usage of the website."));
-//        cookieList.add(new CookieData("uvc", "Comfort", ".addthis.com", "We use cookies to grant a more comfortable usage of the website."));
-//        cookieList.add(new CookieData("vc", "Comfort", ".addthis.com", "We use cookies to grant a more comfortable usage of the website."));
+//        cookieList.add(new CookieData("__atuvc", "Comfort", ".addthis.com", "This cookie is used to enable visitors to share content with a range of networking and sharing platforms."));
+//        cookieList.add(new CookieData("__atuvs", "Comfort", ".addthis.com", "This cookie is used to enable visitors to share content with a range of networking and sharing platforms."));
+//        cookieList.add(new CookieData("ana_svc", "Comfort", ".addthis.com", "This cookie is used to grant a more comfortable usage of the website."));
+//        cookieList.add(new CookieData("di2", "Comfort", ".addthis.com", "This cookie is used to share content on website across popular social media networks."));
+//        cookieList.add(new CookieData("dt", "Comfort", ".addthis.com", "This cookie is usedto allow website visitors to share content on various social networks."));
+//        cookieList.add(new CookieData("km_ai", "Comfort", ".addthis.com", "This cookie is used to provide site owners with information about how visitors use the site."));
+//        cookieList.add(new CookieData("km_lv", "Comfort", ".addthis.com", "This cookie is used to provide site owners with information about how visitors use the site."));
+//        cookieList.add(new CookieData("loc", "Comfort", ".addthis.com", "This cookie is used to grant a more comfortable usage of the website."));
+//        cookieList.add(new CookieData("siteaud", "Comfort", ".addthis.com", "This cookie is used to grant a more comfortable usage of the website."));
+//        cookieList.add(new CookieData("uid", "Comfort", ".addthis.com", "This cookie provides a uniquely assigned, machine-generated user ID and gathers data about activity on the website."));
+//        cookieList.add(new CookieData("um", "Comfort", ".addthis.com", "This cookie is used to grant a more comfortable usage of the website."));
+//        cookieList.add(new CookieData("uvc", "Comfort", ".addthis.com", "This cookie is used to grant a more comfortable usage of the website."));
+//        cookieList.add(new CookieData("vc", "Comfort", ".addthis.com", "This cookie is used to grant a more comfortable usage of the website."));
 //        cookieList.add(new CookieData("visitor_id92742", "Comfort", ".addthis.com", "We use cookies to grant a more comfortable usage of the website."));
-//        cookieList.add(new CookieData("_conv_r", "Comfort", ".addthis.com", "We use cookies to grant a more comfortable usage of the website."));
-//        cookieList.add(new CookieData("_conv_v", "Comfort", ".addthis.com", "We use cookies to grant a more comfortable usage of the website."));
+//        cookieList.add(new CookieData("_conv_r", "Comfort", ".addthis.com", "This cookie is used to grant a more comfortable usage of the website."));
+//        cookieList.add(new CookieData("_conv_v", "Comfort", ".addthis.com", "This cookie is used to grant a more comfortable usage of the website."));
 //
 //
-//        cookieList.add(new CookieData("ASP.NET_SessionId", "Essential", "Miscrosoft", "General purpose platform session cookie, used."));
+//        cookieList.add(new CookieData("ASP.NET_SessionId", "Essential", "Miscrosoft", "Usually used to maintain an anonymised user session by the server."));
 //        cookieList.add(new CookieData("WSS_FullScreenMode", "Essential", "Miscrosoft", "Microsoft SharePoint cookie for internal use of the application to indicate whether a page is shown in full screen mode."));
-        cookieList = cookieDataRepository.findAll();
+        // cookieDataRepository.saveAll(cookieList);
+         cookieList = cookieDataRepository.findAll();
 
         List<CookieReport> resultList = new ArrayList<>();
         List<CookieReport> resultList11 = new ArrayList<>();
