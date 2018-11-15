@@ -30,10 +30,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.TimeUnit;
@@ -304,35 +301,35 @@ public class ExperienceImpl implements ExperienceService {
                             if (driver.getCurrentUrl().contains("m." + mainDomain)) {
                                 isSupport = true;
                             }
-
-                            gate.await();
                             //TakesScreenshot
                             TakesScreenshot screenshot = (TakesScreenshot) driver;
                             File source = screenshot.getScreenshotAs(OutputType.FILE);
-                            FileUtils.copyFile(source, new File("./image.png"));
-                            File file = new File("./image.png");
+                            FileUtils.copyFile(source, new File("./"+ list.indexOf(p) + ".png"));
+                            File file = new File("./"+ list.indexOf(p) + ".png");
                             Map uploadResult = cloudinary.uploader().upload(file, ObjectUtils.emptyMap());
                             String screenShot = uploadResult.get("url").toString();
                             //System.out.println(uploadResult.get("url"));
                             file.delete();
 
-
-                            java.util.List<WebElement> manifest = driver.findElements(By.cssSelector("link[rel='manifest'][href*='.json']"));
-                            System.out.println("size manifest : " + manifest.size());
-                            String valueDisplay = null;
-                            if (manifest.size() != 0 && isSupport == false) {
+                            if( isSupport == false){
+                                java.util.List<WebElement> manifest = driver.findElements(By.cssSelector("link[rel='manifest'][href*='.json']"));
+                                System.out.println("size manifest : " + manifest.size());
+                                String valueDisplay = null;
+                                if (manifest.size() != 0) {
 //                                System.out.println("manifest" + manifest.size());
 //                                System.out.println("manifest" + manifest.get(0).getAttribute("href"));
-                                JSONObject json = new JSONObject(IOUtils.toString(new URL("" + manifest.get(0).getAttribute("href") + ""), Charset.forName("UTF-8")));
+                                    JSONObject json = new JSONObject(IOUtils.toString(new URL("" + manifest.get(0).getAttribute("href") + ""), Charset.forName("UTF-8")));
 
-                                if (json.keySet().contains("display") == true) {
-                                    valueDisplay = json.getString("display");
-                                }
-                                if (valueDisplay == "standalone") {
-                                    isSupport = true;
-                                }
+                                    if (json.keySet().contains("display") == true) {
+                                        valueDisplay = json.getString("display");
+                                    }
+                                    if (valueDisplay == "standalone") {
+                                        isSupport = true;
+                                    }
 
+                                }
                             }
+
 
 
                             java.util.List<WebElement> links1 = driver.findElements(By.cssSelector("meta[name='viewport'][content*='width=device-width'][content*='initial-scale=1']"));
@@ -411,7 +408,7 @@ public class ExperienceImpl implements ExperienceService {
                                 System.out.println("link enough size : " + linkBigEnough);
                                 if (link != 0) {
                                     float a = (float)linkBigEnough/link;
-                                    if (a > 0.1) {
+                                    if (a < 0.9) {
                                         //System.out.println("Links too small!");
                                         issue = issue + "Links too small!,";
                                     }
@@ -433,11 +430,43 @@ public class ExperienceImpl implements ExperienceService {
                                 System.out.println("button enough size : " + buttonBigEnough);
                                 if (button != 0) {
                                     float a = (float)buttonBigEnough/button;
-                                    if (a > 0.1) {
+                                    if (a < 0.9) {
                                        // System.out.println("Buttons too small!");
                                         issue = issue + "Buttons too small!,";
                                     }
                                 }
+
+                                int bodyTextLength = driver.findElement(By.tagName("body")).getText().length();
+
+                                //System.out.println("p length : " + listP.size());
+                                boolean checkSize = false;
+                                int lengthTotal = 0;
+                                List<String> listTag = Arrays.asList("div", "p", "span", "h4", "h5" , "h6", "td", "li");
+                                for(int i = 0; i < listTag.size(); i++){
+                                    if(checkSize == false){
+                                        java.util.List<WebElement> elementListByTag = driver.findElements(By.tagName(listTag.get(i)));
+                                        if(elementListByTag.size() != 0){
+                                            lengthTotal = 0;
+                                            for (int j = 0; j < elementListByTag.size(); j++) {
+                                                if (elementListByTag.get(j).getText().length() != 0 ) {
+                                                    float length = Float.parseFloat(elementListByTag.get(j).getCssValue("font-size").split("px")[0]);
+                                                    if(length < 16)
+                                                        lengthTotal += elementListByTag.get(j).getText().length();
+                                                }
+
+                                            }
+                                            float a = (float)lengthTotal/bodyTextLength;
+                                            if (a > 0.1) {
+                                                checkSize = true;
+                                                issue = issue + "Text too small!,";
+                                            }
+                                        }
+
+                                    }
+
+
+                                }
+
                                 if(issue == null){
                                     issue = "The Page is optimized for the phone!,";
                                 }
@@ -449,9 +478,7 @@ public class ExperienceImpl implements ExperienceService {
                             }
 
 
-                            // SpeedTestReport speedTestReport = new SpeedTestReport(p.getUrl(), interactTime1 + "", loadTime1 + "", sizeTransferred1 + "");
-                            //speedTestReport.setPageOption(option);
-                            //  resultList.add(speedTestReport);
+
                             driver.quit();
                         } catch (InterruptedException | BrokenBarrierException e) {
                             Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
