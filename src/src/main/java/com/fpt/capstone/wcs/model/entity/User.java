@@ -24,7 +24,7 @@ public class User {
     @JsonProperty("token")
     private String token;
     @JsonIgnore
-    private boolean delFlag;
+    private boolean delFlag=false;
 
     public User(Long id, String token)
     {

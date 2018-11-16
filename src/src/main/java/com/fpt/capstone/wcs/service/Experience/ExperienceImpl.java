@@ -11,6 +11,7 @@ import com.fpt.capstone.wcs.utils.MathUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.time.StopWatch;
+import org.apache.tomcat.util.bcel.Const;
 import org.cloudinary.json.JSONObject;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -126,7 +127,7 @@ public class ExperienceImpl implements ExperienceService {
 
 
     public List<SpeedTestReport> speedTestService(List<Page> list, PageOption option) throws InterruptedException {
-        System.setProperty("webdriver.chrome.driver", "C:\\Users\\trinhndse62136\\Downloads\\chromedriver_win32\\chromedriver.exe");
+        System.setProperty("webdriver.chrome.driver", Constant.CHROME_DRIVER);
         //Asign list speed info
         List<SpeedTestReport> resultList = new ArrayList<>();
         final CyclicBarrier gate = new CyclicBarrier(list.size());
@@ -264,9 +265,9 @@ public class ExperienceImpl implements ExperienceService {
     }
 
     public List<MobileLayoutReport> mobileLayoutTestService(List<Page> list, PageOption option) throws InterruptedException {
-        final Cloudinary cloudinary = new Cloudinary(ObjectUtils.asMap("cloud_name", "nguyenductrinh", "api_key", "492747556868815", "api_secret", "TOCMGp7qPI_ifjDCnFMt02T8kWY"));
+        final Cloudinary cloudinary = new Cloudinary(ObjectUtils.asMap("cloud_name", Constant.CLOUDARY_NAME, "api_key", Constant.CLOUDARY_API_KEY, "api_secret", Constant.CLOUDARY_API_SECRET));
 
-        System.setProperty("webdriver.chrome.driver", "C:\\Users\\trinhndse62136\\Downloads\\chromedriver_win32\\chromedriver.exe");
+        System.setProperty("webdriver.chrome.driver", Constant.CHROME_DRIVER);
         List<MobileLayoutReport> resultList = new ArrayList<>();
         final CyclicBarrier gate = new CyclicBarrier(list.size());
         List<Thread> listThread = new ArrayList<>();
