@@ -11,7 +11,10 @@ export default class Pages extends Component {
     componentDidMount() {
         var comp = [];
         this.setState({ loadingTable: true });
-        var param = { "userId": cookies.get("u_id"), "userToken": cookies.get("u_token"), "websiteId": cookies.get("u_w_id") };
+        var param = {  "userId": cookies.get("u_id"),
+        "userToken": cookies.get("u_token"),
+        "websiteId": cookies.get("u_w_id"),
+        "pageOptionId": cookies.get("u_option"),};
 
         fetch("/api/pagestest/lastest", {
             method: 'POST',
@@ -21,7 +24,7 @@ export default class Pages extends Component {
             },
             body: JSON.stringify(param)
         }).then(response => response.json()).then((data) => {
-            comp = data.map((item, index) => {
+            comp = data.pagetestReport.map((item, index) => {
                 return (<TableRow key={index} url={item.url} titleWeb={item.titleWeb} canonicalUrl={item.canonicalUrl} httpCode={item.httpCode} />);
             });
             this.setState({ list: comp });
@@ -33,17 +36,12 @@ export default class Pages extends Component {
     _doPageTest() {
         this.setState({ loadingTable: true, isDisable: true });
         var comp = [];
-        var param = [{ "url": "https://twitter.com/hashtag/hiccupsteahouse?lang=en" },
-        { "url": "https://www.facebook.com/hiccupsteahouse" },
-        { "url": "https://www.instagram.com/hiccupsteahouse/" },
-        { "url": "http://hiccupsteahouse.com/" },
-        { "url": "https://www.orderhiccupsteahouse.com/" },
-        { "url": "http://hiccupsteahouse.com/wp-content/uploads/Hiccups-TeaHouse-Menu-9-18.pdf" },
-        { "url": "http://hiccupsteahouse.com/hiccups-locations/" },
-        { "url": "http://hiccupsteahouse.com/contact-us/" },
-        { "url": "http://hiccupsteahouse.com/careers/" },
-        { "url": "http://www.churroholic.com/" },
-        ];
+        var param = {
+            "userId": cookies.get("u_id"),
+            "userToken": cookies.get("u_token"),
+            "websiteId": cookies.get("u_w_id"),
+            "pageOptionId": cookies.get("u_option"),
+        }
         fetch("/api/pagestest", {
             method: 'POST',
             headers: {
@@ -52,7 +50,7 @@ export default class Pages extends Component {
             },
             body: JSON.stringify(param)
         }).then(response => response.json()).then((data) => {
-            comp = data.map((item, index) => {
+            comp = data.pagetestReport.map((item, index) => {
                 return (<TableRow key={index} url={item.url} titleWeb={item.titleWeb} canonicalUrl={item.canonicalUrl} httpCode={item.httpCode} />);
             });
 

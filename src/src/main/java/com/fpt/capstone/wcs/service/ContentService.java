@@ -1,8 +1,6 @@
 package com.fpt.capstone.wcs.service;
 
-import com.fpt.capstone.wcs.model.entity.ContactReport;
-import com.fpt.capstone.wcs.model.entity.RedirectionReport;
-import com.fpt.capstone.wcs.model.entity.PageReport;
+import com.fpt.capstone.wcs.model.entity.*;
 import com.fpt.capstone.wcs.model.pojo.UrlPOJO;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -22,11 +20,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ContentService {
-    public List<PageReport> getPageInfor(UrlPOJO[] list) throws InterruptedException {
+    public List<PageReport> getPageInfor(List<Page> list, PageOption option) throws InterruptedException {
         List<PageReport> pageCheck = new ArrayList<>();
-        final CyclicBarrier gate = new CyclicBarrier(list.length);
+        final CyclicBarrier gate = new CyclicBarrier(list.size());
         List<Thread> listThread = new ArrayList<>();
-        for (UrlPOJO url:list){
+        for (Page url:list){
             listThread.add(new Thread(){
                 public void run() {
                     try {
@@ -36,6 +34,7 @@ public class ContentService {
                         String canoUrl = getCanonicalUrl(url.getUrl());
 
                         PageReport page = new PageReport(httpcode, url.getUrl(),title,canoUrl);
+                        page.setPageOption(option);
                         pageCheck.add(page);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
@@ -60,6 +59,58 @@ public class ContentService {
         return pageCheck;
     }
 
+    public  List<RedirectionReport> redirectionTest(List<Page> list, PageOption option) throws IOException {
+        List<RedirectionReport> pageCheck = new ArrayList<>();
+        final CyclicBarrier gate = new CyclicBarrier(list.size());
+        List<Thread> listThread = new ArrayList<>();
+        for(Page url:list){
+            listThread.add(new Thread(){
+                public void run() {
+                    try {
+                        int  code =getStatus(url.getUrl());
+                        if(code== HttpURLConnection.HTTP_MOVED_TEMP || code == HttpURLConnection.HTTP_MOVED_PERM){
+                            URL siteURL = new URL(url.getUrl());
+                            HttpURLConnection connection = (HttpURLConnection) siteURL.openConnection();
+                            connection.setRequestMethod("GET");
+                            connection.setRequestProperty("User-Agent","Mozilla/5.0 ");
+                            String message = connection.getResponseMessage();
+                            String newUrl = connection.getHeaderField("Location");
+                            connection = (HttpURLConnection) new URL(newUrl).openConnection();
+                            connection.addRequestProperty("Accept-Language", "en-US,en;q=0.8");
+                            connection .addRequestProperty("User-Agent", "Mozilla");
+                            connection.addRequestProperty("Referer", "google.com");
+                            String codeNew = ""+code;
+                            RedirectionReport link = new RedirectionReport(code, url.getUrl(), message ,newUrl);
+                            link.setPageOption(option);
+                            pageCheck.add(link);
+                        }
+                    }catch (IOException e){
+                        Logger.getLogger(ContentService.class.getName()).log(Level.SEVERE, null, e);
+                    }
+
+                }});
+
+        }
+        for (Thread t : listThread) {
+            System.out.println("Threed start");
+            t.start();
+        }
+
+        for (Thread t : listThread) {
+            System.out.println("Threed join");
+            try {
+                t.join();
+            } catch (InterruptedException e) {
+                Logger.getLogger(ContentService.class.getName()).log(Level.SEVERE, null, e);
+            }
+        }
+        return pageCheck;
+    }
+
+
+
+    //check redirection for Server Behavior TruongLN
+
     public  List<RedirectionReport> redirectionTest(UrlPOJO[] list) throws IOException {
         List<RedirectionReport> pageCheck = new ArrayList<>();
         final CyclicBarrier gate = new CyclicBarrier(list.length);
@@ -82,6 +133,7 @@ public class ContentService {
                             connection.addRequestProperty("Referer", "google.com");
                             String codeNew = ""+code;
                             RedirectionReport link = new RedirectionReport(code, url.getUrl(), message ,newUrl);
+
                             pageCheck.add(link);
                         }
                     }catch (IOException e){
@@ -169,11 +221,11 @@ public class ContentService {
 
     }
 
-    public List<ContactReport> getContactDetail(UrlPOJO[] list){
+    public List<ContactReport> getContactDetail(List<Page> list, PageOption option){
         List<ContactReport> list1 = new ArrayList<>();
-        final CyclicBarrier gate = new CyclicBarrier(list.length);
+        final CyclicBarrier gate = new CyclicBarrier(list.size());
         List<Thread> listThread = new ArrayList<>();
-        for (UrlPOJO newList : list){
+        for (Page newList : list){
             listThread.add(new Thread(){
                 public void run() {
                     try {
@@ -198,6 +250,7 @@ public class ContentService {
                         while (matcher.find()) {
                             System.out.println("Phone0: " + matcher.group());
                             ContactReport phoneNumber = new ContactReport(matcher.group(),url,doc.getElementsContainingOwnText(matcher.group()).toString(),"Phone");
+                            phoneNumber.setPageOption(option);
                             list1.add(phoneNumber);
 
                         }
@@ -208,6 +261,7 @@ public class ContentService {
                         while (matcher.find()) {
                             System.out.println("Phone1: " + matcher.group() + " . " + matcher.start() + " " + matcher.end()+" ");
                             ContactReport phoneNumber = new ContactReport(matcher.group(),url,doc.getElementsContainingOwnText(matcher.group()).toString(),"Phone");
+                            phoneNumber.setPageOption(option);
                             list1.add(phoneNumber);
                         }
 
@@ -217,6 +271,7 @@ public class ContentService {
                         while (matcher.find()) {
                             System.out.println("PHONE 2:" + matcher.group());
                             ContactReport phoneNumber = new ContactReport(matcher.group(),url,doc.getElementsContainingOwnText(matcher.group()).toString(),"Phone");
+                            phoneNumber.setPageOption(option);
                             list1.add(phoneNumber);
                         }
 
@@ -226,6 +281,7 @@ public class ContentService {
                         while (matcher.find()) {
                             System.out.println("PHONE 3:" + matcher.group());
                             ContactReport phoneNumber = new ContactReport(matcher.group(),url,doc.getElementsContainingOwnText(matcher.group()).toString(),"Phone");
+                            phoneNumber.setPageOption(option);
                             list1.add(phoneNumber);
                         }
 
@@ -235,6 +291,7 @@ public class ContentService {
                         while (matcher.find()) {
                             System.out.println("PHONE 4:" + matcher.group());
                             ContactReport phoneNumber = new ContactReport(matcher.group(),url,doc.getElementsContainingOwnText(matcher.group()).toString(),"Phone");
+                            phoneNumber.setPageOption(option);
                             list1.add(phoneNumber);
                         }
 
@@ -244,6 +301,7 @@ public class ContentService {
                         while (matcher.find()) {
                             System.out.println("PHONE 5:" + matcher.group());
                             ContactReport phoneNumber = new ContactReport(matcher.group(),url,doc.getElementsContainingOwnText(matcher.group()).toString(),"Phone");
+                            phoneNumber.setPageOption(option);
                             list1.add(phoneNumber);
                         }
 
@@ -253,6 +311,7 @@ public class ContentService {
                         while (matcher.find()) {
                             System.out.println("PHONE 6:" + matcher.group());
                             ContactReport phoneNumber = new ContactReport(matcher.group(),url,doc.getElementsContainingOwnText(matcher.group()).toString(),"Phone");
+                            phoneNumber.setPageOption(option);
                             list1.add(phoneNumber);
                         }
 
@@ -271,6 +330,7 @@ public class ContentService {
                         while (matcher.find()) {
                             System.out.println("PHONE 8:" + matcher.group());
                             ContactReport phoneNumber = new ContactReport(matcher.group(),url,doc.getElementsContainingOwnText(matcher.group()).toString(),"Phone");
+                            phoneNumber.setPageOption(option);
                             list1.add(phoneNumber);
                         }
                         pattern = Pattern.compile(patternPhone9);
@@ -279,6 +339,7 @@ public class ContentService {
                         while (matcher.find()) {
                             System.out.println("PHONE 9:" + matcher.group());
                             ContactReport phoneNumber = new ContactReport(matcher.group(),url,doc.getElementsContainingOwnText(matcher.group()).toString(),"Phone");
+                            phoneNumber.setPageOption(option);
                             list1.add(phoneNumber);
                         }
                         pattern = Pattern.compile(patternphone10);
@@ -287,6 +348,7 @@ public class ContentService {
                         while (matcher.find()) {
                             System.out.println("PHONE 10:" + matcher.group());
                             ContactReport phoneNumber = new ContactReport(matcher.group(),url,doc.getElementsContainingOwnText(matcher.group()).toString(),"Phone");
+                            phoneNumber.setPageOption(option);
                             list1.add(phoneNumber);
                         }
                         pattern = Pattern.compile(patternPhone11);
@@ -295,12 +357,14 @@ public class ContentService {
                         while (matcher.find()) {
                             System.out.println("PHONE 11:" + matcher.group());
                             ContactReport phoneNumber = new ContactReport(matcher.group(),url,doc.getElementsContainingOwnText(matcher.group()).toString(),"Phone");
+                            phoneNumber.setPageOption(option);
                             list1.add(phoneNumber);
                         }
                         pattern = Pattern.compile("\\w+([.])?+\\w+@\\w+([-]\\w+)?[.]\\w+([.]\\w+)?+([.]\\w+)?");
                         matcher = pattern.matcher(doc.body().text());
                         while (matcher.find()) {
                             ContactReport phoneNumber = new ContactReport(matcher.group(),url,doc.getElementsContainingOwnText(matcher.group()).toString(),"Mail");
+                            phoneNumber.setPageOption(option);
                             list1.add(phoneNumber);
                         }
                         // so my  ^\\(?(\\d{3,4})\\)?[-.\\s]?(\\d{3,4})[-.\\s]?(\\d{2,4})$

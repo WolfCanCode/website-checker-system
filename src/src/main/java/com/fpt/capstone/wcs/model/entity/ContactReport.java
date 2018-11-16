@@ -17,6 +17,7 @@ import java.util.List;
 public class ContactReport {
     @Id
     @GeneratedValue
+    private long id;
     private String phoneMail;
     private String url;
     private String position;

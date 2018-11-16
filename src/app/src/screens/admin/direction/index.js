@@ -12,7 +12,12 @@ export default class Direction extends Component {
         var comp = [];
         this.setState({ loadingTable: true });
         var statusNotFound = "";
-        var param = { "userId": cookies.get("u_id"), "userToken": cookies.get("u_token"), "websiteId": cookies.get("u_w_id") };
+        var param = {
+            "userId": cookies.get("u_id"),
+            "userToken": cookies.get("u_token"),
+            "websiteId": cookies.get("u_w_id"),
+            "pageOptionId": cookies.get("u_option"),
+        }
 
         fetch("/api/redirectiontest/lastest", {
             method: 'POST',
@@ -22,7 +27,7 @@ export default class Direction extends Component {
             },
             body: JSON.stringify(param)
         }).then(response => response.json()).then((data) => {
-            comp = data.map((item, index) => {
+            comp = data.redirectiontestReport.map((item, index) => {
                 return (<TableRow key={index} webAddress={item.url} redirectUrl={item.driectToUrl} type={item.type} httpcode={item.httpCode} />);
             });
             if (comp.length === 0) {
@@ -39,20 +44,12 @@ export default class Direction extends Component {
         this.setState({ loadingTable: true, isDisable: true });
         var comp = [];
         var statusNotFound = "";
-        var param = [{ "url": "https://twitter.com/hashtag/hiccupsteahouse?lang=en" },
-        { "url": "http://www.cungmua.vn" },
-        { "url": "http://www.google.com" },
-        // { "url": "http://www.apple.com/us/shop/go/bag" },
-        // { "url": "http://www.facebook.com" },
-        { "url": "https://hiccupsteahouse.com/contact-us/" },
-        { "url": "https://hiccupsteahouse.com/careers/" },
-        { "url": "https://www.churroholic.com/" },
-            // { "url": "https://www.apple.com/us/shop/goto/giftcards" },
-            // { "url": "http://www.apple.com/today/camp/" },
-            // { "url": "https://www.apple.com/retail/camp/notify.html" },
-            // { "url": "https://www.apple.com/us/shop/goto/account" },
-
-        ];
+        var param = {
+            "userId": cookies.get("u_id"),
+            "userToken": cookies.get("u_token"),
+            "websiteId": cookies.get("u_w_id"),
+            "pageOptionId": cookies.get("u_option"),
+        }
         fetch("/api/redirectiontest", {
             method: 'POST',
             headers: {
@@ -61,7 +58,7 @@ export default class Direction extends Component {
             },
             body: JSON.stringify(param)
         }).then(response => response.json()).then((data) => {
-            comp = data.map((item, index) => {
+            comp = data.redirectiontestReport.map((item, index) => {
                 return (<TableRow key={index} webAddress={item.url} redirectUrl={item.driectToUrl} type={item.type} httpcode={item.httpCode} />);
             });
             if (comp.length === 0) {
