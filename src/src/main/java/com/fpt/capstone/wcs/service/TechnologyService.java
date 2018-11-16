@@ -299,7 +299,7 @@ public class TechnologyService {
         return resultList;
     }
 
-    public static List<FaviconReport> checkFavicon(UrlPOJO[] url, String urlRoot) {
+    public static List<FaviconReport> checkFavicon(List<Page> list, PageOption option, String urlRoot) {
         List<FaviconReport> fav = new ArrayList();
         boolean flagMethod1 = false;
         String urlFaviconMethod1 = urlRoot + "/favicon.ico";
@@ -311,15 +311,17 @@ public class TechnologyService {
                 flagMethod1 = true;
             }
         }
-        for ( UrlPOJO urlNew : url) {
+        for ( Page urlNew : list) {
             if (flagMethod1 == true) {
                 System.out.println(urlNew.getUrl().startsWith(urlRoot));
                 if(urlNew.getUrl().startsWith(urlRoot)){
                     FaviconReport faviconMethod1 = new FaviconReport(urlFaviconMethod1, urlNew.getUrl(), "16x16");
+                    faviconMethod1.setPageOption(option);
                     fav.add(faviconMethod1);
                 }
                 else{
                     FaviconReport faviconMethod1 = new FaviconReport("External Link", urlNew.getUrl(), "");
+                    faviconMethod1.setPageOption(option);
                     fav.add(faviconMethod1);
                 }
             } else {
@@ -330,6 +332,7 @@ public class TechnologyService {
                     System.out.println(elem.size());
                     if (elem.size() == 0) {
                         FaviconReport favicon = new FaviconReport("Missing Favicon", urlNew.getUrl(), "undefine");
+                        favicon.setPageOption(option);
                         fav.add(favicon);
                     }
                     for (Element element : elem) {
@@ -342,6 +345,7 @@ public class TechnologyService {
                         int code = verifyHttpMessage(href);
                         if (code == 200) {
                             FaviconReport favicon = new FaviconReport(href, urlNew.getUrl(), size);
+                            favicon.setPageOption(option);
                             fav.add(favicon);
                             System.out.println("Favicon: " + href + " - Web Address: " + urlNew + " - Size: " + size + " http code: " + code);
                         }
@@ -350,6 +354,7 @@ public class TechnologyService {
                             int checkFaviconResponeAgain = verifyHttpMessage(urlFavAgain);
                             if (checkFaviconResponeAgain == 200) {
                                 FaviconReport favicon = new FaviconReport(urlFavAgain, urlNew.getUrl(), size);
+                                favicon.setPageOption(option);
                                 fav.add(favicon);
                                 System.out.println("Favicon: " + urlFavAgain + " - Web Address: " + urlNew + " - Size: " + size + " http code: " + checkFaviconResponeAgain);
                             }
@@ -358,6 +363,7 @@ public class TechnologyService {
                                 int checkFaviconResponeLast = verifyHttpMessage(urlFavLast);
                                 if (checkFaviconResponeLast == 200) {
                                     FaviconReport favicon = new FaviconReport(urlFavLast, urlNew.getUrl(), size);
+                                    favicon.setPageOption(option);
                                     fav.add(favicon);
                                     System.out.println("Favicon: " + urlFavLast + " - Web Address: " + urlNew + " - Size: " + size + " http code: " + checkFaviconResponeLast);
                                 }

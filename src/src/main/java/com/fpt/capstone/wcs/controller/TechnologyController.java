@@ -157,26 +157,101 @@ public class TechnologyController {
         return success;
     }
 
+//    @PostMapping("/api/favicontest")
+//    public List<FaviconReport> getDataFaviconTest(@RequestBody UrlPOJO[] list) throws InterruptedException {
+//        TechnologyService technologyService = new TechnologyService();
+//        String urlRoot="";
+//        for(int i =0; i< list.length;i++ ){
+//            Pattern pattern = Pattern.compile("(http\\:|https\\:)//([\\w\\-?\\.?]+)?\\.([a-zA-Z]{2,3})?",Pattern.CASE_INSENSITIVE);
+//            Matcher matcher = pattern.matcher(list[i].getUrl());
+//            while (matcher.find()){
+//                urlRoot = matcher.group();
+//            }
+//        }
+//        List<FaviconReport> resultList = technologyService.checkFavicon(list,urlRoot);
+//        faviconRepository.deleteAll();
+//        faviconRepository.saveAll(resultList);
+//        return resultList;
+//    }
+
     @PostMapping("/api/favicontest")
-    public List<FaviconReport> getDataFaviconTest(@RequestBody UrlPOJO[] list) throws InterruptedException {
-        TechnologyService technologyService = new TechnologyService();
-        String urlRoot="";
-        for(int i =0; i< list.length;i++ ){
+    public Map<String, Object> getDataPagesTest(@RequestBody RequestCommonPOJO request) throws InterruptedException {
+        Map<String,Object> res = new HashMap<>();
+        Website website =authenticate.isAuthGetSingleSite(request);
+        if (website != null) {
+            PageOption pageOption = pageOptionRepository.findOneByIdAndWebsiteAndDelFlagEquals(request.getPageOptionId(), website, false);
+            if(pageOption==null){
+                request.setPageOptionId((long)-1);
+            }
+            if(request.getPageOptionId()!=-1) { //page option list is null
+                List<Page> pages = pageOption.getPages();
+                String urlRoot="";
+        for(int i =0; i< pages.size();i++ ){
             Pattern pattern = Pattern.compile("(http\\:|https\\:)//([\\w\\-?\\.?]+)?\\.([a-zA-Z]{2,3})?",Pattern.CASE_INSENSITIVE);
-            Matcher matcher = pattern.matcher(list[i].getUrl());
+            Matcher matcher = pattern.matcher(pages.get(i).getUrl());
             while (matcher.find()){
                 urlRoot = matcher.group();
             }
         }
-        List<FaviconReport> resultList = technologyService.checkFavicon(list,urlRoot);
-        faviconRepository.deleteAll();
-        faviconRepository.saveAll(resultList);
-        return resultList;
+                TechnologyService exp = new TechnologyService();
+                List<FaviconReport> resultList = exp.checkFavicon(pages, pageOption, urlRoot);
+                faviconRepository.removeAllByPageOption(pageOption);
+                faviconRepository.saveAll(resultList);
+                res.put("action", Constant.SUCCESS);
+                res.put("faviconReport", resultList);
+                return res;
+            }
+            else {
+                List<Page> pages = new ArrayList<>();
+                Page page = new Page();
+                page.setUrl(website.getUrl());
+                page.setType(1);
+                pages.add(page);
+                String urlRoot="";
+                for(int i =0; i< pages.size();i++ ){
+                    Pattern pattern = Pattern.compile("(http\\:|https\\:)//([\\w\\-?\\.?]+)?\\.([a-zA-Z]{2,3})?",Pattern.CASE_INSENSITIVE);
+                    Matcher matcher = pattern.matcher(pages.get(i).getUrl());
+                    while (matcher.find()){
+                        urlRoot = matcher.group();
+                    }
+                }
+                TechnologyService exp = new TechnologyService();
+                List<FaviconReport> resultList = exp.checkFavicon(pages, null,urlRoot);
+                faviconRepository.saveAll(resultList);
+                res.put("action", Constant.SUCCESS);
+                res.put("faviconReport", resultList);
+                return res;
+            }
+        } else {
+            res.put("action", Constant.INCORRECT);
+            return res;
+        }
     }
 
     @PostMapping("/api/favicontest/lastest")
-    public List<FaviconReport> getDataFaviconTestLastest() {
-        List<FaviconReport> resultList = faviconRepository.findAll();
-        return resultList;
+    public Map<String, Object> getLastestPageTest(@RequestBody RequestCommonPOJO request)
+    {
+        Map<String, Object> res = new HashMap<>();
+        Website website = authenticate.isAuthGetSingleSite(request);
+        if (website != null) {
+            PageOption pageOption = pageOptionRepository.findOneByIdAndWebsiteAndDelFlagEquals(request.getPageOptionId(), website, false);
+            if(pageOption==null){
+                request.setPageOptionId((long)-1);
+            }
+            if(request.getPageOptionId()!=-1) {
+                List<FaviconReport> resultList = faviconRepository.findAllByPageOption(pageOption);
+                res.put("faviconReport", resultList);
+                res.put("action", Constant.SUCCESS);
+                return res;
+            } else {
+                List<FaviconReport> resultList = faviconRepository.findAllByPageOptionAndUrl(null, website.getUrl());
+                res.put("faviconReport", resultList);
+                res.put("action", Constant.SUCCESS);
+                return res;
+            }
+        } else {
+            res.put("action", Constant.INCORRECT);
+            return res;
+        }
     }
 }

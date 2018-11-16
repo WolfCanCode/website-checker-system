@@ -28,7 +28,10 @@ class faviconScreen extends Component {
         var faviconMissCount = 0;
         var flag = false;
         this.setState({ loadingTable: true });
-        var param = { "userId": cookies.get("u_id"), "userToken": cookies.get("u_token"), "websiteId": cookies.get("u_w_id") };
+        var param = {  "userId": cookies.get("u_id"),
+        "userToken": cookies.get("u_token"),
+        "websiteId": cookies.get("u_w_id"),
+        "pageOptionId": cookies.get("u_option"),};
 
         fetch("/api/favicontest/lastest", {
             method: 'POST',
@@ -38,7 +41,8 @@ class faviconScreen extends Component {
             },
             body: JSON.stringify(param)
         }).then(response => response.json()).then((data) => {
-            comp = data.map((item, index) => {
+            console.log(data);
+            comp = data.faviconReport.map((item, index) => {
                 for (let i = 0; i < listCom.length; i++) {
                     if (item.faviconUrl === listCom[i]) {
                         flag = true;
@@ -72,11 +76,10 @@ class faviconScreen extends Component {
         var favUrlCount = 0;
         var flag = false;
         var faviconMissCount = 0;
-        var param = [{ "url": "http://hiccupsteahouse.com/" },
-        { "url": "https://insites.com/" },
-        { "url": "https://insites.com/tests/" },
-        { "url": "https://insites.com/content/redirections/" },
-        ];
+        var param = {  "userId": cookies.get("u_id"),
+        "userToken": cookies.get("u_token"),
+        "websiteId": cookies.get("u_w_id"),
+        "pageOptionId": cookies.get("u_option"),}
         fetch("/api/favicontest", {
             method: 'POST',
             headers: {
@@ -85,7 +88,7 @@ class faviconScreen extends Component {
             },
             body: JSON.stringify(param)
         }).then(response => response.json()).then((data) => {
-            comp = data.map((item, index) => {
+            comp = data.faviconReport.map((item, index) => {
                 for (let i = 0; i < listCom.length; i++) {
                     if (item.faviconUrl === listCom[i]) {
                         flag = true;

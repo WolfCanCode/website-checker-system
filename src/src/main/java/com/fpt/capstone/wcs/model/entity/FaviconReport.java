@@ -17,15 +17,15 @@ public class FaviconReport {
     @GeneratedValue
     private long id;
     private String faviconUrl;
-    private String webAddress;
+    private String url;
     private String sizeFavicon;
 
     public FaviconReport(){
     }
 
-    public  FaviconReport(String faviconUrl, String webAddress, String sizeFavicon){
+    public  FaviconReport(String faviconUrl, String url, String sizeFavicon){
         this.faviconUrl=faviconUrl;
-        this.webAddress = webAddress;
+        this.url = url;
         this.sizeFavicon  = sizeFavicon;
     }
 
