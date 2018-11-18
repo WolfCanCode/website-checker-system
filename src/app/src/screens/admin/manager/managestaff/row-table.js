@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Table, Button, Modal, Input, Form } from 'semantic-ui-react'
+import { Table, Button, Modal, Input, Form, TableCell } from 'semantic-ui-react'
 import { Cookies } from "react-cookie";
 
 const cookies = new Cookies();
@@ -167,16 +167,17 @@ class TableRow extends Component {
             </Modal>
 
             {/* Row */}
-            <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>{this.props.No + 1}</Table.Cell>
-            <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>Name: {this.props.nameStaff}<br /> Username: {this.props.emailStaff}</Table.Cell>
-            <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>
+            <Table.Cell>{this.props.No + 1}</Table.Cell>
+            <Table.Cell >Name: {this.props.nameStaff}<br /> Username: {this.props.emailStaff}</Table.Cell>
+            <Table.Cell>
                 {this.props.webStaff.map((item, index) => {
                     return (<div key={index}>
                         {item.url}
                     </div>);
                 })}
             </Table.Cell>
-            <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}><Button onClick={() => this.setState({ modalEdit: true })} > Edit </Button><Button onClick={() => this.setState({ modalDelete: true })}> Delete</Button></Table.Cell>
+            <Table.Cell ><Button onClick={() => this.setState({ modalEdit: true })} > Edit </Button></Table.Cell>
+            <TableCell><Button onClick={() => this.setState({ modalDelete: true })}> Delete</Button></TableCell>
         </Table.Row >
         );
     }

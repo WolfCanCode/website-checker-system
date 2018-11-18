@@ -127,6 +127,7 @@ export default class managestaffscreen extends Component {
                                     <Table.HeaderCell>Information</Table.HeaderCell>
                                     <Table.HeaderCell>Assign for Website</Table.HeaderCell>
                                     <Table.HeaderCell>Action</Table.HeaderCell>
+                                    <Table.HeaderCell></Table.HeaderCell>
                                 </Table.Row>
                             </Table.Header>
                             <Table.Body>

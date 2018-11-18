@@ -76,7 +76,6 @@ public class ExperienceImpl implements ExperienceService {
             if (request.getPageOptionId() != -1) { //page option list is null
                 List<Page> pages = pageOption.getPages();
                 List<SpeedTestReport> resultList = speedTestService(pages, pageOption);
-                speedtestRepository.removeAllByPageOption(pageOption);
                 speedtestRepository.saveAll(resultList);
                 res.put("action", Constant.SUCCESS);
                 res.put("speedtestReport", resultList);
@@ -109,7 +108,8 @@ public class ExperienceImpl implements ExperienceService {
                 request.setPageOptionId((long) -1);
             }
             if (request.getPageOptionId() != -1) {
-                List<SpeedTestReport> resultList = speedtestRepository.findAllByPageOption(pageOption);
+                Date lastedCreatedTime = speedtestRepository.findFirstByPageOptionOrderByCreatedTimeDesc(pageOption).getCreatedTime();
+                List<SpeedTestReport> resultList = speedtestRepository.findAllByPageOptionAndCreatedTime(pageOption,lastedCreatedTime);
                 res.put("speedtestReport", resultList);
                 res.put("action", Constant.SUCCESS);
                 return res;
@@ -127,6 +127,7 @@ public class ExperienceImpl implements ExperienceService {
 
 
     public List<SpeedTestReport> speedTestService(List<Page> list, PageOption option) throws InterruptedException {
+        Date timeCreated = new Date();
         System.setProperty("webdriver.chrome.driver", Constant.CHROME_DRIVER);
         //Asign list speed info
         List<SpeedTestReport> resultList = new ArrayList<>();
@@ -180,6 +181,7 @@ public class ExperienceImpl implements ExperienceService {
                             double sizeTransferred1 = Math.floor(totalByte / 1000000 * 10) / 10;
                             SpeedTestReport speedTestReport = new SpeedTestReport(p.getUrl(), interactTime1 + "", loadTime1 + "", sizeTransferred1 + "");
                             speedTestReport.setPageOption(option);
+                            speedTestReport.setCreatedTime(timeCreated);
                             resultList.add(speedTestReport);
                             driver.quit();
                         } catch (InterruptedException | BrokenBarrierException e) {
@@ -309,6 +311,7 @@ public class ExperienceImpl implements ExperienceService {
                             File file = new File("./"+ list.indexOf(p) + ".png");
                             Map uploadResult = cloudinary.uploader().upload(file, ObjectUtils.emptyMap());
                             String screenShot = uploadResult.get("url").toString();
+                            screenShot = screenShot.split("/upload/")[0] + "/upload/w_350/" + screenShot.split("/upload/")[1];
                             //System.out.println(uploadResult.get("url"));
                             file.delete();
 
@@ -379,7 +382,7 @@ public class ExperienceImpl implements ExperienceService {
                                     if (content.contains("user-scalable=no") || content.contains("user-scalable=0")
                                             || (content.contains("minimum-scale=1") && content.contains("maximum-scale=1"))) {
                                        // System.out.println("That page not support pinch to zoom!");
-                                        issue = issue + "Not support pinch to zoom!,";
+                                        issue = issue + "Not support pinch to zoom,";
                                     }
                                 }
 
@@ -388,7 +391,7 @@ public class ExperienceImpl implements ExperienceService {
                                 if (htmlOverflowXValue.matches("scroll|hidden") || htmlOverflowValue.equals("scroll|hidden")) {
                                     if (bodyOverflowXValue.equals("hidden") || bodyOverflowValue.equals("hidden")) {
                                         //System.out.println("That page not support scroll horizontally!");
-                                        issue = issue + "Not support scroll horizontally!,";
+                                        issue = issue + "Not support scroll horizontally,";
                                     }
 
                                 }
@@ -411,7 +414,7 @@ public class ExperienceImpl implements ExperienceService {
                                     float a = (float)linkBigEnough/link;
                                     if (a < 0.9) {
                                         //System.out.println("Links too small!");
-                                        issue = issue + "Links too small!,";
+                                        issue = issue + "Links too small,";
                                     }
                                 }
 
@@ -433,7 +436,7 @@ public class ExperienceImpl implements ExperienceService {
                                     float a = (float)buttonBigEnough/button;
                                     if (a < 0.9) {
                                        // System.out.println("Buttons too small!");
-                                        issue = issue + "Buttons too small!,";
+                                        issue = issue + "Buttons too small,";
                                     }
                                 }
 
@@ -459,7 +462,7 @@ public class ExperienceImpl implements ExperienceService {
                                             float a = (float)lengthTotal/bodyTextLength;
                                             if (a > 0.1) {
                                                 checkSize = true;
-                                                issue = issue + "Text too small!,";
+                                                issue = issue + "Text too small,";
                                             }
                                         }
 
@@ -469,7 +472,7 @@ public class ExperienceImpl implements ExperienceService {
                                 }
 
                                 if(issue == null){
-                                    issue = "The Page is optimized for the phone!,";
+                                    issue = "The Page is optimized for the phone,";
                                 }
                                 MobileLayoutReport mobileLayoutReport = new MobileLayoutReport(p.getUrl(),title,screenShot, issue  );
                                 mobileLayoutReport.setPageOption(option);

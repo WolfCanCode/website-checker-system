@@ -4,10 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Data
 @Entity
@@ -22,6 +19,8 @@ public class SpeedTestReport {
     private String interactiveTime;
     private String pageLoadTime;
     private String size;
+    private Date createdTime;
+
 
     public SpeedTestReport(String url, String interactiveTime, String pageLoadTime, String size) {
         this.url = url;
