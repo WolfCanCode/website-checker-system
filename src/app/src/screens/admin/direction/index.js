@@ -19,7 +19,7 @@ export default class Direction extends Component {
             "pageOptionId": cookies.get("u_option"),
         }
 
-        fetch("http://localhost:8080/api/redirectiontest/lastest", {
+        fetch("/api/redirectiontest/lastest", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -50,7 +50,7 @@ export default class Direction extends Component {
             "websiteId": cookies.get("u_w_id"),
             "pageOptionId": cookies.get("u_option"),
         }
-        fetch("http://localhost:8080/api/redirectiontest", {
+        fetch("/api/redirectiontest", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',

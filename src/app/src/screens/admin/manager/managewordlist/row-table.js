@@ -26,7 +26,7 @@ export default class TableRow extends Component {
                 "id": this.props.id, "word": this.state.word
             }
         };
-        fetch("http://localhost:8080/api/word/editWord", {
+        fetch("/api/word/editWord", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -51,7 +51,7 @@ export default class TableRow extends Component {
                 "id": this.props.id
             }
         };
-        fetch("http://localhost:8080/api/word/deleteWord", {
+        fetch("/api/word/deleteWord", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',

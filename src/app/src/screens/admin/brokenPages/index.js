@@ -26,7 +26,7 @@ class brokenPagesScreen extends Component {
             "websiteId": cookies.get("u_w_id"),
             "pageOptionId": cookies.get("u_option"),
         }
-        fetch("http://localhost:8080/api/brokenPage/lastest", {
+        fetch("/api/brokenPage/lastest", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -54,7 +54,7 @@ class brokenPagesScreen extends Component {
             "pageOptionId": cookies.get("u_option"),
         }
 
-        fetch("http://localhost:8080/api/brokenPage", {
+        fetch("/api/brokenPage", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',

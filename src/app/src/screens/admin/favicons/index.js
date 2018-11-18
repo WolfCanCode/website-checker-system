@@ -35,7 +35,7 @@ class faviconScreen extends Component {
             "pageOptionId": cookies.get("u_option"),
         };
 
-        fetch("http://localhost:8080/api/favicontest/lastest", {
+        fetch("/api/favicontest/lastest", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -84,7 +84,7 @@ class faviconScreen extends Component {
             "websiteId": cookies.get("u_w_id"),
             "pageOptionId": cookies.get("u_option"),
         }
-        fetch("http://localhost:8080/api/favicontest", {
+        fetch("/api/favicontest", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',

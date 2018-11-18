@@ -51,7 +51,7 @@ class TableRow extends Component {
             }
         };
 
-        fetch("http://localhost:8080/api/user/editStaff", {
+        fetch("/api/user/editStaff", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -76,7 +76,7 @@ class TableRow extends Component {
             }
         };
 
-        fetch("http://localhost:8080/api/user/deleteStaff", {
+        fetch("/api/user/deleteStaff", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',

@@ -26,7 +26,7 @@ class brokenLinksScreen extends Component {
         }
 
 
-        fetch("http://localhost:8080/api/brokenLink/lastest", {
+        fetch("/api/brokenLink/lastest", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -57,7 +57,7 @@ class brokenLinksScreen extends Component {
             "pageOptionId": cookies.get("u_option"),
         };
 
-        fetch("http://localhost:8080/api/brokenLink", {
+        fetch("/api/brokenLink", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',

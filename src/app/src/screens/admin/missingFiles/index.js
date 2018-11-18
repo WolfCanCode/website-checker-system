@@ -36,7 +36,7 @@ class missingFilesScreen extends Component {
         this.setState({ loadingTable: true });
         var param = { "userId": cookies.get("u_id"), "userToken": cookies.get("u_token"), "websiteId": cookies.get("u_w_id") };
 
-        fetch("http://localhost:8080/api/missingtest/lastest", {
+        fetch("/api/missingtest/lastest", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -97,7 +97,7 @@ class missingFilesScreen extends Component {
         var listMissingFileCount = [];
         var statusResult = "";
         console.log(param)
-        fetch("http://localhost:8080/api/missingtest", {
+        fetch("/api/missingtest", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',

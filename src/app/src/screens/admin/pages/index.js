@@ -18,7 +18,7 @@ export default class Pages extends Component {
             "pageOptionId": cookies.get("u_option"),
         };
 
-        fetch("http://localhost:8080/api/pagestest/lastest", {
+        fetch("/api/pagestest/lastest", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -44,7 +44,7 @@ export default class Pages extends Component {
             "websiteId": cookies.get("u_w_id"),
             "pageOptionId": cookies.get("u_option"),
         }
-        fetch("http://localhost:8080/api/pagestest", {
+        fetch("/api/pagestest", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',

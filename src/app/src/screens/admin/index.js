@@ -27,7 +27,7 @@ export default class AdminScreen extends Component {
 
     componentWillMount() {
         this.setState({ loadingContent: true });
-        fetch("http://localhost:8080/api/auth", {
+        fetch("/api/auth", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',

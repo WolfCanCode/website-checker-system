@@ -19,7 +19,7 @@ class ConfigScreen extends Component {
     _refreshVer() {
         this.setState({ isLoading: false });
         var param = { "userId": cookies.get("u_id"), "userToken": cookies.get("u_token"), "websiteId": cookies.get("u_w_id") };
-        fetch("http://localhost:8080/api/sitemap/getVer", {
+        fetch("/api/sitemap/getVer", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -40,7 +40,7 @@ class ConfigScreen extends Component {
     _getNewVer() {
         this.setState({ isLoading: true });
         var param = { "userId": cookies.get("u_id"), "userToken": cookies.get("u_token"), "websiteId": cookies.get("u_w_id") };
-        fetch("http://localhost:8080/api/sitemap/makeVer", {
+        fetch("/api/sitemap/makeVer", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',

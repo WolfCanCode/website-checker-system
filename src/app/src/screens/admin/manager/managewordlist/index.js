@@ -26,7 +26,7 @@ export default class managewordlist extends Component {
     }
 
     _refreshTable() {
-        fetch("http://localhost:8080/api/word/manage", {
+        fetch("/api/word/manage", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -67,7 +67,7 @@ export default class managewordlist extends Component {
                 "word": this.state.word
             }
         };
-        fetch("http://localhost:8080/api/word/addWord", {
+        fetch("/api/word/addWord", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',

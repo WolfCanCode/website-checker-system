@@ -28,7 +28,7 @@ class mobileLayoutScreen extends Component {
             "websiteId": cookies.get("u_w_id"),
             "pageOptionId": cookies.get("u_option"),
         }
-        fetch("http://localhost:8080/api/mobileLayoutTest/lastest", {
+        fetch("/api/mobileLayoutTest/lastest", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -63,7 +63,7 @@ class mobileLayoutScreen extends Component {
             "pageOptionId": cookies.get("u_option"),
         }
 
-        fetch("http://localhost:8080/api/mobileLayoutTest", {
+        fetch("/api/mobileLayoutTest", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',

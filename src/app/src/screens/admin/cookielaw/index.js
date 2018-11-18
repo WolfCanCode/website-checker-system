@@ -21,7 +21,7 @@ export default class CookieLaw extends Component {
             "websiteId": cookies.get("u_w_id"),
             "pageOptionId": cookies.get("u_option"),
         }
-        fetch("http://localhost:8080/api/cookie/lastest", {
+        fetch("/api/cookie/lastest", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -49,7 +49,7 @@ export default class CookieLaw extends Component {
             "pageOptionId": cookies.get("u_option"),
         }
 
-        fetch("http://localhost:8080/api/cookie", {
+        fetch("/api/cookie", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -66,8 +66,8 @@ export default class CookieLaw extends Component {
 
     }
 
-    
-   
+
+
 
 
     render() {
@@ -80,16 +80,16 @@ export default class CookieLaw extends Component {
                         Check
                        <Icon name='right arrow' />
                     </Button>
-                    <div style={{ marginBottom: '10px', float: 'right'}}> 
-                    
-                    
-                    <ReactToExcel 
-                        className="btn1"       
-                        table="table-to-xls"
-                        filename="cookie_test_file"
-                        sheet="sheet 1"
-                        buttonText={<Button ><Icon name="print" />Export</Button>}
-                    />
+                    <div style={{ marginBottom: '10px', float: 'right' }}>
+
+
+                        <ReactToExcel
+                            className="btn1"
+                            table="table-to-xls"
+                            filename="cookie_test_file"
+                            sheet="sheet 1"
+                            buttonText={<Button ><Icon name="print" />Export</Button>}
+                        />
                     </div>
 
                     <div style={{ marginBottom: '10px', float: 'right' }}>

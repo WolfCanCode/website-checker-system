@@ -17,7 +17,7 @@ export default class JavascriptErrorScreen extends Component {
       "websiteId": cookies.get("u_w_id"),
       "pageOptionId": cookies.get("u_option"),
     };
-    fetch("http://localhost:8080/api/jsTest/lastest", {
+    fetch("/api/jsTest/lastest", {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
@@ -51,7 +51,7 @@ export default class JavascriptErrorScreen extends Component {
       "pageOptionId": cookies.get("u_option"),
     };
 
-    fetch("http://localhost:8080/api/jsTest", {
+    fetch("/api/jsTest", {
       method: 'POST',
       headers: {
         'Accept': 'application/json',

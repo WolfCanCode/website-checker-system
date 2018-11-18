@@ -11,7 +11,7 @@ class brokenLinksScreen extends Component {
         this.setState({ loadingTable: true });
         var param = { "userId": cookies.get("u_id"), "userToken": cookies.get("u_token"), "websiteId": cookies.get("u_w_id") };
 
-        fetch("http://localhost:8080/api/svbehavior", {
+        fetch("/api/svbehavior", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
