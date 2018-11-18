@@ -3,12 +3,14 @@ package com.fpt.capstone.wcs.controller;
 import com.fpt.capstone.wcs.model.entity.User;
 import com.fpt.capstone.wcs.model.entity.Version;
 import com.fpt.capstone.wcs.model.entity.Website;
+import com.fpt.capstone.wcs.model.entity.Word;
 import com.fpt.capstone.wcs.model.pojo.ManagerRequestPOJO;
 import com.fpt.capstone.wcs.model.pojo.RequestCommonPOJO;
 import com.fpt.capstone.wcs.model.pojo.WebsitePojo;
 import com.fpt.capstone.wcs.repository.RoleRepository;
 import com.fpt.capstone.wcs.repository.UserRepository;
 import com.fpt.capstone.wcs.repository.WebsiteRepository;
+import com.fpt.capstone.wcs.repository.WordRepository;
 import com.fpt.capstone.wcs.utils.Authenticate;
 import com.fpt.capstone.wcs.utils.Constant;
 import com.fpt.capstone.wcs.utils.EncodeUtil;
@@ -33,6 +35,8 @@ public class ManagerController {
     WebsiteRepository websiteRepository;
     @Autowired
     SitemapController sitemapController;
+    @Autowired
+    WordRepository wordRepository;
 
 
     @PostMapping("/api/website/manage")
@@ -291,4 +295,100 @@ public class ManagerController {
             return res;
         }
     }
+
+
+    @PostMapping("/api/word/manage")
+    public Map<String, Object> getWordList(@RequestBody ManagerRequestPOJO request) {
+        Map<String, Object> res = new HashMap<>();
+        User manager = authenticate.isAuthAndManagerGet(request);
+        if (manager != null) {
+            List<Word> wordList = wordRepository.findAllByUserAndDelFlagEquals(manager,false);
+            if (wordList != null) {
+
+                res.put("action", Constant.SUCCESS);
+                res.put("wordList", wordList);
+                return res;
+            } else {
+                res.put("action", Constant.INCORRECT);
+                return res;
+            }
+        } else {
+            res.put("action", Constant.INCORRECT);
+            return res;
+        }
+    }
+
+    @PostMapping("/api/word/addWord")
+    public Map<String, Object> addWord(@RequestBody ManagerRequestPOJO request) throws MalformedURLException {
+        Map<String, Object> res = new HashMap<>();
+        User manager = authenticate.isAuthAndManagerGet(request);
+        if (manager != null) {
+            Word tmp = wordRepository
+                    .findFirstByUserAndWordAndDelFlagEquals(
+                            manager,
+                            request.getWord().getWord(),
+                            false);
+
+            if (tmp == null) {
+                List<User> managers = new ArrayList<>();
+                managers.add(manager);
+                Word word = new Word();
+                word.setWord(request.getWord().getWord());
+                word.setUser(managers);
+                wordRepository.save(word);
+                res.put("action", Constant.SUCCESS);
+                return res;
+            } else {
+                res.put("action", Constant.DUPLICATE_ERROR);
+                return res;
+            }
+        } else {
+            res.put("action", Constant.PERMISSION_ERROR);
+            return res;
+        }
+    }
+
+    @PostMapping("/api/word/editWord")
+    public Map<String, Object> editWord(@RequestBody ManagerRequestPOJO request) {
+        Map<String, Object> res = new HashMap<>();
+        User manager = authenticate.isAuthAndManagerGet(request);
+        if (manager != null) {
+            Word tmp = wordRepository.findOneByUserAndIdAndDelFlagEquals(manager, request.getWord().getId(), false);
+            if (tmp != null) {
+                tmp.setWord(request.getWord().getWord());
+                wordRepository.save(tmp);
+                res.put("action", Constant.SUCCESS);
+                return res;
+            } else {
+                res.put("action", Constant.INCORRECT);
+                return res;
+            }
+        } else {
+            res.put("action", Constant.PERMISSION_ERROR);
+            return res;
+        }
+    }
+
+    @PostMapping("/api/word/deleteWord")
+    public Map<String, Object> delWord(@RequestBody ManagerRequestPOJO request) {
+        Map<String, Object> res = new HashMap<>();
+        User manager = authenticate.isAuthAndManagerGet(request);
+        if (manager != null) {
+            Word tmp = wordRepository.findOneByUserAndIdAndDelFlagEquals(manager, request.getWord().getId(), false);
+            if (tmp != null) {
+                tmp.setDelFlag(true);
+                wordRepository.save(tmp);
+                res.put("action", Constant.SUCCESS);
+                return res;
+            } else {
+                res.put("action", Constant.INCORRECT);
+                return res;
+            }
+        } else {
+            res.put("action", Constant.PERMISSION_ERROR);
+            return res;
+        }
+    }
+
+
     }

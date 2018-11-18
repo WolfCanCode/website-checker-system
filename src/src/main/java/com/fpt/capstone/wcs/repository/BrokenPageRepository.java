@@ -10,5 +10,6 @@ import java.util.List;
 @Repository
 public interface BrokenPageRepository extends JpaRepository<BrokenPageReport,Long> {
     List<BrokenPageReport> findAllByPageOption(PageOption pageOption);
+    List<BrokenPageReport> findAllByPageOptionAndUrlPage(PageOption pageOption, String url);
     void removeAllByPageOption(PageOption pageOption);
 }
