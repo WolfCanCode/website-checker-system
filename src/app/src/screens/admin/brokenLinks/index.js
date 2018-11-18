@@ -3,6 +3,8 @@ import 'semantic-ui-css/semantic.min.css';
 import { Segment, Button, Table, Icon, Input } from 'semantic-ui-react'
 import TableRow from './row-table';
 import { Cookies } from "react-cookie";
+import ReactToExcel from "react-html-table-to-excel";
+import './style.css';
 
 const cookies = new Cookies();
 
@@ -10,7 +12,7 @@ const cookies = new Cookies();
 
 class brokenLinksScreen extends Component {
 
-    state = { list: [], loadingTable: false, isDisable: false, tested:false };
+    state = { list: [], loadingTable: false, isDisable: false, tested: false };
 
 
     componentDidMount() {
@@ -22,8 +24,8 @@ class brokenLinksScreen extends Component {
             "websiteId": cookies.get("u_w_id"),
             "pageOptionId": cookies.get("u_option"),
         }
-            
-        
+
+
         fetch("/api/brokenLink/lastest", {
             method: 'POST',
             headers: {
@@ -35,10 +37,10 @@ class brokenLinksScreen extends Component {
             comp = data.brokenLinkReport.map((item, index) => {
                 return (<TableRow key={index} urlPage={item.urlPage} urlLink={item.urlLink} httpCode={item.httpCode} httpMessage={item.httpMessage} />);
             });
-           
-                this.setState({ list: comp });
-        
-            
+
+            this.setState({ list: comp });
+
+
             this.setState({ loadingTable: false });
         });
 
@@ -66,13 +68,13 @@ class brokenLinksScreen extends Component {
             comp = data.brokenLinkReport.map((item, index) => {
                 return (<TableRow key={index} urlPage={item.urlPage} urlLink={item.urlLink} httpCode={item.httpCode} httpMessage={item.httpMessage} />);
             });
-            
-           
+
+
             this.setState({ list: comp });
-           if(this.state.list.length === 0){
-               this.setState({ tested : true });
-           } 
-            
+            if (this.state.list.length === 0) {
+                this.setState({ tested: true });
+            }
+
             this.setState({ loadingTable: false, isDisable: false });
         });
 
@@ -105,14 +107,22 @@ class brokenLinksScreen extends Component {
                                 <p style={{ fontSize: 24 }}>2 <br /> External broken links</p>
                             </Segment>
                         </Segment.Group>
-                        <Segment basic style={{ marginBottom: '60px', marginRight: '20px' }}>
-                            <Button floated='right' ><Icon name="print" />Export</Button>
+                        <Segment basic style={{ marginBottom: '60px'}}>
+                            <div style={{ float: 'right' }}>
+                                <ReactToExcel 
+                                    className="btn1"
+                                    table="table-to-xls"
+                                    filename="broken_link_test_file"
+                                    sheet="sheet 1"
+                                    buttonText={<Button ><Icon name="print" />Export</Button>}
+                                />
+                            </div>
 
                             <Input icon='search' placeholder='Search...' style={{ float: 'right' }} />
                         </Segment>
                         <Segment style={{ maxHeight: '40vh', overflow: "auto" }}>
 
-                            <Table singleLine unstackable textAlign='center' style={{ tableLayout: 'auto' }}>
+                            <Table singleLine unstackable textAlign='center' style={{ tableLayout: 'auto' }} id="table-to-xls">
                                 <Table.Header >
                                     <Table.Row>
                                         <Table.HeaderCell>Page</Table.HeaderCell>
@@ -123,7 +133,7 @@ class brokenLinksScreen extends Component {
                                     </Table.Row>
                                 </Table.Header>
                                 <Table.Body>
-                                    {this.state.list.length === 0 ? <Table.Row><Table.Cell>{this.state.tested?"This page has no broken links!":"This page haven't test yet, please try to test!"}</Table.Cell></Table.Row> : this.state.list}
+                                    {this.state.list.length === 0 ? <Table.Row><Table.Cell>{this.state.tested ? "This page has no broken links!" : "This page haven't test yet, please try to test!"}</Table.Cell></Table.Row> : this.state.list}
                                 </Table.Body>
                             </Table>
                         </Segment>

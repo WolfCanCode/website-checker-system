@@ -2,6 +2,9 @@ import React, { Component } from 'react';
 import { Segment, Button, Icon, Table, Input } from 'semantic-ui-react'
 import TableRow from './row-table';
 import { Cookies } from "react-cookie";
+import ReactToExcel from "react-html-table-to-excel";
+import './style.css';
+
 
 const cookies = new Cookies();
 export default class CookieLaw extends Component {
@@ -63,6 +66,10 @@ export default class CookieLaw extends Component {
 
     }
 
+    
+   
+
+
     render() {
         return (
 
@@ -73,12 +80,22 @@ export default class CookieLaw extends Component {
                         Check
                        <Icon name='right arrow' />
                     </Button>
+                    <div style={{ marginBottom: '10px', float: 'right'}}> 
                     
-                    <Button style={{ marginLeft: '10px' }} floated='right'><Icon name="print" />Export</Button>
-            <div style={{ marginBottom: '10px', float: 'right' }}>
-              <Input icon='search' placeholder='Search...' />
-            </div>
-                    <Table singleLine unstackable  style={{ fontSize: '16px',  }}>
+                    
+                    <ReactToExcel 
+                        className="btn1"       
+                        table="table-to-xls"
+                        filename="cookie_test_file"
+                        sheet="sheet 1"
+                        buttonText={<Button ><Icon name="print" />Export</Button>}
+                    />
+                    </div>
+
+                    <div style={{ marginBottom: '10px', float: 'right' }}>
+                        <Input icon='search' placeholder='Search...' />
+                    </div>
+                    <Table singleLine unstackable style={{ fontSize: '16px', }} id="table-to-xls">
                         <Table.Header textAlign='center'>
                             <Table.Row>
                                 <Table.HeaderCell>Cookie Name</Table.HeaderCell>
@@ -104,7 +121,9 @@ export default class CookieLaw extends Component {
                     </Table>
                 </Segment>
 
+
             </Segment.Group>
+
         );
     }
 }
