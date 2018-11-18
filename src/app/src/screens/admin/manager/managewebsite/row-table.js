@@ -180,6 +180,7 @@ export default class TableRow extends Component {
                     closeOnEscape={closeOnEscape}
                     closeOnDimmerClick={closeOnDimmerClick}
                     onClose={this.close1}
+                    dimmer="blurring"
                 >
                     <Modal.Header>Delete Your Website</Modal.Header>
                     <Modal.Content>
@@ -194,7 +195,10 @@ export default class TableRow extends Component {
             </Transition>
             {/* Edit */}
             <Transition duration={600} divided size='huge' verticalAlign='middle' visible={open}>
-                <Modal size={size} open={open} >
+                <Modal
+                    size={size}
+                    open={open}
+                    dimmer="blurring" >
                     <Modal.Header>Edit Website</Modal.Header>
                     <Modal.Content >
                         <p >Website Name</p>
@@ -213,7 +217,10 @@ export default class TableRow extends Component {
 
             {/* Assign */}
             <Transition duration={600} divided size='huge' verticalAlign='middle' visible={this.state.assignModal}>
-                <Modal size={"large"} open={this.state.assignModal} >
+                <Modal
+                    size={"large"}
+                    open={this.state.assignModal}
+                    dimmer="blurring">
                     <Modal.Header>Assign Website</Modal.Header>
                     <Modal.Content >
                         <p >Staffs:</p>
@@ -234,16 +241,16 @@ export default class TableRow extends Component {
                 </Modal>
             </Transition>
 
-            {/* <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}><a href={this.props.urlPage}>{this.props.urlPage.split("www.")[1]}</a></Table.Cell>
-            <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}><a href={this.props.urlLink}>{this.props.urlLink.split("www.")[1]}</a></Table.Cell> */}
             <Table.Cell ><a >{this.props.id}</a></Table.Cell>
             <Table.Cell ><a >{this.props.name}</a></Table.Cell>
             <Table.Cell ><a >{this.props.url}</a></Table.Cell>
             <Table.Cell ><a >{this.props.version}</a></Table.Cell>
             <Table.Cell ><a >{this.props.time}</a></Table.Cell>
-            <Table.Cell ><Button onClick={() => this._makeNewver(this.props.id)} color="blue">Make</Button></Table.Cell>
-            <Table.Cell ><Button onClick={() => this._assignModal()} > Assign </Button><Button onClick={this.show('mini')} > Edit </Button><Button onClick={this.closeConfigShow(false, true)}> Delete</Button></Table.Cell>
-            {/* <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>{this.props.httpcode}</Table.Cell> */}
+            <Table.Cell ><Button onClick={() => this._makeNewver(this.props.id)} color="green">Make</Button></Table.Cell>
+            <Table.Cell >
+                <Button primary onClick={() => this._assignModal()} > Assign </Button>
+                <Button color="orange" onClick={this.show('mini')} > Edit </Button>
+                <Button negative onClick={this.closeConfigShow(false, true)}> Delete</Button></Table.Cell>
         </Table.Row >
         );
     }

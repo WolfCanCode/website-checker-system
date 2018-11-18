@@ -10,7 +10,16 @@ const cookies = new Cookies();
 
 
 class speedTestScreen extends Component {
-    state = { list: [], loadingTable: false, averageInteractiveTime: 0, averagePageLoadTime: 0, averageSize: 0, isDisable: false };
+    state = {
+        list: [],
+        loadingTable: false,
+        averageInteractiveTime: 0,
+        averagePageLoadTime: 0,
+        averageSize: 0,
+        isDisable: false,
+        isDoneTest: false,
+        listReportId: []
+    };
 
 
     componentDidMount() {
@@ -51,11 +60,13 @@ class speedTestScreen extends Component {
             let averagePageLoadTime = (totalPageLoadTime / listLength).toFixed(1);
             let averageSize = (totalSize / listLength).toFixed(1);
 
-            this.setState({ averageInteractiveTime: averageInteractiveTime });
-            this.setState({ averagePageLoadTime: averagePageLoadTime });
-            this.setState({ averageSize: averageSize });
-            this.setState({ list: comp });
-            this.setState({ loadingTable: false });
+            this.setState({
+                averageInteractiveTime: averageInteractiveTime,
+                averagePageLoadTime: averagePageLoadTime,
+                averageSize: averageSize,
+                list: comp,
+                loadingTable: false
+            });
         });
 
 
@@ -73,6 +84,62 @@ class speedTestScreen extends Component {
         };
 
         fetch("/api/speedTest", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(param)
+        }).then(response => response.json()).then((data) => {
+            var listReport = [];
+            comp = data.speedtestReport.map((item, index) => {
+                listReport.push(item.id);
+                return (<TableRow key={index} url={item.url} interactiveTime={item.interactiveTime} pageLoadTime={item.pageLoadTime} size={item.size} />);
+            });
+
+            let totalInteractiveTime = data.speedtestReport.reduce((interactiveTime, item) => {
+                return interactiveTime = +interactiveTime + +item.interactiveTime
+            }, 0)
+
+            let totalPageLoadTime = data.speedtestReport.reduce((pageLoadTime, item) => {
+                return pageLoadTime = +pageLoadTime + +item.pageLoadTime
+            }, 0)
+
+            let totalSize = data.speedtestReport.reduce((sizePage, item) => {
+                return sizePage = +sizePage + +item.size
+            }, 0)
+
+            let listLength = comp.length;
+            let averageInteractiveTime = (totalInteractiveTime / listLength).toFixed(1);
+            let averagePageLoadTime = (totalPageLoadTime / listLength).toFixed(1);
+            let averageSize = (totalSize / listLength).toFixed(1);
+
+            this.setState({
+                averageInteractiveTime: averageInteractiveTime,
+                averagePageLoadTime: averagePageLoadTime,
+                averageSize: averageSize,
+                list: comp,
+                loadingTable: false,
+                isDisable: false,
+                isDoneTest: true,
+                listReportId: listReport
+            });
+        });
+    }
+
+    _saveReport() {
+        this.setState({ loadingTable: true });
+        this.setState({ isDisable: true });
+        var comp = [];
+        var param = {
+            "userId": cookies.get("u_id"),
+            "userToken": cookies.get("u_token"),
+            "websiteId": cookies.get("u_w_id"),
+            "pageOptionId": cookies.get("u_option"),
+            "listReportId": this.state.listReportId
+        };
+
+        fetch("/api/speedTest/saveReport", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -101,15 +168,19 @@ class speedTestScreen extends Component {
             let averagePageLoadTime = (totalPageLoadTime / listLength).toFixed(1);
             let averageSize = (totalSize / listLength).toFixed(1);
 
-            this.setState({ averageInteractiveTime: averageInteractiveTime });
-            this.setState({ averagePageLoadTime: averagePageLoadTime });
-            this.setState({ averageSize: averageSize });
-            this.setState({ list: comp });
-            this.setState({ loadingTable: false });
-            this.setState({ isDisable: false });
-
+            this.setState({
+                averageInteractiveTime: averageInteractiveTime,
+                averagePageLoadTime: averagePageLoadTime,
+                averageSize: averageSize,
+                list: comp,
+                loadingTable: false,
+                isDisable: false,
+                isDoneTest: false
+            });
         });
     }
+
+
 
     render() {
         return (
@@ -133,11 +204,14 @@ class speedTestScreen extends Component {
                             </Segment>
                         </Segment.Group>
                         <Segment basic>
-                            <Button icon labelPosition='right' disabled={this.state.isDisable} onClick={() => this._doSpeedTest()}>
+                            <Button icon primary labelPosition='right' disabled={this.state.isDisable} onClick={() => this._doSpeedTest()}>
                                 Check
                        <Icon name='right arrow' />
                             </Button>
-                            <Button floated='right' ><Icon name="print" />Export</Button>
+                            {this.state.isDoneTest ? <Button icon color="green" onClick={() => this._saveReport()}>
+                                <Icon name='check' />
+                            </Button> : ""}
+                            <Button floated='right' color="green" ><Icon name="print" />Export</Button>
 
                             <Input icon='search' placeholder='Search...' style={{ float: 'right' }} />
                         </Segment>

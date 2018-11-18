@@ -77,10 +77,11 @@ class HeaderAdmin extends Component {
 
 
     _doLogout = () => {
-        cookies.remove("u_id");
-        cookies.remove("u_token");
-        cookies.remove("u_w_id");
-        cookies.remove("u_isManager");
+        cookies.remove("u_id", { path: '/' });
+        cookies.remove("u_token", { path: '/' });
+        cookies.remove("u_w_id", { path: '/' });
+        cookies.remove("u_isManager", { path: '/' });
+        cookies.remove("u_option", { path: '/' });
         this.props.logout(true);
 
     }

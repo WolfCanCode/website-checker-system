@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Table, Button, Modal, Input, Form, TableCell } from 'semantic-ui-react'
+import { Table, Button, Modal, Input, Form } from 'semantic-ui-react'
 import { Cookies } from "react-cookie";
 
 const cookies = new Cookies();
@@ -176,8 +176,10 @@ class TableRow extends Component {
                     </div>);
                 })}
             </Table.Cell>
-            <Table.Cell ><Button onClick={() => this.setState({ modalEdit: true })} > Edit </Button></Table.Cell>
-            <TableCell><Button onClick={() => this.setState({ modalDelete: true })}> Delete</Button></TableCell>
+            <Table.Cell>
+                <Button color="orange" onClick={() => this.setState({ modalEdit: true })} > Edit </Button>
+                <Button negative onClick={() => this.setState({ modalDelete: true })}> Delete</Button>
+            </Table.Cell>
         </Table.Row >
         );
     }
