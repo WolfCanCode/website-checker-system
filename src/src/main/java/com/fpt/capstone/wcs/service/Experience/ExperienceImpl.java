@@ -335,6 +335,23 @@ public class ExperienceImpl implements ExperienceService {
                             }
 
 
+                            if(isSupport == false){
+                                java.util.List<WebElement> media = driver.findElements(By.cssSelector("link[rel='stylesheet']"));
+                                List<String> listFramework = Arrays.asList("/bootstrap.min.css","/pure-min.css", "/w3.css", "/semantic.min.css");
+                                if(media.size() != 0){
+                                    for (int i = 0; i< media.size(); i++){
+                                        for (int j = 0; j < listFramework.size(); j++){
+                                            if(media.get(i).getAttribute("href").contains(listFramework.get(j))){
+                                                isSupport = true;
+                                            }
+                                        }
+
+                                    }
+                                }
+
+                            }
+
+
 
                             java.util.List<WebElement> links1 = driver.findElements(By.cssSelector("meta[name='viewport'][content*='width=device-width'][content*='initial-scale=1']"));
                             System.out.println("size viewport " + links1.size());

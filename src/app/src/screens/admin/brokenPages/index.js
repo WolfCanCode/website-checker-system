@@ -3,6 +3,8 @@ import 'semantic-ui-css/semantic.min.css';
 import { Segment, Button, Table, Icon, Input } from 'semantic-ui-react'
 import TableRow from './row-table';
 import { Cookies } from "react-cookie";
+import ReactToExcel from "react-html-table-to-excel";
+import './style.css';
 
 const cookies = new Cookies();
 
@@ -12,7 +14,7 @@ const cookies = new Cookies();
 
 class brokenPagesScreen extends Component {
 
-    state = { list: [], loadingTable: false, isDisable: false, tested:false  };
+    state = { list: [], loadingTable: false, isDisable: false, tested: false };
 
 
     componentDidMount() {
@@ -64,9 +66,9 @@ class brokenPagesScreen extends Component {
                 return (<TableRow key={index} urlPage={item.urlPage} stt={item.stt} httpCode={item.httpCode} httpMessage={item.httpMessage} />);
             });
             this.setState({ list: comp });
-            if(this.state.list.length === 0){
-                this.setState({ tested : true });
-            } 
+            if (this.state.list.length === 0) {
+                this.setState({ tested: true });
+            }
             this.setState({ loadingTable: false, isDisable: false });
         });
 
@@ -103,13 +105,23 @@ class brokenPagesScreen extends Component {
                                 <p style={{ fontSize: 24 }}>2 <br /> Error pages</p>
                             </Segment>
                         </Segment.Group>
-                        <Segment basic style={{ marginBottom: '60px', marginRight: '20px' }}>
-                            <Button floated='right' ><Icon name="print" />Export</Button>
+                        <Segment basic style={{ marginBottom: '60px'}}>
+                            <div style={{ marginBottom: '10px', float: 'right' }}>
+
+
+                                <ReactToExcel
+                                    className="btn1"
+                                    table="table-to-xls"
+                                    filename="broken_page_test_file"
+                                    sheet="sheet 1"
+                                    buttonText={<Button ><Icon name="print" />Export</Button>}
+                                />
+                            </div>
                             <Input icon='search' placeholder='Search...' style={{ float: 'right' }} />
                         </Segment>
                         <Segment style={{ maxHeight: '30vh', overflow: "auto" }}>
 
-                            <Table singleLine unstackable textAlign='center' style={{ tableLayout: 'auto' }}>
+                            <Table singleLine unstackable textAlign='center' style={{ tableLayout: 'auto' }} id="table-to-xls">
                                 <Table.Header >
                                     <Table.Row>
                                         <Table.HeaderCell>Page</Table.HeaderCell>
@@ -118,7 +130,7 @@ class brokenPagesScreen extends Component {
                                     </Table.Row>
                                 </Table.Header>
                                 <Table.Body>
-                                    {this.state.list.length === 0 ? <Table.Row><Table.Cell>{this.state.tested?"This site has no broken pages!":"This page haven't test yet, please try to test!"}</Table.Cell> </Table.Row> : this.state.list}
+                                    {this.state.list.length === 0 ? <Table.Row><Table.Cell>{this.state.tested ? "This site has no broken pages!" : "This page haven't test yet, please try to test!"}</Table.Cell> </Table.Row> : this.state.list}
                                 </Table.Body>
                             </Table>
                         </Segment>
