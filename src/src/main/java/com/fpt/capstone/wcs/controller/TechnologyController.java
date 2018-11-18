@@ -24,19 +24,20 @@ import java.util.regex.Pattern;
 
 @RestController
 public class TechnologyController {
+//    @Autowired
+//    JSCheckRepository jsCheckRepository;
     @Autowired
-    JSCheckRepository jsCheckRepository;
     ServerBehaviorRepository serverBehaviorRepository;
 //    @Autowired
 //    MissingFilesPagesRepository missingFilesPagesRepository;
     @Autowired
     CookieRepository cookieRepository;
 
-
-    @Autowired
-    FaviconRepository faviconRepository;
-    @Autowired
-    TechnologyService technologyService;
+//
+//    @Autowired
+//    FaviconRepository faviconRepository;
+//    @Autowired
+//    TechnologyService technologyService;
     @Autowired
     PageRepository pageRepository;
     @Autowired
@@ -46,19 +47,24 @@ public class TechnologyController {
     @Autowired
     Authenticate authenticate;
 
+    @Autowired
+    com.fpt.capstone.wcs.service.Technology.TechnologyService technologyServiceS1;
+
     @PostMapping("/api/jsTest")
-    public List<JavascriptReport> getDataPagesTest(@RequestBody UrlPOJO[] list) throws InterruptedException {
-        TechnologyService technologyService = new TechnologyService();
-        List<JavascriptReport> resultList = technologyService.jsTestService(list);
-        jsCheckRepository.deleteAll();
-        jsCheckRepository.saveAll(resultList);
-        return resultList;
+    public Map<String, Object> getJavaErrrorTest(@RequestBody RequestCommonPOJO request) throws InterruptedException {
+//        TechnologyService technologyService = new TechnologyService();
+       // List<JavascriptReport> resultList = technologyService.jsTestService(list);
+//        jsCheckRepository.deleteAll();
+//        jsCheckRepository.saveAll(resultList);
+         return  technologyServiceS1.getJavaErrrorTest(request);
     }
 
     @PostMapping("/api/jsTest/lastest")
-    public List<JavascriptReport> getLastestSpeedTest() {
-        List<JavascriptReport> resultList = jsCheckRepository.findAll();
-        return resultList;
+    public Map<String, Object> getLastestSpeedTest(@RequestBody RequestCommonPOJO request) {
+//
+//        List<JavascriptReport> resultList = jsCheckRepository.findAll();
+//        return resultList;
+       return technologyServiceS1.getLastestSpeedTest(request);
     }
 
     @PostMapping("/api/svbehavior")
@@ -96,6 +102,7 @@ public class TechnologyController {
 
             if(request.getPageOptionId()!=-1) { //page option list is null
                 List<Page> pages = pageOption.getPages();
+                TechnologyService technologyService = new TechnologyService();
                 List<CookieReport> resultList = technologyService.cookieService(pages, pageOption);
                 cookieRepository.removeAllByPageOption(pageOption);
                 cookieRepository.saveAll(resultList);
@@ -176,82 +183,12 @@ public class TechnologyController {
 
     @PostMapping("/api/favicontest")
     public Map<String, Object> getDataPagesTest(@RequestBody RequestCommonPOJO request) throws InterruptedException {
-        Map<String,Object> res = new HashMap<>();
-        Website website =authenticate.isAuthGetSingleSite(request);
-        if (website != null) {
-            PageOption pageOption = pageOptionRepository.findOneByIdAndWebsiteAndDelFlagEquals(request.getPageOptionId(), website, false);
-            if(pageOption==null){
-                request.setPageOptionId((long)-1);
-            }
-            if(request.getPageOptionId()!=-1) { //page option list is null
-                List<Page> pages = pageOption.getPages();
-                String urlRoot="";
-        for(int i =0; i< pages.size();i++ ){
-            Pattern pattern = Pattern.compile("(http\\:|https\\:)//([\\w\\-?\\.?]+)?\\.([a-zA-Z]{2,3})?",Pattern.CASE_INSENSITIVE);
-            Matcher matcher = pattern.matcher(pages.get(i).getUrl());
-            while (matcher.find()){
-                urlRoot = matcher.group();
-            }
-        }
-                TechnologyService exp = new TechnologyService();
-                List<FaviconReport> resultList = exp.checkFavicon(pages, pageOption, urlRoot);
-                faviconRepository.removeAllByPageOption(pageOption);
-                faviconRepository.saveAll(resultList);
-                res.put("action", Constant.SUCCESS);
-                res.put("faviconReport", resultList);
-                return res;
-            }
-            else {
-                List<Page> pages = new ArrayList<>();
-                Page page = new Page();
-                page.setUrl(website.getUrl());
-                page.setType(1);
-                pages.add(page);
-                String urlRoot="";
-                for(int i =0; i< pages.size();i++ ){
-                    Pattern pattern = Pattern.compile("(http\\:|https\\:)//([\\w\\-?\\.?]+)?\\.([a-zA-Z]{2,3})?",Pattern.CASE_INSENSITIVE);
-                    Matcher matcher = pattern.matcher(pages.get(i).getUrl());
-                    while (matcher.find()){
-                        urlRoot = matcher.group();
-                    }
-                }
-                TechnologyService exp = new TechnologyService();
-                List<FaviconReport> resultList = exp.checkFavicon(pages, null,urlRoot);
-                faviconRepository.saveAll(resultList);
-                res.put("action", Constant.SUCCESS);
-                res.put("faviconReport", resultList);
-                return res;
-            }
-        } else {
-            res.put("action", Constant.INCORRECT);
-            return res;
-        }
+        return technologyServiceS1.faviconTest(request);
     }
 
     @PostMapping("/api/favicontest/lastest")
     public Map<String, Object> getLastestPageTest(@RequestBody RequestCommonPOJO request)
     {
-        Map<String, Object> res = new HashMap<>();
-        Website website = authenticate.isAuthGetSingleSite(request);
-        if (website != null) {
-            PageOption pageOption = pageOptionRepository.findOneByIdAndWebsiteAndDelFlagEquals(request.getPageOptionId(), website, false);
-            if(pageOption==null){
-                request.setPageOptionId((long)-1);
-            }
-            if(request.getPageOptionId()!=-1) {
-                List<FaviconReport> resultList = faviconRepository.findAllByPageOption(pageOption);
-                res.put("faviconReport", resultList);
-                res.put("action", Constant.SUCCESS);
-                return res;
-            } else {
-                List<FaviconReport> resultList = faviconRepository.findAllByPageOptionAndUrl(null, website.getUrl());
-                res.put("faviconReport", resultList);
-                res.put("action", Constant.SUCCESS);
-                return res;
-            }
-        } else {
-            res.put("action", Constant.INCORRECT);
-            return res;
-        }
+       return technologyServiceS1.getLastestFaviconTest(request);
     }
 }
