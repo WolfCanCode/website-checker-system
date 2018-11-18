@@ -10,5 +10,6 @@ import java.util.List;
 @Repository
 public interface BrokenLinkRepository extends JpaRepository<BrokenLinkReport,Long> {
     List<BrokenLinkReport> findAllByPageOption(PageOption pageOption);
+    List<BrokenLinkReport> findAllByPageOptionAndUrlLink(PageOption pageOption, String url);
     void removeAllByPageOption(PageOption pageOption);
 }

@@ -20,7 +20,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ContentService {
-    public List<PageReport> getPageInfor(List<Page> list, PageOption option) throws InterruptedException {
+    public List<PageReport> getPageInfor(List<Page> list, PageOption option)  {
         List<PageReport> pageCheck = new ArrayList<>();
         final CyclicBarrier gate = new CyclicBarrier(list.size());
         List<Thread> listThread = new ArrayList<>();
@@ -54,12 +54,16 @@ public class ContentService {
 
         for (Thread t : listThread) {
             System.out.println("Threed join");
-            t.join();
+            try {
+                t.join();
+            } catch (InterruptedException e) {
+                Logger.getLogger(ContentService.class.getName()).log(Level.SEVERE, null, e);
+            }
         }
         return pageCheck;
     }
 
-    public  List<RedirectionReport> redirectionTest(List<Page> list, PageOption option) throws IOException {
+    public  List<RedirectionReport> redirectionTest(List<Page> list, PageOption option)  {
         List<RedirectionReport> pageCheck = new ArrayList<>();
         final CyclicBarrier gate = new CyclicBarrier(list.size());
         List<Thread> listThread = new ArrayList<>();
