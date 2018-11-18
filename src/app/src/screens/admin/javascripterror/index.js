@@ -10,7 +10,13 @@ export default class JavascriptErrorScreen extends Component {
   componentDidMount() {
     var comp = [];
     this.setState({ loadingTable: true });
-    var param = [];
+
+    var param = {
+      "userId": cookies.get("u_id"),
+      "userToken": cookies.get("u_token"),
+      "websiteId": cookies.get("u_w_id"),
+      "pageOptionId": cookies.get("u_option"),
+    };
     fetch("http://localhost:8080/api/jsTest/lastest", {
       method: 'POST',
       headers: {
@@ -19,15 +25,16 @@ export default class JavascriptErrorScreen extends Component {
       },
       body: JSON.stringify(param)
     }).then(response => response.json()).then((data) => {
-      if (data.length !== 0) {
-        comp = data.map((item, index) => {
-          var msg = item.messages.replace("-", "");
-          msg = msg.replace(msg.split(" ")[0], "");
-          var messages = msg.split(" at");
-          return (<TableRow key={index} page={item.pages} type={item.type} messages={messages} />);
-        });
-        this.setState({ list: comp });
-      }
+      console.log(data)
+      // if (data.jsErrorReport.length !== 0) {
+      comp = data.jsErrorReport.map((item, index) => {
+        var msg = item.messages.replace("-", "");
+        msg = msg.replace(msg.split(" ")[0], "");
+        var messages = msg.split(" at");
+        return (<TableRow key={index} page={item.pages} type={item.type} messages={messages} />);
+      });
+      this.setState({ list: comp });
+      // }
       this.setState({ loadingTable: false });
     });
 
@@ -37,7 +44,12 @@ export default class JavascriptErrorScreen extends Component {
     this.setState({ loadingTable: true });
     this.setState({ isDisable: true });
     var comp = [];
-    var param = { "userId": cookies.get("u_id"), "userToken": cookies.get("u_token"), "websiteId": cookies.get("u_w_id") };
+    var param = {
+      "userId": cookies.get("u_id"),
+      "userToken": cookies.get("u_token"),
+      "websiteId": cookies.get("u_w_id"),
+      "pageOptionId": cookies.get("u_option"),
+    };
 
     fetch("http://localhost:8080/api/jsTest", {
       method: 'POST',
@@ -47,15 +59,17 @@ export default class JavascriptErrorScreen extends Component {
       },
       body: JSON.stringify(param)
     }).then(response => response.json()).then((data) => {
-      if (data.length !== 0) {
-        comp = data.map((item, index) => {
-          var msg = item.messages.replace("-", "");
-          msg = msg.replace(msg.split(" ")[0], "");
-          var messages = msg.split(" at");
-          return (<TableRow key={index} page={item.pages} type={item.type} messages={messages} />);
-        });
-        this.setState({ list: comp });
-      }
+      console.log(data.jsErrorReport)
+      // if (data.jsErrorReport.length !== 0) {
+      comp = data.jsErrorReport.map((item, index) => {
+
+        var msg = item.messages.replace("-", "");
+        msg = msg.replace(msg.split(" ")[0], "");
+        var messages = msg.split(" at");
+        return (<TableRow key={index} page={item.pages} type={item.type} messages={messages} />);
+      });
+      this.setState({ list: comp });
+      // }
       this.setState({ loadingTable: false });
     });
   }
