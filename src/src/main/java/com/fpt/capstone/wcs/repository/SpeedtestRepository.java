@@ -13,7 +13,7 @@ import java.util.List;
 public interface SpeedtestRepository extends JpaRepository<SpeedTestReport,Long> {
     List<SpeedTestReport> findAllByPageOption(PageOption pageOption);
     List<SpeedTestReport> findAllByPageOptionAndUrl(PageOption pageOption, String url);
-    SpeedTestReport findFirstByPageOptionOrderByCreatedTimeDesc(PageOption pageOption);
+    SpeedTestReport findFirstByPageOptionAndDelFlagEqualsOrderByCreatedTimeDesc(PageOption pageOption,boolean delFlag);
     List<SpeedTestReport> findAllByPageOptionAndCreatedTime(PageOption pageOption, Date createdTime);
     void removeAllByPageOption(PageOption pageOption);
 }

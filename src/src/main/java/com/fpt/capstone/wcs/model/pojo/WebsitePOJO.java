@@ -7,7 +7,7 @@ import lombok.Setter;
 @Data
 @Getter
 @Setter
-public class WebsitePojo {
+public class WebsitePOJO {
     private long id;
     private String name;
     private String url;

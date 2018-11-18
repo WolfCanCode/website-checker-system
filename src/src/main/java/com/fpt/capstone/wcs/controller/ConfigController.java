@@ -1,6 +1,6 @@
 package com.fpt.capstone.wcs.controller;
 
-import com.fpt.capstone.wcs.model.pojo.PageOptionPojo;
+import com.fpt.capstone.wcs.model.pojo.PageOptionPOJO;
 import com.fpt.capstone.wcs.model.pojo.RequestCommonPOJO;
 import com.fpt.capstone.wcs.service.Header.HeaderService;
 import com.fpt.capstone.wcs.service.PageOption.PageOptionService;
@@ -41,32 +41,32 @@ public class ConfigController {
     }
 
     @PostMapping("/api/page/pageOption/select")
-    public Map<String, Object> getSelectedPageOption(@RequestBody PageOptionPojo request) {
+    public Map<String, Object> getSelectedPageOption(@RequestBody PageOptionPOJO request) {
         return  pageOptionService.selectPageOption(request);
     }
 
     @PostMapping("/api/page/pageOption/add")
-    public Map<String, Object> addPageOption(@RequestBody PageOptionPojo request) {
+    public Map<String, Object> addPageOption(@RequestBody PageOptionPOJO request) {
         return  pageOptionService.addPageOption(request);
     }
 
     @PostMapping("/api/page/pageOption/updatePage")
-    public Map<String, Object> updatePageOption(@RequestBody PageOptionPojo request) {
+    public Map<String, Object> updatePageOption(@RequestBody PageOptionPOJO request) {
         return  pageOptionService.updatePageOption(request);
     }
 
     @PostMapping("/api/page/pageOption/updateName")
-    public Map<String, Object> editPageOption(@RequestBody PageOptionPojo request) {
+    public Map<String, Object> editPageOption(@RequestBody PageOptionPOJO request) {
         return  pageOptionService.updateNamePageOption(request);
     }
 
     @PostMapping("/api/page/pageOption/delete")
-    public Map<String, Object> deletePageOption(@RequestBody PageOptionPojo request) {
+    public Map<String, Object> deletePageOption(@RequestBody PageOptionPOJO request) {
         return  pageOptionService.deletePageOption(request);
     }
 
     @PostMapping("/api/page/pageOption/size")
-    public Map<String, Object> sizePageOption(@RequestBody PageOptionPojo request) {
+    public Map<String, Object> sizePageOption(@RequestBody PageOptionPOJO request) {
         return  pageOptionService.pageOptionSize(request);
     }
 

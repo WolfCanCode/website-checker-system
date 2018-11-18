@@ -59,4 +59,14 @@ public class User {
             mappedBy = "user")
     private List<Website> website = new ArrayList<>();
 
+    @OneToMany(targetEntity = PageOption.class, mappedBy = "createdUser", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<PageOption> pageOptions= new ArrayList<>();
+
+    //Report
+
+    @OneToMany(targetEntity = SpeedTestReport.class, mappedBy = "createdUser", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<SpeedTestReport> speedTestReports= new ArrayList<>();
+
 }

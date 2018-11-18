@@ -1,6 +1,7 @@
 package com.fpt.capstone.wcs.controller;
 
 import com.fpt.capstone.wcs.model.pojo.RequestCommonPOJO;
+import com.fpt.capstone.wcs.model.pojo.RequestReportPOJO;
 import com.fpt.capstone.wcs.service.Experience.ExperienceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,8 +13,13 @@ import java.util.*;
 
 @RestController
 public class ExperienceController {
-    @Autowired
+    final
     ExperienceService experienceService;
+
+    @Autowired
+    public ExperienceController(ExperienceService experienceService) {
+        this.experienceService = experienceService;
+    }
 
 
     @Transactional
@@ -27,7 +33,12 @@ public class ExperienceController {
         return experienceService.getLastestSpeedTest(request);
     }
 
-    @Transactional
+    @PostMapping("/api/speedTest/saveReport")
+    public Map<String, Object> saveReport(@RequestBody RequestReportPOJO request) {
+        return experienceService.saveReport(request);
+    }
+
+        @Transactional
     @PostMapping("/api/mobileLayoutTest")
     public Map<String, Object> getDataMobileLayout(@RequestBody RequestCommonPOJO request) throws InterruptedException {
         return experienceService.getDataMobileLayout(request);

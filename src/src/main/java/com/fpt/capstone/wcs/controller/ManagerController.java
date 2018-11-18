@@ -5,7 +5,7 @@ import com.fpt.capstone.wcs.model.entity.Version;
 import com.fpt.capstone.wcs.model.entity.Website;
 import com.fpt.capstone.wcs.model.pojo.ManagerRequestPOJO;
 import com.fpt.capstone.wcs.model.pojo.RequestCommonPOJO;
-import com.fpt.capstone.wcs.model.pojo.WebsitePojo;
+import com.fpt.capstone.wcs.model.pojo.WebsitePOJO;
 import com.fpt.capstone.wcs.repository.RoleRepository;
 import com.fpt.capstone.wcs.repository.UserRepository;
 import com.fpt.capstone.wcs.repository.WebsiteRepository;
@@ -42,9 +42,9 @@ public class ManagerController {
         if (manager != null) {
             List<Website> websites = websiteRepository.findAllByUserAndDelFlagEquals(manager,false);
             if (websites != null) {
-                List<WebsitePojo> websitePojos = new ArrayList<>();
+                List<WebsitePOJO> websitePOJOS = new ArrayList<>();
                 for (Website website : websites) {
-                    WebsitePojo web = new WebsitePojo();
+                    WebsitePOJO web = new WebsitePOJO();
                     web.setId(website.getId());
                     web.setName(website.getName());
                     web.setUrl(website.getUrl());
@@ -62,10 +62,10 @@ public class ManagerController {
                         web.setVersion(0);
                         web.setTime("Haven't Test yet");
                     }
-                    websitePojos.add(web);
+                    websitePOJOS.add(web);
                 }
                 res.put("action", Constant.SUCCESS);
-                res.put("website", websitePojos);
+                res.put("website", websitePOJOS);
                 return res;
             } else {
                 res.put("action", Constant.INCORRECT);

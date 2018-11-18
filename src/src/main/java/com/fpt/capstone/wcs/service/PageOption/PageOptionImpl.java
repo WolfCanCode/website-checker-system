@@ -4,8 +4,9 @@ import com.fpt.capstone.wcs.model.entity.Page;
 import com.fpt.capstone.wcs.model.entity.PageOption;
 import com.fpt.capstone.wcs.model.entity.Version;
 import com.fpt.capstone.wcs.model.entity.Website;
-import com.fpt.capstone.wcs.model.pojo.PageOptionPojo;
+import com.fpt.capstone.wcs.model.pojo.PageOptionPOJO;
 import com.fpt.capstone.wcs.model.pojo.RequestCommonPOJO;
+import com.fpt.capstone.wcs.model.pojo.WebsiteUserPOJO;
 import com.fpt.capstone.wcs.repository.*;
 import com.fpt.capstone.wcs.utils.Authenticate;
 import com.fpt.capstone.wcs.utils.Constant;
@@ -41,20 +42,24 @@ public class PageOptionImpl implements PageOptionService {
     @Override
     public Map<String, Object> init(RequestCommonPOJO request) {
         Map<String, Object> res = new HashMap<>();
-        Website website = authenticate.isAuthGetSingleSite(request);
-        if (website != null) {
-            PageOption firstPageOption = pageOptionRepository.findFirstByWebsiteAndDelFlagEqualsOrderByTimeDesc(website, false);
-            List<PageOption> pageOptions = pageOptionRepository.findAllByWebsiteAndDelFlagEqualsOrderByTimeDesc(website,false);
-            Version version = versionRepository.findFirstByWebsiteOrderByVersionDesc(website);
+        WebsiteUserPOJO websiteUser = authenticate.isAuthGetUserAndWebsite(request);
+        if (websiteUser != null) {
+            PageOption firstPageOption = pageOptionRepository.findFirstByWebsiteAndDelFlagEqualsOrderByTimeDesc(websiteUser.getWebsite(), false);
+            List<PageOption> pageOptions = pageOptionRepository
+                    .findAllByWebsiteAndCreatedUserAndDelFlagEqualsOrderByTimeDesc(
+                            websiteUser.getWebsite(),
+                            websiteUser.getUser(),
+                            false);
+            Version version = versionRepository.findFirstByWebsiteOrderByVersionDesc(websiteUser.getWebsite());
             if (version != null) {
-                List<Page> listPage = pageRepository.findAllByWebsiteAndVersionAndTypeEquals(website, version, 1);
+                List<Page> listPage = pageRepository.findAllByWebsiteAndVersionAndTypeEquals(websiteUser.getWebsite(), version, 1);
                 if (firstPageOption == null) {
                 } else {
                     res.put("currentPageOption", firstPageOption.getPages());
                 }
                 res.put("allPageOption", pageOptions);
                 res.put("listPage", listPage);
-                res.put("websiteName", website.getUrl());
+                res.put("websiteName", websiteUser.getWebsite().getUrl());
                 res.put("action", Constant.SUCCESS);
                 return res;
             } else {
@@ -71,7 +76,7 @@ public class PageOptionImpl implements PageOptionService {
     }
 
     @Override
-    public Map<String, Object> selectPageOption(PageOptionPojo request) {
+    public Map<String, Object> selectPageOption(PageOptionPOJO request) {
         Map<String, Object> res = new HashMap<>();
         RequestCommonPOJO req = new RequestCommonPOJO();
         req.setUserToken(request.getUserToken());
@@ -97,18 +102,20 @@ public class PageOptionImpl implements PageOptionService {
     }
 
     @Override
-    public Map<String, Object> addPageOption(PageOptionPojo request) {
+    public Map<String, Object> addPageOption(PageOptionPOJO request) {
         Map<String, Object> res = new HashMap<>();
         RequestCommonPOJO req = new RequestCommonPOJO();
         req.setUserToken(request.getUserToken());
         req.setWebsiteId(request.getWebsiteId());
         req.setUserId(request.getUserId());
-        Website website = authenticate.isAuthGetSingleSite(req);
-        if (website != null) {
+        WebsiteUserPOJO websiteUser = authenticate.isAuthGetUserAndWebsite(req);
+        if (websiteUser != null) {
             PageOption pageOption = new PageOption();
-            pageOption.setWebsite(website);
+            pageOption.setWebsite(websiteUser.getWebsite());
             pageOption.setName(request.getPageOptionName());
+            pageOption.setCreatedUser(websiteUser.getUser());
             pageOption.setTime(new Date());
+
             pageOptionRepository.save(pageOption);
             res.put("action", Constant.SUCCESS);
             return res;
@@ -120,7 +127,7 @@ public class PageOptionImpl implements PageOptionService {
     }
 
     @Override
-    public Map<String, Object> updatePageOption(PageOptionPojo request) {
+    public Map<String, Object> updatePageOption(PageOptionPOJO request) {
         Map<String, Object> res = new HashMap<>();
         RequestCommonPOJO req = new RequestCommonPOJO();
         req.setUserToken(request.getUserToken());
@@ -145,7 +152,7 @@ public class PageOptionImpl implements PageOptionService {
     }
 
     @Override
-    public Map<String, Object> updateNamePageOption(PageOptionPojo request) {
+    public Map<String, Object> updateNamePageOption(PageOptionPOJO request) {
         Map<String, Object> res = new HashMap<>();
         RequestCommonPOJO req = new RequestCommonPOJO();
         req.setUserToken(request.getUserToken());
@@ -166,7 +173,7 @@ public class PageOptionImpl implements PageOptionService {
     }
 
     @Override
-    public Map<String, Object> deletePageOption(PageOptionPojo request) {
+    public Map<String, Object> deletePageOption(PageOptionPOJO request) {
         Map<String, Object> res = new HashMap<>();
         RequestCommonPOJO req = new RequestCommonPOJO();
         req.setUserToken(request.getUserToken());
@@ -185,7 +192,7 @@ public class PageOptionImpl implements PageOptionService {
     }
 
     @Override
-    public Map<String, Object> pageOptionSize(PageOptionPojo request) {
+    public Map<String, Object> pageOptionSize(PageOptionPOJO request) {
         Map<String, Object> res = new HashMap<>();
         RequestCommonPOJO req = new RequestCommonPOJO();
         req.setUserToken(request.getUserToken());

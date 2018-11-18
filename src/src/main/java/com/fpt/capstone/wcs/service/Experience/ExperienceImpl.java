@@ -2,8 +2,11 @@ package com.fpt.capstone.wcs.service.Experience;
 
 import com.fpt.capstone.wcs.model.entity.*;
 import com.fpt.capstone.wcs.model.pojo.RequestCommonPOJO;
+import com.fpt.capstone.wcs.model.pojo.RequestReportPOJO;
+import com.fpt.capstone.wcs.model.pojo.WebsiteUserPOJO;
 import com.fpt.capstone.wcs.repository.MobileLayoutRepository;
 import com.fpt.capstone.wcs.repository.PageOptionRepository;
+import com.fpt.capstone.wcs.repository.PageRepository;
 import com.fpt.capstone.wcs.repository.SpeedtestRepository;
 import com.fpt.capstone.wcs.utils.Authenticate;
 import com.fpt.capstone.wcs.utils.Constant;
@@ -56,26 +59,28 @@ public class ExperienceImpl implements ExperienceService {
     MobileLayoutRepository mobileLayoutRepository;
 
     @Autowired
-    public ExperienceImpl(Authenticate authenticate, PageOptionRepository pageOptionRepository, SpeedtestRepository speedtestRepository, MobileLayoutRepository mobileLayoutRepository) {
+    public ExperienceImpl(Authenticate authenticate,
+                          PageOptionRepository pageOptionRepository,
+                          SpeedtestRepository speedtestRepository,
+                          MobileLayoutRepository mobileLayoutRepository) {
         this.authenticate = authenticate;
         this.pageOptionRepository = pageOptionRepository;
         this.speedtestRepository = speedtestRepository;
         this.mobileLayoutRepository = mobileLayoutRepository;
-
     }
 
     @Override
     public Map<String, Object> doSpeedTest(RequestCommonPOJO request) throws InterruptedException {
         Map<String, Object> res = new HashMap<>();
-        Website website = authenticate.isAuthGetSingleSite(request);
-        if (website != null) {
-            PageOption pageOption = pageOptionRepository.findOneByIdAndWebsiteAndDelFlagEquals(request.getPageOptionId(), website, false);
+        WebsiteUserPOJO userWebsite = authenticate.isAuthGetUserAndWebsite(request);
+        if (userWebsite != null) {
+            PageOption pageOption = pageOptionRepository.findOneByIdAndWebsiteAndDelFlagEquals(request.getPageOptionId(), userWebsite.getWebsite(), false);
             if (pageOption == null) {
                 request.setPageOptionId((long) -1);
             }
             if (request.getPageOptionId() != -1) { //page option list is null
                 List<Page> pages = pageOption.getPages();
-                List<SpeedTestReport> resultList = speedTestService(pages, pageOption);
+                List<SpeedTestReport> resultList = speedTestService(pages, pageOption, userWebsite.getUser());
                 speedtestRepository.saveAll(resultList);
                 res.put("action", Constant.SUCCESS);
                 res.put("speedtestReport", resultList);
@@ -83,13 +88,48 @@ public class ExperienceImpl implements ExperienceService {
             } else {
                 List<Page> pages = new ArrayList<>();
                 Page page = new Page();
-                page.setUrl(website.getUrl());
+                page.setUrl(userWebsite.getWebsite().getUrl());
                 page.setType(1);
                 pages.add(page);
-                List<SpeedTestReport> resultList = speedTestService(pages, null);
-                speedtestRepository.saveAll(resultList);
+                List<SpeedTestReport> resultList = speedTestService(pages, null, userWebsite.getUser());
+                resultList= speedtestRepository.saveAll(resultList);
                 res.put("action", Constant.SUCCESS);
                 res.put("speedtestReport", resultList);
+                return res;
+            }
+        } else {
+            res.put("action", Constant.INCORRECT);
+            return res;
+        }
+    }
+
+    @Override
+    public Map<String, Object> saveReport(RequestReportPOJO request) {
+        Map<String, Object> res = new HashMap<>();
+        RequestCommonPOJO requestCommon = new RequestCommonPOJO();
+        requestCommon.setPageOptionId(request.getPageOptionId());
+        requestCommon.setUserId(request.getUserId());
+        requestCommon.setWebsiteId(request.getWebsiteId());
+        requestCommon.setUserToken(request.getUserToken());
+        WebsiteUserPOJO userWebsite = authenticate.isAuthGetUserAndWebsite(requestCommon);
+        if (userWebsite != null) {
+            PageOption pageOption = pageOptionRepository.findOneByIdAndWebsiteAndDelFlagEquals(request.getPageOptionId(), userWebsite.getWebsite(), false);
+            List<SpeedTestReport> listReport = new ArrayList<>();
+            for (int i = 0; i < request.getListReportId().size(); i++) {
+                Optional<SpeedTestReport> optionalReport = speedtestRepository.findById(request.getListReportId().get(i));
+                if (optionalReport.isPresent()) {
+                    SpeedTestReport report = optionalReport.get();
+                    report.setDelFlag(false);
+                    listReport.add(report);
+                }
+            }
+            List<SpeedTestReport> results = speedtestRepository.saveAll(listReport);
+            if (results.size() != 0) {
+                res.put("action", Constant.SUCCESS);
+                res.put("speedtestReport", results);
+                return res;
+            } else {
+                res.put("action", Constant.INCORRECT);
                 return res;
             }
         } else {
@@ -108,11 +148,18 @@ public class ExperienceImpl implements ExperienceService {
                 request.setPageOptionId((long) -1);
             }
             if (request.getPageOptionId() != -1) {
-                Date lastedCreatedTime = speedtestRepository.findFirstByPageOptionOrderByCreatedTimeDesc(pageOption).getCreatedTime();
-                List<SpeedTestReport> resultList = speedtestRepository.findAllByPageOptionAndCreatedTime(pageOption,lastedCreatedTime);
-                res.put("speedtestReport", resultList);
-                res.put("action", Constant.SUCCESS);
-                return res;
+                SpeedTestReport speedTestReport = speedtestRepository.findFirstByPageOptionAndDelFlagEqualsOrderByCreatedTimeDesc(pageOption, false);
+                if (speedTestReport != null) {
+                    Date lastedCreatedTime = speedTestReport.getCreatedTime();
+                    List<SpeedTestReport> resultList = speedtestRepository.findAllByPageOptionAndCreatedTime(pageOption, lastedCreatedTime);
+                    res.put("speedtestReport", resultList);
+                    res.put("action", Constant.SUCCESS);
+                    return res;
+                } else {
+                    res.put("speedtestReport", new ArrayList<>());
+                    res.put("action", Constant.SUCCESS);
+                    return res;
+                }
             } else {
                 List<SpeedTestReport> resultList = speedtestRepository.findAllByPageOptionAndUrl(null, website.getUrl());
                 res.put("speedtestReport", resultList);
@@ -126,8 +173,8 @@ public class ExperienceImpl implements ExperienceService {
     }
 
 
-    public List<SpeedTestReport> speedTestService(List<Page> list, PageOption option) throws InterruptedException {
-        Date timeCreated = new Date();
+    public List<SpeedTestReport> speedTestService(List<Page> list, PageOption option, User createdUser) throws InterruptedException {
+        Date createdTime = new Date();
         System.setProperty("webdriver.chrome.driver", Constant.CHROME_DRIVER);
         //Asign list speed info
         List<SpeedTestReport> resultList = new ArrayList<>();
@@ -181,7 +228,8 @@ public class ExperienceImpl implements ExperienceService {
                             double sizeTransferred1 = Math.floor(totalByte / 1000000 * 10) / 10;
                             SpeedTestReport speedTestReport = new SpeedTestReport(p.getUrl(), interactTime1 + "", loadTime1 + "", sizeTransferred1 + "");
                             speedTestReport.setPageOption(option);
-                            speedTestReport.setCreatedTime(timeCreated);
+                            speedTestReport.setCreatedTime(createdTime);
+                            speedTestReport.setCreatedUser(createdUser);
                             resultList.add(speedTestReport);
                             driver.quit();
                         } catch (InterruptedException | BrokenBarrierException e) {
@@ -307,15 +355,15 @@ public class ExperienceImpl implements ExperienceService {
                             //TakesScreenshot
                             TakesScreenshot screenshot = (TakesScreenshot) driver;
                             File source = screenshot.getScreenshotAs(OutputType.FILE);
-                            FileUtils.copyFile(source, new File("./"+ list.indexOf(p) + ".png"));
-                            File file = new File("./"+ list.indexOf(p) + ".png");
+                            FileUtils.copyFile(source, new File("./" + list.indexOf(p) + ".png"));
+                            File file = new File("./" + list.indexOf(p) + ".png");
                             Map uploadResult = cloudinary.uploader().upload(file, ObjectUtils.emptyMap());
                             String screenShot = uploadResult.get("url").toString();
                             screenShot = screenShot.split("/upload/")[0] + "/upload/w_350/" + screenShot.split("/upload/")[1];
                             //System.out.println(uploadResult.get("url"));
                             file.delete();
 
-                            if( isSupport == false){
+                            if (isSupport == false) {
                                 java.util.List<WebElement> manifest = driver.findElements(By.cssSelector("link[rel='manifest'][href*='.json']"));
                                 System.out.println("size manifest : " + manifest.size());
                                 String valueDisplay = null;
@@ -335,13 +383,13 @@ public class ExperienceImpl implements ExperienceService {
                             }
 
 
-                            if(isSupport == false){
+                            if (isSupport == false) {
                                 java.util.List<WebElement> media = driver.findElements(By.cssSelector("link[rel='stylesheet']"));
-                                List<String> listFramework = Arrays.asList("/bootstrap.min.css","/pure-min.css", "/w3.css", "/semantic.min.css");
-                                if(media.size() != 0){
-                                    for (int i = 0; i< media.size(); i++){
-                                        for (int j = 0; j < listFramework.size(); j++){
-                                            if(media.get(i).getAttribute("href").contains(listFramework.get(j))){
+                                List<String> listFramework = Arrays.asList("/bootstrap.min.css", "/pure-min.css", "/w3.css", "/semantic.min.css");
+                                if (media.size() != 0) {
+                                    for (int i = 0; i < media.size(); i++) {
+                                        for (int j = 0; j < listFramework.size(); j++) {
+                                            if (media.get(i).getAttribute("href").contains(listFramework.get(j))) {
                                                 isSupport = true;
                                             }
                                         }
@@ -350,7 +398,6 @@ public class ExperienceImpl implements ExperienceService {
                                 }
 
                             }
-
 
 
                             java.util.List<WebElement> links1 = driver.findElements(By.cssSelector("meta[name='viewport'][content*='width=device-width'][content*='initial-scale=1']"));
@@ -387,9 +434,9 @@ public class ExperienceImpl implements ExperienceService {
                             if (isSupport == false) {
                                 //System.out.println("That page is not Optimize for Mobile!");
                                 issue = "Not Optimize for Mobile!,";
-                                 MobileLayoutReport mobileLayoutReport = new MobileLayoutReport(p.getUrl(),title,screenShot, issue  );
+                                MobileLayoutReport mobileLayoutReport = new MobileLayoutReport(p.getUrl(), title, screenShot, issue);
                                 mobileLayoutReport.setPageOption(option);
-                                  resultList.add(mobileLayoutReport);
+                                resultList.add(mobileLayoutReport);
 
                             } else {
 
@@ -398,7 +445,7 @@ public class ExperienceImpl implements ExperienceService {
                                 if (content != null) {
                                     if (content.contains("user-scalable=no") || content.contains("user-scalable=0")
                                             || (content.contains("minimum-scale=1") && content.contains("maximum-scale=1"))) {
-                                       // System.out.println("That page not support pinch to zoom!");
+                                        // System.out.println("That page not support pinch to zoom!");
                                         issue = issue + "Not support pinch to zoom,";
                                     }
                                 }
@@ -428,7 +475,7 @@ public class ExperienceImpl implements ExperienceService {
                                 System.out.println("link size : " + link);
                                 System.out.println("link enough size : " + linkBigEnough);
                                 if (link != 0) {
-                                    float a = (float)linkBigEnough/link;
+                                    float a = (float) linkBigEnough / link;
                                     if (a < 0.9) {
                                         //System.out.println("Links too small!");
                                         issue = issue + "Links too small,";
@@ -450,9 +497,9 @@ public class ExperienceImpl implements ExperienceService {
                                 System.out.println("button size : " + button);
                                 System.out.println("button enough size : " + buttonBigEnough);
                                 if (button != 0) {
-                                    float a = (float)buttonBigEnough/button;
+                                    float a = (float) buttonBigEnough / button;
                                     if (a < 0.9) {
-                                       // System.out.println("Buttons too small!");
+                                        // System.out.println("Buttons too small!");
                                         issue = issue + "Buttons too small,";
                                     }
                                 }
@@ -462,21 +509,21 @@ public class ExperienceImpl implements ExperienceService {
                                 //System.out.println("p length : " + listP.size());
                                 boolean checkSize = false;
                                 int lengthTotal = 0;
-                                List<String> listTag = Arrays.asList("div", "p", "span", "h4", "h5" , "h6", "td", "li");
-                                for(int i = 0; i < listTag.size(); i++){
-                                    if(checkSize == false){
+                                List<String> listTag = Arrays.asList("div", "p", "span", "h4", "h5", "h6", "td", "li");
+                                for (int i = 0; i < listTag.size(); i++) {
+                                    if (checkSize == false) {
                                         java.util.List<WebElement> elementListByTag = driver.findElements(By.tagName(listTag.get(i)));
-                                        if(elementListByTag.size() != 0){
+                                        if (elementListByTag.size() != 0) {
                                             lengthTotal = 0;
                                             for (int j = 0; j < elementListByTag.size(); j++) {
-                                                if (elementListByTag.get(j).getText().length() != 0 ) {
+                                                if (elementListByTag.get(j).getText().length() != 0) {
                                                     float length = Float.parseFloat(elementListByTag.get(j).getCssValue("font-size").split("px")[0]);
-                                                    if(length < 16)
+                                                    if (length < 16)
                                                         lengthTotal += elementListByTag.get(j).getText().length();
                                                 }
 
                                             }
-                                            float a = (float)lengthTotal/bodyTextLength;
+                                            float a = (float) lengthTotal / bodyTextLength;
                                             if (a > 0.1) {
                                                 checkSize = true;
                                                 issue = issue + "Text too small,";
@@ -488,16 +535,15 @@ public class ExperienceImpl implements ExperienceService {
 
                                 }
 
-                                if(issue == null){
+                                if (issue == null) {
                                     issue = "The Page is optimized for the phone,";
                                 }
-                                MobileLayoutReport mobileLayoutReport = new MobileLayoutReport(p.getUrl(),title,screenShot, issue  );
+                                MobileLayoutReport mobileLayoutReport = new MobileLayoutReport(p.getUrl(), title, screenShot, issue);
                                 mobileLayoutReport.setPageOption(option);
                                 resultList.add(mobileLayoutReport);
 
 
                             }
-
 
 
                             driver.quit();

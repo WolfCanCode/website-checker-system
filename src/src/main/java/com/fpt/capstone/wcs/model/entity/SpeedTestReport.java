@@ -21,6 +21,12 @@ public class SpeedTestReport {
     private String size;
     private Date createdTime;
 
+    @ManyToOne()
+    @JoinColumn(name="createdUser")
+    private User createdUser;
+
+    private boolean delFlag = true;
+
 
     public SpeedTestReport(String url, String interactiveTime, String pageLoadTime, String size) {
         this.url = url;

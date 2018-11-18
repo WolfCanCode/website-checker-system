@@ -24,6 +24,9 @@ public class PageOption {
     long id;
     String name;
     Date time;
+    @ManyToOne()
+    @JoinColumn(name="createdUser")
+    private User createdUser;
     boolean delFlag=false;
 
     @NotNull
