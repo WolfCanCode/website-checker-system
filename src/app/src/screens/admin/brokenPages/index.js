@@ -26,7 +26,7 @@ class brokenPagesScreen extends Component {
             "websiteId": cookies.get("u_w_id"),
             "pageOptionId": cookies.get("u_option"),
         }
-        fetch("/api/brokenPage/lastest", {
+        fetch("http://localhost:8080/api/brokenPage/lastest", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -54,7 +54,7 @@ class brokenPagesScreen extends Component {
             "pageOptionId": cookies.get("u_option"),
         }
 
-        fetch("/api/brokenPage", {
+        fetch("http://localhost:8080/api/brokenPage", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -105,7 +105,7 @@ class brokenPagesScreen extends Component {
                                 <p style={{ fontSize: 24 }}>2 <br /> Error pages</p>
                             </Segment>
                         </Segment.Group>
-                        <Segment basic style={{ marginBottom: '60px'}}>
+                        <Segment basic style={{ marginBottom: '60px' }}>
                             <div style={{ marginBottom: '10px', float: 'right' }}>
 
 

@@ -21,7 +21,7 @@ export default class CookieLaw extends Component {
             "websiteId": cookies.get("u_w_id"),
             "pageOptionId": cookies.get("u_option"),
         }
-        fetch("/api/cookie/lastest", {
+        fetch("http://localhost:8080/api/cookie/lastest", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -49,7 +49,7 @@ export default class CookieLaw extends Component {
             "pageOptionId": cookies.get("u_option"),
         }
 
-        fetch("/api/cookie", {
+        fetch("http://localhost:8080/api/cookie", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',

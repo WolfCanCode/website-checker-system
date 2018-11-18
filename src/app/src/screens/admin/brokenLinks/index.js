@@ -26,7 +26,7 @@ class brokenLinksScreen extends Component {
         }
 
 
-        fetch("/api/brokenLink/lastest", {
+        fetch("http://localhost:8080/api/brokenLink/lastest", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -57,7 +57,7 @@ class brokenLinksScreen extends Component {
             "pageOptionId": cookies.get("u_option"),
         };
 
-        fetch("/api/brokenLink", {
+        fetch("http://localhost:8080/api/brokenLink", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -107,9 +107,9 @@ class brokenLinksScreen extends Component {
                                 <p style={{ fontSize: 24 }}>2 <br /> External broken links</p>
                             </Segment>
                         </Segment.Group>
-                        <Segment basic style={{ marginBottom: '60px'}}>
+                        <Segment basic style={{ marginBottom: '60px' }}>
                             <div style={{ float: 'right' }}>
-                                <ReactToExcel 
+                                <ReactToExcel
                                     className="btn1"
                                     table="table-to-xls"
                                     filename="broken_link_test_file"

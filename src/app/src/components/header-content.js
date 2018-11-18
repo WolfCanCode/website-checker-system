@@ -30,7 +30,7 @@ export default class HeaderContent extends Component {
     }
 
     _getPageNum() {
-        fetch("/api/page/pageOption/size", {
+        fetch("http://localhost:8080/api/page/pageOption/size", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -72,7 +72,7 @@ export default class HeaderContent extends Component {
                 this.setState({ pageNum: this.state.pageNum + 1 })
             }
         }
-        fetch("/api/page/pageOption/updatePage", {
+        fetch("http://localhost:8080/api/page/pageOption/updatePage", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -107,7 +107,7 @@ export default class HeaderContent extends Component {
     /* open modal page option send init */
     _onOpenPageOptionMode() {
         if (cookies.get("u_isManager") !== "true") {
-            fetch("/api/page/pageOption", {
+            fetch("http://localhost:8080/api/page/pageOption", {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -145,7 +145,7 @@ export default class HeaderContent extends Component {
             this.setState({
                 isLoading: true
             })
-            fetch("/api/page/pageOption/add", {
+            fetch("http://localhost:8080/api/page/pageOption/add", {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -154,7 +154,7 @@ export default class HeaderContent extends Component {
                 body: JSON.stringify({ "userId": cookies.get("u_id"), "userToken": cookies.get("u_token"), "websiteId": cookies.get("u_w_id"), "pageOptionName": this.state.addPOName })
             }).then(async response => response.json()).then(async (data) => {
                 //Refresh
-                fetch("/api/page/pageOption", {
+                fetch("http://localhost:8080/api/page/pageOption", {
                     method: 'POST',
                     headers: {
                         'Accept': 'application/json',
@@ -250,7 +250,7 @@ export default class HeaderContent extends Component {
         this.setState({
             isLoading: true
         })
-        fetch("/api/page/pageOption/delete", {
+        fetch("http://localhost:8080/api/page/pageOption/delete", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -265,7 +265,7 @@ export default class HeaderContent extends Component {
         }).then(async response => response.json()).then(async (data) => {
             if (data.action === "SUCCESS") {
 
-                fetch("/api/page/pageOption", {
+                fetch("http://localhost:8080/api/page/pageOption", {
                     method: 'POST',
                     headers: {
                         'Accept': 'application/json',
@@ -358,7 +358,7 @@ export default class HeaderContent extends Component {
         this.setState({
             isLoading: true
         })
-        fetch("/api/page/pageOption/updateName", {
+        fetch("http://localhost:8080/api/page/pageOption/updateName", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -374,7 +374,7 @@ export default class HeaderContent extends Component {
         }).then(async response => response.json()).then(async (data) => {
             if (data.action === "SUCCESS") {
 
-                fetch("/api/page/pageOption", {
+                fetch("http://localhost:8080/api/page/pageOption", {
                     method: 'POST',
                     headers: {
                         'Accept': 'application/json',
@@ -422,7 +422,7 @@ export default class HeaderContent extends Component {
     /* select page option */
     _selectPageOption(id) {
         this._getPageNum();
-        fetch("/api/page/pageOption/select", {
+        fetch("http://localhost:8080/api/page/pageOption/select", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',

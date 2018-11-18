@@ -23,7 +23,7 @@ export default class TableRow extends Component {
     _makeNewver(id) {
         this.props.loadingTable(true);
         var param = { "userId": cookies.get("u_id"), "userToken": cookies.get("u_token"), "websiteId": id };
-        fetch("/api/sitemap/makeVer", {
+        fetch("http://localhost:8080/api/sitemap/makeVer", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -47,7 +47,7 @@ export default class TableRow extends Component {
                 "id": this.props.id, "name": this.state.webName
             }
         };
-        fetch("/api/manager/editWebsite", {
+        fetch("http://localhost:8080/api/manager/editWebsite", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -72,7 +72,7 @@ export default class TableRow extends Component {
                 "id": this.props.id
             }
         };
-        fetch("/api/manager/deleteWebsite", {
+        fetch("http://localhost:8080/api/manager/deleteWebsite", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -93,7 +93,7 @@ export default class TableRow extends Component {
                 "id": this.props.id
             }
         };
-        fetch("/api/manager/defaultAssign", {
+        fetch("http://localhost:8080/api/manager/defaultAssign", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -139,7 +139,7 @@ export default class TableRow extends Component {
                 "id": this.props.id
             }, listStaffId: this.state.userAssign
         };
-        fetch("/api/manager/assignWebsite", {
+        fetch("http://localhost:8080/api/manager/assignWebsite", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',

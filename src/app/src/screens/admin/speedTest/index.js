@@ -31,7 +31,7 @@ class speedTestScreen extends Component {
             "websiteId": cookies.get("u_w_id"),
             "pageOptionId": cookies.get("u_option"),
         }
-        fetch("/api/speedTest/lastest", {
+        fetch("http://localhost:8080/api/speedTest/lastest", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -83,7 +83,7 @@ class speedTestScreen extends Component {
             "pageOptionId": cookies.get("u_option"),
         };
 
-        fetch("/api/speedTest", {
+        fetch("http://localhost:8080/api/speedTest", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -139,7 +139,7 @@ class speedTestScreen extends Component {
             "listReportId": this.state.listReportId
         };
 
-        fetch("/api/speedTest/saveReport", {
+        fetch("http://localhost:8080/api/speedTest/saveReport", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',

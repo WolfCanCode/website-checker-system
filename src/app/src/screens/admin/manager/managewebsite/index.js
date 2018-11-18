@@ -26,7 +26,7 @@ export default class managewebsitescreen extends Component {
     }
 
     _refreshTable() {
-        fetch("/api/website/manage", {
+        fetch("http://localhost:8080/api/website/manage", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -68,7 +68,7 @@ export default class managewebsitescreen extends Component {
                 "name": this.state.webName, "url": this.state.webUrl
             }
         };
-        fetch("/api/manager/addWebsite", {
+        fetch("http://localhost:8080/api/manager/addWebsite", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',

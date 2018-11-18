@@ -11,12 +11,14 @@ export default class Pages extends Component {
     componentDidMount() {
         var comp = [];
         this.setState({ loadingTable: true });
-        var param = {  "userId": cookies.get("u_id"),
-        "userToken": cookies.get("u_token"),
-        "websiteId": cookies.get("u_w_id"),
-        "pageOptionId": cookies.get("u_option"),};
+        var param = {
+            "userId": cookies.get("u_id"),
+            "userToken": cookies.get("u_token"),
+            "websiteId": cookies.get("u_w_id"),
+            "pageOptionId": cookies.get("u_option"),
+        };
 
-        fetch("/api/pagestest/lastest", {
+        fetch("http://localhost:8080/api/pagestest/lastest", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -42,7 +44,7 @@ export default class Pages extends Component {
             "websiteId": cookies.get("u_w_id"),
             "pageOptionId": cookies.get("u_option"),
         }
-        fetch("/api/pagestest", {
+        fetch("http://localhost:8080/api/pagestest", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',

@@ -8,10 +8,7 @@ import com.fpt.capstone.wcs.service.TechnologyService;
 import com.fpt.capstone.wcs.utils.Authenticate;
 import com.fpt.capstone.wcs.utils.Constant;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
 import java.io.IOException;
@@ -46,6 +43,7 @@ public class TechnologyController {
     @Autowired
     Authenticate authenticate;
 
+    @CrossOrigin
     @PostMapping("/api/jsTest")
     public List<JavascriptReport> getDataPagesTest(@RequestBody UrlPOJO[] list) throws InterruptedException {
         TechnologyService technologyService = new TechnologyService();
@@ -55,12 +53,14 @@ public class TechnologyController {
         return resultList;
     }
 
+    @CrossOrigin
     @PostMapping("/api/jsTest/lastest")
     public List<JavascriptReport> getLastestSpeedTest() {
         List<JavascriptReport> resultList = jsCheckRepository.findAll();
         return resultList;
     }
 
+    @CrossOrigin
     @PostMapping("/api/svbehavior")
     public ServerBehaviorReport getServerBehavior(@RequestBody UrlPOJO url) throws InterruptedException, IOException {
         TechnologyService technologyService = new TechnologyService();
@@ -69,6 +69,7 @@ public class TechnologyController {
         return result;
     }
 
+    @CrossOrigin
     @PostMapping("/api/svbehavior/lastest")
     public ServerBehaviorReport getLastestServerBehavior() {
         ServerBehaviorReport result = serverBehaviorRepository.findAll().get(0);
@@ -81,6 +82,7 @@ public class TechnologyController {
 
 
 
+    @CrossOrigin
     @Transactional
     @PostMapping("/api/cookie")
     public Map<String, Object> getCookies(@RequestBody RequestCommonPOJO request) throws InterruptedException {
@@ -122,6 +124,7 @@ public class TechnologyController {
         }
     }
 
+    @CrossOrigin
     @PostMapping("/api/cookie/lastest")
     public Map<String, Object> getLastestCookies(@RequestBody RequestCommonPOJO request)
     {
@@ -151,6 +154,7 @@ public class TechnologyController {
         }
     }
 
+    @CrossOrigin
     @GetMapping("/api/cookie/isExist")
     public boolean checkAlreadyCookieCheck() {
         boolean success = cookieRepository.findAll().isEmpty();
@@ -174,6 +178,7 @@ public class TechnologyController {
 //        return resultList;
 //    }
 
+    @CrossOrigin
     @PostMapping("/api/favicontest")
     public Map<String, Object> getDataPagesTest(@RequestBody RequestCommonPOJO request) throws InterruptedException {
         Map<String,Object> res = new HashMap<>();
@@ -228,6 +233,7 @@ public class TechnologyController {
         }
     }
 
+    @CrossOrigin
     @PostMapping("/api/favicontest/lastest")
     public Map<String, Object> getLastestPageTest(@RequestBody RequestCommonPOJO request)
     {

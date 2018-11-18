@@ -26,7 +26,7 @@ export default class managewordlist extends Component {
     }
 
     _refreshTable() {
-        fetch("/api/word/manage", {
+        fetch("http://localhost:8080/api/word/manage", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -36,7 +36,7 @@ export default class managewordlist extends Component {
         }).then(response => response.json()).then((data) => {
             if (data.action === "SUCCESS") {
                 var list = data.wordList.map((item, index) => {
-                    return (<TableRow key={index} id={item.id} word={item.word}  createdTime={item.createdTime} loadingTable={(isLoading) => this._loadingTable(isLoading)} refreshTable={() => this._refreshTable()} />);
+                    return (<TableRow key={index} id={item.id} word={item.word} createdTime={item.createdTime} loadingTable={(isLoading) => this._loadingTable(isLoading)} refreshTable={() => this._refreshTable()} />);
                 });
                 this.setState({ listWord: list, isLoading: false });
 
@@ -49,7 +49,7 @@ export default class managewordlist extends Component {
         this.setState({ word: event.target.value }, () => this._checkAddBtn());
     }
 
-    
+
 
     _checkAddBtn() {
         var result = false;
@@ -67,7 +67,7 @@ export default class managewordlist extends Component {
                 "word": this.state.word
             }
         };
-        fetch("/api/word/addWord", {
+        fetch("http://localhost:8080/api/word/addWord", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -79,8 +79,8 @@ export default class managewordlist extends Component {
                 this.setState({ addLoading: false });
                 this.setState({ addModal: false });
                 this._refreshTable();
-                
-            }  if (data.action === "DUPLICATE ERROR") {
+
+            } if (data.action === "DUPLICATE ERROR") {
                 alert("This word is existed");
             }
         });
@@ -104,7 +104,7 @@ export default class managewordlist extends Component {
                                             <label>Word</label>
                                             <Input type="text" placeholder="Word" onChange={(event) => this._onchangeWord(event)} value={this.state.word}></Input>
                                         </Form.Field>
-                                       
+
                                     </Form>
                                 </Modal.Content>
                                 <Modal.Actions>
@@ -121,7 +121,7 @@ export default class managewordlist extends Component {
                                 <Table.Header>
                                     <Table.Row>
                                         <Table.HeaderCell>No</Table.HeaderCell>
-                                        <Table.HeaderCell>Word</Table.HeaderCell>                                       
+                                        <Table.HeaderCell>Word</Table.HeaderCell>
                                         <Table.HeaderCell>Lastest updated</Table.HeaderCell>
                                         <Table.HeaderCell>Action</Table.HeaderCell>
 

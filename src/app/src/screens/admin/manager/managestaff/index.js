@@ -17,7 +17,7 @@ export default class managestaffscreen extends Component {
         this.setState({ loadingTable: true });
         var comp = [];
         var param = { "managerId": cookies.get("u_id"), "managerToken": cookies.get("u_token") };
-        fetch("/api/user/getStaff", {
+        fetch("http://localhost:8080/api/user/getStaff", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -66,7 +66,7 @@ export default class managestaffscreen extends Component {
                 "name": this.state.staffName, "email": this.state.staffEmail, "password": this.state.staffPassword
             }
         };
-        fetch("/api/user/addStaff", {
+        fetch("http://localhost:8080/api/user/addStaff", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',

@@ -14,7 +14,7 @@ const cookies = new Cookies();
 
 
 class mobileLayoutScreen extends Component {
-    state = { list: [],list1: [], loadingTable: false, isDisable: false };
+    state = { list: [], list1: [], loadingTable: false, isDisable: false };
 
 
     componentDidMount() {
@@ -28,7 +28,7 @@ class mobileLayoutScreen extends Component {
             "websiteId": cookies.get("u_w_id"),
             "pageOptionId": cookies.get("u_option"),
         }
-        fetch("/api/mobileLayoutTest/lastest", {
+        fetch("http://localhost:8080/api/mobileLayoutTest/lastest", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -63,7 +63,7 @@ class mobileLayoutScreen extends Component {
             "pageOptionId": cookies.get("u_option"),
         }
 
-        fetch("/api/mobileLayoutTest", {
+        fetch("http://localhost:8080/api/mobileLayoutTest", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -99,7 +99,7 @@ class mobileLayoutScreen extends Component {
                     <div style={{ marginBottom: '10px', float: 'right' }}>
 
 
-                        <ReactToExcel 
+                        <ReactToExcel
                             className="btn1"
                             table="table-to-xls1"
                             filename="mobile_layout_test_file"
@@ -126,7 +126,7 @@ class mobileLayoutScreen extends Component {
 
                         </Table.Body>
 
-                        
+
                     </Table>
                     <Table singleLine unstackable style={{ fontSize: '16px', }} id="table-to-xls1">
                         <Table.Header style={{ textAlign: 'center' }} >
@@ -144,7 +144,7 @@ class mobileLayoutScreen extends Component {
 
                         </Table.Body>
 
-                        
+
                     </Table>
                 </Segment>
 

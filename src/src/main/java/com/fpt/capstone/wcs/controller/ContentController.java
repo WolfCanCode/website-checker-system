@@ -25,12 +25,14 @@ public class ContentController {
     @Autowired
     ContentService contentService;
 
+    @CrossOrigin
     @Transactional
     @PostMapping("/api/pagestest")
     public Map<String, Object> getDataPagesTest(@RequestBody RequestCommonPOJO request) throws InterruptedException {
        return contentService.getDataPagesTest(request);
     }
 
+    @CrossOrigin
     @PostMapping("/api/pagestest/lastest")
     public Map<String, Object> getLastestPageTest(@RequestBody RequestCommonPOJO request)
     {
@@ -38,33 +40,28 @@ public class ContentController {
     }
 
 
-
-
+    @CrossOrigin
     @Transactional
     @PostMapping("/api/redirectiontest")
     public Map<String, Object> getDataRedirectTest(@RequestBody RequestCommonPOJO request) throws InterruptedException, IOException {
       return  contentService.getDataRedirectTest(request);
     }
 
-
-
+    @CrossOrigin
     @PostMapping("/api/redirectiontest/lastest")
     public Map<String, Object> getLastestLinkRedirection(@RequestBody RequestCommonPOJO request)
     {
        return contentService.getLastestLinkRedirection(request);
     }
 
-
-
-
+    @CrossOrigin
     @Transactional
     @PostMapping("/api/contactDetail")
     public Map<String, Object> getDataContactDetail(@RequestBody RequestCommonPOJO request) throws InterruptedException, IOException {
         return contentService.getDataContactDetail(request);
     }
 
-
-
+    @CrossOrigin
     @PostMapping("/api/contactDetail/lastest")
     public Map<String, Object> getLastestContactDetail(@RequestBody RequestCommonPOJO request)
     {

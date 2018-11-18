@@ -50,6 +50,7 @@ public class SitemapController {
 //        return res;
 //    }
 
+    @CrossOrigin
     @PostMapping("/api/sitemap/getVer")
     public Map<String, Object> getLastestVer(@RequestBody RequestCommonPOJO request) {
         Map<String, Object> res = new HashMap<>();
@@ -81,6 +82,7 @@ public class SitemapController {
         }
     }
 
+    @CrossOrigin
     @PostMapping("/api/sitemap/makeVer")
     public Map<String, Object> makeNewVer(@RequestBody RequestCommonPOJO request) throws MalformedURLException {
         Map<String, Object> res = new HashMap<>();

@@ -11,7 +11,7 @@ export default class JavascriptErrorScreen extends Component {
     var comp = [];
     this.setState({ loadingTable: true });
     var param = [];
-    fetch("/api/jsTest/lastest", {
+    fetch("http://localhost:8080/api/jsTest/lastest", {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
@@ -39,7 +39,7 @@ export default class JavascriptErrorScreen extends Component {
     var comp = [];
     var param = { "userId": cookies.get("u_id"), "userToken": cookies.get("u_token"), "websiteId": cookies.get("u_w_id") };
 
-    fetch("/api/jsTest", {
+    fetch("http://localhost:8080/api/jsTest", {
       method: 'POST',
       headers: {
         'Accept': 'application/json',

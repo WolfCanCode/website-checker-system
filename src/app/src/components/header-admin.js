@@ -14,7 +14,7 @@ class HeaderAdmin extends Component {
     componentDidMount() {
         if (cookies.get("u_isManager") !== "true") {
             //binding dropdown
-            fetch("/api/headerStaff", {
+            fetch("http://localhost:8080/api/headerStaff", {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -49,7 +49,7 @@ class HeaderAdmin extends Component {
             });
         }
         else {
-            fetch("/api/headerManager", {
+            fetch("http://localhost:8080/api/headerManager", {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',

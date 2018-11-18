@@ -12,6 +12,7 @@ import com.fpt.capstone.wcs.utils.Authenticate;
 import com.fpt.capstone.wcs.utils.Constant;
 import com.fpt.capstone.wcs.utils.EncodeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,13 +24,21 @@ import java.util.*;
 @RestController
 public class UserController {
     //scan repository
-    @Autowired
+    final
     UserRepository userRepository;
-    @Autowired
+    final
     Authenticate authenticate;
-    @Autowired
+    final
     RoleRepository roleRepository;
 
+    @Autowired
+    public UserController(UserRepository userRepository, Authenticate authenticate, RoleRepository roleRepository) {
+        this.userRepository = userRepository;
+        this.authenticate = authenticate;
+        this.roleRepository = roleRepository;
+    }
+
+    @CrossOrigin
     @PostMapping("/api/login")
     public Map<String, Object> doLogin(@RequestBody User user) {
         String email = user.getEmail();
@@ -58,6 +67,7 @@ public class UserController {
 
     }
 
+    @CrossOrigin
     @PostMapping("/api/auth")
     public Map<String, Object> isAuth(@RequestBody RequestCommonPOJO request) {
         Map<String, Object> res = new HashMap<>();

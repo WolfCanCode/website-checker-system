@@ -12,6 +12,7 @@ import com.fpt.capstone.wcs.service.Quality.QualityService;
 
 import com.fpt.capstone.wcs.utils.Authenticate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -40,39 +41,37 @@ public class QualityController {
 
     @Autowired
     Authenticate authenticate;
+
+
+    @CrossOrigin
     @Transactional
     @PostMapping("/api/brokenLink")
     public Map<String, Object> getDataBrokenLink(@RequestBody RequestCommonPOJO request) throws InterruptedException {
     return qualityService.getDataBrokenLink(request);
     }
-// oke chưa ? dang loi kia
+
+
+    @CrossOrigin
     @PostMapping("/api/brokenLink/lastest")
     public Map<String, Object> getLastestBrokenLink(@RequestBody RequestCommonPOJO request) {
         return qualityService.getLastestBrokenLink(request);
     }
 
-//    @GetMapping("/api/brokenLink/isExist")
-//    public boolean checkAlreadyBrokenLinkCheck() {
-//        boolean success = brokenLinkRepository.findAll().isEmpty();
-//        return success;
-//    }
+    @CrossOrigin
     @Transactional
     @PostMapping("/api/brokenPage")
     public Map<String, Object> getDataBrokenPage(@RequestBody RequestCommonPOJO request) throws InterruptedException {
         return qualityService.getDataBrokenPage(request);
     }
 
+    @CrossOrigin
     @PostMapping("/api/brokenPage/lastest")
     public Map<String, Object> getLastestBrokenPage(@RequestBody RequestCommonPOJO request) {
         return qualityService.getLastestBrokenPage(request);
     }
 
-//    @GetMapping("/api/brokenPage/isExist")
-//    public boolean checkAlreadyBrokenPageCheck() {
-//        boolean success = brokenPageRepository.findAll().isEmpty();
-//        return success;
-//    }
 
+    @CrossOrigin
     @PostMapping("/api/missingtest")
     public List<MissingFileReport> getMissingFile(@RequestBody MissingFilePOJO[] request) throws InterruptedException {
         com.fpt.capstone.wcs.service.QualityService qualityService = new com.fpt.capstone.wcs.service.QualityService();
@@ -126,6 +125,7 @@ public class QualityController {
         return result;
     }
 
+    @CrossOrigin
     @PostMapping("/api/missingtest/lastest")
     public List<MissingFileReport> getLastestMissingFile() {
         List<MissingFileReport> result = missingFilesPagesRepository.findAll();

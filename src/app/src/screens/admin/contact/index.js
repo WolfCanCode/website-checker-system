@@ -19,7 +19,7 @@ export default class Contact extends Component {
       "pageOptionId": cookies.get("u_option"),
     }
 
-    fetch("/api/contactDetail/lastest", {
+    fetch("http://localhost:8080/api/contactDetail/lastest", {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
@@ -68,7 +68,7 @@ export default class Contact extends Component {
       "websiteId": cookies.get("u_w_id"),
       "pageOptionId": cookies.get("u_option"),
     }
-    fetch("/api/contactDetail", {
+    fetch("http://localhost:8080/api/contactDetail", {
       method: 'POST',
       headers: {
         'Accept': 'application/json',

@@ -28,12 +28,14 @@ class faviconScreen extends Component {
         var faviconMissCount = 0;
         var flag = false;
         this.setState({ loadingTable: true });
-        var param = {  "userId": cookies.get("u_id"),
-        "userToken": cookies.get("u_token"),
-        "websiteId": cookies.get("u_w_id"),
-        "pageOptionId": cookies.get("u_option"),};
+        var param = {
+            "userId": cookies.get("u_id"),
+            "userToken": cookies.get("u_token"),
+            "websiteId": cookies.get("u_w_id"),
+            "pageOptionId": cookies.get("u_option"),
+        };
 
-        fetch("/api/favicontest/lastest", {
+        fetch("http://localhost:8080/api/favicontest/lastest", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -76,11 +78,13 @@ class faviconScreen extends Component {
         var favUrlCount = 0;
         var flag = false;
         var faviconMissCount = 0;
-        var param = {  "userId": cookies.get("u_id"),
-        "userToken": cookies.get("u_token"),
-        "websiteId": cookies.get("u_w_id"),
-        "pageOptionId": cookies.get("u_option"),}
-        fetch("/api/favicontest", {
+        var param = {
+            "userId": cookies.get("u_id"),
+            "userToken": cookies.get("u_token"),
+            "websiteId": cookies.get("u_w_id"),
+            "pageOptionId": cookies.get("u_option"),
+        }
+        fetch("http://localhost:8080/api/favicontest", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',

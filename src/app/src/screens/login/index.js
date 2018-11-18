@@ -96,7 +96,7 @@ class LoginScreen extends Component {
     async _doLogin() {
         this.setState({ isLoading: true });
         var param = { "email": this.state.userName, "password": this.state.password };
-        const response = await fetch('/api/login', {
+        const response = await fetch('http://localhost:8080/api/login', {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',

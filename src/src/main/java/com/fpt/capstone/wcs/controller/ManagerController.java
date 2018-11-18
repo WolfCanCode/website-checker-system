@@ -15,6 +15,7 @@ import com.fpt.capstone.wcs.utils.Authenticate;
 import com.fpt.capstone.wcs.utils.Constant;
 import com.fpt.capstone.wcs.utils.EncodeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -39,12 +40,13 @@ public class ManagerController {
     WordRepository wordRepository;
 
 
+    @CrossOrigin
     @PostMapping("/api/website/manage")
     public Map<String, Object> getmanageWesite(@RequestBody ManagerRequestPOJO request) {
         Map<String, Object> res = new HashMap<>();
         User manager = authenticate.isAuthAndManagerGet(request);
         if (manager != null) {
-            List<Website> websites = websiteRepository.findAllByUserAndDelFlagEquals(manager,false);
+            List<Website> websites = websiteRepository.findAllByUserAndDelFlagEquals(manager, false);
             if (websites != null) {
                 List<WebsitePOJO> websitePOJOS = new ArrayList<>();
                 for (Website website : websites) {
@@ -82,6 +84,7 @@ public class ManagerController {
     }
 
 
+    @CrossOrigin
     @PostMapping("/api/manager/addWebsite")
     public Map<String, Object> addWebsite(@RequestBody ManagerRequestPOJO request) throws MalformedURLException {
         Map<String, Object> res = new HashMap<>();
@@ -120,6 +123,7 @@ public class ManagerController {
         }
     }
 
+    @CrossOrigin
     @PostMapping("/api/manager/editWebsite")
     public Map<String, Object> editWebsite(@RequestBody ManagerRequestPOJO request) {
         Map<String, Object> res = new HashMap<>();
@@ -141,6 +145,7 @@ public class ManagerController {
         }
     }
 
+    @CrossOrigin
     @PostMapping("/api/manager/deleteWebsite")
     public Map<String, Object> delWebsite(@RequestBody ManagerRequestPOJO request) {
         Map<String, Object> res = new HashMap<>();
@@ -162,6 +167,7 @@ public class ManagerController {
         }
     }
 
+    @CrossOrigin
     @PostMapping("/api/manager/assignWebsite")
     public Map<String, Object> assignWebsite(@RequestBody ManagerRequestPOJO request) {
         Map<String, Object> res = new HashMap<>();
@@ -170,16 +176,14 @@ public class ManagerController {
             Website tmp = websiteRepository.findOneByUserAndIdAndDelFlagEquals(manager, request.getWebsite().getId(), false);
             List<User> listStaff = new ArrayList<>();
             boolean checkManager = false;
-            for (Long id : request.getListStaffId()){
-                if(manager.getId()==id)
-                {
-                    checkManager=true;
+            for (Long id : request.getListStaffId()) {
+                if (manager.getId() == id) {
+                    checkManager = true;
                 }
                 User staff = userRepository.findOneById(id);
                 listStaff.add(staff);
             }
-            if(checkManager==false)
-            {
+            if (checkManager == false) {
                 listStaff.add(manager);
             }
 
@@ -198,6 +202,7 @@ public class ManagerController {
         }
     }
 
+    @CrossOrigin
     @PostMapping("/api/manager/defaultAssign")
     public Map<String, Object> defaultAssWebsite(@RequestBody ManagerRequestPOJO request) {
         Map<String, Object> res = new HashMap<>();
@@ -207,7 +212,7 @@ public class ManagerController {
             if (tmp != null) {
                 List<User> staff = userRepository.findAllByManagerAndDelFlagEquals(manager, false);
 
-                res.put("staffs",staff);
+                res.put("staffs", staff);
                 res.put("defStaffs", tmp.getUser());
                 res.put("action", Constant.SUCCESS);
                 return res;
@@ -221,65 +226,68 @@ public class ManagerController {
         }
     }
 
-        @PostMapping("/api/user/getStaff")
-        public Map<String, Object> getAllStaff (@RequestBody ManagerRequestPOJO request){
-            Map<String, Object> res = new HashMap<>();
-            User manager = authenticate.isAuthAndManagerGet(request);
-            if (manager != null) {
-                List<User> staff = userRepository.findAllByManagerAndDelFlagEquals(manager, false);
-                for (int i = 0 ; i< staff.size(); i++)
-                {
-                    staff.get(i).setWebsite(websiteRepository.findAllByUserAndDelFlagEquals(staff.get(i),false));
-                }
-                res.put("action", Constant.SUCCESS);
-                res.put("listStaff", staff);
-                return res;
-            } else {
-                res.put("action", Constant.PERMISSION_ERROR);
-                return res;
+    @CrossOrigin
+    @PostMapping("/api/user/getStaff")
+    public Map<String, Object> getAllStaff(@RequestBody ManagerRequestPOJO request) {
+        Map<String, Object> res = new HashMap<>();
+        User manager = authenticate.isAuthAndManagerGet(request);
+        if (manager != null) {
+            List<User> staff = userRepository.findAllByManagerAndDelFlagEquals(manager, false);
+            for (int i = 0; i < staff.size(); i++) {
+                staff.get(i).setWebsite(websiteRepository.findAllByUserAndDelFlagEquals(staff.get(i), false));
             }
+            res.put("action", Constant.SUCCESS);
+            res.put("listStaff", staff);
+            return res;
+        } else {
+            res.put("action", Constant.PERMISSION_ERROR);
+            return res;
         }
+    }
 
-        @PostMapping("/api/user/addStaff")
-        public Map<String, Object> addStaff (@RequestBody ManagerRequestPOJO request){
-            Map<String, Object> res = new HashMap<>();
-            User manager = authenticate.isAuthAndManagerGet(request);
-            User addStaff = request.getStaff();
-            if (manager != null) {
-                addStaff.setManager(manager);
-                addStaff.setRole(roleRepository.findById((long) 1).get());
-                addStaff.setDelFlag(false);
-                addStaff.setPassword(EncodeUtil.doEncode(addStaff.getPassword()));
-                userRepository.save(addStaff);
-                res.put("action", Constant.SUCCESS);
-                return res;
-            } else {
-                res.put("action", Constant.PERMISSION_ERROR);
-                return res;
+    @CrossOrigin
+    @PostMapping("/api/user/addStaff")
+    public Map<String, Object> addStaff(@RequestBody ManagerRequestPOJO request) {
+        Map<String, Object> res = new HashMap<>();
+        User manager = authenticate.isAuthAndManagerGet(request);
+        User addStaff = request.getStaff();
+        if (manager != null) {
+            addStaff.setManager(manager);
+            addStaff.setRole(roleRepository.findById((long) 1).get());
+            addStaff.setDelFlag(false);
+            addStaff.setPassword(EncodeUtil.doEncode(addStaff.getPassword()));
+            userRepository.save(addStaff);
+            res.put("action", Constant.SUCCESS);
+            return res;
+        } else {
+            res.put("action", Constant.PERMISSION_ERROR);
+            return res;
+        }
+    }
+
+    @CrossOrigin
+    @PostMapping("/api/user/editStaff")
+    public Map<String, Object> editStaff(@RequestBody ManagerRequestPOJO request) {
+        Map<String, Object> res = new HashMap<>();
+        User manager = authenticate.isAuthAndManagerGet(request);
+        User editStaff = request.getStaff();
+        if (manager != null) {
+            User staff = userRepository.findOneByIdAndDelFlagEquals(request.getStaff().getId(), false);
+            staff.setEmail(editStaff.getEmail());
+            staff.setName(editStaff.getName());
+            if (editStaff.getPassword() != null && !editStaff.getPassword().equals("")) {
+                staff.setPassword(EncodeUtil.doEncode(editStaff.getPassword()));
             }
+            userRepository.save(staff);
+            res.put("action", Constant.SUCCESS);
+            return res;
+        } else {
+            res.put("action", Constant.PERMISSION_ERROR);
+            return res;
         }
+    }
 
-        @PostMapping("/api/user/editStaff")
-        public Map<String, Object> editStaff (@RequestBody ManagerRequestPOJO request){
-            Map<String, Object> res = new HashMap<>();
-            User manager = authenticate.isAuthAndManagerGet(request);
-            User editStaff = request.getStaff();
-            if (manager != null) {
-                User staff = userRepository.findOneByIdAndDelFlagEquals(request.getStaff().getId(), false);
-                staff.setEmail(editStaff.getEmail());
-                staff.setName(editStaff.getName());
-                if (editStaff.getPassword() != null && !editStaff.getPassword().equals("")) {
-                    staff.setPassword(EncodeUtil.doEncode(editStaff.getPassword()));
-                }
-                userRepository.save(staff);
-                res.put("action", Constant.SUCCESS);
-                return res;
-            } else {
-                res.put("action", Constant.PERMISSION_ERROR);
-                return res;
-            }
-        }
-
+    @CrossOrigin
     @PostMapping("api/user/deleteStaff")
     public Map<String, Object> deleteStaff(@RequestBody ManagerRequestPOJO request) {
         Map<String, Object> res = new HashMap<>();
@@ -297,12 +305,13 @@ public class ManagerController {
     }
 
 
+    @CrossOrigin
     @PostMapping("/api/word/manage")
     public Map<String, Object> getWordList(@RequestBody ManagerRequestPOJO request) {
         Map<String, Object> res = new HashMap<>();
         User manager = authenticate.isAuthAndManagerGet(request);
         if (manager != null) {
-            List<Word> wordList = wordRepository.findAllByUserAndDelFlagEquals(manager,false);
+            List<Word> wordList = wordRepository.findAllByUserAndDelFlagEquals(manager, false);
             if (wordList != null) {
 
                 res.put("action", Constant.SUCCESS);
@@ -318,6 +327,7 @@ public class ManagerController {
         }
     }
 
+    @CrossOrigin
     @PostMapping("/api/word/addWord")
     public Map<String, Object> addWord(@RequestBody ManagerRequestPOJO request) throws MalformedURLException {
         Map<String, Object> res = new HashMap<>();
@@ -348,6 +358,7 @@ public class ManagerController {
         }
     }
 
+    @CrossOrigin
     @PostMapping("/api/word/editWord")
     public Map<String, Object> editWord(@RequestBody ManagerRequestPOJO request) {
         Map<String, Object> res = new HashMap<>();
@@ -369,6 +380,7 @@ public class ManagerController {
         }
     }
 
+    @CrossOrigin
     @PostMapping("/api/word/deleteWord")
     public Map<String, Object> delWord(@RequestBody ManagerRequestPOJO request) {
         Map<String, Object> res = new HashMap<>();
@@ -391,4 +403,4 @@ public class ManagerController {
     }
 
 
-    }
+}
