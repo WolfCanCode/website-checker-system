@@ -2,12 +2,15 @@ package com.fpt.capstone.wcs.service.Quality;
 
 import com.fpt.capstone.wcs.model.entity.*;
 import com.fpt.capstone.wcs.model.pojo.RequestCommonPOJO;
-import com.fpt.capstone.wcs.repository.BrokenLinkRepository;
-import com.fpt.capstone.wcs.repository.BrokenPageRepository;
-import com.fpt.capstone.wcs.repository.PageOptionRepository;
+import com.fpt.capstone.wcs.repository.*;
 import com.fpt.capstone.wcs.service.Experience.ExperienceImpl;
 import com.fpt.capstone.wcs.utils.Authenticate;
 import com.fpt.capstone.wcs.utils.Constant;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -35,13 +38,19 @@ public class QualityImpl implements QualityService {
     BrokenLinkRepository brokenLinkRepository;
     final
     BrokenPageRepository brokenPageRepository;
+    final
+    ProhibitedContentRepository prohibitedContentRepository;
+    final
+    WordRepository wordRepository;
 
     @Autowired
-    public QualityImpl(Authenticate authenticate, PageOptionRepository pageOptionRepository, BrokenLinkRepository brokenLinkRepository, BrokenPageRepository brokenPageRepository) {
+    public QualityImpl(Authenticate authenticate, PageOptionRepository pageOptionRepository, BrokenLinkRepository brokenLinkRepository, BrokenPageRepository brokenPageRepository, WordRepository wordRepository,ProhibitedContentRepository prohibitedContentRepository) {
         this.authenticate = authenticate;
         this.pageOptionRepository = pageOptionRepository;
         this.brokenLinkRepository = brokenLinkRepository;
         this.brokenPageRepository = brokenPageRepository;
+        this.wordRepository = wordRepository;
+        this.prohibitedContentRepository = prohibitedContentRepository;
 
     }
 
@@ -273,6 +282,8 @@ public class QualityImpl implements QualityService {
     }
 
 
+
+
     public List<BrokenPageReport> brokenPageService(List<Page> list, PageOption option) throws InterruptedException {
         //Asign list Broken Page
         List<BrokenPageReport> resultList = new ArrayList<>();
@@ -360,5 +371,141 @@ public class QualityImpl implements QualityService {
         return resultList;
 
     }
+
+    @Override
+    public Map<String, Object> getDataProhibitedContent(RequestCommonPOJO request) throws InterruptedException {
+        Map<String, Object> res = new HashMap<>();
+        Website website = authenticate.isAuthGetSingleSite(request);
+        if (website != null) {
+            PageOption pageOption = pageOptionRepository.findOneByIdAndWebsiteAndDelFlagEquals(request.getPageOptionId(), website, false);
+            if(pageOption==null){
+                request.setPageOptionId((long)-1);
+            }
+
+
+
+            if(request.getPageOptionId()!=-1) { //page option list is null
+                List<Page> pages = pageOption.getPages();
+                List<ProhibitedContentReport> resultList = prohibitedContentService(pages, pageOption);
+                prohibitedContentRepository.removeAllByPageOption(pageOption);
+                prohibitedContentRepository.saveAll(resultList);
+                res.put("action", Constant.SUCCESS);
+                res.put("prohibitedContentReport", resultList);
+                return res;
+            }
+            else {
+                List<Page> pages = new ArrayList<>();
+                Page page = new Page();
+                page.setUrl(website.getUrl());
+                page.setType(1);
+                pages.add(page);
+                List<ProhibitedContentReport> resultList = prohibitedContentService(pages, null);
+                prohibitedContentRepository.saveAll(resultList);
+                res.put("action", Constant.SUCCESS);
+                res.put("prohibitedContentReport", resultList);
+                return res;
+            }
+        } else {
+            res.put("action", Constant.INCORRECT);
+            return res;
+        }
+
+    }
+
+    @Override
+    public Map<String, Object> getLastestProhibitedContent(RequestCommonPOJO request) {
+        Map<String, Object> res = new HashMap<>();
+        Website website = authenticate.isAuthGetSingleSite(request);
+        if (website != null) {
+            PageOption pageOption = pageOptionRepository.findOneByIdAndWebsiteAndDelFlagEquals(request.getPageOptionId(), website, false);
+            if(pageOption==null){
+                request.setPageOptionId((long)-1);
+            }
+
+            if(request.getPageOptionId()!=-1) {
+
+                List<ProhibitedContentReport> resultList = prohibitedContentRepository.findAllByPageOption(pageOption);
+                res.put("prohibitedContentReport", resultList);
+                res.put("action", Constant.SUCCESS);
+                return res;
+            } else {
+                List<ProhibitedContentReport> resultList = prohibitedContentRepository.findAllByPageOptionAndUrlPage(null,website.getUrl() );
+                res.put("prohibitedContentReport", resultList);
+                res.put("action", Constant.SUCCESS);
+                return res;
+            }
+        } else {
+            res.put("action", Constant.INCORRECT);
+            return res;
+        }
+    }
+
+    public List<ProhibitedContentReport> prohibitedContentService(List<Page> list, PageOption option) throws InterruptedException {
+        System.setProperty("webdriver.chrome.driver", Constant.CHROME_DRIVER);
+        //Asign list JS info
+        List<Word> wordList = new ArrayList<>();
+
+        wordList = wordRepository.findAll();
+
+            List<ProhibitedContentReport> resultList = new ArrayList<>();
+
+
+        final CyclicBarrier gate = new CyclicBarrier(list.size());
+        List<Thread> listThread = new ArrayList<>();
+        List<String> cookieNames = new ArrayList<String>();
+
+        for (Page p : list) {
+            List<Word> finalWordList = wordList;
+            listThread.add(new Thread() {
+                public void run() {
+                    try {
+                        gate.await();
+
+                        ChromeOptions chromeOptions = new ChromeOptions();
+                        chromeOptions.addArguments("--headless");
+
+                        WebDriver driver = new ChromeDriver(chromeOptions);//chay an
+
+                        driver.get(p.getUrl());
+                        WebElement textt = driver.findElement(By.tagName("body"));
+                        for (int i = 0; i< finalWordList.size(); i++){
+                                if(textt.getText().toLowerCase().contains(finalWordList.get(i).getWord().toLowerCase())){
+                                    ProhibitedContentReport prohibitedContentReport = new ProhibitedContentReport(p.getUrl(),finalWordList.get(i).getWord(),finalWordList.get(i).getType());
+                                    prohibitedContentReport.setPageOption(option);
+                                    resultList.add(prohibitedContentReport);
+                                }
+
+                        }
+
+
+
+
+
+
+
+
+                    }catch (InterruptedException | BrokenBarrierException e) {
+                        Logger.getLogger(QualityImpl.class.getName()).log(Level.SEVERE, null, e);
+                    }
+                }
+            });
+        }
+        for (Thread t : listThread) {
+            System.out.println("Threed start");
+            t.start();
+        }
+
+        for (Thread t : listThread) {
+            System.out.println("Threed join");
+            t.join();
+        }
+
+
+
+
+//
+        return resultList;
+    }
+
 
 }

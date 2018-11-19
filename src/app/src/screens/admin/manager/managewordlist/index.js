@@ -36,7 +36,7 @@ export default class managewordlist extends Component {
         }).then(response => response.json()).then((data) => {
             if (data.action === "SUCCESS") {
                 var list = data.wordList.map((item, index) => {
-                    return (<TableRow key={index} id={item.id} word={item.word} createdTime={item.createdTime} loadingTable={(isLoading) => this._loadingTable(isLoading)} refreshTable={() => this._refreshTable()} />);
+                    return (<TableRow key={index} id={item.id} word={item.word} type={item.type} modifiedTime={item.modifiedTime} loadingTable={(isLoading) => this._loadingTable(isLoading)} refreshTable={() => this._refreshTable()} />);
                 });
                 this.setState({ listWord: list, isLoading: false });
 
@@ -123,6 +123,7 @@ export default class managewordlist extends Component {
                                         <Table.HeaderCell>No</Table.HeaderCell>
                                         <Table.HeaderCell>Word</Table.HeaderCell>
                                         <Table.HeaderCell>Lastest updated</Table.HeaderCell>
+                                        <Table.HeaderCell>Type</Table.HeaderCell>
                                         <Table.HeaderCell>Action</Table.HeaderCell>
 
                                     </Table.Row>

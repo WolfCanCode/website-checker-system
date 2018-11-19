@@ -1,72 +1,123 @@
 import React, { Component } from 'react';
-import { Segment, Button, SegmentGroup, Icon, Table, Label, Input} from 'semantic-ui-react'
-// import { Cookies } from "react-cookie";
+import { Segment, Button, Icon, Table, Input } from 'semantic-ui-react'
+import TableRow from './row-table';
+import { Cookies } from "react-cookie";
+import ReactToExcel from "react-html-table-to-excel";
+import './style.css';
 
-// const cookies = new Cookies();
+
+const cookies = new Cookies();
 export default class ProhibitedContent extends Component {
+    
+
+    state = { list: [], loadingTable: false, isDisable: false };
+
+
+    componentDidMount() {
+        var comp = [];
+        this.setState({ loadingTable: true });
+        var param = {
+            "userId": cookies.get("u_id"),
+            "userToken": cookies.get("u_token"),
+            "websiteId": cookies.get("u_w_id"),
+            "pageOptionId": cookies.get("u_option"),
+        }
+        fetch("/api/prohibitedContent/lastest", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(param)
+        }).then(response => response.json()).then((data) => {
+            comp = data.prohibitedContentReport.map((item, index) => {
+                return (<TableRow key={index} urlPage={item.urlPage} word={item.word} type={item.type} />);
+            });
+            this.setState({ list: comp });
+            this.setState({ loadingTable: false });
+        });
+
+
+    }
+
+    _doProhibitedContent() {
+        var comp = [];
+        this.setState({ loadingTable: true, isDisable: true });
+        var param = {
+            "userId": cookies.get("u_id"),
+            "userToken": cookies.get("u_token"),
+            "websiteId": cookies.get("u_w_id"),
+            "pageOptionId": cookies.get("u_option"),
+        }
+
+        fetch("/api/prohibitedContent", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(param)
+        }).then(response => response.json()).then((data) => {
+            comp = data.prohibitedContentReport.map((item, index) => {
+                return (<TableRow key={index} urlPage={item.urlPage} word={item.word} type={item.type} />);
+            });
+            this.setState({ list: comp });
+            this.setState({ loadingTable: false, isDisable: false });
+        });
+
+    }
+
+
+
+
 
     render() {
         return (
-            <div>
-                <SegmentGroup vertical='true'>
-                    <Segment.Group horizontal>
-                        <Segment basic>
-                            <Segment.Group horizontal>
-                                <Segment style={{ margin: 'auto', textAlign: 'center', padding: 0 }}>
-                                    <Icon className="warning sign" size='huge' color='red' />
-                                </Segment>
-                                <Segment style={{ paddingLeft: '10px' }}>
-                                    <p style={{ fontSize: 24 }}>2 <br />
-                                        Pieces of prohibited content</p>
-                                </Segment >
-                                <Segment style={{ margin: 'auto', textAlign: 'center', padding: 0 }}>
-                                    <Icon className="file outline" size='huge' color='grey' /></Segment>
-                                <Segment>
-                                    <p style={{ fontSize: 24 }}>15 <br /> Affected Pages</p>
-                                </Segment>
 
-                            </Segment.Group>
-                            <Button style={{ marginRight: '10px' }} floated='right'><Icon name="print" />Export</Button>
-                            <div style={{ marginBottom: '10px' }}>
-                                <Input icon='search' placeholder='Search...' />
-                            </div>
-                            <Table singleLine unstackable style={{ fontSize: '14px' }}>
-                                <Table.Header>
-                                    <Table.Row>
-                                        <Table.HeaderCell></Table.HeaderCell>
-                                        <Table.HeaderCell>Text</Table.HeaderCell>
-                                        <Table.HeaderCell>Type</Table.HeaderCell>
-                                        <Table.HeaderCell>Pages</Table.HeaderCell>
-                                        <Table.HeaderCell></Table.HeaderCell>
-                                    </Table.Row>
-                                </Table.Header>
-                                <Table.Body>
-                                    <Table.Row>
-                                        <Table.Cell><Icon circular inverted color='blue' name="search" /></Table.Cell>
-                                        <Table.Cell style={{ width: '200px', whiteSpace: 'normal', wordBreak: 'break-all' }}>Wine</Table.Cell>
-                                        <Table.Cell>Custom</Table.Cell>
-                                        <Table.Cell style={{ width: '50px', whiteSpace: 'normal', wordBreak: 'break-all' }}>   <Label circular color='grey'>
-        2
-      </Label></Table.Cell>
-                                        <Table.Cell><Button floated='right' >Ignore</Button></Table.Cell>
-                                    </Table.Row>
-                                    <Table.Row>
-                                        <Table.Cell><Icon circular inverted color='blue' name="search" /></Table.Cell>
-                                        <Table.Cell style={{ width: '200px', whiteSpace: 'normal', wordBreak: 'break-all' }}>Crappy</Table.Cell>
-                                        <Table.Cell>Potentially offensive</Table.Cell>
-                                        <Table.Cell style={{ width: '50px', whiteSpace: 'normal', wordBreak: 'break-all' }}>   <Label circular color='grey'>
-        13
-      </Label></Table.Cell>
-                                        <Table.Cell><Button floated='right' >Ignore</Button></Table.Cell>
-                                    </Table.Row>
+            <Segment.Group horizontal style={{ margin: 0 }}>
 
-                                </Table.Body>
-                            </Table>
-                        </Segment>
-                        
-                    </Segment.Group>
-                </SegmentGroup>
-            </div>
+                <Segment basic loading={this.state.loadingTable} >
+                    <Button icon labelPosition='right' disabled={this.state.isDisable} onClick={() => this._doProhibitedContent()}>
+                        Check
+                       <Icon name='right arrow' />
+                    </Button>
+                    <div style={{ marginBottom: '10px', float: 'right' }}>
+
+
+                        <ReactToExcel
+                            className="btn1"
+                            table="table-to-xls"
+                            filename="cookie_test_file"
+                            sheet="sheet 1"
+                            buttonText={<Button ><Icon name="print" />Export</Button>}
+                        />
+                    </div>
+
+                    <div style={{ marginBottom: '10px', float: 'right' }}>
+                        <Input icon='search' placeholder='Search...' />
+                    </div>
+                    <Table singleLine unstackable style={{ fontSize: '16px', }} id="table-to-xls">
+                        <Table.Header textAlign='center'>
+                            <Table.Row>
+                               
+                                <Table.HeaderCell>Word</Table.HeaderCell>
+                                <Table.HeaderCell>Type</Table.HeaderCell>
+                                <Table.HeaderCell>UrlPage</Table.HeaderCell>
+                                
+
+                            </Table.Row>
+                        </Table.Header>
+                        <Table.Body>
+                            {this.state.list.length === 0 ? <Table.Row><Table.Cell>This page haven't test yet, please try to test</Table.Cell></Table.Row> : this.state.list}
+                           
+
+                        </Table.Body>
+                    </Table>
+                </Segment>
+
+
+            </Segment.Group>
+
         );
     }
 }

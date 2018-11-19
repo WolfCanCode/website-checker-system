@@ -70,6 +70,19 @@ public class QualityController {
         return qualityService.getLastestBrokenPage(request);
     }
 
+    @CrossOrigin
+    @Transactional
+    @PostMapping("/api/prohibitedContent")
+    public Map<String, Object> getDataProhibitedContent(@RequestBody RequestCommonPOJO request) throws InterruptedException {
+        return qualityService.getDataProhibitedContent(request);
+    }
+
+    @CrossOrigin
+    @PostMapping("/api/prohibitedContent/lastest")
+    public Map<String, Object> getLastestProhibitedContent(@RequestBody RequestCommonPOJO request) {
+        return qualityService.getLastestProhibitedContent(request);
+    }
+
 
     @CrossOrigin
     @PostMapping("/api/missingtest")

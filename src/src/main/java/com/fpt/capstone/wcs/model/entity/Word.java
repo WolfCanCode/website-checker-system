@@ -24,6 +24,8 @@ public class Word {
     private long id;
     @NotNull
     private String word;
+    @NotNull
+    private String type;
     @CreationTimestamp
     private LocalDateTime createdTime;
     @UpdateTimestamp

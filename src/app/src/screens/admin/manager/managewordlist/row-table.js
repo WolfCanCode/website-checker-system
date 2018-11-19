@@ -125,7 +125,8 @@ export default class TableRow extends Component {
 
             <Table.Cell ><a >{this.props.id}</a></Table.Cell>
             <Table.Cell ><a >{this.props.word}</a></Table.Cell>
-            <Table.Cell ><a >{this.props.createdTime}</a></Table.Cell>
+            <Table.Cell ><a >{this.props.modifiedTime.split("T")[0]}</a></Table.Cell>
+            <Table.Cell ><a >{this.props.type}</a></Table.Cell>
             <Table.Cell ><Button onClick={this.show('mini')} > Edit </Button><Button onClick={this.closeConfigShow(false, true)}> Delete</Button></Table.Cell>
 
         </Table.Row >

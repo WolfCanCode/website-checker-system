@@ -10,4 +10,7 @@ public interface QualityService {
     //Broken Page
     public Map<String, Object> getDataBrokenPage(RequestCommonPOJO request) throws InterruptedException;
     public Map<String, Object> getLastestBrokenPage(RequestCommonPOJO request);
+    //Prohibited
+    public Map<String, Object> getDataProhibitedContent(RequestCommonPOJO request) throws InterruptedException;
+    public Map<String, Object> getLastestProhibitedContent(RequestCommonPOJO request);
 }
