@@ -2,10 +2,7 @@ package com.fpt.capstone.wcs.service.Technology;
 
 import com.fpt.capstone.wcs.model.entity.*;
 import com.fpt.capstone.wcs.model.pojo.RequestCommonPOJO;
-import com.fpt.capstone.wcs.repository.CookieRepository;
-import com.fpt.capstone.wcs.repository.FaviconRepository;
-import com.fpt.capstone.wcs.repository.JSCheckRepository;
-import com.fpt.capstone.wcs.repository.PageOptionRepository;
+import com.fpt.capstone.wcs.repository.*;
 import com.fpt.capstone.wcs.utils.Authenticate;
 import com.fpt.capstone.wcs.utils.Constant;
 import org.jsoup.Jsoup;
@@ -55,12 +52,15 @@ public class TechnologyImpl implements TechnologyService {
 
     final CookieRepository cookieRepository;
 
-    public TechnologyImpl(PageOptionRepository pageOptionRepository, Authenticate authenticate, FaviconRepository faviconRepository, JSCheckRepository jsCheckRepository, CookieRepository cookieRepository) {
+    final CookieDataRepository cookieDataRepository;
+
+    public TechnologyImpl(PageOptionRepository pageOptionRepository, Authenticate authenticate, FaviconRepository faviconRepository, JSCheckRepository jsCheckRepository, CookieRepository cookieRepository, CookieDataRepository cookieDataRepository) {
         this.pageOptionRepository = pageOptionRepository;
         this.authenticate = authenticate;
         this.faviconRepository = faviconRepository;
         this.jsCheckRepository = jsCheckRepository;
         this.cookieRepository = cookieRepository;
+        this.cookieDataRepository = cookieDataRepository;
     }
 
     @Override
@@ -213,14 +213,161 @@ public class TechnologyImpl implements TechnologyService {
     }
 
     @Override
-    public Map<String, Object> getCookies(RequestCommonPOJO request) {
-        return null;
+    public Map<String, Object> getCookies(RequestCommonPOJO request) throws InterruptedException {
+        Map<String, Object> res = new HashMap<>();
+        Website website = authenticate.isAuthGetSingleSite(request);
+        if (website != null) {
+            PageOption pageOption = pageOptionRepository.findOneByIdAndWebsiteAndDelFlagEquals(request.getPageOptionId(), website, false);
+            if(pageOption==null){
+                request.setPageOptionId((long)-1);
+            }
+
+
+
+            if(request.getPageOptionId()!=-1) { //page option list is null
+                List<Page> pages = pageOption.getPages();
+
+                List<CookieReport> resultList = cookieService(pages, pageOption);
+                cookieRepository.removeAllByPageOption(pageOption);
+                cookieRepository.saveAll(resultList);
+                res.put("action", Constant.SUCCESS);
+                res.put("cookieReport", resultList);
+                return res;
+            }
+            else {
+                List<Page> pages = new ArrayList<>();
+                Page page = new Page();
+                page.setUrl(website.getUrl());
+                page.setType(1);
+                pages.add(page);
+
+                List<CookieReport> resultList = cookieService(pages, null);
+                cookieRepository.saveAll(resultList);
+                res.put("action", Constant.SUCCESS);
+                res.put("cookieReport", resultList);
+                return res;
+            }
+        } else {
+            res.put("action", Constant.INCORRECT);
+            return res;
+        }
     }
 
     @Override
     public Map<String, Object> getLastestCookies(RequestCommonPOJO request) {
-        return null;
+        Map<String, Object> res = new HashMap<>();
+        Website website = authenticate.isAuthGetSingleSite(request);
+        if (website != null) {
+            PageOption pageOption = pageOptionRepository.findOneByIdAndWebsiteAndDelFlagEquals(request.getPageOptionId(), website, false);
+            if(pageOption==null){
+                request.setPageOptionId((long)-1);
+            }
+
+            if(request.getPageOptionId()!=-1) {
+
+                List<CookieReport> resultList = cookieRepository.findAllByPageOption(pageOption);
+                res.put("cookieReport", resultList);
+                res.put("action", Constant.SUCCESS);
+                return res;
+            } else {
+                List<CookieReport> resultList = cookieRepository.findAllByPageOption(null);
+                res.put("cookieReport", resultList);
+                res.put("action", Constant.SUCCESS);
+                return res;
+            }
+        } else {
+            res.put("action", Constant.INCORRECT);
+            return res;
+        }
     }
+
+
+    public List<CookieReport> cookieService(List<Page> list, PageOption option) throws InterruptedException {
+        System.setProperty("webdriver.chrome.driver", Constant.CHROME_DRIVER);
+        //Asign list JS info
+        List<CookieData> cookieList = new ArrayList<>();
+
+        cookieList = cookieDataRepository.findAll();
+
+        List<CookieReport> resultList = new ArrayList<>();
+        List<CookieReport> resultList11 = new ArrayList<>();
+
+        final CyclicBarrier gate = new CyclicBarrier(list.size());
+        List<Thread> listThread = new ArrayList<>();
+        List<String> cookieNames = new ArrayList<String>();
+
+        for (Page p : list) {
+            listThread.add(new Thread() {
+                public void run() {
+                    try {
+                        gate.await();
+
+                        ChromeOptions chromeOptions = new ChromeOptions();
+                        chromeOptions.addArguments("--headless");
+
+                        WebDriver driver = new ChromeDriver(chromeOptions);//chay an
+
+                        driver.get(p.getUrl());
+
+                        Set<org.openqa.selenium.Cookie> cookies = driver.manage().getCookies();
+
+                        //To find the number of cookies used by this site
+                        System.out.println("Number of cookies in this site " + cookies.size());
+
+                        for (org.openqa.selenium.Cookie cookie : cookies) {
+                            // System.out.println(cookie.getName()+" "+cookie.getValue());
+                            resultList11.add(new CookieReport(cookie.getName(), cookie.getDomain()));
+
+                        }
+                        System.out.println("size 1 " + resultList11.size());
+
+
+                    } catch (InterruptedException | BrokenBarrierException e) {
+                        Logger.getLogger(TechnologyImpl.class.getName()).log(Level.SEVERE, null, e);
+                    }
+                }
+            });
+        }
+        for (Thread t : listThread) {
+            System.out.println("Threed start");
+            t.start();
+        }
+
+        for (Thread t : listThread) {
+            System.out.println("Threed join");
+            t.join();
+        }
+
+        //delete duplicate cookie
+        List<CookieReport> resultList1 = resultList11.stream()
+                .collect(collectingAndThen(toCollection(() -> new TreeSet<>(comparing(CookieReport::getCookieName).thenComparing(CookieReport::getParty))),
+                        ArrayList::new));
+        System.out.println("size 2 " + resultList1.size());
+        int a = 0;
+        for (CookieReport cookieName : resultList1) {
+            a = 0;
+            for (int i = 0; i < cookieList.size(); i++) {
+                if (cookieName.getCookieName().equalsIgnoreCase(cookieList.get(i).getCookieName())) {
+                    CookieReport cookieReport =  new CookieReport(cookieList.get(i).getCookieName(), cookieList.get(i).getCategory(), cookieList.get(i).getParty(), cookieList.get(i).getDescription());
+                    cookieReport.setPageOption(option);
+                    resultList.add(cookieReport);
+                    //resultList.add(new CookieReport(cookieList.get(i).getCookieName(), cookieList.get(i).getCategory(), cookieList.get(i).getParty(), cookieList.get(i).getDescription()));
+                    a = 1;
+                }
+            }
+            if (a == 0) {
+                CookieReport cookieReport = new CookieReport(cookieName.getCookieName(), "Unknown", cookieName.getParty(), "The purpose of these cookies in unknown.");
+                cookieReport.setPageOption(option);
+                resultList.add(cookieReport);
+                //resultList.add(new CookieReport(cookieName.getCookieName(), "Unknown", cookieName.getParty(), "The purpose of these cookies in unknown."));
+
+            }
+
+        }
+//
+        return resultList;
+    }
+
 
     public List<JavascriptReport> jsTestService(List<Page> list, PageOption option) {
         System.setProperty("webdriver.chrome.driver", Constant.CHROME_DRIVER);

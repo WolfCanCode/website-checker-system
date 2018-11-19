@@ -12,6 +12,6 @@ public interface TechnologyService {
     public Map<String, Object> getJavaErrrorTest(@RequestBody RequestCommonPOJO request);
     public Map<String, Object> getLastestSpeedTest(@RequestBody RequestCommonPOJO request);
 
-    public Map<String, Object> getCookies(@RequestBody RequestCommonPOJO request);
+    public Map<String, Object> getCookies(@RequestBody RequestCommonPOJO request) throws InterruptedException;
     public Map<String, Object> getLastestCookies(@RequestBody RequestCommonPOJO request);
 }

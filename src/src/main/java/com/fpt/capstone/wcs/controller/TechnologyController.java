@@ -93,73 +93,13 @@ public class TechnologyController {
     @Transactional
     @PostMapping("/api/cookie")
     public Map<String, Object> getCookies(@RequestBody RequestCommonPOJO request) throws InterruptedException {
-        Map<String, Object> res = new HashMap<>();
-        Website website = authenticate.isAuthGetSingleSite(request);
-        if (website != null) {
-            PageOption pageOption = pageOptionRepository.findOneByIdAndWebsiteAndDelFlagEquals(request.getPageOptionId(), website, false);
-            if(pageOption==null){
-                request.setPageOptionId((long)-1);
-            }
-
-
-
-            if(request.getPageOptionId()!=-1) { //page option list is null
-                List<Page> pages = pageOption.getPages();
-                TechnologyService technologyService = new TechnologyService();
-                List<CookieReport> resultList = technologyService.cookieService(pages, pageOption);
-                cookieRepository.removeAllByPageOption(pageOption);
-                cookieRepository.saveAll(resultList);
-                res.put("action", Constant.SUCCESS);
-                res.put("cookieReport", resultList);
-                return res;
-            }
-            else {
-                List<Page> pages = new ArrayList<>();
-                Page page = new Page();
-                page.setUrl(website.getUrl());
-                page.setType(1);
-                pages.add(page);
-                TechnologyService technologyService = new TechnologyService();
-                List<CookieReport> resultList = technologyService.cookieService(pages, null);
-                cookieRepository.saveAll(resultList);
-                res.put("action", Constant.SUCCESS);
-                res.put("cookieReport", resultList);
-                return res;
-            }
-        } else {
-            res.put("action", Constant.INCORRECT);
-            return res;
-        }
+        return  technologyServiceS1.getCookies(request);
     }
 
     @CrossOrigin
     @PostMapping("/api/cookie/lastest")
-    public Map<String, Object> getLastestCookies(@RequestBody RequestCommonPOJO request)
-    {
-        Map<String, Object> res = new HashMap<>();
-        Website website = authenticate.isAuthGetSingleSite(request);
-        if (website != null) {
-            PageOption pageOption = pageOptionRepository.findOneByIdAndWebsiteAndDelFlagEquals(request.getPageOptionId(), website, false);
-            if(pageOption==null){
-                request.setPageOptionId((long)-1);
-            }
-
-            if(request.getPageOptionId()!=-1) {
-
-                List<CookieReport> resultList = cookieRepository.findAllByPageOption(pageOption);
-                res.put("cookieReport", resultList);
-                res.put("action", Constant.SUCCESS);
-                return res;
-            } else {
-                List<CookieReport> resultList = cookieRepository.findAllByPageOption(null);
-                res.put("cookieReport", resultList);
-                res.put("action", Constant.SUCCESS);
-                return res;
-            }
-        } else {
-            res.put("action", Constant.INCORRECT);
-            return res;
-        }
+    public Map<String, Object> getLastestCookies(@RequestBody RequestCommonPOJO request) {
+        return  technologyServiceS1.getLastestCookies(request);
     }
 
     @CrossOrigin
