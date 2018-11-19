@@ -111,7 +111,7 @@ export class RouteClient extends Component {
 }
 
 export const RouteStaff = withRouter(({ location }) => (
-    <div style={{ background: "#fff", boxShadow: "-5px 5px 15px rgba(0,0,0,0.1)", maxHeight: '72vh', overflowX: "auto" }}>
+    <div style={{ background: "#fff", boxShadow: "-5px 5px 15px rgba(0,0,0,0.1)", maxHeight: '90%', overflowX: "auto" }}>
         <TransitionGroup>
             <CSSTransition
                 key={location.key}
@@ -150,7 +150,7 @@ export const RouteStaff = withRouter(({ location }) => (
 
 
 export const RouteManager = withRouter(({ location }) => (
-    <div style={{ background: "#fff", boxShadow: "-5px 5px 15px rgba(0,0,0,0.1)", maxHeight: '72vh', overflowX: "auto" }}>
+    <div style={{ background: "#fff", boxShadow: "-5px 5px 15px rgba(0,0,0,0.1)", maxHeight: '90', overflowX: "auto" }}>
         <TransitionGroup>
             <CSSTransition
                 key={location.key}

@@ -253,7 +253,7 @@ public class ManagerController {
         User addStaff = request.getStaff();
         if (manager != null) {
             addStaff.setManager(manager);
-            addStaff.setRole(roleRepository.findById((long) 1).get());
+            addStaff.setRole(roleRepository.findById((long) 2).get());
             addStaff.setDelFlag(false);
             addStaff.setPassword(EncodeUtil.doEncode(addStaff.getPassword()));
             userRepository.save(addStaff);

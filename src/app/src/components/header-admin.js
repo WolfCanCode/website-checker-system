@@ -1,14 +1,18 @@
 import React, { Component } from 'react';
-import { Input, Dropdown, Menu, Icon } from 'semantic-ui-react';
+
+import { Input, Dropdown, Menu, Icon, Image } from 'semantic-ui-react';
 // import { Redirect } from "react-router-dom";
 import { Cookies } from "react-cookie";
-
+import avatar from "../assets/avatar.png";
 const cookies = new Cookies();
 
+const userOptions = [
+    { key: 'user', text: 'Account', icon: 'user' },
+    { key: 'settings', text: 'Settings', icon: 'settings' }
+];
 
 class HeaderAdmin extends Component {
-    state = { valWebpage: null, listWeb: null, logout: false, account_name: "", marginBody: 160 };
-
+    state = { valWebpage: null, listWeb: null, logout: false, account_name: "", marginBody: 190, trigger: null };
 
 
     componentDidMount() {
@@ -30,7 +34,14 @@ class HeaderAdmin extends Component {
                         return { key: index, value: item.id, text: item.url };
 
                     });
-                    this.setState({ listWeb: list, account_name: data.fullname }, () => {
+                    var trigger = (
+                        <span style={{ fontSize: 16, color: 'white' }}>
+                            <Image avatar src={avatar} /> {data.fullname}
+                        </span>
+                    );
+
+
+                    this.setState({ listWeb: list, account_name: data.fullname, trigger: trigger }, () => {
                         if (cookies.get('u_w_id') !== null && cookies.get('u_w_id') !== undefined) {
                             for (let i = 0; i < list.length; i++) {
                                 // eslint-disable-next-line
@@ -58,7 +69,15 @@ class HeaderAdmin extends Component {
                 body: JSON.stringify({ "userId": cookies.get("u_id"), "userToken": cookies.get("u_token") })
             }).then(response => response.json()).then((data) => {
                 if (data.action === "SUCCESS") {
-                    this.setState({ account_name: data.fullname });
+                    var trigger = (
+                        <span style={{ fontSize: 16, color: 'white' }}>
+                            <Image avatar src={avatar} /> {data.fullname}
+                        </span>
+                    );
+
+
+                    this.setState({ account_name: data.fullname, trigger: trigger });
+
                 } else {
                     this._doLogout();
                 }
@@ -88,7 +107,7 @@ class HeaderAdmin extends Component {
 
     _hideShowSideBar() {
         if (this.state.marginBody === 10) {
-            this.setState({ marginBody: 160 });
+            this.setState({ marginBody: 190 });
         } else {
             this.setState({ marginBody: 10 });
         }
@@ -99,17 +118,18 @@ class HeaderAdmin extends Component {
 
     render() {
         return (
-            <Menu className="top" style={{ background: 'rgb(55, 33, 173)', position: 'absolute', width: '100%', zIndex: '4', margin: '0', height: '50px' }}>
+            <Menu className="top" style={{ background: 'rgb(55, 33, 173)', position: 'absolute', width: '100%', zIndex: '6', margin: '0', height: '50px' }}>
                 <Menu.Item><Icon className='bars' style={{ color: "white", cursor: "pointer", marginLeft: `${this.state.marginBody}px`, transition: "all 0.6s" }} onClick={() => this._hideShowSideBar()} /></Menu.Item>
                 {cookies.get("u_isManager") !== "true" ? <Menu.Item><Dropdown key="1" onChange={(event, data) => this._changeWebPage(event, data)} options={this.state.listWeb} value={this.state.valWebpage} style={{ color: 'white', fontSize: '18px' }} /></Menu.Item> : ""}
                 <Menu.Menu position='right'>
                     <Menu.Item>
                         <Input icon='search' placeholder='Search...' />
                     </Menu.Item>
-                    <Menu.Item style={{ color: 'white', fontWeight: 'bold' }}>
-                        Hi, {this.state.account_name}
+                    <Menu.Item>
+                        <Dropdown trigger={this.state.trigger} options={userOptions} pointing='top left' icon={null} />
                     </Menu.Item>
-                    <Menu.Item style={{ color: 'white', fontWeight: 'bold' }}
+
+                    <Menu.Item style={{ background: 'red', color: 'white', fontWeight: 'bold', fontSize: 16, margin: 0 }}
                         name='logout'
                         onClick={() => this._doLogout()}
                     />

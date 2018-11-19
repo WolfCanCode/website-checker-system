@@ -25,7 +25,7 @@ class LoginScreen extends Component {
                 `}
                 </style>
                 <Segment.Group horizontal style={{ height: '100%', margin: 0 }}>
-                    <Segment basic style={{ flex: 1, background: `url(${bg1})`, backgroundSize: 'cover' }} loading={this.state.isLogin}>
+                    <Segment basic style={{ flex: 1, background: `url(${bg1})`, backgroundSize: 'cover', minWidth: 390, overflow: 'hidden' }} loading={this.state.isLogin}>
                         <Grid style={{ height: 150 }}></Grid>
                         <Grid style={{ height: 'auto' }} >
                             <Grid.Column style={{ width: '100%', height: 'auto' }}>

@@ -17,9 +17,9 @@ import {
 } from 'semantic-ui-react'
 import 'semantic-ui-css/semantic.min.css';
 import logo from '../../assets/icon-wsc.png';
-import wallpaper from '../../assets/wallpaperfinal.jpg';
+import wallpaper from '../../assets/wallpaper.jpg';
 import {
-    Link
+  Link
 } from "react-router-dom";
 //layout 
 const HomepageHeading = ({ mobile }) => (
@@ -74,7 +74,7 @@ class DesktopContainer extends Component {
         >
           <Segment
             textAlign='center'
-            style={{ minHeight: 860, padding: '1em 0em', background: `url(${wallpaper})`, backgroundSize: 'cover' }}
+            style={{ minHeight: '100vh', padding: '1em 0em', background: `url(${wallpaper})`, backgroundSize: 'cover' }}
             vertical
           >
             <Menu
@@ -98,11 +98,12 @@ class DesktopContainer extends Component {
                 <Menu.Item as='a' >TESTS WHAT?</Menu.Item>
                 <Menu.Item as='a' >PRICING</Menu.Item>
                 <Menu.Item >
-                  <Button inverted={!fixed}>
-                      <Link to={'/login'} style={{color:'white'}}>Log in</Link>
+                  <Button inverted={!fixed} as={Link} to={'/login'}>
+                    {/* <Link to={'/login'} style={{color:'white'}}>Log in</Link> */}
+                    Log in
                   </Button>
-                  <Button  inverted={!fixed} primary={fixed} style={{ marginLeft: '0.5em' }}>
-                      <Link to={'/register'} style={{color:'white'}}>Sign up</Link>
+                  <Button inverted={!fixed} primary={fixed} style={{ marginLeft: '0.5em' }}>
+                    Sign up
                   </Button>
                 </Menu.Item>
               </Container>
@@ -166,7 +167,7 @@ class MobileContainer extends Component {
             </Menu.Item>
             <Menu.Item as='a'>Tests What</Menu.Item>
             <Menu.Item as='a'>Pricing</Menu.Item>
-            <Menu.Item as='a'>Log in</Menu.Item>
+            <Menu.Item as={Link} to="/login">Log in</Menu.Item>
             <Menu.Item as='a'>Sign Up</Menu.Item>
           </Sidebar>
 
@@ -187,7 +188,7 @@ class MobileContainer extends Component {
                     <Icon name='sidebar' />
                   </Menu.Item>
                   <Menu.Item position='right'>
-                    <Button as='a' inverted>
+                    <Button as={Link} to="/login" inverted>
                       Log in
                     </Button>
                     <Button as='a' inverted style={{ marginLeft: '0.5em' }}>

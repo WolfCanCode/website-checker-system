@@ -38,20 +38,20 @@ export default class SideMenu extends Component {
         this.listMenuItem = menuList.map((item, index) => {
             if (item.items === null) {
                 return (
-                    <Menu.Item style={{ fontSize: 15, fontWeight: 'bold' }} key={index} as={Link} to={item.to} active={this.state.menuActive === item.key ? true : false} onClick={() => this._doActiveChange(item)}>
+                    <Menu.Item style={{ fontSize: 18, fontWeight: 'bold' }} key={index} as={Link} to={item.to} active={this.state.menuActive === item.key ? true : false} onClick={() => this._doActiveChange(item)}>
                         {item.name}
                     </Menu.Item>);
             } else {
                 var childItem = item.items.map((itemC, indexC) => {
                     return (
-                        <Menu.Item style={{ fontSize: 13 }} key={indexC} as={Link} to={itemC.to} active={this.state.menuActive === itemC.key ? true : false} onClick={() => this._doActiveChange(itemC)}>
+                        <Menu.Item style={{ fontSize: 15 }} key={indexC} as={Link} to={itemC.to} active={this.state.menuActive === itemC.key ? true : false} onClick={() => this._doActiveChange(itemC)}>
                             {itemC.name}
                         </Menu.Item>
                     );
                 });
                 return (
                     <Menu.Item key={index}>
-                        <Menu.Header style={{ fontSize: 15 }}>{item.name}</Menu.Header>
+                        <Menu.Header style={{ fontSize: 18 }}>{item.name}</Menu.Header>
                         <Menu.Menu>
                             {childItem}
                         </Menu.Menu>
@@ -71,7 +71,7 @@ export default class SideMenu extends Component {
 
     render() {
         return (
-            <Sidebar as={Menu} animation='overlay' inverted vertical visible={this.props.visible} width='thin' style={{ background: `url(${sidebarBg})`, backgroundSize: 'cover' }}>
+            <Sidebar as={Menu} animation='overlay' inverted vertical visible={this.props.visible} style={{ background: `url(${sidebarBg})`, backgroundSize: 'cover', width: 180 }}>
                 <Menu.Item>
                     <Image src={logo} style={{ width: '65px', height: 'auto', margin: 'auto' }} />
                 </Menu.Item>

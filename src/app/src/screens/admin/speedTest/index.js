@@ -185,8 +185,8 @@ class speedTestScreen extends Component {
     render() {
         return (
             <Segment.Group>
-                <Segment.Group horizontal>
-                    <Segment basic loading={this.state.loadingTable}>
+                <Segment.Group horizontal >
+                    <Segment basic loading={this.state.loadingTable} >
 
                         <Segment.Group horizontal >
 
@@ -203,21 +203,23 @@ class speedTestScreen extends Component {
                                 <p style={{ fontSize: 24 }}>{isNaN(this.state.averageSize) ? 0 : this.state.averageSize} MB <br /> Average page size</p>
                             </Segment>
                         </Segment.Group>
-                        <Segment basic>
-                            <Button icon primary labelPosition='right' disabled={this.state.isDisable} onClick={() => this._doSpeedTest()}>
-                                Check
+                        <Segment.Group style={{ border: 0, minWidth: 300, overflow: "auto" }}>
+                            <Segment style={{ border: 0 }}>
+                                <Button icon primary labelPosition='right' disabled={this.state.isDisable} onClick={() => this._doSpeedTest()}>
+                                    Check
                        <Icon name='right arrow' />
-                            </Button>
-                            {this.state.isDoneTest ? <Button icon color="green" onClick={() => this._saveReport()}>
-                                <Icon name='check' />
-                            </Button> : ""}
-                            <Button floated='right' color="green" ><Icon name="print" />Export</Button>
+                                </Button>
+                                {this.state.isDoneTest ? <Button icon color="green" labelPosition='right' onClick={() => this._saveReport()}>
+                                    Save <Icon name='check' />
+                                </Button> : ""}
+                                <Button floated='right' color="green" ><Icon name="print" />Export</Button>
 
-                            <Input icon='search' placeholder='Search...' style={{ float: 'right' }} />
-                        </Segment>
-                        <Segment basic style={{ maxHeight: 300, overflow: "auto" }}>
+                                <Input icon='search' placeholder='Search...' style={{ float: 'right', marginRight: 5 }} />
+                            </Segment>
+                        </Segment.Group>
+                        <Segment basic style={{ maxHeight: '98%', overflow: "auto" }}>
 
-                            <Table singleLine unstackable textAlign='center' style={{ tableLayout: 'auto' }}>
+                            <Table unstackable >
                                 <Table.Header >
                                     <Table.Row>
                                         <Table.HeaderCell>Page</Table.HeaderCell>
