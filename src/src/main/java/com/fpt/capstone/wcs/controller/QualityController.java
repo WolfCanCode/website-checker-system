@@ -11,6 +11,7 @@ import com.fpt.capstone.wcs.service.Quality.QualityService;
 
 
 import com.fpt.capstone.wcs.utils.Authenticate;
+import com.fpt.capstone.wcs.utils.Constant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -28,19 +30,8 @@ import java.util.regex.Pattern;
 public class QualityController {
 
     @Autowired
-    PageRepository pageRepository;
-    @Autowired
-    VersionRepository versionRepository;
-    @Autowired
-    PageOptionRepository pageOptionRepository;
-    @Autowired
-    MissingFilesPagesRepository missingFilesPagesRepository;
-    @Autowired
     QualityService qualityService;
 
-
-    @Autowired
-    Authenticate authenticate;
 
 
     @CrossOrigin
@@ -83,65 +74,15 @@ public class QualityController {
         return qualityService.getLastestProhibitedContent(request);
     }
 
-
-    @CrossOrigin
+    @Transactional
     @PostMapping("/api/missingtest")
-    public List<MissingFileReport> getMissingFile(@RequestBody MissingFilePOJO[] request) throws InterruptedException {
-        com.fpt.capstone.wcs.service.QualityService qualityService = new com.fpt.capstone.wcs.service.QualityService();
-        List<MissingFileReport> result= new ArrayList<>();
-        System.out.println( request.length);
-        UrlPOJO[] list = new UrlPOJO[2];
-        list[0]= new UrlPOJO("https://www.bhcosmetics.com/");
-        list[1]= new UrlPOJO("https://thanhnien.vn/");
-        String urlRoot="";
-        for(int i =0; i< list.length;i++ ){
-            Pattern pattern = Pattern.compile("(http\\:|https\\:)//([\\w\\-?\\.?]+)?\\.([a-zA-Z]{2,3})?",Pattern.CASE_INSENSITIVE);
-            Matcher matcher = pattern.matcher(list[i].getUrl());
-            while (matcher.find()){
-                urlRoot = matcher.group();
-            }
-        }
-        if(request.length==0|| request.length==4){
-            System.out.println("Vo ne");
-            result =  qualityService.getMissingFile(list, urlRoot);
-        }
-        else{
-            for (MissingFilePOJO missingFilePOJODTO :request){
-               int typeSwicth = missingFilePOJODTO.getType();
-                System.out.println(typeSwicth);
-                switch (missingFilePOJODTO.getType()){
-                    case 1:{
-                        result.addAll(qualityService.getMissingFileImg(list, urlRoot));
-                        break;
-                    }
-                    case 2:{
-                        result.addAll(qualityService.getMissingFileCss(list,urlRoot));
-                        break;
-                    }
-                    case 3:{
-                        result.addAll(qualityService.getMissingFileDoc(list, urlRoot));
-                        break;
-
-                    }
-                    case 4:{
-                        result.addAll(qualityService.getMissingFileARCHIVES(list, urlRoot));
-                        break;
-                    }
-                }
-            }
-        }
-
-
-        missingFilesPagesRepository.deleteAll();
-        missingFilesPagesRepository.saveAll(result);
-        System.out.println("Ket Thuc check");
-        return result;
+   public Map<String, Object> getMissingFile(@RequestBody MissingFilePOJO request) throws InterruptedException {
+        return qualityService.getMissingFile(request);
     }
 
     @CrossOrigin
     @PostMapping("/api/missingtest/lastest")
-    public List<MissingFileReport> getLastestMissingFile() {
-        List<MissingFileReport> result = missingFilesPagesRepository.findAll();
-        return result;
+    public Map<String, Object> getLastestMissingFile(@RequestBody MissingFilePOJO request) {
+        return  qualityService.getLastestMissingFile(request);
     }
 }

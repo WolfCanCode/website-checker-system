@@ -1,17 +1,20 @@
 package com.fpt.capstone.wcs.model.pojo;
 
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+
+import java.util.List;
 
 
 @Data
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class MissingFilePOJO {
-    private Integer type;
-
-    public MissingFilePOJO(Integer type) {
-        this.type = type;
-    }
+    private List<Integer> listType;
+    private Long userId;
+    private String userToken;
+    private Long websiteId;
+    private Long pageOptionId;
+    
 }

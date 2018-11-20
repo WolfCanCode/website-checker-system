@@ -34,7 +34,10 @@ class missingFilesScreen extends Component {
         var listMissingFileCount = [];
         var statusResult = "";
         this.setState({ loadingTable: true });
-        var param = { "userId": cookies.get("u_id"), "userToken": cookies.get("u_token"), "websiteId": cookies.get("u_w_id") };
+        var param = { "userId": cookies.get("u_id"),
+        "userToken": cookies.get("u_token"),
+        "websiteId": cookies.get("u_w_id"),
+        "pageOptionId": cookies.get("u_option"), };
 
         fetch("/api/missingtest/lastest", {
             method: 'POST',
@@ -44,7 +47,7 @@ class missingFilesScreen extends Component {
             },
             body: JSON.stringify(param)
         }).then(response => response.json()).then((data) => {
-            comp = data.map((item, index) => {
+            comp = data.missingFileReport.map((item, index) => {
                 for (let i = 0; i < listCom.length; i++) {
                     if (item.pages === listCom[i]) {
                         flag = true;
@@ -88,7 +91,11 @@ class missingFilesScreen extends Component {
     _doMissingFilePagesTest() {
         this.setState({ loadingTable: true, isDisable: true });
         var comp = [];
-        var param = this.state.listType;
+        var param = {"userId": cookies.get("u_id"),
+        "userToken": cookies.get("u_token"),
+        "websiteId": cookies.get("u_w_id"),
+        "pageOptionId": cookies.get("u_option"),
+        "listType":this.state.listType};
         var countPageAffected1 = 0;
         var countMissingFile1 = 0;
         let flag = false;
@@ -105,7 +112,7 @@ class missingFilesScreen extends Component {
             },
             body: JSON.stringify(param)
         }).then(response => response.json()).then((data) => {
-            comp = data.map((item, index) => {
+            comp = data.missingFileReport.map((item, index) => {
                 for (let i = 0; i < listCom.length; i++) {
                     if (item.pages === listCom[i]) {
                         flag = true;
@@ -152,20 +159,21 @@ class missingFilesScreen extends Component {
         var flag = false;
         var listTemp = this.state.listType;
         for (let i = 0; i < listTemp.length; i++) {
-            if (listTemp[i].type === 1) {
+            if (listTemp[i] === 1) {
                 listTemp.splice(i, 1);
+                
                 flag = true;
-
+                
             }
 
         }
         if (!flag) {
-            listTemp.push({ type: 1 });
+            listTemp.push(1 );
             active = true;
         }
 
 
-
+        console.log("Ac:"+active)
         this.setState({ listType: listTemp, isActiveImg: active })
 
         console.log(listTemp);
@@ -178,14 +186,14 @@ class missingFilesScreen extends Component {
         var listTemp = this.state.listType;
 
         for (let i = 0; i < listTemp.length; i++) {
-            if (listTemp[i].type === 2) {
+            if (listTemp[i] === 2) {
                 listTemp.splice(i, 1);
                 flag = true;
             }
 
         }
         if (!flag) {
-            listTemp.push({ type: 2 });
+            listTemp.push( 2 );
             active = true;
         }
 
@@ -201,14 +209,14 @@ class missingFilesScreen extends Component {
         var listTemp = this.state.listType;
 
         for (let i = 0; i < listTemp.length; i++) {
-            if (listTemp[i].type === 3) {
+            if (listTemp[i] === 3) {
                 listTemp.splice(i, 1);
                 flag = true;
             }
 
         }
         if (!flag) {
-            listTemp.push({ type: 3 });
+            listTemp.push( 3 );
             active = true;
         }
 
@@ -224,14 +232,14 @@ class missingFilesScreen extends Component {
         var listTemp = this.state.listType;
 
         for (let i = 0; i < listTemp.length; i++) {
-            if (listTemp[i].type === 4) {
+            if (listTemp[i] === 4) {
                 listTemp.splice(i, 1);
                 flag = true;
             }
 
         }
         if (!flag) {
-            listTemp.push({ type: 4 });
+            listTemp.push( 4 );
             active = true;
         }
 

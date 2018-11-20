@@ -30,12 +30,12 @@ public class QualityService {
 
 
 
-    public List<MissingFileReport> getMissingFileImg(UrlPOJO[] url, String urlNew) throws InterruptedException {
+    public List<MissingFileReport> getMissingFileImg(List<Page> list,PageOption option, String urlNew) {
         List<MissingFileReport> missing = new ArrayList<>();
-        final CyclicBarrier gate = new CyclicBarrier(url.length);
+        final CyclicBarrier gate = new CyclicBarrier(list.size());
         List<Thread> listThread = new ArrayList<>();
         String urlRoot = urlNew;
-        for (UrlPOJO u : url) {
+        for (Page u : list) {
             listThread.add(new Thread() {
                 public void run() {
                     try {
@@ -53,6 +53,7 @@ public class QualityService {
                                 byte[] capacity =  getBytes(strChcek);
                                 if(capacity.length==0){
                                     MissingFileReport fileNew = new MissingFileReport(strChcek, checkCode+" size: "+capacity.length, u.getUrl());
+                                    fileNew.setPageOption(option);
                                     missing.add(fileNew);
                                 }
                                 System.out.println("Image: " + strChcek + " - Code:" + checkCode);
@@ -64,6 +65,7 @@ public class QualityService {
                                     byte[] capacity =  getBytes(checkAgain);
                                     if(capacity.length==0){
                                         MissingFileReport fileNew = new MissingFileReport(checkAgain, codeCheckAgain+" size: "+capacity.length, u.getUrl());
+                                        fileNew.setPageOption(option);
                                         missing.add(fileNew);
                                     }
                                     System.out.println("Image Again: " + checkAgain + " - Code:" + codeCheckAgain);
@@ -75,11 +77,13 @@ public class QualityService {
                                         byte[] capacity =  getBytes(checkLast);
                                         if(capacity.length==0){
                                             MissingFileReport fileNew = new MissingFileReport(checkLast, codeCheclast+" size: "+capacity.length, u.getUrl());
+                                            fileNew.setPageOption(option);
                                             missing.add(fileNew);
                                         }
                                         System.out.println("Image Last: " + checkLast + " - Code:" + codeCheclast);
                                     } else {
                                         MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheclast, u.getUrl());
+                                        fileNew.setPageOption(option);
                                         missing.add(fileNew);
                                         System.out.println("Image Last Fail: " + strChcek + " -Code: " + codeCheclast);
                                     }
@@ -105,17 +109,21 @@ public class QualityService {
 
         for (Thread t : listThread) {
             System.out.println("Threed join");
-            t.join();
+            try {
+                t.join();
+            } catch (InterruptedException e) {
+                Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
+            }
         }
         return missing;
     }
 
-    public List<MissingFileReport> getMissingFileDoc(UrlPOJO[] url, String urlNew) throws InterruptedException {
+    public List<MissingFileReport> getMissingFileDoc(List<Page> list,PageOption option, String urlNew)  {
         List<MissingFileReport> missing = new ArrayList<>();
-        final CyclicBarrier gate = new CyclicBarrier(url.length);
+        final CyclicBarrier gate = new CyclicBarrier(list.size());
         List<Thread> listThread = new ArrayList<>();
         String urlRoot = urlNew;
-        for (UrlPOJO u : url) {
+        for ( Page u : list) {
             listThread.add(new Thread() {
                 public void run() {
                     try {
@@ -132,6 +140,7 @@ public class QualityService {
                                 byte[] capacity =  getBytes(strChcek);
                                 if(capacity.length==0){
                                     MissingFileReport fileNew = new MissingFileReport(strChcek, checkCode+" size: "+capacity.length, u.getUrl());
+                                    fileNew.setPageOption(option);
                                     missing.add(fileNew);
                                 }
                                 System.out.println("DOC: " + strChcek + " - Code:" + checkCode);
@@ -143,6 +152,7 @@ public class QualityService {
                                     byte[] capacity =  getBytes(checkAgain);
                                     if(capacity.length==0){
                                         MissingFileReport fileNew = new MissingFileReport(checkAgain, codeCheckAgain+" size: "+capacity.length, u.getUrl());
+                                        fileNew.setPageOption(option);
                                         missing.add(fileNew);
                                     }
                                     System.out.println("DOC Again: " + checkAgain + " - Code:" + codeCheckAgain);
@@ -155,11 +165,13 @@ public class QualityService {
                                         byte[] capacity =  getBytes(checkLast);
                                         if(capacity.length==0){
                                             MissingFileReport fileNew = new MissingFileReport(checkLast, codeCheclast+" size: "+capacity.length, u.getUrl());
+                                            fileNew.setPageOption(option);
                                             missing.add(fileNew);
                                         }
                                         System.out.println("DOC Last: " + checkLast + " - Code:" + codeCheclast);
                                     } else {
                                         MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheclast, u.getUrl());
+                                        fileNew.setPageOption(option);
                                         missing.add(fileNew);
                                         System.out.println("DOC Last Fail: " + strChcek + " -Code: " + codeCheclast);
                                     }
@@ -186,17 +198,21 @@ public class QualityService {
 
         for (Thread t : listThread) {
             System.out.println("Threed join");
-            t.join();
+            try {
+                t.join();
+            } catch (InterruptedException e) {
+                Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
+            }
         }
         return missing;
     }
 
-    public List<MissingFileReport> getMissingFileCss(UrlPOJO[] url, String urlNew) throws InterruptedException {
+    public List<MissingFileReport> getMissingFileCss(List<Page> list,PageOption option, String urlNew)  {
         List<MissingFileReport> missing = new ArrayList<>();
-        final CyclicBarrier gate = new CyclicBarrier(url.length);
+        final CyclicBarrier gate = new CyclicBarrier(list.size());
         List<Thread> listThread = new ArrayList<>();
         String urlRoot = urlNew;
-        for (UrlPOJO u : url) {
+        for (Page u : list) {
             listThread.add(new Thread() {
                 public void run() {
                     try {
@@ -214,6 +230,7 @@ public class QualityService {
                                 byte[] capacity =  getBytes(strChcek);
                                 if(capacity.length==0){
                                     MissingFileReport fileNew = new MissingFileReport(strChcek, checkCode+" size: "+capacity.length, u.getUrl());
+                                    fileNew.setPageOption(option);
                                     missing.add(fileNew);
                                 }
                                 System.out.println("CSS 2: " + strChcek + " - Code:" + checkCode);
@@ -225,6 +242,7 @@ public class QualityService {
                                     byte[] capacity =  getBytes(checkAgain);
                                     if(capacity.length==0){
                                         MissingFileReport fileNew = new MissingFileReport(checkAgain, codeCheckAgain+" size: "+capacity.length, u.getUrl());
+                                        fileNew.setPageOption(option);
                                         missing.add(fileNew);
                                     }
                                     System.out.println("CSS 2 Again: " + checkAgain + " - Code:" + codeCheckAgain);
@@ -238,10 +256,12 @@ public class QualityService {
                                         System.out.println("CSS 2 Last: " + checkLast + " - Code:" + codeCheclast);
                                         if(capacity.length==0){
                                             MissingFileReport fileNew = new MissingFileReport(checkLast, codeCheclast+" size: "+capacity.length, u.getUrl());
+                                            fileNew.setPageOption(option);
                                             missing.add(fileNew);
                                         }
                                     } else {
                                         MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheclast, u.getUrl());
+                                        fileNew.setPageOption(option);
                                         missing.add(fileNew);
                                         System.out.println("CSS 2 Last Fail: " + strChcek + " -Code: " + codeCheclast);
                                     }
@@ -267,17 +287,21 @@ public class QualityService {
 
         for (Thread t : listThread) {
             System.out.println("Threed join");
-            t.join();
+            try {
+                t.join();
+            } catch (InterruptedException e) {
+                Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
+            }
         }
         return missing;
     }
 
-    public List<MissingFileReport> getMissingFileMP3andMP4(UrlPOJO[] url, String urlNew) throws InterruptedException {
+    public List<MissingFileReport> getMissingFileMP3andMP4(List<Page> list,PageOption option, String urlNew) {
         List<MissingFileReport> missing = new ArrayList<>();
-        final CyclicBarrier gate = new CyclicBarrier(url.length);
+        final CyclicBarrier gate = new CyclicBarrier(list.size());
         List<Thread> listThread = new ArrayList<>();
         String urlRoot = urlNew;
-        for (UrlPOJO u : url) {
+        for (Page u : list) {
             listThread.add(new Thread() {
                 public void run() {
                     try {
@@ -295,6 +319,7 @@ public class QualityService {
                                 System.out.println("MP4: " + strChcek + " - Code:" + checkCode);
                                 if(capacity.length==0){
                                     MissingFileReport fileNew = new MissingFileReport(strChcek, checkCode+" size: "+capacity.length, u.getUrl());
+                                    fileNew.setPageOption(option);
                                     missing.add(fileNew);
                                 }
                             }
@@ -306,6 +331,7 @@ public class QualityService {
                                     System.out.println("MP4 Again: " + checkAgain + " - Code:" + codeCheckAgain);
                                     if(capacity.length==0){
                                         MissingFileReport fileNew = new MissingFileReport( checkAgain, codeCheckAgain+" size: "+capacity.length, u.getUrl());
+                                        fileNew.setPageOption(option);
                                         missing.add(fileNew);
                                     }
                                 }
@@ -318,10 +344,12 @@ public class QualityService {
                                         System.out.println("MP4 Last: " + checkLast + " - Code:" + codeCheclast);
                                         if(capacity.length==0){
                                             MissingFileReport fileNew = new MissingFileReport( checkLast,  codeCheclast+" size: "+capacity.length, u.getUrl());
+                                            fileNew.setPageOption(option);
                                             missing.add(fileNew);
                                         }
                                     } else {
                                         MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheclast, u.getUrl());
+                                        fileNew.setPageOption(option);
                                         missing.add(fileNew);
                                         System.out.println("MP4 Last Fail: " + strChcek + " -Code: " + codeCheclast);
                                     }
@@ -348,17 +376,21 @@ public class QualityService {
 
         for (Thread t : listThread) {
             System.out.println("Threed join");
-            t.join();
+            try {
+                t.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
         return missing;
     }
 
-    public List<MissingFileReport> getMissingFileARCHIVES(UrlPOJO[] url, String urlNew) throws InterruptedException {
+    public List<MissingFileReport> getMissingFileARCHIVES(List<Page> list,PageOption option, String urlNew)  {
         List<MissingFileReport> missing = new ArrayList<>();
-        final CyclicBarrier gate = new CyclicBarrier(url.length);
+        final CyclicBarrier gate = new CyclicBarrier(list.size());
         List<Thread> listThread = new ArrayList<>();
         String urlRoot = urlNew;
-        for (UrlPOJO u : url) {
+        for (Page u : list) {
             listThread.add(new Thread() {
                 public void run() {
                     try {
@@ -375,6 +407,7 @@ public class QualityService {
                                 byte[] capacity =  getBytes(strChcek);
                                 if(capacity.length==0){
                                     MissingFileReport fileNew = new MissingFileReport(strChcek, checkCode+" size: "+capacity.length, u.getUrl());
+                                    fileNew.setPageOption(option);
                                     missing.add(fileNew);
                                 }
                                 System.out.println("ARCHIRE: " + strChcek + " - Code:" + checkCode);
@@ -386,6 +419,7 @@ public class QualityService {
                                     byte[] capacity =  getBytes(checkAgain);
                                     if(capacity.length==0){
                                         MissingFileReport fileNew = new MissingFileReport(checkAgain, codeCheckAgain+" size: "+capacity.length, u.getUrl());
+                                        fileNew.setPageOption(option);
                                         missing.add(fileNew);
                                     }
                                     System.out.println("ARCHIVES Again: " + checkAgain + " - Code:" + codeCheckAgain);
@@ -398,11 +432,13 @@ public class QualityService {
                                         byte[] capacity =  getBytes(checkLast);
                                         if(capacity.length==0){
                                             MissingFileReport fileNew = new MissingFileReport(checkLast, codeCheclast+" size: "+capacity.length, u.getUrl());
+                                            fileNew.setPageOption(option);
                                             missing.add(fileNew);
                                         }
                                         System.out.println("ARCHIVES Last: " + checkLast + " - Code:" + codeCheclast);
                                     } else {
                                         MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheclast, u.getUrl());
+                                        fileNew.setPageOption(option);
                                         missing.add(fileNew);
                                         System.out.println("ARCHIVES Last Fail: " + strChcek + " -Code: " + codeCheclast);
                                     }
@@ -429,17 +465,21 @@ public class QualityService {
 
         for (Thread t : listThread) {
             System.out.println("Threed join");
-            t.join();
+            try {
+                t.join();
+            } catch (InterruptedException e) {
+                Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
+            }
         }
         return missing;
     }
 
-    public List<MissingFileReport> getMissingFile(UrlPOJO[] url, String urlNew) throws InterruptedException {
+    public List<MissingFileReport> getMissingFile(List<Page> list,PageOption option, String urlNew) {
         List<MissingFileReport> missing = new ArrayList<>();
-        final CyclicBarrier gate = new CyclicBarrier(url.length);
+        final CyclicBarrier gate = new CyclicBarrier(list.size());
         List<Thread> listThread = new ArrayList<>();
         String urlRoot = urlNew;
-        for (UrlPOJO u : url) {
+        for (Page u : list) {
             listThread.add(new Thread() {
                 public void run() {
                     try {
@@ -457,6 +497,7 @@ public class QualityService {
                                 byte[] capacity =  getBytes(strChcek);
                                 if(capacity.length==0){
                                     MissingFileReport fileNew = new MissingFileReport(strChcek, checkCode+" size: "+capacity.length, u.getUrl());
+                                    fileNew.setPageOption(option);
                                     missing.add(fileNew);
                                 }
                                 System.out.println("Image: " + strChcek + " - Code:" + checkCode);
@@ -468,6 +509,7 @@ public class QualityService {
                                     byte[] capacity =  getBytes(checkAgain);
                                     if(capacity.length==0){
                                         MissingFileReport fileNew = new MissingFileReport(checkAgain, codeCheckAgain+" size: "+capacity.length, u.getUrl());
+                                        fileNew.setPageOption(option);
                                         missing.add(fileNew);
                                     }
                                     System.out.println("Image Again: " + checkAgain + " - Code:" + codeCheckAgain);
@@ -479,11 +521,13 @@ public class QualityService {
                                         byte[] capacity =  getBytes(checkLast);
                                         if(capacity.length==0){
                                             MissingFileReport fileNew = new MissingFileReport(checkLast, codeCheclast+" size: "+capacity.length, u.getUrl());
+                                            fileNew.setPageOption(option);
                                             missing.add(fileNew);
                                         }
                                         System.out.println("Image Last: " + checkLast + " - Code:" + codeCheclast);
                                     } else {
                                         MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheclast, u.getUrl());
+                                        fileNew.setPageOption(option);
                                         missing.add(fileNew);
                                         System.out.println("Image Last Fail: " + strChcek + " -Code: " + codeCheclast);
                                     }
@@ -503,6 +547,7 @@ public class QualityService {
                                 byte[] capacity =  getBytes(strChcek);
                                 if(capacity.length==0){
                                     MissingFileReport fileNew = new MissingFileReport(strChcek, checkCode+" size: "+capacity.length, u.getUrl());
+                                    fileNew.setPageOption(option);
                                     missing.add(fileNew);
                                 }
                                 System.out.println("DOC: " + strChcek + " - Code:" + checkCode);
@@ -514,6 +559,7 @@ public class QualityService {
                                     byte[] capacity =  getBytes(checkAgain);
                                     if(capacity.length==0){
                                         MissingFileReport fileNew = new MissingFileReport(checkAgain, codeCheckAgain+" size: "+capacity.length, u.getUrl());
+                                        fileNew.setPageOption(option);
                                         missing.add(fileNew);
                                     }
                                     System.out.println("DOC Again: " + checkAgain + " - Code:" + codeCheckAgain);
@@ -526,11 +572,13 @@ public class QualityService {
                                         byte[] capacity =  getBytes(checkLast);
                                         if(capacity.length==0){
                                             MissingFileReport fileNew = new MissingFileReport(checkLast, codeCheclast+" size: "+capacity.length, u.getUrl());
+                                            fileNew.setPageOption(option);
                                             missing.add(fileNew);
                                         }
                                         System.out.println("DOC Last: " + checkLast + " - Code:" + codeCheclast);
                                     } else {
                                         MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheclast, u.getUrl());
+                                        fileNew.setPageOption(option);
                                         missing.add(fileNew);
                                         System.out.println("DOC Last Fail: " + strChcek + " -Code: " + codeCheclast);
                                     }
@@ -550,6 +598,7 @@ public class QualityService {
                                 byte[] capacity =  getBytes(strChcek);
                                 if(capacity.length==0){
                                     MissingFileReport fileNew = new MissingFileReport(strChcek, checkCode+" size: "+capacity.length, u.getUrl());
+                                    fileNew.setPageOption(option);
                                     missing.add(fileNew);
                                 }
                                 System.out.println("ARCHIRE: " + strChcek + " - Code:" + checkCode);
@@ -561,6 +610,7 @@ public class QualityService {
                                     byte[] capacity =  getBytes(checkAgain);
                                     if(capacity.length==0){
                                         MissingFileReport fileNew = new MissingFileReport(checkAgain, codeCheckAgain+" size: "+capacity.length, u.getUrl());
+                                        fileNew.setPageOption(option);
                                         missing.add(fileNew);
                                     }
                                     System.out.println("ARCHIVES Again: " + checkAgain + " - Code:" + codeCheckAgain);
@@ -573,11 +623,13 @@ public class QualityService {
                                         byte[] capacity =  getBytes(checkLast);
                                         if(capacity.length==0){
                                             MissingFileReport fileNew = new MissingFileReport(checkLast, codeCheclast+" size: "+capacity.length, u.getUrl());
+                                            fileNew.setPageOption(option);
                                             missing.add(fileNew);
                                         }
                                         System.out.println("ARCHIVES Last: " + checkLast + " - Code:" + codeCheclast);
                                     } else {
                                         MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheclast, u.getUrl());
+                                        fileNew.setPageOption(option);
                                         missing.add(fileNew);
                                         System.out.println("ARCHIVES Last Fail: " + strChcek + " -Code: " + codeCheclast);
                                     }
@@ -598,6 +650,7 @@ public class QualityService {
                                 byte[] capacity =  getBytes(strChcek);
                                 if(capacity.length==0){
                                     MissingFileReport fileNew = new MissingFileReport(strChcek, checkCode+" size: "+capacity.length, u.getUrl());
+                                    fileNew.setPageOption(option);
                                     missing.add(fileNew);
                                 }
                                 System.out.println("CSS 2: " + strChcek + " - Code:" + checkCode);
@@ -609,6 +662,7 @@ public class QualityService {
                                     byte[] capacity =  getBytes(checkAgain);
                                     if(capacity.length==0){
                                         MissingFileReport fileNew = new MissingFileReport(checkAgain, codeCheckAgain+" size: "+capacity.length, u.getUrl());
+                                        fileNew.setPageOption(option);
                                         missing.add(fileNew);
                                     }
                                     System.out.println("CSS 2 Again: " + checkAgain + " - Code:" + codeCheckAgain);
@@ -622,10 +676,12 @@ public class QualityService {
                                         System.out.println("CSS 2 Last: " + checkLast + " - Code:" + codeCheclast);
                                         if(capacity.length==0){
                                             MissingFileReport fileNew = new MissingFileReport(checkLast, codeCheclast+" size: "+capacity.length, u.getUrl());
+                                            fileNew.setPageOption(option);
                                             missing.add(fileNew);
                                         }
                                     } else {
                                         MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheclast, u.getUrl());
+                                        fileNew.setPageOption(option);
                                         missing.add(fileNew);
                                         System.out.println("CSS 2 Last Fail: " + strChcek + " -Code: " + codeCheclast);
                                     }
@@ -647,6 +703,7 @@ public class QualityService {
                                 System.out.println("MP4: " + strChcek + " - Code:" + checkCode);
                                 if(capacity.length==0){
                                     MissingFileReport fileNew = new MissingFileReport(strChcek, checkCode+" size: "+capacity.length, u.getUrl());
+                                    fileNew.setPageOption(option);
                                     missing.add(fileNew);
                                 }
                             }
@@ -658,6 +715,7 @@ public class QualityService {
                                     System.out.println("MP4 Again: " + checkAgain + " - Code:" + codeCheckAgain);
                                     if(capacity.length==0){
                                         MissingFileReport fileNew = new MissingFileReport( checkAgain, codeCheckAgain+" size: "+capacity.length, u.getUrl());
+                                        fileNew.setPageOption(option);
                                         missing.add(fileNew);
                                     }
                                 }
@@ -670,10 +728,12 @@ public class QualityService {
                                         System.out.println("MP4 Last: " + checkLast + " - Code:" + codeCheclast);
                                         if(capacity.length==0){
                                             MissingFileReport fileNew = new MissingFileReport( checkLast,  codeCheclast+" size: "+capacity.length, u.getUrl());
+                                            fileNew.setPageOption(option);
                                             missing.add(fileNew);
                                         }
                                     } else {
                                         MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheclast, u.getUrl());
+                                        fileNew.setPageOption(option);
                                         missing.add(fileNew);
                                         System.out.println("MP4 Last Fail: " + strChcek + " -Code: " + codeCheclast);
                                     }
@@ -694,6 +754,7 @@ public class QualityService {
                                 System.out.println("MP3: " + strChcek + " - Code:" + checkCode);
                                 if(capacity.length==0){
                                     MissingFileReport fileNew = new MissingFileReport(strChcek, checkCode+" size:: "+capacity.length, u.getUrl());
+                                    fileNew.setPageOption(option);
                                     missing.add(fileNew);
                                 }
                             }
@@ -705,6 +766,7 @@ public class QualityService {
                                     System.out.println("MP3 Again: " + checkAgain + " - Code:" + codeCheckAgain);
                                     if(capacity.length==0){
                                         MissingFileReport fileNew = new MissingFileReport(checkAgain, codeCheckAgain+" size:: "+capacity.length, u.getUrl());
+                                        fileNew.setPageOption(option);
                                         missing.add(fileNew);
                                     }
                                 }
@@ -716,11 +778,13 @@ public class QualityService {
                                         byte[] capacity =  getBytes(checkLast);
                                         if(capacity.length==0){
                                             MissingFileReport fileNew = new MissingFileReport(checkLast, codeCheclast+" size:: "+capacity.length, u.getUrl());
+                                            fileNew.setPageOption(option);
                                             missing.add(fileNew);
                                         }
                                         System.out.println("MP3 Last: " + checkLast + " - Code:" + codeCheclast);
                                     } else {
                                         MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheclast, u.getUrl());
+                                        fileNew.setPageOption(option);
                                         missing.add(fileNew);
                                         System.out.println("MP3 Last Fail: " + strChcek + " -Code: " + codeCheclast);
                                     }
@@ -747,7 +811,11 @@ public class QualityService {
 
         for (Thread t : listThread) {
             System.out.println("Threed join");
-            t.join();
+            try {
+                t.join();
+            } catch (InterruptedException e) {
+                Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
+            }
         }
 
         return missing;

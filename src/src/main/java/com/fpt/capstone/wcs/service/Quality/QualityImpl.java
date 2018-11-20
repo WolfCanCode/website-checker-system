@@ -1,11 +1,14 @@
 package com.fpt.capstone.wcs.service.Quality;
 
 import com.fpt.capstone.wcs.model.entity.*;
+import com.fpt.capstone.wcs.model.pojo.MissingFilePOJO;
 import com.fpt.capstone.wcs.model.pojo.RequestCommonPOJO;
 import com.fpt.capstone.wcs.repository.*;
 import com.fpt.capstone.wcs.service.Experience.ExperienceImpl;
 import com.fpt.capstone.wcs.utils.Authenticate;
 import com.fpt.capstone.wcs.utils.Constant;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -14,16 +17,24 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.*;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.atteo.evo.inflector.English;
+import sun.misc.IOUtils;
+
 @Service
 public class QualityImpl implements QualityService {
 
@@ -36,6 +47,8 @@ public class QualityImpl implements QualityService {
     final
     BrokenPageRepository brokenPageRepository;
     final
+    MissingFilesPagesRepository missingFilesPagesRepository;
+    final
     ProhibitedContentRepository prohibitedContentRepository;
     final
     WordRepository wordRepository;
@@ -43,11 +56,12 @@ public class QualityImpl implements QualityService {
     InrregularVerbRepository inrregularVerbRepository;
 
     @Autowired
-    public QualityImpl(Authenticate authenticate, PageOptionRepository pageOptionRepository, BrokenLinkRepository brokenLinkRepository, BrokenPageRepository brokenPageRepository, WordRepository wordRepository,ProhibitedContentRepository prohibitedContentRepository, InrregularVerbRepository inrregularVerbRepository) {
+    public QualityImpl(Authenticate authenticate, PageOptionRepository pageOptionRepository, BrokenLinkRepository brokenLinkRepository, BrokenPageRepository brokenPageRepository, MissingFilesPagesRepository missingFilesPagesRepository, WordRepository wordRepository, ProhibitedContentRepository prohibitedContentRepository, InrregularVerbRepository inrregularVerbRepository) {
         this.authenticate = authenticate;
         this.pageOptionRepository = pageOptionRepository;
         this.brokenLinkRepository = brokenLinkRepository;
         this.brokenPageRepository = brokenPageRepository;
+        this.missingFilesPagesRepository = missingFilesPagesRepository;
         this.wordRepository = wordRepository;
         this.prohibitedContentRepository = prohibitedContentRepository;
         this.inrregularVerbRepository = inrregularVerbRepository;
@@ -438,6 +452,1011 @@ public class QualityImpl implements QualityService {
             res.put("action", Constant.INCORRECT);
             return res;
         }
+    }
+
+
+    @Override
+    public Map<String, Object> getMissingFile(MissingFilePOJO request) {
+        Map<String, Object> res = new HashMap<>();
+
+        RequestCommonPOJO pojo = new RequestCommonPOJO();
+        pojo.setPageOptionId(request.getPageOptionId());
+        pojo.setUserId(request.getUserId());
+        pojo.setUserToken(request.getUserToken());
+        pojo.setWebsiteId(request.getWebsiteId());
+        Website website =authenticate.isAuthGetSingleSite(pojo);
+        if (website != null) {
+            PageOption pageOption = pageOptionRepository.findOneByIdAndWebsiteAndDelFlagEquals(request.getPageOptionId(), website, false);
+            if(pageOption==null){
+                request.setPageOptionId((long)-1);
+            }
+            if(request.getPageOptionId()!=-1) { //page option list is null
+                List<Page> pages = pageOption.getPages();
+                String urlRoot="";
+                for(int i =0; i< pages.size();i++ ){
+                    Pattern pattern = Pattern.compile("(http\\:|https\\:)//([\\w\\-?\\.?]+)?\\.([a-zA-Z]{2,3})?",Pattern.CASE_INSENSITIVE);
+                    Matcher matcher = pattern.matcher(pages.get(i).getUrl());
+                    while (matcher.find()){
+                        urlRoot = matcher.group();
+                    }
+                }
+                if(request.getListType().size()==0|| request.getListType().size()==4){
+                    System.out.println("Vo ne");
+                    List<MissingFileReport> resultList =  getMissingFile(pages,pageOption, urlRoot);
+                    missingFilesPagesRepository.removeAllByPageOption(pageOption);
+                    missingFilesPagesRepository.saveAll(resultList);
+                    res.put("action", Constant.SUCCESS);
+                    res.put("missingFileReport", resultList);
+                }
+                else{
+                    for (Integer missingFilePOJODTO :request.getListType()){
+                        switch (missingFilePOJODTO){
+                            case 1:{
+                                List<MissingFileReport> resultList=getMissingFileImg(pages,pageOption, urlRoot);
+                                missingFilesPagesRepository.removeAllByPageOption(pageOption);
+                                missingFilesPagesRepository.saveAll(resultList);
+                                res.put("action", Constant.SUCCESS);
+                                res.put("missingFileReport", resultList);
+                                break;
+                            }
+                            case 2:{
+                                List<MissingFileReport> resultList =getMissingFileCss(pages,pageOption, urlRoot);
+                                missingFilesPagesRepository.removeAllByPageOption(pageOption);
+                                missingFilesPagesRepository.saveAll(resultList);
+                                res.put("action", Constant.SUCCESS);
+                                res.put("missingFileReport", resultList);
+                                break;
+                            }
+                            case 3:{
+                                List<MissingFileReport> resultList =getMissingFileDoc(pages,pageOption, urlRoot);
+                                missingFilesPagesRepository.removeAllByPageOption(pageOption);
+                                missingFilesPagesRepository.saveAll(resultList);
+                                res.put("action", Constant.SUCCESS);
+                                res.put("missingFileReport", resultList);
+                                break;
+
+                            }
+                            case 4:{
+                                List<MissingFileReport> resultList =getMissingFileARCHIVES(pages,pageOption, urlRoot);
+                                missingFilesPagesRepository.removeAllByPageOption(pageOption);
+                                missingFilesPagesRepository.saveAll(resultList);
+                                res.put("action", Constant.SUCCESS);
+                                res.put("missingFileReport", resultList);
+                                break;
+                            }
+                        }
+                    }
+                }
+
+
+                return res;
+            }
+            else {
+                List<Page> pages = new ArrayList<>();
+                Page page = new Page();
+                page.setUrl(website.getUrl());
+                page.setType(1);
+                pages.add(page);
+                String urlRoot="";
+                for(int i =0; i< pages.size();i++ ){
+                    Pattern pattern = Pattern.compile("(http\\:|https\\:)//([\\w\\-?\\.?]+)?\\.([a-zA-Z]{2,3})?",Pattern.CASE_INSENSITIVE);
+                    Matcher matcher = pattern.matcher(pages.get(i).getUrl());
+                    while (matcher.find()){
+                        urlRoot = matcher.group();
+                    }
+                }
+                if(request.getListType().size()==0|| request.getListType().size()==4){
+                    System.out.println("Vo ne");
+                    List<MissingFileReport> resultList =  getMissingFile(pages,pageOption, urlRoot);
+                    missingFilesPagesRepository.removeAllByPageOption(pageOption);
+                    missingFilesPagesRepository.saveAll(resultList);
+                    res.put("action", Constant.SUCCESS);
+                    res.put("missingFileReport", resultList);
+                }
+                else{
+                    for (Integer missingFilePOJODTO :request.getListType()){
+                        switch (missingFilePOJODTO){
+                            case 1:{
+                                List<MissingFileReport> resultList=getMissingFileImg(pages,pageOption, urlRoot);
+                                missingFilesPagesRepository.removeAllByPageOption(pageOption);
+                                missingFilesPagesRepository.saveAll(resultList);
+                                res.put("action", Constant.SUCCESS);
+                                res.put("missingFileReport", resultList);
+                                break;
+                            }
+                            case 2:{
+                                List<MissingFileReport> resultList =getMissingFileCss(pages,pageOption, urlRoot);
+                                missingFilesPagesRepository.removeAllByPageOption(pageOption);
+                                missingFilesPagesRepository.saveAll(resultList);
+                                res.put("action", Constant.SUCCESS);
+                                res.put("missingFileReport", resultList);
+                                break;
+                            }
+                            case 3:{
+                                List<MissingFileReport> resultList =getMissingFileDoc(pages,pageOption, urlRoot);
+                                missingFilesPagesRepository.removeAllByPageOption(pageOption);
+                                missingFilesPagesRepository.saveAll(resultList);
+                                res.put("action", Constant.SUCCESS);
+                                res.put("missingFileReport", resultList);
+                                break;
+
+                            }
+                            case 4:{
+                                List<MissingFileReport> resultList =getMissingFileARCHIVES(pages,pageOption, urlRoot);
+                                missingFilesPagesRepository.removeAllByPageOption(pageOption);
+                                missingFilesPagesRepository.saveAll(resultList);
+                                res.put("action", Constant.SUCCESS);
+                                res.put("missingFileReport", resultList);
+                                break;
+                            }
+                        }
+                    }
+                }
+                return res;
+            }
+        } else {
+            res.put("action", Constant.INCORRECT);
+            return res;
+        }
+    }
+
+    @Override
+    public Map<String, Object> getLastestMissingFile(MissingFilePOJO request) {
+        Map<String, Object> res = new HashMap<>();
+        RequestCommonPOJO pojo = new RequestCommonPOJO();
+        pojo.setPageOptionId(request.getPageOptionId());
+        pojo.setUserId(request.getUserId());
+        pojo.setUserToken(request.getUserToken());
+        pojo.setWebsiteId(request.getWebsiteId());
+        Website website = authenticate.isAuthGetSingleSite(pojo);
+        if (website != null) {
+            PageOption pageOption = pageOptionRepository.findOneByIdAndWebsiteAndDelFlagEquals(request.getPageOptionId(), website, false);
+            if(pageOption==null){
+                request.setPageOptionId((long)-1);
+            }
+            if(request.getPageOptionId()!=-1) {
+                List<MissingFileReport> resultList = missingFilesPagesRepository.findAllByPageOption(pageOption);
+                res.put("missingFileReport", resultList);
+                res.put("action", Constant.SUCCESS);
+                return res;
+            } else {
+                List<MissingFileReport> resultList = missingFilesPagesRepository.findAllByPageOptionAndPages(null, website.getUrl());
+                res.put("missingFileReport", resultList);
+                res.put("action", Constant.SUCCESS);
+                return res;
+            }
+        } else {
+            res.put("action", Constant.INCORRECT);
+            return res;
+        }
+    }
+
+    public List<MissingFileReport> getMissingFileImg(List<Page> list,PageOption option, String urlNew) {
+        List<MissingFileReport> missing = new ArrayList<>();
+        final CyclicBarrier gate = new CyclicBarrier(list.size());
+        List<Thread> listThread = new ArrayList<>();
+        String urlRoot = urlNew;
+        for (Page u : list) {
+            listThread.add(new Thread() {
+                public void run() {
+                    try {
+                        gate.await();
+                        Document doc = Jsoup.connect(u.getUrl()).get();
+                        int i = 0;
+                        //check missing image
+                        Pattern pattern = Pattern.compile("((http\\:|https\\:)?//?([\\w\\-?\\.?]+)?\\.([a-zA-Z]{2,3})?)?(/\\S*)\\.(jpg|gif|jp2|jpeg|png|psd|tga|svg)", Pattern.CASE_INSENSITIVE);
+                        Matcher matcher = pattern.matcher(doc.html());
+                        while (matcher.find()) {
+                            i++;
+                            String strChcek = matcher.group();
+                            String checkCode = verifyHttpMessage(strChcek);
+                            if (checkCode.equals("OK")) {
+                                byte[] capacity =  getBytes(strChcek);
+                                if(capacity.length==0){
+                                    MissingFileReport fileNew = new MissingFileReport(strChcek, checkCode+" size: "+capacity.length, u.getUrl());
+                                    fileNew.setPageOption(option);
+                                    missing.add(fileNew);
+                                }
+                                System.out.println("Image: " + strChcek + " - Code:" + checkCode);
+                            }
+                            if (!checkCode.equals("OK")) {
+                                String checkAgain = urlRoot + strChcek;
+                                String codeCheckAgain = verifyHttpMessage(checkAgain);
+                                if (codeCheckAgain.equals("OK")) {
+                                    byte[] capacity =  getBytes(checkAgain);
+                                    if(capacity.length==0){
+                                        MissingFileReport fileNew = new MissingFileReport(checkAgain, codeCheckAgain+" size: "+capacity.length, u.getUrl());
+                                        fileNew.setPageOption(option);
+                                        missing.add(fileNew);
+                                    }
+                                    System.out.println("Image Again: " + checkAgain + " - Code:" + codeCheckAgain);
+                                }
+                                if (!codeCheckAgain.equals("OK")) {
+                                    String checkLast = "https:" + strChcek;
+                                    String codeCheclast = verifyHttpMessage(checkLast);
+                                    if (codeCheclast.equals("OK")) {
+                                        byte[] capacity =  getBytes(checkLast);
+                                        if(capacity.length==0){
+                                            MissingFileReport fileNew = new MissingFileReport(checkLast, codeCheclast+" size: "+capacity.length, u.getUrl());
+                                            fileNew.setPageOption(option);
+                                            missing.add(fileNew);
+                                        }
+                                        System.out.println("Image Last: " + checkLast + " - Code:" + codeCheclast);
+                                    } else {
+                                        MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheclast, u.getUrl());
+                                        fileNew.setPageOption(option);
+                                        missing.add(fileNew);
+                                        System.out.println("Image Last Fail: " + strChcek + " -Code: " + codeCheclast);
+                                    }
+                                }
+                            }
+                        }
+                    } catch (IOException e) {
+                        Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
+                    } catch (InterruptedException e) {
+                        Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
+                    } catch (BrokenBarrierException e) {
+                        Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
+                    }
+                }
+            });
+            System.out.println(urlRoot);
+
+        }
+        for (Thread t : listThread) {
+            System.out.println("Threed start");
+            t.start();
+        }
+
+        for (Thread t : listThread) {
+            System.out.println("Threed join");
+            try {
+                t.join();
+            } catch (InterruptedException e) {
+                Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
+            }
+        }
+        return missing;
+    }
+
+    public List<MissingFileReport> getMissingFileDoc(List<Page> list,PageOption option, String urlNew)  {
+        List<MissingFileReport> missing = new ArrayList<>();
+        final CyclicBarrier gate = new CyclicBarrier(list.size());
+        List<Thread> listThread = new ArrayList<>();
+        String urlRoot = urlNew;
+        for ( Page u : list) {
+            listThread.add(new Thread() {
+                public void run() {
+                    try {
+                        gate.await();
+                        Document doc = Jsoup.connect(u.getUrl()).get();
+                        int i = 0;
+                        //check missing image
+                        Pattern pattern = Pattern.compile("((http\\:|https\\:)?//?([\\w\\-?\\.?]+)?\\.([a-zA-Z]{2,3})?)?(/\\S*)\\.(doc|docx|ppt|pptx|pdf|ps|txt|xls|xlsx)");
+                        Matcher matcher = pattern.matcher(doc.html());
+                        while (matcher.find()) {
+                            String strChcek = matcher.group();
+                            String checkCode = verifyHttpMessage(strChcek);
+                            if (checkCode.equals("OK")) {
+                                byte[] capacity =  getBytes(strChcek);
+                                if(capacity.length==0){
+                                    MissingFileReport fileNew = new MissingFileReport(strChcek, checkCode+" size: "+capacity.length, u.getUrl());
+                                    fileNew.setPageOption(option);
+                                    missing.add(fileNew);
+                                }
+                                System.out.println("DOC: " + strChcek + " - Code:" + checkCode);
+                            }
+                            if (!checkCode.equals("OK")) {
+                                String checkAgain = urlRoot + strChcek;
+                                String codeCheckAgain = verifyHttpMessage(checkAgain);
+                                if (codeCheckAgain.equals("OK")) {
+                                    byte[] capacity =  getBytes(checkAgain);
+                                    if(capacity.length==0){
+                                        MissingFileReport fileNew = new MissingFileReport(checkAgain, codeCheckAgain+" size: "+capacity.length, u.getUrl());
+                                        fileNew.setPageOption(option);
+                                        missing.add(fileNew);
+                                    }
+                                    System.out.println("DOC Again: " + checkAgain + " - Code:" + codeCheckAgain);
+                                }
+                                if (!codeCheckAgain.equals("OK")) {
+                                    String checkLast = "https:" + strChcek;
+                                    String codeCheclast = verifyHttpMessage(checkLast);
+                                    System.out.println("Code Check Last: " + codeCheclast);
+                                    if (codeCheclast.equals("OK")) {
+                                        byte[] capacity =  getBytes(checkLast);
+                                        if(capacity.length==0){
+                                            MissingFileReport fileNew = new MissingFileReport(checkLast, codeCheclast+" size: "+capacity.length, u.getUrl());
+                                            fileNew.setPageOption(option);
+                                            missing.add(fileNew);
+                                        }
+                                        System.out.println("DOC Last: " + checkLast + " - Code:" + codeCheclast);
+                                    } else {
+                                        MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheclast, u.getUrl());
+                                        fileNew.setPageOption(option);
+                                        missing.add(fileNew);
+                                        System.out.println("DOC Last Fail: " + strChcek + " -Code: " + codeCheclast);
+                                    }
+                                }
+                            }
+
+                        }
+                    } catch (IOException e) {
+                        Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
+                    } catch (InterruptedException e) {
+                        Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
+                    } catch (BrokenBarrierException e) {
+                        Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
+                    }
+                }
+            });
+            System.out.println(urlRoot);
+
+        }
+        for (Thread t : listThread) {
+            System.out.println("Threed start");
+            t.start();
+        }
+
+        for (Thread t : listThread) {
+            System.out.println("Threed join");
+            try {
+                t.join();
+            } catch (InterruptedException e) {
+                Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
+            }
+        }
+        return missing;
+    }
+
+    public List<MissingFileReport> getMissingFileCss(List<Page> list,PageOption option, String urlNew)  {
+        List<MissingFileReport> missing = new ArrayList<>();
+        final CyclicBarrier gate = new CyclicBarrier(list.size());
+        List<Thread> listThread = new ArrayList<>();
+        String urlRoot = urlNew;
+        for (Page u : list) {
+            listThread.add(new Thread() {
+                public void run() {
+                    try {
+                        gate.await();
+                        Document doc = Jsoup.connect(u.getUrl()).get();
+                        int i = 0;
+                        //check missing image
+                        Pattern pattern = Pattern.compile("((http\\:|https\\:)?//?([\\w\\-?\\.?]+)?\\.([a-zA-Z]{2,3})?)?(/\\S*)\\.(css)(([\\?\\.\\=]\\w*)*)?", Pattern.CASE_INSENSITIVE);
+                        Matcher matcher = pattern.matcher(doc.html());
+                        while (matcher.find()) {
+//            System.out.println(matcher.group());
+                            String strChcek = matcher.group();
+                            String checkCode = verifyHttpMessage(strChcek);
+                            if (checkCode.equals("OK")) {
+                                byte[] capacity =  getBytes(strChcek);
+                                if(capacity.length==0){
+                                    MissingFileReport fileNew = new MissingFileReport(strChcek, checkCode+" size: "+capacity.length, u.getUrl());
+                                    fileNew.setPageOption(option);
+                                    missing.add(fileNew);
+                                }
+                                System.out.println("CSS 2: " + strChcek + " - Code:" + checkCode);
+                            }
+                            if (!checkCode.equals("OK")) {
+                                String checkAgain = urlRoot + strChcek;
+                                String codeCheckAgain = verifyHttpMessage(checkAgain);
+                                if (codeCheckAgain.equals("OK")) {
+                                    byte[] capacity =  getBytes(checkAgain);
+                                    if(capacity.length==0){
+                                        MissingFileReport fileNew = new MissingFileReport(checkAgain, codeCheckAgain+" size: "+capacity.length, u.getUrl());
+                                        fileNew.setPageOption(option);
+                                        missing.add(fileNew);
+                                    }
+                                    System.out.println("CSS 2 Again: " + checkAgain + " - Code:" + codeCheckAgain);
+                                }
+                                if (!codeCheckAgain.equals("OK")) {
+                                    String checkLast = "https:" + strChcek;
+                                    String codeCheclast = verifyHttpMessage(checkLast);
+                                    System.out.println("Code Check Last: " + codeCheclast);
+                                    if (codeCheclast.equals("OK")) {
+                                        byte[] capacity =  getBytes(checkLast);
+                                        System.out.println("CSS 2 Last: " + checkLast + " - Code:" + codeCheclast);
+                                        if(capacity.length==0){
+                                            MissingFileReport fileNew = new MissingFileReport(checkLast, codeCheclast+" size: "+capacity.length, u.getUrl());
+                                            fileNew.setPageOption(option);
+                                            missing.add(fileNew);
+                                        }
+                                    } else {
+                                        MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheclast, u.getUrl());
+                                        fileNew.setPageOption(option);
+                                        missing.add(fileNew);
+                                        System.out.println("CSS 2 Last Fail: " + strChcek + " -Code: " + codeCheclast);
+                                    }
+                                }
+                            }
+                        }
+                    } catch (IOException e) {
+                        Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
+                    } catch (InterruptedException e) {
+                        Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
+                    } catch (BrokenBarrierException e) {
+                        Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
+                    }
+                }
+            });
+            System.out.println(urlRoot);
+
+        }
+        for (Thread t : listThread) {
+            System.out.println("Threed start");
+            t.start();
+        }
+
+        for (Thread t : listThread) {
+            System.out.println("Threed join");
+            try {
+                t.join();
+            } catch (InterruptedException e) {
+                Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
+            }
+        }
+        return missing;
+    }
+
+    public List<MissingFileReport> getMissingFileMP3andMP4(List<Page> list,PageOption option, String urlNew) {
+        List<MissingFileReport> missing = new ArrayList<>();
+        final CyclicBarrier gate = new CyclicBarrier(list.size());
+        List<Thread> listThread = new ArrayList<>();
+        String urlRoot = urlNew;
+        for (Page u : list) {
+            listThread.add(new Thread() {
+                public void run() {
+                    try {
+                        gate.await();
+                        Document doc = Jsoup.connect(u.getUrl()).get();
+                        int i = 0;
+                        //check missing image
+                        Pattern pattern = Pattern.compile("(http\\:|https\\:)?//?([\\w\\-?\\.?]+)?\\.([a-zA-Z]{2,3})?(/\\S*)\\.(mp3|avi|flv|mp4)(\\w*)?", Pattern.CASE_INSENSITIVE);
+                        Matcher matcher = pattern.matcher(doc.html());
+                        while (matcher.find()) {
+                            String strChcek = matcher.group();
+                            String checkCode = verifyHttpMessage(strChcek);
+                            if (checkCode.equals("OK")) {
+                                byte[] capacity =  getBytes(strChcek);
+                                System.out.println("MP4: " + strChcek + " - Code:" + checkCode);
+                                if(capacity.length==0){
+                                    MissingFileReport fileNew = new MissingFileReport(strChcek, checkCode+" size: "+capacity.length, u.getUrl());
+                                    fileNew.setPageOption(option);
+                                    missing.add(fileNew);
+                                }
+                            }
+                            if (!checkCode.equals("OK")) {
+                                String checkAgain = urlRoot + strChcek;
+                                String codeCheckAgain = verifyHttpMessage(checkAgain);
+                                if (codeCheckAgain.equals("OK")) {
+                                    byte[] capacity =  getBytes(checkAgain);
+                                    System.out.println("MP4 Again: " + checkAgain + " - Code:" + codeCheckAgain);
+                                    if(capacity.length==0){
+                                        MissingFileReport fileNew = new MissingFileReport( checkAgain, codeCheckAgain+" size: "+capacity.length, u.getUrl());
+                                        fileNew.setPageOption(option);
+                                        missing.add(fileNew);
+                                    }
+                                }
+                                if (!codeCheckAgain.equals("OK")) {
+                                    String checkLast = "https:" + strChcek;
+                                    String codeCheclast = verifyHttpMessage(checkLast);
+                                    System.out.println("Code Check Last: " + codeCheclast);
+                                    if (codeCheclast.equals("OK")) {
+                                        byte[] capacity =  getBytes(checkLast);
+                                        System.out.println("MP4 Last: " + checkLast + " - Code:" + codeCheclast);
+                                        if(capacity.length==0){
+                                            MissingFileReport fileNew = new MissingFileReport( checkLast,  codeCheclast+" size: "+capacity.length, u.getUrl());
+                                            fileNew.setPageOption(option);
+                                            missing.add(fileNew);
+                                        }
+                                    } else {
+                                        MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheclast, u.getUrl());
+                                        fileNew.setPageOption(option);
+                                        missing.add(fileNew);
+                                        System.out.println("MP4 Last Fail: " + strChcek + " -Code: " + codeCheclast);
+                                    }
+                                }
+                            }
+
+                        }
+                    } catch (IOException e) {
+                        Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
+                    } catch (InterruptedException e) {
+                        Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
+                    } catch (BrokenBarrierException e) {
+                        Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
+                    }
+                }
+            });
+            System.out.println(urlRoot);
+
+        }
+        for (Thread t : listThread) {
+            System.out.println("Threed start");
+            t.start();
+        }
+
+        for (Thread t : listThread) {
+            System.out.println("Threed join");
+            try {
+                t.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        return missing;
+    }
+
+    public List<MissingFileReport> getMissingFileARCHIVES(List<Page> list,PageOption option, String urlNew)  {
+        List<MissingFileReport> missing = new ArrayList<>();
+        final CyclicBarrier gate = new CyclicBarrier(list.size());
+        List<Thread> listThread = new ArrayList<>();
+        String urlRoot = urlNew;
+        for (Page u : list) {
+            listThread.add(new Thread() {
+                public void run() {
+                    try {
+                        gate.await();
+                        Document doc = Jsoup.connect(u.getUrl()).get();
+                        int i = 0;
+                        //check missing image
+                        Pattern pattern = Pattern.compile("((http\\:|https\\:)?//?([\\w\\-?\\.?]+)?\\.([a-zA-Z]{2,3})?)(/\\S*)\\.(7z|zip|rar|jar|tar|tar|gz|cab)", Pattern.CASE_INSENSITIVE);
+                        Matcher matcher = pattern.matcher(doc.html());
+                        while (matcher.find()) {
+                            String strChcek = matcher.group();
+                            String checkCode = verifyHttpMessage(strChcek);
+                            if (checkCode.equals("OK")) {
+                                byte[] capacity =  getBytes(strChcek);
+                                if(capacity.length==0){
+                                    MissingFileReport fileNew = new MissingFileReport(strChcek, checkCode+" size: "+capacity.length, u.getUrl());
+                                    fileNew.setPageOption(option);
+                                    missing.add(fileNew);
+                                }
+                                System.out.println("ARCHIRE: " + strChcek + " - Code:" + checkCode);
+                            }
+                            if (!checkCode.equals("OK")) {
+                                String checkAgain = urlRoot + strChcek;
+                                String codeCheckAgain = verifyHttpMessage(checkAgain);
+                                if (codeCheckAgain.equals("OK")) {
+                                    byte[] capacity =  getBytes(checkAgain);
+                                    if(capacity.length==0){
+                                        MissingFileReport fileNew = new MissingFileReport(checkAgain, codeCheckAgain+" size: "+capacity.length, u.getUrl());
+                                        fileNew.setPageOption(option);
+                                        missing.add(fileNew);
+                                    }
+                                    System.out.println("ARCHIVES Again: " + checkAgain + " - Code:" + codeCheckAgain);
+                                }
+                                if (!codeCheckAgain.equals("OK")) {
+                                    String checkLast = "https:" + strChcek;
+                                    String codeCheclast = verifyHttpMessage(checkLast);
+                                    System.out.println("Code Check Last: " + codeCheclast);
+                                    if (codeCheclast.equals("OK")) {
+                                        byte[] capacity =  getBytes(checkLast);
+                                        if(capacity.length==0){
+                                            MissingFileReport fileNew = new MissingFileReport(checkLast, codeCheclast+" size: "+capacity.length, u.getUrl());
+                                            fileNew.setPageOption(option);
+                                            missing.add(fileNew);
+                                        }
+                                        System.out.println("ARCHIVES Last: " + checkLast + " - Code:" + codeCheclast);
+                                    } else {
+                                        MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheclast, u.getUrl());
+                                        fileNew.setPageOption(option);
+                                        missing.add(fileNew);
+                                        System.out.println("ARCHIVES Last Fail: " + strChcek + " -Code: " + codeCheclast);
+                                    }
+                                }
+                            }
+
+                        }
+                    } catch (IOException e) {
+                        Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
+                    } catch (InterruptedException e) {
+                        Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
+                    } catch (BrokenBarrierException e) {
+                        Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
+                    }
+                }
+            });
+            System.out.println(urlRoot);
+
+        }
+        for (Thread t : listThread) {
+            System.out.println("Threed start");
+            t.start();
+        }
+
+        for (Thread t : listThread) {
+            System.out.println("Threed join");
+            try {
+                t.join();
+            } catch (InterruptedException e) {
+                Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
+            }
+        }
+        return missing;
+    }
+
+    public List<MissingFileReport> getMissingFile(List<Page> list,PageOption option, String urlNew) {
+        List<MissingFileReport> missing = new ArrayList<>();
+        final CyclicBarrier gate = new CyclicBarrier(list.size());
+        List<Thread> listThread = new ArrayList<>();
+        String urlRoot = urlNew;
+        for (Page u : list) {
+            listThread.add(new Thread() {
+                public void run() {
+                    try {
+                        gate.await();
+                        Document doc = Jsoup.connect(u.getUrl()).get();
+                        int i = 0;
+                        //check missing image
+                        Pattern pattern = Pattern.compile("((http\\:|https\\:)?//?([\\w\\-?\\.?]+)?\\.([a-zA-Z]{2,3})?)?(/\\S*)\\.(jpg|gif|jp2|jpeg|pbm|pcx|pgm|png|ppm|psd|tiff|tga|svg)", Pattern.CASE_INSENSITIVE);
+                        Matcher matcher = pattern.matcher(doc.html());
+                        while (matcher.find()) {
+                            i++;
+                            String strChcek = matcher.group();
+                            String checkCode = verifyHttpMessage(strChcek);
+                            if (checkCode.equals("OK")) {
+                                byte[] capacity =  getBytes(strChcek);
+                                if(capacity.length==0){
+                                    MissingFileReport fileNew = new MissingFileReport(strChcek, checkCode+" size: "+capacity.length, u.getUrl());
+                                    fileNew.setPageOption(option);
+                                    missing.add(fileNew);
+                                }
+                                System.out.println("Image: " + strChcek + " - Code:" + checkCode);
+                            }
+                            if (!checkCode.equals("OK")) {
+                                String checkAgain = urlRoot + strChcek;
+                                String codeCheckAgain = verifyHttpMessage(checkAgain);
+                                if (codeCheckAgain.equals("OK")) {
+                                    byte[] capacity =  getBytes(checkAgain);
+                                    if(capacity.length==0){
+                                        MissingFileReport fileNew = new MissingFileReport(checkAgain, codeCheckAgain+" size: "+capacity.length, u.getUrl());
+                                        fileNew.setPageOption(option);
+                                        missing.add(fileNew);
+                                    }
+                                    System.out.println("Image Again: " + checkAgain + " - Code:" + codeCheckAgain);
+                                }
+                                if (!codeCheckAgain.equals("OK")) {
+                                    String checkLast = "https:" + strChcek;
+                                    String codeCheclast = verifyHttpMessage(checkLast);
+                                    if (codeCheclast.equals("OK")) {
+                                        byte[] capacity =  getBytes(checkLast);
+                                        if(capacity.length==0){
+                                            MissingFileReport fileNew = new MissingFileReport(checkLast, codeCheclast+" size: "+capacity.length, u.getUrl());
+                                            fileNew.setPageOption(option);
+                                            missing.add(fileNew);
+                                        }
+                                        System.out.println("Image Last: " + checkLast + " - Code:" + codeCheclast);
+                                    } else {
+                                        MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheclast, u.getUrl());
+                                        fileNew.setPageOption(option);
+                                        missing.add(fileNew);
+                                        System.out.println("Image Last Fail: " + strChcek + " -Code: " + codeCheclast);
+                                    }
+                                }
+                            }
+                        }
+                        //End check missing file
+
+
+                        //Check missing doc
+                        pattern = Pattern.compile("((http\\:|https\\:)?//?([\\w\\-?\\.?]+)?\\.([a-zA-Z]{2,3})?)?(/\\S*)\\.(doc|docx|djvu|odp|ods|odt|pps|ppsx|ppt|pptx|pdf|ps|eps|rtf|txt|wks|wps|xls|xlsx|xps)");
+                        matcher = pattern.matcher(doc.html());
+                        while (matcher.find()) {
+                            String strChcek = matcher.group();
+                            String checkCode = verifyHttpMessage(strChcek);
+                            if (checkCode.equals("OK")) {
+                                byte[] capacity =  getBytes(strChcek);
+                                if(capacity.length==0){
+                                    MissingFileReport fileNew = new MissingFileReport(strChcek, checkCode+" size: "+capacity.length, u.getUrl());
+                                    fileNew.setPageOption(option);
+                                    missing.add(fileNew);
+                                }
+                                System.out.println("DOC: " + strChcek + " - Code:" + checkCode);
+                            }
+                            if (!checkCode.equals("OK")) {
+                                String checkAgain = urlRoot + strChcek;
+                                String codeCheckAgain = verifyHttpMessage(checkAgain);
+                                if (codeCheckAgain.equals("OK")) {
+                                    byte[] capacity =  getBytes(checkAgain);
+                                    if(capacity.length==0){
+                                        MissingFileReport fileNew = new MissingFileReport(checkAgain, codeCheckAgain+" size: "+capacity.length, u.getUrl());
+                                        fileNew.setPageOption(option);
+                                        missing.add(fileNew);
+                                    }
+                                    System.out.println("DOC Again: " + checkAgain + " - Code:" + codeCheckAgain);
+                                }
+                                if (!codeCheckAgain.equals("OK")) {
+                                    String checkLast = "https:" + strChcek;
+                                    String codeCheclast = verifyHttpMessage(checkLast);
+                                    System.out.println("Code Check Last: " + codeCheclast);
+                                    if (codeCheclast.equals("OK")) {
+                                        byte[] capacity =  getBytes(checkLast);
+                                        if(capacity.length==0){
+                                            MissingFileReport fileNew = new MissingFileReport(checkLast, codeCheclast+" size: "+capacity.length, u.getUrl());
+                                            fileNew.setPageOption(option);
+                                            missing.add(fileNew);
+                                        }
+                                        System.out.println("DOC Last: " + checkLast + " - Code:" + codeCheclast);
+                                    } else {
+                                        MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheclast, u.getUrl());
+                                        fileNew.setPageOption(option);
+                                        missing.add(fileNew);
+                                        System.out.println("DOC Last Fail: " + strChcek + " -Code: " + codeCheclast);
+                                    }
+                                }
+                            }
+
+                        }
+                        // end check missing doc
+
+                        //check missing ARCHIVES
+                        pattern = Pattern.compile("((http\\:|https\\:)?//?([\\w\\-?\\.?]+)?\\.([a-zA-Z]{2,3})?)(/\\S*)\\.(7z|zip|rar|jar|tar|tar|gz|cab)", Pattern.CASE_INSENSITIVE);
+                        matcher = pattern.matcher(doc.html());
+                        while (matcher.find()) {
+                            String strChcek = matcher.group();
+                            String checkCode = verifyHttpMessage(strChcek);
+                            if (checkCode.equals("OK")) {
+                                byte[] capacity =  getBytes(strChcek);
+                                if(capacity.length==0){
+                                    MissingFileReport fileNew = new MissingFileReport(strChcek, checkCode+" size: "+capacity.length, u.getUrl());
+                                    fileNew.setPageOption(option);
+                                    missing.add(fileNew);
+                                }
+                                System.out.println("ARCHIRE: " + strChcek + " - Code:" + checkCode);
+                            }
+                            if (!checkCode.equals("OK")) {
+                                String checkAgain = urlRoot + strChcek;
+                                String codeCheckAgain = verifyHttpMessage(checkAgain);
+                                if (codeCheckAgain.equals("OK")) {
+                                    byte[] capacity =  getBytes(checkAgain);
+                                    if(capacity.length==0){
+                                        MissingFileReport fileNew = new MissingFileReport(checkAgain, codeCheckAgain+" size: "+capacity.length, u.getUrl());
+                                        fileNew.setPageOption(option);
+                                        missing.add(fileNew);
+                                    }
+                                    System.out.println("ARCHIVES Again: " + checkAgain + " - Code:" + codeCheckAgain);
+                                }
+                                if (!codeCheckAgain.equals("OK")) {
+                                    String checkLast = "https:" + strChcek;
+                                    String codeCheclast = verifyHttpMessage(checkLast);
+                                    System.out.println("Code Check Last: " + codeCheclast);
+                                    if (codeCheclast.equals("OK")) {
+                                        byte[] capacity =  getBytes(checkLast);
+                                        if(capacity.length==0){
+                                            MissingFileReport fileNew = new MissingFileReport(checkLast, codeCheclast+" size: "+capacity.length, u.getUrl());
+                                            fileNew.setPageOption(option);
+                                            missing.add(fileNew);
+                                        }
+                                        System.out.println("ARCHIVES Last: " + checkLast + " - Code:" + codeCheclast);
+                                    } else {
+                                        MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheclast, u.getUrl());
+                                        fileNew.setPageOption(option);
+                                        missing.add(fileNew);
+                                        System.out.println("ARCHIVES Last Fail: " + strChcek + " -Code: " + codeCheclast);
+                                    }
+                                }
+                            }
+
+                        }
+                        //end check ARCHIVES
+
+                        //check missing css
+                        pattern = Pattern.compile("((http\\:|https\\:)?//?([\\w\\-?\\.?]+)?\\.([a-zA-Z]{2,3})?)?(/\\S*)\\.(css)(([\\?\\.\\=]\\w*)*)?", Pattern.CASE_INSENSITIVE);
+                        matcher = pattern.matcher(doc.html());
+                        while (matcher.find()) {
+//            System.out.println(matcher.group());
+                            String strChcek = matcher.group();
+                            String checkCode = verifyHttpMessage(strChcek);
+                            if (checkCode.equals("OK")) {
+                                byte[] capacity =  getBytes(strChcek);
+                                if(capacity.length==0){
+                                    MissingFileReport fileNew = new MissingFileReport(strChcek, checkCode+" size: "+capacity.length, u.getUrl());
+                                    fileNew.setPageOption(option);
+                                    missing.add(fileNew);
+                                }
+                                System.out.println("CSS 2: " + strChcek + " - Code:" + checkCode);
+                            }
+                            if (!checkCode.equals("OK")) {
+                                String checkAgain = urlRoot + strChcek;
+                                String codeCheckAgain = verifyHttpMessage(checkAgain);
+                                if (codeCheckAgain.equals("OK")) {
+                                    byte[] capacity =  getBytes(checkAgain);
+                                    if(capacity.length==0){
+                                        MissingFileReport fileNew = new MissingFileReport(checkAgain, codeCheckAgain+" size: "+capacity.length, u.getUrl());
+                                        fileNew.setPageOption(option);
+                                        missing.add(fileNew);
+                                    }
+                                    System.out.println("CSS 2 Again: " + checkAgain + " - Code:" + codeCheckAgain);
+                                }
+                                if (!codeCheckAgain.equals("OK")) {
+                                    String checkLast = "https:" + strChcek;
+                                    String codeCheclast = verifyHttpMessage(checkLast);
+                                    System.out.println("Code Check Last: " + codeCheclast);
+                                    if (codeCheclast.equals("OK")) {
+                                        byte[] capacity =  getBytes(checkLast);
+                                        System.out.println("CSS 2 Last: " + checkLast + " - Code:" + codeCheclast);
+                                        if(capacity.length==0){
+                                            MissingFileReport fileNew = new MissingFileReport(checkLast, codeCheclast+" size: "+capacity.length, u.getUrl());
+                                            fileNew.setPageOption(option);
+                                            missing.add(fileNew);
+                                        }
+                                    } else {
+                                        MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheclast, u.getUrl());
+                                        fileNew.setPageOption(option);
+                                        missing.add(fileNew);
+                                        System.out.println("CSS 2 Last Fail: " + strChcek + " -Code: " + codeCheclast);
+                                    }
+                                }
+                            }
+                        }
+                        //end check missing css
+                        // check missing file js
+
+                        //end check missing file js
+                        //check missing mp4 file
+                        pattern = Pattern.compile("(http\\:|https\\:)?//?([\\w\\-?\\.?]+)?\\.([a-zA-Z]{2,3})?(/\\S*)\\.(3gp|avi|flv|m4v|mkv|mov|mp4|mpeg|ogv|wmv|webm)(\\w*)?", Pattern.CASE_INSENSITIVE);
+                        matcher = pattern.matcher(doc.html());
+                        while (matcher.find()) {
+                            String strChcek = matcher.group();
+                            String checkCode = verifyHttpMessage(strChcek);
+                            if (checkCode.equals("OK")) {
+                                byte[] capacity =  getBytes(strChcek);
+                                System.out.println("MP4: " + strChcek + " - Code:" + checkCode);
+                                if(capacity.length==0){
+                                    MissingFileReport fileNew = new MissingFileReport(strChcek, checkCode+" size: "+capacity.length, u.getUrl());
+                                    fileNew.setPageOption(option);
+                                    missing.add(fileNew);
+                                }
+                            }
+                            if (!checkCode.equals("OK")) {
+                                String checkAgain = urlRoot + strChcek;
+                                String codeCheckAgain = verifyHttpMessage(checkAgain);
+                                if (codeCheckAgain.equals("OK")) {
+                                    byte[] capacity =  getBytes(checkAgain);
+                                    System.out.println("MP4 Again: " + checkAgain + " - Code:" + codeCheckAgain);
+                                    if(capacity.length==0){
+                                        MissingFileReport fileNew = new MissingFileReport( checkAgain, codeCheckAgain+" size: "+capacity.length, u.getUrl());
+                                        fileNew.setPageOption(option);
+                                        missing.add(fileNew);
+                                    }
+                                }
+                                if (!codeCheckAgain.equals("OK")) {
+                                    String checkLast = "https:" + strChcek;
+                                    String codeCheclast = verifyHttpMessage(checkLast);
+                                    System.out.println("Code Check Last: " + codeCheclast);
+                                    if (codeCheclast.equals("OK")) {
+                                        byte[] capacity =  getBytes(checkLast);
+                                        System.out.println("MP4 Last: " + checkLast + " - Code:" + codeCheclast);
+                                        if(capacity.length==0){
+                                            MissingFileReport fileNew = new MissingFileReport( checkLast,  codeCheclast+" size: "+capacity.length, u.getUrl());
+                                            fileNew.setPageOption(option);
+                                            missing.add(fileNew);
+                                        }
+                                    } else {
+                                        MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheclast, u.getUrl());
+                                        fileNew.setPageOption(option);
+                                        missing.add(fileNew);
+                                        System.out.println("MP4 Last Fail: " + strChcek + " -Code: " + codeCheclast);
+                                    }
+                                }
+                            }
+
+                        }
+                        //end check mp4 file
+
+                        //check missing mp3 file
+                        pattern = Pattern.compile("(http\\:|https\\:)?//?([\\w\\-?\\.?]+)?\\.([a-zA-Z]{2,3})?(/\\S*)\\.(aac|ac3|aiff|amr|ape|flac|m4a|mka|mp3|mpc|ogg|wav|wma)", Pattern.CASE_INSENSITIVE);
+                        matcher = pattern.matcher(doc.html());
+                        while (matcher.find()) {
+                            String strChcek = matcher.group();
+                            String checkCode = verifyHttpMessage(strChcek);
+                            if (checkCode.equals("OK")) {
+                                byte[] capacity =  getBytes(strChcek);
+                                System.out.println("MP3: " + strChcek + " - Code:" + checkCode);
+                                if(capacity.length==0){
+                                    MissingFileReport fileNew = new MissingFileReport(strChcek, checkCode+" size:: "+capacity.length, u.getUrl());
+                                    fileNew.setPageOption(option);
+                                    missing.add(fileNew);
+                                }
+                            }
+                            if (!checkCode.equals("OK")) {
+                                String checkAgain = urlRoot + strChcek;
+                                String codeCheckAgain = verifyHttpMessage(checkAgain);
+                                if (codeCheckAgain.equals("OK")) {
+                                    byte[] capacity =  getBytes(checkAgain);
+                                    System.out.println("MP3 Again: " + checkAgain + " - Code:" + codeCheckAgain);
+                                    if(capacity.length==0){
+                                        MissingFileReport fileNew = new MissingFileReport(checkAgain, codeCheckAgain+" size:: "+capacity.length, u.getUrl());
+                                        fileNew.setPageOption(option);
+                                        missing.add(fileNew);
+                                    }
+                                }
+                                if (!codeCheckAgain.equals("OK")) {
+                                    String checkLast = "https:" + strChcek;
+                                    String codeCheclast = verifyHttpMessage(checkLast);
+                                    System.out.println("Code Check Last: " + codeCheclast);
+                                    if (codeCheclast.equals("OK")) {
+                                        byte[] capacity =  getBytes(checkLast);
+                                        if(capacity.length==0){
+                                            MissingFileReport fileNew = new MissingFileReport(checkLast, codeCheclast+" size:: "+capacity.length, u.getUrl());
+                                            fileNew.setPageOption(option);
+                                            missing.add(fileNew);
+                                        }
+                                        System.out.println("MP3 Last: " + checkLast + " - Code:" + codeCheclast);
+                                    } else {
+                                        MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheclast, u.getUrl());
+                                        fileNew.setPageOption(option);
+                                        missing.add(fileNew);
+                                        System.out.println("MP3 Last Fail: " + strChcek + " -Code: " + codeCheclast);
+                                    }
+                                }
+                            }
+                        }
+                        //end check Missing mp3 file
+                    } catch (IOException e) {
+                        Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
+                    } catch (InterruptedException e) {
+                        Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
+                    } catch (BrokenBarrierException e) {
+                        Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
+                    }
+                }
+            });
+            System.out.println(urlRoot);
+
+        }
+        for (Thread t : listThread) {
+            System.out.println("Threed start");
+            t.start();
+        }
+
+        for (Thread t : listThread) {
+            System.out.println("Threed join");
+            try {
+                t.join();
+            } catch (InterruptedException e) {
+                Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
+            }
+        }
+
+        return missing;
+    }
+
+
+    // Function check http message Phúc Anh
+    private String verifyHttpMessage(String url) {
+        String message = "";
+        try {
+            URL urlTesst = new URL(url);
+            HttpURLConnection connection = (HttpURLConnection) urlTesst.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("User-Agent", "Mozilla/5.0 ");
+            message = connection.getResponseMessage();
+        } catch (Exception e) {
+            message = "Not Found";
+        }
+        return message;
+    }
+
+    //Function get size file
+    private  byte[] getBytes(String url)  {
+        byte[] b = new byte[0];
+        try {
+            URL urlTesst = new URL(url);
+            URLConnection uc = urlTesst.openConnection();
+            int len = uc.getContentLength();
+            InputStream in = new BufferedInputStream(uc.getInputStream());
+
+            try {
+                b = IOUtils.readFully(in, len, true);
+            } finally {
+                in.close();
+            }
+        }catch (IOException ex){
+
+        }
+
+        return b;
     }
 
     public List<ProhibitedContentReport> prohibitedContentService(List<Page> list, PageOption option) throws InterruptedException {
