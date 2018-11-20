@@ -104,7 +104,7 @@ class brokenLinksScreen extends Component {
                             <Segment style={{ margin: 'auto', textAlign: 'center', padding: 0 }}>
                                 <Icon className="broken chain" size='huge' color='red' /></Segment>
                             <Segment>
-                                <p style={{ fontSize: 24 }}>2 <br /> External broken links</p>
+                                <p style={{ fontSize: 24 }}>0 <br /> External broken links</p>
                             </Segment>
                         </Segment.Group>
                         <Segment basic style={{ marginBottom: '60px' }}>

@@ -95,14 +95,14 @@ class brokenPagesScreen extends Component {
                                 <Icon className="warning sign" size='huge' color='red' />
                             </Segment>
                             <Segment style={{ paddingLeft: '10px' }}>
-                                <p style={{ fontSize: 24 }}>10<br />
+                                <p style={{ fontSize: 24 }}>0<br />
                                     Missing pages</p>
                             </Segment >
 
                             <Segment style={{ margin: 'auto', textAlign: 'center', padding: 0 }}>
                                 <Icon className="warning sign" size='huge' color='black' /></Segment>
                             <Segment>
-                                <p style={{ fontSize: 24 }}>2 <br /> Error pages</p>
+                                <p style={{ fontSize: 24 }}>0 <br /> Error pages</p>
                             </Segment>
                         </Segment.Group>
                         <Segment basic style={{ marginBottom: '60px' }}>

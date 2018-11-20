@@ -34,8 +34,8 @@ class faviconScreen extends Component {
             "websiteId": cookies.get("u_w_id"),
             "pageOptionId": cookies.get("u_option"),
         };
-
-        fetch("/api/favicontest/lastest", {
+        console.log("U-Option"+cookies.get("u_option"))
+        fetch("/api/faviconTest/lastest", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -44,7 +44,7 @@ class faviconScreen extends Component {
             body: JSON.stringify(param)
         }).then(response => response.json()).then((data) => {
             console.log(data);
-            comp = data.faviconReport.map((item, index) => {
+            comp = data.favicontestReport.map((item, index) => {
                 for (let i = 0; i < listCom.length; i++) {
                     if (item.faviconUrl === listCom[i]) {
                         flag = true;
@@ -61,7 +61,7 @@ class faviconScreen extends Component {
                     faviconMissCount++;
                 }
 
-                return (<TableRow key={index} image={item.faviconUrl} url={item.faviconUrl} sizeFav={item.sizeFavicon} webAddress={item.webAddress} />);
+                return (<TableRow key={index} image={item.faviconUrl} url={item.faviconUrl} sizeFav={item.sizeFavicon} webAddress={item.url} />);
             });
             this.setState({ faviconMissingCount: faviconMissCount })
             this.setState({ faviconCount: favUrlCount });
@@ -83,8 +83,9 @@ class faviconScreen extends Component {
             "userToken": cookies.get("u_token"),
             "websiteId": cookies.get("u_w_id"),
             "pageOptionId": cookies.get("u_option"),
-        }
-        fetch("/api/favicontest", {
+        };
+        console.log("U-Option"+cookies.get("u_option"))
+        fetch("/api/faviconTest", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -92,7 +93,8 @@ class faviconScreen extends Component {
             },
             body: JSON.stringify(param)
         }).then(response => response.json()).then((data) => {
-            comp = data.faviconReport.map((item, index) => {
+            console.log(data)
+            comp = data.favicontestReport.map((item, index) => {
                 for (let i = 0; i < listCom.length; i++) {
                     if (item.faviconUrl === listCom[i]) {
                         flag = true;
@@ -108,7 +110,7 @@ class faviconScreen extends Component {
                 if (item.faviconUrl === "Missing Favicon") {
                     faviconMissCount++;
                 }
-                return (<TableRow key={index} image={item.faviconUrl} url={item.faviconUrl} sizeFav={item.sizeFavicon} webAddress={item.webAddress} />);
+                return (<TableRow key={index} image={item.faviconUrl} url={item.faviconUrl} sizeFav={item.sizeFavicon} webAddress={item.url} />);
             });
             this.setState({ faviconCount: favUrlCount });
             this.setState({ faviconMissingCount: faviconMissCount });

@@ -4,7 +4,8 @@ import com.fpt.capstone.wcs.model.entity.*;
 import com.fpt.capstone.wcs.model.pojo.RequestCommonPOJO;
 import com.fpt.capstone.wcs.model.pojo.UrlPOJO;
 import com.fpt.capstone.wcs.repository.*;
-import com.fpt.capstone.wcs.service.TechnologyService;
+
+import com.fpt.capstone.wcs.service.Technology.TechnologyService;
 import com.fpt.capstone.wcs.utils.Authenticate;
 import com.fpt.capstone.wcs.utils.Constant;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,8 +32,7 @@ public class TechnologyController {
     CookieRepository cookieRepository;
 
 //
-//    @Autowired
-//    FaviconRepository faviconRepository;
+
 //    @Autowired
 //    TechnologyService technologyService;
     @Autowired
@@ -46,31 +46,24 @@ public class TechnologyController {
 
 
     @Autowired
-    com.fpt.capstone.wcs.service.Technology.TechnologyService technologyServiceS1;
+    TechnologyService technologyServiceS1;
 
     @CrossOrigin
     @PostMapping("/api/jsTest")
     public Map<String, Object> getJavaErrrorTest(@RequestBody RequestCommonPOJO request) throws InterruptedException {
-//        TechnologyService technologyService = new TechnologyService();
-       // List<JavascriptReport> resultList = technologyService.jsTestService(list);
-//        jsCheckRepository.deleteAll();
-//        jsCheckRepository.saveAll(resultList);
          return  technologyServiceS1.getJavaErrrorTest(request);
     }
 
     @CrossOrigin
     @PostMapping("/api/jsTest/lastest")
     public Map<String, Object> getLastestSpeedTest(@RequestBody RequestCommonPOJO request) {
-//
-//        List<JavascriptReport> resultList = jsCheckRepository.findAll();
-//        return resultList;
        return technologyServiceS1.getLastestSpeedTest(request);
     }
 
     @CrossOrigin
     @PostMapping("/api/svbehavior")
     public ServerBehaviorReport getServerBehavior(@RequestBody UrlPOJO url) throws InterruptedException, IOException {
-        TechnologyService technologyService = new TechnologyService();
+        com.fpt.capstone.wcs.service.TechnologyService technologyService = new com.fpt.capstone.wcs.service.TechnologyService();
         ServerBehaviorReport result = technologyService.checkServerBehavior(url);
 //        serverBehaviorRepository.save(result);
         return result;
@@ -109,31 +102,16 @@ public class TechnologyController {
         return success;
     }
 
-//    @PostMapping("/api/favicontest")
-//    public List<FaviconReport> getDataFaviconTest(@RequestBody UrlPOJO[] list) throws InterruptedException {
-//        TechnologyService technologyService = new TechnologyService();
-//        String urlRoot="";
-//        for(int i =0; i< list.length;i++ ){
-//            Pattern pattern = Pattern.compile("(http\\:|https\\:)//([\\w\\-?\\.?]+)?\\.([a-zA-Z]{2,3})?",Pattern.CASE_INSENSITIVE);
-//            Matcher matcher = pattern.matcher(list[i].getUrl());
-//            while (matcher.find()){
-//                urlRoot = matcher.group();
-//            }
-//        }
-//        List<FaviconReport> resultList = technologyService.checkFavicon(list,urlRoot);
-//        faviconRepository.deleteAll();
-//        faviconRepository.saveAll(resultList);
-//        return resultList;
-//    }
 
-    @CrossOrigin
-    @PostMapping("/api/favicontest")
-    public Map<String, Object> getDataPagesTest(@RequestBody RequestCommonPOJO request) throws InterruptedException {
-        return technologyServiceS1.faviconTest(request);
+    @Transactional
+    @PostMapping("/api/faviconTest")
+    public  Map<String, Object> getDataFaviconTest(@RequestBody  RequestCommonPOJO request) throws InterruptedException {
+        return  technologyServiceS1.getfaviconTest(request);
     }
 
-    @CrossOrigin
-    @PostMapping("/api/favicontest/lastest")
+
+
+    @PostMapping("/api/faviconTest/lastest")
     public Map<String, Object> getLastestPageTest(@RequestBody RequestCommonPOJO request)
     {
        return technologyServiceS1.getLastestFaviconTest(request);

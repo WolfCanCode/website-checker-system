@@ -183,10 +183,12 @@ public class TechnologyService {
 
 
 
-    public static List<FaviconReport> checkFavicon(List<Page> list, PageOption option, String urlRoot) {
+    public List<FaviconReport> checkFavicon( UrlPOJO[] list, String urlRoot) {
         List<FaviconReport> fav = new ArrayList();
         boolean flagMethod1 = false;
         String urlFaviconMethod1 = urlRoot + "/favicon.ico";
+        final CyclicBarrier gate = new CyclicBarrier(list.length);
+        List<Thread> listThread = new ArrayList<>();
         int httpMessage = verifyHttpMessage(urlFaviconMethod1);
         if (httpMessage == 200) {
             byte[] capacity = getBytes(urlFaviconMethod1);
@@ -195,71 +197,93 @@ public class TechnologyService {
                 flagMethod1 = true;
             }
         }
-        for ( Page urlNew : list) {
-            if (flagMethod1 == true) {
-                System.out.println(urlNew.getUrl().startsWith(urlRoot));
-                if(urlNew.getUrl().startsWith(urlRoot)){
-                    FaviconReport faviconMethod1 = new FaviconReport(urlFaviconMethod1, urlNew.getUrl(), "16x16");
-                    faviconMethod1.setPageOption(option);
-                    fav.add(faviconMethod1);
-                }
-                else{
-                    FaviconReport faviconMethod1 = new FaviconReport("External Link", urlNew.getUrl(), "");
-                    faviconMethod1.setPageOption(option);
-                    fav.add(faviconMethod1);
-                }
-            } else {
-                try {
-                    Document doc = Jsoup.connect(urlNew.getUrl()).ignoreContentType(true).get();
-
-                    Elements elem = doc.head().select("link[rel~=(shortcut icon|icon|apple-touch-icon-precomposed|nokia-touch-icon)]");
-                    System.out.println(elem.size());
-                    if (elem.size() == 0) {
-                        FaviconReport favicon = new FaviconReport("Missing Favicon", urlNew.getUrl(), "undefine");
-                        favicon.setPageOption(option);
-                        fav.add(favicon);
-                    }
-                    for (Element element : elem) {
-                        String size = element.attr("sizes");
-
-                        if (size.equals("")) {
-                            size = "undefine";
-                        }
-                        String href = elem.attr("href");
-                        int code = verifyHttpMessage(href);
-                        if (code == 200) {
-                            FaviconReport favicon = new FaviconReport(href, urlNew.getUrl(), size);
-                            favicon.setPageOption(option);
-                            fav.add(favicon);
-                            System.out.println("Favicon: " + href + " - Web Address: " + urlNew + " - Size: " + size + " http code: " + code);
-                        }
-                        if (code != 200) {
-                            String urlFavAgain = urlRoot + href;
-                            int checkFaviconResponeAgain = verifyHttpMessage(urlFavAgain);
-                            if (checkFaviconResponeAgain == 200) {
-                                FaviconReport favicon = new FaviconReport(urlFavAgain, urlNew.getUrl(), size);
-                                favicon.setPageOption(option);
-                                fav.add(favicon);
-                                System.out.println("Favicon: " + urlFavAgain + " - Web Address: " + urlNew + " - Size: " + size + " http code: " + checkFaviconResponeAgain);
+        for (UrlPOJO urlNew : list) {
+            boolean finalFlagMethod = flagMethod1;
+            listThread.add(new Thread() {
+                public void run() {
+                    try {
+                        gate.await();
+                        if (finalFlagMethod == true) {
+                            System.out.println(urlNew.getUrl().startsWith(urlRoot));
+                            if(urlNew.getUrl().startsWith(urlRoot)){
+                                FaviconReport faviconMethod1 = new FaviconReport(urlFaviconMethod1, urlNew.getUrl(), "16x16");
+//                    faviconMethod1.setPageOption(option);
+                                fav.add(faviconMethod1);
                             }
-                            if (checkFaviconResponeAgain != 200) {
-                                String urlFavLast = "https:" + href;
-                                int checkFaviconResponeLast = verifyHttpMessage(urlFavLast);
-                                if (checkFaviconResponeLast == 200) {
-                                    FaviconReport favicon = new FaviconReport(urlFavLast, urlNew.getUrl(), size);
-                                    favicon.setPageOption(option);
+                            else{
+                                FaviconReport faviconMethod1 = new FaviconReport("External Link", urlNew.getUrl(), "");
+//                    faviconMethod1.setPageOption(option);
+                                fav.add(faviconMethod1);
+                            }
+                        } else {
+                            try {
+                                Document doc = Jsoup.connect(urlNew.getUrl()).ignoreContentType(true).get();
+
+                                Elements elem = doc.head().select("link[rel~=(shortcut icon|icon|apple-touch-icon-precomposed|nokia-touch-icon)]");
+                                System.out.println(elem.size());
+                                if (elem.size() == 0) {
+                                    FaviconReport favicon = new FaviconReport("Missing Favicon", urlNew.getUrl(), "undefine");
+//                        favicon.setPageOption(option);
                                     fav.add(favicon);
-                                    System.out.println("Favicon: " + urlFavLast + " - Web Address: " + urlNew + " - Size: " + size + " http code: " + checkFaviconResponeLast);
                                 }
+                                for (Element element : elem) {
+                                    String size = element.attr("sizes");
+
+                                    if (size.equals("")) {
+                                        size = "undefine";
+                                    }
+                                    String href = elem.attr("href");
+                                    int code = verifyHttpMessage(href);
+                                    if (code == 200) {
+                                        FaviconReport favicon = new FaviconReport(href, urlNew.getUrl(), size);
+//                            favicon.setPageOption(option);
+                                        fav.add(favicon);
+                                        System.out.println("Favicon: " + href + " - Web Address: " + urlNew + " - Size: " + size + " http code: " + code);
+                                    }
+                                    if (code != 200) {
+                                        String urlFavAgain = urlRoot + href;
+                                        int checkFaviconResponeAgain = verifyHttpMessage(urlFavAgain);
+                                        if (checkFaviconResponeAgain == 200) {
+                                            FaviconReport favicon = new FaviconReport(urlFavAgain, urlNew.getUrl(), size);
+//                                favicon.setPageOption(option);
+                                            fav.add(favicon);
+                                            System.out.println("Favicon: " + urlFavAgain + " - Web Address: " + urlNew + " - Size: " + size + " http code: " + checkFaviconResponeAgain);
+                                        }
+                                        if (checkFaviconResponeAgain != 200) {
+                                            String urlFavLast = "https:" + href;
+                                            int checkFaviconResponeLast = verifyHttpMessage(urlFavLast);
+                                            if (checkFaviconResponeLast == 200) {
+                                                FaviconReport favicon = new FaviconReport(urlFavLast, urlNew.getUrl(), size);
+//                                    favicon.setPageOption(option);
+                                                fav.add(favicon);
+                                                System.out.println("Favicon: " + urlFavLast + " - Web Address: " + urlNew + " - Size: " + size + " http code: " + checkFaviconResponeLast);
+                                            }
+                                        }
+                                    }
+
+                                }
+                            } catch (IOException ex) {
+                                Logger.getLogger( TechnologyService.class.getName()).log(Level.SEVERE, null, ex);
                             }
                         }
-
+                    } catch (InterruptedException | BrokenBarrierException e) {
+                        Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
                     }
-                } catch (IOException ex) {
-                    Logger.getLogger( TechnologyService.class.getName()).log(Level.SEVERE, null, ex);
                 }
-            }
+            });
+        }
+        for (Thread t : listThread) {
+            System.out.println("Threed start");
+            t.start();
+        }
 
+        for (Thread t : listThread) {
+            System.out.println("Threed join");
+            try {
+                t.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
         return fav;
     }

@@ -11,17 +11,16 @@ import javax.persistence.*;
 @Getter
 @Setter
 @Entity
+@Table(name="FaviconReport")
 public class FaviconReport {
 
     @Id
     @GeneratedValue
-    private long id;
+    private Long id;
     private String faviconUrl;
     private String url;
     private String sizeFavicon;
 
-    public FaviconReport(){
-    }
 
     public  FaviconReport(String faviconUrl, String url, String sizeFavicon){
         this.faviconUrl=faviconUrl;

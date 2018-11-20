@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import java.util.Map;
 
 public interface TechnologyService {
-    public Map<String, Object> faviconTest(@RequestBody RequestCommonPOJO request);
+    public Map<String, Object> getfaviconTest(@RequestBody RequestCommonPOJO request);
     public Map<String, Object> getLastestFaviconTest(@RequestBody RequestCommonPOJO request);
 
     public Map<String, Object> getJavaErrrorTest(@RequestBody RequestCommonPOJO request);
