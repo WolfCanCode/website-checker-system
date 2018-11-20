@@ -6,7 +6,7 @@ const cookies = new Cookies();
 
 export default class TableRow extends Component {
     state = {
-        open: false, open1: false, oldWord: this.props.word, word: this.props.word, isDisable: true, editLoading: false, loadingDelete: false
+        open: false, open1: false, oldWord: this.props.word, word: this.props.word,type: this.props.type, isDisable: true, editLoading: false, loadingDelete: false
     }
 
     show = size => () => this.setState({ size, open: true })
@@ -23,7 +23,7 @@ export default class TableRow extends Component {
         this.setState({ editLoading: true, isDisable: false });
         var param = {
             "managerId": cookies.get("u_id"), "managerToken": cookies.get("u_token"), word: {
-                "id": this.props.id, "word": this.state.word
+                "id": this.props.id, "word": this.state.word, "type": this.state.type
             }
         };
         fetch("/api/word/editWord", {
@@ -70,12 +70,15 @@ export default class TableRow extends Component {
 
 
     _onchangeWord(event) {
-        this.setState({ word: event.target.value }, () => this._checkAddBtn());
+        this.setState({ word: event.target.value }, () => this._checkEditBtn());
+    }
+    _onchangeType(event) {
+        this.setState({ type: event.target.value }, () => this._checkEditBtn());
     }
 
-    _checkAddBtn() {
+    _checkEditBtn() {
         var result = false;
-        if (this.state.word === "" || this.state.word === this.state.oldWord) {
+        if (this.state.word === "" || this.state.type === "" || this.state.word === this.state.oldWord ) {
             result = true;
         }
         this.setState({ isDisable: result });
@@ -112,6 +115,10 @@ export default class TableRow extends Component {
                         <p >Word</p>
                     </Modal.Content>
                     <Input type="text" style={{ marginLeft: '20px', width: '90%', marginBottom: '20px' }} onChange={(event) => this._onchangeWord(event)} value={this.state.word}></Input>
+                    <Modal.Content >
+                        <p >Type</p>
+                    </Modal.Content>
+                    <Input type="text" style={{ marginLeft: '20px', width: '90%', marginBottom: '20px' }} onChange={(event) => this._onchangeType(event)} value={this.state.type}></Input>
 
                     <Modal.Actions>
                         <Button onClick={this.close}>Cancel</Button>

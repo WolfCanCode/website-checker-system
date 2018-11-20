@@ -11,7 +11,7 @@ const cookies = new Cookies();
 export default class managewordlist extends Component {
 
 
-    state = { addModal: false, isLoading: false, listWord: null, word: "", isDisable: true, addLoading: false }
+    state = { addModal: false, isLoading: false, listWord: null, word: "", type : "", isDisable: true, addLoading: false }
 
 
 
@@ -49,11 +49,15 @@ export default class managewordlist extends Component {
         this.setState({ word: event.target.value }, () => this._checkAddBtn());
     }
 
+    _onchangeType(event) {
+        this.setState({ type: event.target.value }, () => this._checkAddBtn());
+    }
+
 
 
     _checkAddBtn() {
         var result = false;
-        if (this.state.word === "") {
+        if (this.state.word === "" || this.state.type === "") {
             result = true;
         }
         this.setState({ isDisable: result });
@@ -64,7 +68,7 @@ export default class managewordlist extends Component {
         var param = {
             "managerId": cookies.get("u_id"), "managerToken": cookies.get("u_token")
             , word: {
-                "word": this.state.word
+                "word": this.state.word, "type": this.state.type
             }
         };
         fetch("/api/word/addWord", {
@@ -104,8 +108,13 @@ export default class managewordlist extends Component {
                                             <label>Word</label>
                                             <Input type="text" placeholder="Word" onChange={(event) => this._onchangeWord(event)} value={this.state.word}></Input>
                                         </Form.Field>
+                                        <Form.Field>
+                                            <label>Type</label>
+                                            <Input type="text" placeholder="Type" onChange={(event) => this._onchangeType(event)} value={this.state.type}></Input>
+                                        </Form.Field>
 
                                     </Form>
+                                    
                                 </Modal.Content>
                                 <Modal.Actions>
                                     <Button onClick={() => this.setState({ addModal: false })}>Cancel</Button>

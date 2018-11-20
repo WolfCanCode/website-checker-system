@@ -344,6 +344,7 @@ public class ManagerController {
                 managers.add(manager);
                 Word word = new Word();
                 word.setWord(request.getWord().getWord());
+                word.setType(request.getWord().getType());
                 word.setUser(managers);
                 wordRepository.save(word);
                 res.put("action", Constant.SUCCESS);
@@ -367,6 +368,8 @@ public class ManagerController {
             Word tmp = wordRepository.findOneByUserAndIdAndDelFlagEquals(manager, request.getWord().getId(), false);
             if (tmp != null) {
                 tmp.setWord(request.getWord().getWord());
+                tmp.setType(request.getWord().getType());
+
                 wordRepository.save(tmp);
                 res.put("action", Constant.SUCCESS);
                 return res;

@@ -18,15 +18,12 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-//chạy đc cái đã
+import org.atteo.evo.inflector.English;
 @Service
 public class QualityImpl implements QualityService {
 
@@ -42,15 +39,18 @@ public class QualityImpl implements QualityService {
     ProhibitedContentRepository prohibitedContentRepository;
     final
     WordRepository wordRepository;
+    final
+    InrregularVerbRepository inrregularVerbRepository;
 
     @Autowired
-    public QualityImpl(Authenticate authenticate, PageOptionRepository pageOptionRepository, BrokenLinkRepository brokenLinkRepository, BrokenPageRepository brokenPageRepository, WordRepository wordRepository,ProhibitedContentRepository prohibitedContentRepository) {
+    public QualityImpl(Authenticate authenticate, PageOptionRepository pageOptionRepository, BrokenLinkRepository brokenLinkRepository, BrokenPageRepository brokenPageRepository, WordRepository wordRepository,ProhibitedContentRepository prohibitedContentRepository, InrregularVerbRepository inrregularVerbRepository) {
         this.authenticate = authenticate;
         this.pageOptionRepository = pageOptionRepository;
         this.brokenLinkRepository = brokenLinkRepository;
         this.brokenPageRepository = brokenPageRepository;
         this.wordRepository = wordRepository;
         this.prohibitedContentRepository = prohibitedContentRepository;
+        this.inrregularVerbRepository = inrregularVerbRepository;
 
     }
 
@@ -442,43 +442,103 @@ public class QualityImpl implements QualityService {
 
     public List<ProhibitedContentReport> prohibitedContentService(List<Page> list, PageOption option) throws InterruptedException {
         System.setProperty("webdriver.chrome.driver", Constant.CHROME_DRIVER);
-        //Asign list JS info
+
         List<Word> wordList = new ArrayList<>();
 
-        wordList = wordRepository.findAll();
+        wordList = wordRepository.findAllByDelFlagEquals(false);
+        System.out.println("wordlist " + wordList.size());
 
-            List<ProhibitedContentReport> resultList = new ArrayList<>();
+        List<InrregularVerb> inrregularVerbList = new ArrayList<>();
+
+        inrregularVerbList = inrregularVerbRepository.findAll();
+        List<ProhibitedContentReport> resultList = new ArrayList<>();
 
 
         final CyclicBarrier gate = new CyclicBarrier(list.size());
         List<Thread> listThread = new ArrayList<>();
-        List<String> cookieNames = new ArrayList<String>();
+        List<Character> consonants = Arrays.asList('b','c','d','f','g','h','j','k','l','m','n','p','q','r','s','t','v','x','y','z');// phu am
+        List<Character> vowels = Arrays.asList('a', 'e', 'i', 'o', 'u');//nguyen am
+
 
         for (Page p : list) {
             List<Word> finalWordList = wordList;
+            List<InrregularVerb> finalInrregularVerbList = inrregularVerbList;
             listThread.add(new Thread() {
                 public void run() {
                     try {
                         gate.await();
+                        String verb,verb1, verb2, verb3, verbing, verbed;
 
                         ChromeOptions chromeOptions = new ChromeOptions();
                         chromeOptions.addArguments("--headless");
-
                         WebDriver driver = new ChromeDriver(chromeOptions);//chay an
-
                         driver.get(p.getUrl());
-                        WebElement textt = driver.findElement(By.tagName("body"));
+                        WebElement texts = driver.findElement(By.tagName("body"));
+                        String  bodyText = texts.getText().toLowerCase();
                         for (int i = 0; i< finalWordList.size(); i++){
-                                if(textt.getText().toLowerCase().contains(finalWordList.get(i).getWord().toLowerCase())){
-                                    ProhibitedContentReport prohibitedContentReport = new ProhibitedContentReport(p.getUrl(),finalWordList.get(i).getWord(),finalWordList.get(i).getType());
+                            //String a = finalWordList.get(i).getWord().concat("," + );
+                            String a = finalWordList.get(i).getWord().concat(",");
+                            a = a.concat(English.plural(finalWordList.get(i).getWord()) + ",");
+
+                            verb = finalWordList.get(i).getWord().toLowerCase();
+
+                            if( verb.length()>1 && consonants.contains( verb.charAt(verb.length()-2)) && vowels.contains( verb.charAt(verb.length()-1))){
+                                verbing = verb.substring(0, verb.length()-1) + "ing";
+                                a = a.concat(verbing + ",");
+                                //tan cung khong phai y va w, , truoc la nguyen am, truoc nua khong phai la nguyen am
+                            }else{
+                                verbing = verb + "ing";
+                                a = a.concat(verbing + ",");
+                            }
+
+                            Boolean check = true;
+                            for (int j = 0; j < finalInrregularVerbList.size(); j++ ){
+
+                                    verb1 = finalInrregularVerbList.get(j).getVerbV1();
+                                    verb2 = finalInrregularVerbList.get(j).getVerbV2();
+                                    verb3 = finalInrregularVerbList.get(j).getVerbV3();
+
+                                    if (verb.equalsIgnoreCase(verb1)){
+                                        a = a.concat(verb2 + ",");
+                                        a = a.concat(verb3 + ",");
+                                        check = false;
+
+                                    }
+                                }
+
+                                if(check == true){
+                                    if(verb.charAt(verb.length()-1)=='e'){//tan cung e
+                                        verbed = verb + "d";
+                                        //tan cung y, truoc la phu am
+                                    }else if(consonants.contains(verb.charAt(verb.length()-2)) && verb.charAt(verb.length()-1)=='y'){
+                                        verbed = verb.substring(0, verb.length()-1) + "ied";
+                                        //tan cung khong phai y va w, , truoc la nguyen am, truoc nua khong phai la nguyen am
+                                    }else if(verb.length()>2 && !vowels.contains(verb.charAt(verb.length()-3)) && vowels.contains(verb.charAt(verb.length()-2)) && ( consonants.contains(verb.charAt(verb.length()-1)) && verb.charAt(verb.length()-1)!='w' && verb.charAt(verb.length()-1)!='y' )){
+                                        verbed = verb + verb.charAt(verb.length()-1) + "ed";
+                                    }else{
+                                        verbed = verb + "ed";
+                                    }
+                                    a = a.concat(verbed + ",");
+
+                                }
+
+
+
+
+
+                            System.out.println("dsad" + a);
+                            String[] list1 = a.split(",");
+                            for(int j = 0; j < list1.length;j++){
+                                if(bodyText.contains(list1[j].toLowerCase())){
+
+                                    ProhibitedContentReport prohibitedContentReport = new ProhibitedContentReport(p.getUrl(),list1[j],finalWordList.get(i).getType());
                                     prohibitedContentReport.setPageOption(option);
                                     resultList.add(prohibitedContentReport);
                                 }
+                            }
+
 
                         }
-
-
-
 
 
 

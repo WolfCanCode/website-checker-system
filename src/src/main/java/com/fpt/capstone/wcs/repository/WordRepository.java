@@ -10,6 +10,8 @@ import java.util.List;
 @Repository
 public interface WordRepository extends JpaRepository<Word,Long> {
     List<Word> findAllByUserAndDelFlagEquals(User user, boolean isDel);
+    List<Word> findAllByDelFlagEquals(boolean isDel);
+
    Word findOneByUserAndIdAndDelFlagEquals(User user, Long id, boolean isDel);
     Word findFirstByUserAndWordAndDelFlagEquals(User manager , String word, boolean isDel);
 //    Website findOneByUserAndUrlAndDelFlagEquals(User user, String url, boolean isDel);
