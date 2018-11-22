@@ -2,7 +2,6 @@ package com.fpt.capstone.wcs.repository;
 
 import com.fpt.capstone.wcs.model.entity.User;
 import com.fpt.capstone.wcs.model.entity.WarningWord;
-import com.fpt.capstone.wcs.model.entity.Word;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
