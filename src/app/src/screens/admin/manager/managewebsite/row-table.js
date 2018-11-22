@@ -43,9 +43,10 @@ export default class TableRow extends Component {
         });
     }
 
-    _viewSitemap(id, name) {
+    _viewSitemap(id, name, url) {
         // eslint-disable-next-line
         var result = [];
+        var urlLength = url.length;
         this.props.loadingTable(true);
         this.props.showingModal(true);
         this.props.getSelectedWebName(name);
@@ -74,7 +75,7 @@ export default class TableRow extends Component {
             var map = [];
             var typeMap = [];
             var urlMap = [];
-
+            var shorthand = "";
             map = this.state.map;
             typeMap = this.state.typeMap;
             urlMap = this.state.urlMap;
@@ -83,10 +84,12 @@ export default class TableRow extends Component {
             var context = canvas.getContext("2d");
             var rectCoord = [];
             context.beginPath();
-            context.font = '12px serif';
+            context.font = '18px serif';
 
-            var boxW = 300;
-            var boxH = 25;
+            // var boxW = 300;
+            // var boxH = 25;
+            var boxW = 270;
+            var boxH = 30;
 
             var halfBoxH = boxH / 2;
 
@@ -97,12 +100,37 @@ export default class TableRow extends Component {
 
             var StartDrawingX = mxWidth - 10 - boxW;
             var StartDrawingY = 10;
-            function addTextToBox(coordX, coordY, fontType, content) {
+
+            function addTextToBox(coordX, coordY, fontType, content, type) {
                 context.save();
                 context.fillStyle = "black";
-                context.font = content;
+                context.font = fontType;
                 context.textAlign = 'left';
                 context.translate(coordX + 10, coordY + boxH - 10);
+
+                if (content === url) {
+
+                }
+
+                else if (type === 1 || type === 3) {
+                    var distance = content.length - urlLength;
+                    if (distance > 30) {
+                        content = content.substring(urlLength, urlLength + 30) + '...';
+                    } else {
+                        content = content.substring(urlLength, urlLength + 30);
+                    }
+
+                    // alert(content);
+                }
+                else if (type === 2) {
+                    var distance = content.length - urlLength;
+                    if (distance > 30) {
+                        content = content.substring(0, 30) + "...";
+                    } else {
+                        content = content.substring(0, 30);
+                    }
+
+                }
                 context.fillText(content, 0, 0);
                 context.restore();
             }
@@ -132,6 +160,7 @@ export default class TableRow extends Component {
 
                             // analysis color of type
                             context.fillStyle = "#79c5fc";
+
                             if (typeMap[floor][i] === 3) context.fillStyle = "red";
                             if (typeMap[floor][i] === 2) context.fillStyle = "gray";
 
@@ -139,7 +168,10 @@ export default class TableRow extends Component {
                             context.stroke();
 
                             // add text
-                            addTextToBox(deep, curRow, '12px serif', urlMap[floor][i]);
+
+                            addTextToBox(deep, curRow, '18px serif', urlMap[floor][i], typeMap[floor][i]);
+
+
                             //addTextToBox(deep, curRow, '12px serif', 'x = ' + deep + " y = " + curRow);
                         }
                         rect.push(curRow);
@@ -167,7 +199,7 @@ export default class TableRow extends Component {
                             context.stroke();
 
                             // add text
-                            addTextToBox(deep, coord[i], '12px serif', urlMap[floor][i]);
+                            addTextToBox(deep, coord[i], '18px serif', urlMap[floor][i], typeMap[floor][i]);
                             //addTextToBox(deep, coord[i], '12px serif', 'x = ' + deep + "y = " + coord[i]);
                         }
                         rect.push(coord[i]);
@@ -464,6 +496,7 @@ export default class TableRow extends Component {
             <Table.Cell ><a >{this.props.version}</a></Table.Cell>
             <Table.Cell ><a >{this.props.time}</a></Table.Cell>
             <Table.Cell ><Button onClick={() => this._makeNewver(this.props.id)} color="green">Make</Button></Table.Cell>
+            <Table.Cell ><Button onClick={() => this._viewSitemap(this.props.id, this.props.name, this.props.url)} color="blue">View Sitemap</Button></Table.Cell>
             <Table.Cell >
                 <Table.Cell ><Button onClick={() => this._viewSitemap(this.props.id, this.props.name)} color="blue">View Sitemap</Button></Table.Cell>
                 <Table.Cell ><Button primary onClick={() => this._assignModal()} > Assign </Button>
