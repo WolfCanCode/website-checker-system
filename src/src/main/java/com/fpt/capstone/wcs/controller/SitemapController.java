@@ -1,14 +1,8 @@
 package com.fpt.capstone.wcs.controller;
 
-import com.fpt.capstone.wcs.model.entity.Page;
-import com.fpt.capstone.wcs.model.entity.User;
-import com.fpt.capstone.wcs.model.entity.Version;
-import com.fpt.capstone.wcs.model.entity.Website;
+import com.fpt.capstone.wcs.model.entity.*;
 import com.fpt.capstone.wcs.model.pojo.RequestCommonPOJO;
-import com.fpt.capstone.wcs.repository.PageRepository;
-import com.fpt.capstone.wcs.repository.UserRepository;
-import com.fpt.capstone.wcs.repository.VersionRepository;
-import com.fpt.capstone.wcs.repository.WebsiteRepository;
+import com.fpt.capstone.wcs.repository.*;
 import com.fpt.capstone.wcs.service.SiteMapService;
 import com.fpt.capstone.wcs.model.pojo.SiteMapOutputPOJO;
 import com.fpt.capstone.wcs.model.pojo.UrlPOJO;
@@ -17,22 +11,35 @@ import com.fpt.capstone.wcs.utils.Constant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.transaction.Transactional;
 import java.net.MalformedURLException;
 import java.util.*;
 
 @RestController
 public class SitemapController {
 
-    @Autowired
+    final
     WebsiteRepository websiteRepository;
-    @Autowired
+    final
     UserRepository userRepository;
-    @Autowired
+    final
     PageRepository pageRepository;
-    @Autowired
+    final
     VersionRepository versionRepository;
-    @Autowired
+    final
     Authenticate authenticate;
+    final
+    PageOptionRepository pageOptionRepository;
+
+    @Autowired
+    public SitemapController(WebsiteRepository websiteRepository, UserRepository userRepository, PageRepository pageRepository, VersionRepository versionRepository, Authenticate authenticate, PageOptionRepository pageOptionRepository) {
+        this.websiteRepository = websiteRepository;
+        this.userRepository = userRepository;
+        this.pageRepository = pageRepository;
+        this.versionRepository = versionRepository;
+        this.authenticate = authenticate;
+        this.pageOptionRepository = pageOptionRepository;
+    }
 
     @PostMapping("/api/sitemap/getVisualSitemap")
     public List<SiteMapOutputPOJO> getVisualSitemap(@RequestBody RequestCommonPOJO request) throws MalformedURLException {
@@ -125,7 +132,31 @@ public class SitemapController {
                 SiteMapService sms = new SiteMapService(website.getUrl());
                 sms.buildSiteMap();
                 List<Page> pages = sms.getAllPage(website, ver);
+
+                // renew page option
                 pageRepository.saveAll(pages);
+                List<Page> newPages = pageRepository.findAllByVersion(ver);
+                List<PageOption> pageOptionList = pageOptionRepository.findAllByWebsiteAndDelFlagEquals(website, false);
+                for(int i = 0 ; i < pageOptionList.size(); i++)
+                {
+                    PageOption item = pageOptionList.get(i);
+                    List<Page> pagesOfPageOption = item.getPages();
+
+                    //map find new url with new version pages
+                    for(int k = 0 ; k < newPages.size(); k++)
+                    {
+                        for(int h = 0 ; h < pagesOfPageOption.size(); h++)
+                        {
+                            if(newPages.get(k).getUrl().equals(pagesOfPageOption.get(h).getUrl()))
+                            {
+                                pagesOfPageOption.set(h,newPages.get(k));
+                            }
+                        }
+                    }
+                    pageOptionRepository.delete(item);
+                    item.setPages(pagesOfPageOption);
+                    pageOptionRepository.save(item);
+                }
                 res.put("action", Constant.SUCCESS);
                 res.put("version", ver.getVersion());
                 res.put("time", ver.getTime().getDate() + "/" + (ver.getTime().getMonth() + 1) + "/2018");

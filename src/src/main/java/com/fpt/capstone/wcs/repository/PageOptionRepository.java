@@ -15,5 +15,6 @@ public interface PageOptionRepository extends JpaRepository<PageOption,Long> {
     PageOption findFirstByWebsiteAndDelFlagEquals(Website website, boolean delFlag);
     PageOption findByPagesAndDelFlagEquals(List<Page> pages, boolean delFlag);
     List<PageOption> findAllByWebsiteAndCreatedUserAndDelFlagEqualsOrderByTimeDesc(Website website, User user, boolean delFlag);
+    List<PageOption> findAllByWebsiteAndDelFlagEquals(Website website, boolean delFlag);
     PageOption findOneByIdAndWebsiteAndDelFlagEquals(Long id, Website website, boolean delFlag);
 }

@@ -99,11 +99,11 @@ public class ManagerController {
                 website.setUser(managers);
                 websiteRepository.save(website);
                 Website newWebsite = websiteRepository.findOneByUserAndUrlAndDelFlagEquals(manager, request.getWebsite().getUrl(), false);
-                RequestCommonPOJO passAnotherController = new RequestCommonPOJO();
-                passAnotherController.setWebsiteId(newWebsite.getId());
-                passAnotherController.setUserId(request.getManagerId());
-                passAnotherController.setUserToken(request.getManagerToken());
-                res = sitemapController.makeNewVer(passAnotherController);
+                RequestCommonPOJO passAnotherService = new RequestCommonPOJO();
+                passAnotherService.setWebsiteId(newWebsite.getId());
+                passAnotherService.setUserId(request.getManagerId());
+                passAnotherService.setUserToken(request.getManagerToken());
+                res = sitemapController.makeNewVer(passAnotherService);
                 return res;
             } else {
                 res.put("action", Constant.DUPLICATE_ERROR);
