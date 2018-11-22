@@ -46,7 +46,7 @@ export default class managewebsitescreen extends Component {
         }).then(response => response.json()).then((data) => {
             if (data.action === "SUCCESS") {
                 var list = data.website.map((item, index) => {
-                    return (<TableRow key={index} id={item.id} name={item.name} url={item.url} version={item.version}
+                    return (<TableRow key={index} no={index} id={item.id} name={item.name} url={item.url} version={item.version}
                         time={item.time} loadingTable={(isLoading) => this._loadingTable(isLoading)}
                         refreshTable={() => this._refreshTable()}
                         showingModal={(isShow) => this._showingModal(isShow)}
