@@ -31,8 +31,8 @@ export default class managewebsitescreen extends Component {
         this.setState({ isShow: isShow })
     }
 
-    _getSelectedWebName(name){
-        this.setState({currWeb : name})
+    _getSelectedWebName(name) {
+        this.setState({ currWeb: name })
     }
 
     _refreshTable() {
@@ -46,15 +46,11 @@ export default class managewebsitescreen extends Component {
         }).then(response => response.json()).then((data) => {
             if (data.action === "SUCCESS") {
                 var list = data.website.map((item, index) => {
-<<<<<<< HEAD
                     return (<TableRow key={index} id={item.id} name={item.name} url={item.url} version={item.version}
                         time={item.time} loadingTable={(isLoading) => this._loadingTable(isLoading)}
                         refreshTable={() => this._refreshTable()}
-                        showingModal={(isShow) => this._showingModal(isShow)} 
-                        getSelectedWebName= {(name) => this._getSelectedWebName(name)}/>);
-=======
-                    return (<TableRow key={index} no={index} id={item.id} name={item.name} url={item.url} version={item.version} time={item.time} loadingTable={(isLoading) => this._loadingTable(isLoading)} refreshTable={() => this._refreshTable()} />);
->>>>>>> c92b6c40e88e838a623a86760065dac93325f325
+                        showingModal={(isShow) => this._showingModal(isShow)}
+                        getSelectedWebName={(name) => this._getSelectedWebName(name)} />);
                 });
                 this.setState({ listWeb: list, isLoading: false });
 
@@ -116,7 +112,7 @@ export default class managewebsitescreen extends Component {
 
                             <Button style={{ float: 'right' }} onClick={() => this.setState({ addModal: true })}> Add </Button>
 
-                            <Modal open={this.state.addModal} closeOnEscape="true"> 
+                            <Modal open={this.state.addModal} closeOnEscape="true">
                                 <Modal.Header>Add Website</Modal.Header>
                                 <Modal.Content>
                                     <Form>
@@ -141,12 +137,12 @@ export default class managewebsitescreen extends Component {
                     <Segment.Group horizontal style={{ maxHeight: '63vh', overflow: "auto" }}>
                         {/*View Sitemap*/}
                         <Transition duration={600} divided size='huge' verticalAlign='middle' visible={this.state.isShow}>
-                            <Modal open={this.state.isShow} size="fullscreen" style={{left: '100 !important'}}>
+                            <Modal open={this.state.isShow} size="fullscreen" style={{ left: '100 !important' }}>
                                 <Modal.Header>Visual Sitemap of Website: {this.state.currWeb}</Modal.Header>
                                 <Modal.Content scrolling>
-                                    
+
                                     <Segment basic loading={this.state.isLoading}>
-                                        <Canvas/>   
+                                        <Canvas />
                                     </Segment>
                                 </Modal.Content>
                                 <Modal.Actions>

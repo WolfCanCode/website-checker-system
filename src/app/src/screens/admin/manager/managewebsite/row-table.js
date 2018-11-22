@@ -6,13 +6,13 @@ const cookies = new Cookies();
 
 export default class TableRow extends Component {
     state = {
-        open: false, open1: false, oldWebName: this.props.name, webName: this.props.name, 
+        open: false, open1: false, oldWebName: this.props.name, webName: this.props.name,
         isDisable: true, editLoading: false, options: [], userAssign: [], defValue: [], loadingDelete: false,
         urlRoot: "", map: [], typeMap: [], urlMap: []
     }
     constructor(props) {
         super(props);
-        this._makeNewver = this._makeNewver.bind(this);        
+        this._makeNewver = this._makeNewver.bind(this);
     }
     show = size => () => this.setState({ size, open: true })
     close1 = () => this.setState({ open1: false })
@@ -24,7 +24,7 @@ export default class TableRow extends Component {
 
     _makeNewver(id) {
         this.props.loadingTable(true);
-        
+
         var param = { "userId": cookies.get("u_id"), "userToken": cookies.get("u_token"), "websiteId": id };
         fetch("/api/sitemap/makeVer", {
             method: 'POST',
@@ -43,7 +43,7 @@ export default class TableRow extends Component {
         });
     }
 
-    _viewSitemap(id, name){
+    _viewSitemap(id, name) {
         // eslint-disable-next-line
         var result = [];
         this.props.loadingTable(true);
@@ -218,44 +218,44 @@ export default class TableRow extends Component {
             this.props.loadingTable(false);
 
             // add 'click event' to canvas
-        canvas.addEventListener('click', function (event) {
+            canvas.addEventListener('click', function (event) {
 
-            // correct the coordinate
-            var rect = canvas.getBoundingClientRect();
-            let x = event.clientX - rect.left;
-            let y = event.clientY - rect.top;
+                // correct the coordinate
+                var rect = canvas.getBoundingClientRect();
+                let x = event.clientX - rect.left;
+                let y = event.clientY - rect.top;
 
-            //alert(x + ", " + y);
+                //alert(x + ", " + y);
 
-            var isInside = false;
-            var id = -1;
-            // loop in all rectangle
-            for (var i = 0; i < rectCoord.length; i++) {
+                var isInside = false;
+                var id = -1;
+                // loop in all rectangle
+                for (var i = 0; i < rectCoord.length; i++) {
 
-                var minX = rectCoord[i].x;
-                var minY = rectCoord[i].y;
-                var maxX = minX + boxW - 1;
-                var maxY = minY + boxH - 1;
+                    var minX = rectCoord[i].x;
+                    var minY = rectCoord[i].y;
+                    var maxX = minX + boxW - 1;
+                    var maxY = minY + boxH - 1;
 
-                if (minX <= x && x <= maxX && minY <= y && y <= maxY) {
-                    //alert("Inside!");
-                    isInside = true;
-                    id = i;
-                    break;
+                    if (minX <= x && x <= maxX && minY <= y && y <= maxY) {
+                        //alert("Inside!");
+                        isInside = true;
+                        id = i;
+                        break;
+                    }
                 }
-            }
 
-            if (isInside === true) {
-                // pop-up the url
-                 alert("Your URL: " + rectCoord[id].url);
-                // var selectedUrl = rectCoord[id].url;
-                // this._getAllLinksReferencingTo (selectedUrl);
-            }
-        });
+                if (isInside === true) {
+                    // pop-up the url
+                    alert("Your URL: " + rectCoord[id].url);
+                    // var selectedUrl = rectCoord[id].url;
+                    // this._getAllLinksReferencingTo (selectedUrl);
+                }
+            });
         });
     }
-    
-    
+
+
     _editWebsite() {
         this.setState({ editLoading: true, isDisable: false });
         var param = {
@@ -458,12 +458,7 @@ export default class TableRow extends Component {
                 </Modal>
             </Transition>
 
-<<<<<<< HEAD
-            
-            <Table.Cell ><a >{this.props.id}</a></Table.Cell>
-=======
             <Table.Cell ><a >{this.props.no + 1}</a></Table.Cell>
->>>>>>> c92b6c40e88e838a623a86760065dac93325f325
             <Table.Cell ><a >{this.props.name}</a></Table.Cell>
             <Table.Cell ><a >{this.props.url}</a></Table.Cell>
             <Table.Cell ><a >{this.props.version}</a></Table.Cell>
