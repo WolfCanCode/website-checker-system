@@ -51,18 +51,18 @@ public class QualityImpl implements QualityService {
     final
     ProhibitedContentRepository prohibitedContentRepository;
     final
-    WordRepository wordRepository;
+    WarningWordRepository warningWordRepository;
     final
     InrregularVerbRepository inrregularVerbRepository;
 
     @Autowired
-    public QualityImpl(Authenticate authenticate, PageOptionRepository pageOptionRepository, BrokenLinkRepository brokenLinkRepository, BrokenPageRepository brokenPageRepository, MissingFilesPagesRepository missingFilesPagesRepository, WordRepository wordRepository, ProhibitedContentRepository prohibitedContentRepository, InrregularVerbRepository inrregularVerbRepository) {
+    public QualityImpl(Authenticate authenticate, PageOptionRepository pageOptionRepository, BrokenLinkRepository brokenLinkRepository, BrokenPageRepository brokenPageRepository, MissingFilesPagesRepository missingFilesPagesRepository, WarningWordRepository warningWordRepository, ProhibitedContentRepository prohibitedContentRepository, InrregularVerbRepository inrregularVerbRepository) {
         this.authenticate = authenticate;
         this.pageOptionRepository = pageOptionRepository;
         this.brokenLinkRepository = brokenLinkRepository;
         this.brokenPageRepository = brokenPageRepository;
         this.missingFilesPagesRepository = missingFilesPagesRepository;
-        this.wordRepository = wordRepository;
+        this.warningWordRepository = warningWordRepository;
         this.prohibitedContentRepository = prohibitedContentRepository;
         this.inrregularVerbRepository = inrregularVerbRepository;
 
@@ -1462,9 +1462,9 @@ public class QualityImpl implements QualityService {
     public List<ProhibitedContentReport> prohibitedContentService(List<Page> list, PageOption option) throws InterruptedException {
         System.setProperty("webdriver.chrome.driver", Constant.CHROME_DRIVER);
 
-        List<Word> wordList = new ArrayList<>();
+        List<WarningWord> wordList = new ArrayList<>();
 
-        wordList = wordRepository.findAllByDelFlagEquals(false);
+        wordList = warningWordRepository.findAllByDelFlagEquals(false);
         System.out.println("wordlist " + wordList.size());
 
         List<InrregularVerb> inrregularVerbList = new ArrayList<>();
@@ -1480,7 +1480,7 @@ public class QualityImpl implements QualityService {
 
 
         for (Page p : list) {
-            List<Word> finalWordList = wordList;
+            List<WarningWord> finalWordList = wordList;
             List<InrregularVerb> finalInrregularVerbList = inrregularVerbList;
             listThread.add(new Thread() {
                 public void run() {
@@ -1550,7 +1550,7 @@ public class QualityImpl implements QualityService {
                             for(int j = 0; j < list1.length;j++){
                                 if(bodyText.contains(list1[j].toLowerCase())){
 
-                                    ProhibitedContentReport prohibitedContentReport = new ProhibitedContentReport(p.getUrl(),list1[j],finalWordList.get(i).getType());
+                                    ProhibitedContentReport prohibitedContentReport = new ProhibitedContentReport(p.getUrl(),list1[j],finalWordList.get(i).getTopic().getTypeName());
                                     prohibitedContentReport.setPageOption(option);
                                     resultList.add(prohibitedContentReport);
                                 }
