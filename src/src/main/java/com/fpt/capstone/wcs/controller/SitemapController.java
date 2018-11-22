@@ -33,25 +33,9 @@ public class SitemapController {
     VersionRepository versionRepository;
     @Autowired
     Authenticate authenticate;
-//
-//    @PostMapping("/api/sitemap")
-//    public List<SiteMapOutputPOJO> getSiteMap(@RequestBody UrlPOJO url) throws MalformedURLException {
-//        String urlRoot = url.getUrl();
-//        System.out.println("ROOT: " + urlRoot);
-//        SiteMapService sitemap = new SiteMapService(urlRoot);
-//        sitemap.buildSiteMap();
-//        List<String> rs = sitemap.getDecodeGraph();
-//        SiteMapOutputPOJO sm = new SiteMapOutputPOJO();
-//        sm.setMap(rs.get(0));
-//        sm.setTypeMap(rs.get(1));
-//        sm.setUrlMap(rs.get(2));
-//        List<SiteMapOutputPOJO> res = new ArrayList<>();
-//        res.add(sm);
-//        return res;
-//    }
 
     @PostMapping("/api/sitemap/getVisualSitemap")
-    public List<SiteMapOutputPOJO> getSiteTree(@RequestBody RequestCommonPOJO request) throws MalformedURLException {
+    public List<SiteMapOutputPOJO> getVisualSitemap(@RequestBody RequestCommonPOJO request) throws MalformedURLException {
         List<SiteMapOutputPOJO> sm = null;
         Website website = authenticate.isAuthGetSingleSite(request);
         if (website != null) {
@@ -65,20 +49,22 @@ public class SitemapController {
         return sm;
     }
 
-//    @PostMapping("/api/sitemap/getReferecingUrl")
-//    public List<SiteMapOutputPOJO> getSiteTree(@RequestBody RequestCommonPOJO request) throws MalformedURLException {
-//        List<SiteMapOutputPOJO> sm = null;
-//        Website website = authenticate.isAuthGetSingleSite(request);
-//        if (website != null) {
-//            String url = website.getUrl();
-//            SiteMapService sms = new SiteMapService(url);
-//            sms.buildSiteMap();
-//            List<String> rs = sms.getDecodeGraph();
-//            sm = new ArrayList<>() ;
-//            sm.add(new SiteMapOutputPOJO(rs.get(0), rs.get(1), rs.get(2)));
-//        }
-//        return sm;
-//    }
+    @PostMapping("/api/sitemap/getAllLinksReferencingOnSelectetUrl")
+    public List<SiteMapOutputPOJO> getAllLinksReferencingOnSelectetUrl(@RequestBody RequestCommonPOJO request) throws MalformedURLException {
+        List<SiteMapOutputPOJO> sm = null;
+        Website website = authenticate.isAuthGetSingleSite(request);
+        if (website != null) {
+            String url = website.getUrl();
+            SiteMapService sms = new SiteMapService(url);
+            sms.buildSiteMap();
+            List<String> rs = sms.getDecodeGraph();
+            sm = new ArrayList<>() ;
+            sm.add(new SiteMapOutputPOJO(rs.get(0), rs.get(1), rs.get(2)));
+        }
+        return sm;
+    }
+
+
 
     @CrossOrigin
     @PostMapping("/api/sitemap/getVer")
