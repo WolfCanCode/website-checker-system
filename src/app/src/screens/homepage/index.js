@@ -18,6 +18,7 @@ import {
 import 'semantic-ui-css/semantic.min.css';
 import logo from '../../assets/icon-wsc.png';
 import wallpaper from '../../assets/wallpaper.jpg';
+import laptop from '../../assets/laptop.png';
 import {
   Link
 } from "react-router-dom";
@@ -74,7 +75,7 @@ class DesktopContainer extends Component {
         >
           <Segment
             textAlign='center'
-            style={{ minHeight: '100vh', padding: '1em 0em', background: `url(${wallpaper})`, backgroundSize: 'cover' }}
+            style={{ height: '100%', minHeight: '100vh', padding: '1em 0em', background: `url(${wallpaper})`, backgroundSize: 'cover' }}
             vertical
           >
             <Menu
@@ -109,7 +110,11 @@ class DesktopContainer extends Component {
               </Container>
             </Menu>
             <HomepageHeading />
-            <Input size='big' loading={this.state.searchLoading} label='http://' icon={<Icon name='search' inverted circular link onClick={() => this.onClickSearch()} />} placeholder='mysite.com' style={{ marginTop: '30px' }} value={this.state.txtSearch} onChange={event => this.onChangeText(event)} />          </Segment>
+            <Input size='big' loading={this.state.searchLoading} label='http://' icon={<Icon name='search' inverted circular link onClick={() => this.onClickSearch()} />} placeholder='mysite.com' style={{ marginTop: '30px' }} value={this.state.txtSearch} onChange={event => this.onChangeText(event)} />
+            <Image style={{ position: 'relative', width: '80vh', margin: 'auto', top: '5vh', }} src={laptop} />
+
+          </Segment>
+
         </Visibility>
 
         {children}
@@ -179,7 +184,7 @@ class MobileContainer extends Component {
             <Segment
               inverted
               textAlign='center'
-              style={{ minHeight: 750, padding: '1em 0em', background: `url(${wallpaper})`, backgroundSize: 'cover' }}
+              style={{ height: 'auto', minHeight: '100vh', padding: '1em 0em', background: `url(${wallpaper})`, backgroundSize: 'cover' }}
               vertical
             >
               <Container>
@@ -198,7 +203,10 @@ class MobileContainer extends Component {
                 </Menu>
               </Container>
               <HomepageHeading mobile />
-              <Input size='big' label='http://' icon={<Icon name='search' inverted circular link />} placeholder='mysite.com' style={{ marginTop: '30px' }} />
+
+              <Input size='big' label='https://' icon={<Icon name='search' inverted circular link />} placeholder='mysite.com' style={{ marginTop: '30px' }} />
+              <Image style={{ position: 'relative', width: '80vh', margin: 'auto', top: '5vh', }} src={laptop} />
+
             </Segment>
 
             {children}

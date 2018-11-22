@@ -464,11 +464,11 @@ export default class TableRow extends Component {
             <Table.Cell ><a >{this.props.version}</a></Table.Cell>
             <Table.Cell ><a >{this.props.time}</a></Table.Cell>
             <Table.Cell ><Button onClick={() => this._makeNewver(this.props.id)} color="green">Make</Button></Table.Cell>
-            <Table.Cell ><Button onClick={() => this._viewSitemap(this.props.id, this.props.name)} color="blue">View Sitemap</Button></Table.Cell>
             <Table.Cell >
-                <Button primary onClick={() => this._assignModal()} > Assign </Button>
-                <Button color="orange" onClick={this.show('mini')} > Edit </Button>
-                <Button negative onClick={this.closeConfigShow(false, true)}> Delete</Button></Table.Cell>
+                <Table.Cell ><Button onClick={() => this._viewSitemap(this.props.id, this.props.name)} color="blue">View Sitemap</Button></Table.Cell>
+                <Table.Cell ><Button primary onClick={() => this._assignModal()} > Assign </Button>
+                    <Button color="orange" onClick={this.show('mini')} > Edit </Button>
+                    <Button negative onClick={this.closeConfigShow(false, true)}> Delete</Button></Table.Cell></Table.Cell>
         </Table.Row >
         );
     }

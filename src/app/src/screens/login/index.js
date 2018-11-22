@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
-import { Button, Form, Grid, Header, Image, Segment, Message } from 'semantic-ui-react';
+import { Button, Form, Grid, Header, Segment, Message } from 'semantic-ui-react';
 import 'semantic-ui-css/semantic.min.css';
 import bg1 from '../../assets/bg-login-layout1.jpg';
 import bg2 from '../../assets/bg-login-layout2.jpg';
-import divLogin from '../../assets/divider-login.png';
 import { Cookies } from "react-cookie";
 const cookies = new Cookies();
 
@@ -24,15 +23,14 @@ class LoginScreen extends Component {
                     } 
                 `}
                 </style>
-                <Segment.Group horizontal style={{ height: '100%', margin: 0 }}>
-                    <Segment basic style={{ flex: 1, background: `url(${bg1})`, backgroundSize: 'cover', minWidth: 390, overflow: 'hidden' }} loading={this.state.isLogin}>
+                <Segment.Group horizontal style={{ height: '100%', margin: 0, maxWidth: '100vw' }}>
+                    <Segment basic style={{ flex: 1, background: `url(${bg1})`, backgroundSize: 'cover', minWidth: 390, maxWidth: '100vh', overflow: 'hidden' }} loading={this.state.isLogin}>
                         <Grid style={{ height: 150 }}></Grid>
                         <Grid style={{ height: 'auto' }} >
                             <Grid.Column style={{ width: '100%', height: 'auto' }}>
                                 <Header as='h2' color='blue' textAlign='center' >
                                     <Segment padded basic style={{ width: '100%', height: 'auto' }}>
                                         <p style={{ fontSize: 60 }}>Login</p>
-                                        <Image src={divLogin} style={{ margin: 'auto' }} />
                                     </Segment>
                                 </Header>
                                 <Form size='large'>
@@ -73,7 +71,7 @@ class LoginScreen extends Component {
                             </Grid.Column>
                         </Grid>
                     </Segment>
-                    <Segment basic style={{ flex: 2.5, background: `url(${bg2})`, backgroundSize: 'cover' }}></Segment>
+                    <Segment basic style={{ flex: 2.5, background: `url(${bg2})`, backgroundSize: 'cover', minWidth: 0 }}></Segment>
                 </Segment.Group>
             </div>
         );

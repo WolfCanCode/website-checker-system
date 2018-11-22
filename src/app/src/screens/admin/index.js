@@ -97,7 +97,7 @@ export default class AdminScreen extends Component {
         if (this.state.sideShow === true) {
             this.setState({ sideShow: false, marginBody: 10 })
         } else {
-            this.setState({ sideShow: true, marginBody: 160 })
+            this.setState({ sideShow: true, marginBody: 190 })
         }
     }
 

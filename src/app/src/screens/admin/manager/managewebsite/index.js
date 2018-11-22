@@ -111,41 +111,43 @@ export default class managewebsitescreen extends Component {
                         <div style={{ marginBottom: '30px' }}>
 
                             <Button style={{ float: 'right' }} onClick={() => this.setState({ addModal: true })}> Add </Button>
-
-                            <Modal open={this.state.addModal} closeOnEscape="true">
-                                <Modal.Header>Add Website</Modal.Header>
-                                <Modal.Content>
-                                    <Form>
-                                        <Form.Field>
-                                            <label>Website name</label>
-                                            <Input type="text" placeholder="Website Name" onChange={(event) => this._onchangeName(event)} value={this.state.webName}></Input>
-                                        </Form.Field>
-                                        <Form.Field>
-                                            <label>Website URL</label>
-                                            <Input type="text" placeholder="Website URL" onChange={(event) => this._onchangeUrl(event)} value={this.state.webUrl}></Input>
-                                        </Form.Field>
-                                    </Form>
-                                </Modal.Content>
-                                <Modal.Actions>
-                                    <Button onClick={() => this.setState({ addModal: false })}>Cancel</Button>
-                                    <Button content='Done' color='blue' loading={this.state.addLoading} disabled={this.state.isDisable} onClick={() => this._addWebsite()} />
-                                </Modal.Actions>
-                            </Modal>
-
+                            <Transition duration={600} divided size='huge' verticalAlign='middle' visible={this.state.addModal}>
+                                <Modal open={this.state.addModal} closeOnEscape="true">
+                                    <Modal.Header>Add Website</Modal.Header>
+                                    <Modal.Content>
+                                        <Form>
+                                            <Form.Field>
+                                                <label>Website name</label>
+                                                <Input type="text" placeholder="Website Name" onChange={(event) => this._onchangeName(event)} value={this.state.webName}></Input>
+                                            </Form.Field>
+                                            <Form.Field>
+                                                <label>Website URL</label>
+                                                <Input type="text" placeholder="Website URL" onChange={(event) => this._onchangeUrl(event)} value={this.state.webUrl}></Input>
+                                            </Form.Field>
+                                        </Form>
+                                    </Modal.Content>
+                                    <Modal.Actions>
+                                        <Button onClick={() => this.setState({ addModal: false })}>Cancel</Button>
+                                        <Button content='Done' color='blue' loading={this.state.addLoading} disabled={this.state.isDisable} onClick={() => this._addWebsite()} />
+                                    </Modal.Actions>
+                                </Modal>
+                            </Transition>
                         </div>
                     </Segment>
                     <Segment.Group horizontal style={{ maxHeight: '63vh', overflow: "auto" }}>
                         {/*View Sitemap*/}
                         <Transition duration={600} divided size='huge' verticalAlign='middle' visible={this.state.isShow}>
-                            <Modal open={this.state.isShow} size="fullscreen" style={{ left: '100 !important' }}>
-                                <Modal.Header>Visual Sitemap of Website: {this.state.currWeb}</Modal.Header>
-                                <Modal.Content scrolling>
+                            <Modal open={this.state.isShow} style={{ width: '100%', height: '100%', background: 'white' }}>
+                                <Modal.Header style={{ textAlign: 'center', fontSize: 25, fontWeight: 'bold', color: 'black' }}>Visual Sitemap of Website: {this.state.currWeb}</Modal.Header>
+                                <Modal.Content style={{ maxHeight: 'calc(85vh)', overflow: 'auto' }}>
 
-                                    <Segment basic loading={this.state.isLoading}>
+                                    <Segment basic style={{
+                                        height: 'calc(80vh)'
+                                    }} loading={this.state.isLoading}>
                                         <Canvas />
                                     </Segment>
                                 </Modal.Content>
-                                <Modal.Actions>
+                                <Modal.Actions >
                                     <Button onClick={() => this.setState({ isShow: false })}> Cancel</Button>
                                 </Modal.Actions>
                             </Modal>

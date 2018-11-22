@@ -217,7 +217,7 @@ class speedTestScreen extends Component {
                                 <Input icon='search' placeholder='Search...' style={{ float: 'right', marginRight: 5 }} />
                             </Segment>
                         </Segment.Group>
-                        <Segment basic style={{ maxHeight: '98%', overflow: "auto" }}>
+                        <Segment basic style={{ maxHeight: '61vh', overflow: "auto" }}>
 
                             <Table unstackable >
                                 <Table.Header >
