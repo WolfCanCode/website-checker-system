@@ -4,7 +4,6 @@ import { Segment, Button, Table, Icon, Input } from 'semantic-ui-react'
 import TableRow from './row-table';
 import { Cookies } from "react-cookie";
 import ReactToExcel from "react-html-table-to-excel";
-import './style.css';
 
 const cookies = new Cookies();
 

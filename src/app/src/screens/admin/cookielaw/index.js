@@ -3,7 +3,7 @@ import { Segment, Button, Icon, Table, Input } from 'semantic-ui-react'
 import TableRow from './row-table';
 import { Cookies } from "react-cookie";
 import ReactToExcel from "react-html-table-to-excel";
-import './style.css';
+
 
 
 const cookies = new Cookies();

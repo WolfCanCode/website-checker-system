@@ -5,7 +5,7 @@ import Grammar from '../assets/grammar.png';
 import SpeedTest from '../assets/desktopSpeed.png';
 import MissingFile from '../assets/missingFile.png';
 import Favicons from '../assets/favicon.png';
-import Prohibited from '../assets/prohibited.PNG';
+import Prohibited from '../assets/prohibited.png';
 
 export const menu = [
     {

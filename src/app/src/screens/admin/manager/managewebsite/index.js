@@ -36,7 +36,7 @@ export default class managewebsitescreen extends Component {
         }).then(response => response.json()).then((data) => {
             if (data.action === "SUCCESS") {
                 var list = data.website.map((item, index) => {
-                    return (<TableRow key={index} id={item.id} name={item.name} url={item.url} version={item.version} time={item.time} loadingTable={(isLoading) => this._loadingTable(isLoading)} refreshTable={() => this._refreshTable()} />);
+                    return (<TableRow key={index} no={index} id={item.id} name={item.name} url={item.url} version={item.version} time={item.time} loadingTable={(isLoading) => this._loadingTable(isLoading)} refreshTable={() => this._refreshTable()} />);
                 });
                 this.setState({ listWeb: list, isLoading: false });
 
@@ -123,7 +123,7 @@ export default class managewebsitescreen extends Component {
                             <Table singleLine unstackable>
                                 <Table.Header>
                                     <Table.Row>
-                                        <Table.HeaderCell>ID</Table.HeaderCell>
+                                        <Table.HeaderCell>No</Table.HeaderCell>
                                         <Table.HeaderCell>Name</Table.HeaderCell>
                                         <Table.HeaderCell>URL</Table.HeaderCell>
                                         <Table.HeaderCell>Version</Table.HeaderCell>
