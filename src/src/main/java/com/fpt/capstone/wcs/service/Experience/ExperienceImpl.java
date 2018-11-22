@@ -79,7 +79,16 @@ public class ExperienceImpl implements ExperienceService {
                 request.setPageOptionId((long) -1);
             }
             if (request.getPageOptionId() != -1) { //page option list is null
+
+
                 List<Page> pages = pageOption.getPages();
+                if(pages.size()==0)
+                {
+                    Page page = new Page();
+                    page.setUrl(userWebsite.getWebsite().getUrl());
+                    page.setType(1);
+                    pages.add(page);
+                }
                 List<SpeedTestReport> resultList = speedTestService(pages, pageOption, userWebsite.getUser());
                 speedtestRepository.saveAll(resultList);
                 res.put("action", Constant.SUCCESS);
