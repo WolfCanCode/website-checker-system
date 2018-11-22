@@ -241,7 +241,7 @@ export default class TableRow extends Component {
                 </Modal>
             </Transition>
 
-            <Table.Cell ><a >{this.props.id}</a></Table.Cell>
+            <Table.Cell ><a >{this.props.no + 1}</a></Table.Cell>
             <Table.Cell ><a >{this.props.name}</a></Table.Cell>
             <Table.Cell ><a >{this.props.url}</a></Table.Cell>
             <Table.Cell ><a >{this.props.version}</a></Table.Cell>

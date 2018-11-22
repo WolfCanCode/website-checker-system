@@ -15,7 +15,8 @@ import java.util.List;
 @JsonIgnoreProperties( value = {"password","token"}, allowSetters= true)
 public class User {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id", updatable = false, nullable = false)
     private Long id;
     private String name;
     @JsonProperty("password")

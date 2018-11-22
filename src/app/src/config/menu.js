@@ -1,11 +1,11 @@
 import BrokenLinks from '../assets/BrokenLinks.png';
 import BrokenPage from '../assets/brokenPage.png';
 import Spelling from '../assets/spelling.png';
-import Grammar from '../assets/grammar.PNG';
+import Grammar from '../assets/grammar.png';
 import SpeedTest from '../assets/desktopSpeed.png';
 import MissingFile from '../assets/missingFile.png';
 import Favicons from '../assets/favicon.png';
-import Prohibited from '../assets/prohibited.PNG';
+import Prohibited from '../assets/prohibited.png';
 
 export const menu = [
     {
