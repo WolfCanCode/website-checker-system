@@ -35,9 +35,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.*;
-import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.CyclicBarrier;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -82,14 +80,13 @@ public class ExperienceImpl implements ExperienceService {
 
 
                 List<Page> pages = pageOption.getPages();
-                if(pages.size()==0)
-                {
+                if (pages.size() == 0) {
                     Page page = new Page();
                     page.setUrl(userWebsite.getWebsite().getUrl());
                     page.setType(1);
                     pages.add(page);
                 }
-                List<SpeedTestReport> resultList = speedTestService(pages, pageOption, userWebsite.getUser());
+                List<SpeedTestReport> resultList = speedTestService(pages, pageOption);
                 speedtestRepository.saveAll(resultList);
                 res.put("action", Constant.SUCCESS);
                 res.put("speedtestReport", resultList);
@@ -100,8 +97,8 @@ public class ExperienceImpl implements ExperienceService {
                 page.setUrl(userWebsite.getWebsite().getUrl());
                 page.setType(1);
                 pages.add(page);
-                List<SpeedTestReport> resultList = speedTestService(pages, null, userWebsite.getUser());
-                resultList= speedtestRepository.saveAll(resultList);
+                List<SpeedTestReport> resultList = speedTestService(pages, null);
+                resultList = speedtestRepository.saveAll(resultList);
                 res.put("action", Constant.SUCCESS);
                 res.put("speedtestReport", resultList);
                 return res;
@@ -182,81 +179,81 @@ public class ExperienceImpl implements ExperienceService {
     }
 
 
-    public List<SpeedTestReport> speedTestService(List<Page> list, PageOption option, User createdUser) throws InterruptedException {
+    public List<SpeedTestReport> speedTestService(List<Page> list, PageOption option) throws InterruptedException {
         Date createdTime = new Date();
         System.setProperty("webdriver.chrome.driver", Constant.CHROME_DRIVER);
         //Asign list speed info
         List<SpeedTestReport> resultList = new ArrayList<>();
-        final CyclicBarrier gate = new CyclicBarrier(list.size());
-        List<Thread> listThread = new ArrayList<>();
+        ExecutorService executor = Executors.newFixedThreadPool(5);
         for (Page p : list) {
-            if (p.getType() == 1) {
-                listThread.add(new Thread() {
-                    public void run() {
-                        try {
-                            gate.await();
-                            System.out.println("start testing url= " + p.getUrl());
-                            //DesiredCapabilities
-                            DesiredCapabilities capabilities = DesiredCapabilities.chrome();
-                            LoggingPreferences logPrefs = new LoggingPreferences();
-                            logPrefs.enable(LogType.PERFORMANCE, Level.INFO);
-                            ChromeOptions chromeOptions = new ChromeOptions();
-                            chromeOptions.addArguments("--headless");
-                            chromeOptions.setCapability(CapabilityType.LOGGING_PREFS, logPrefs);
-                            WebDriver driver = new ChromeDriver(chromeOptions);//chay an
+            executor.submit(new Runnable() {
+                @Override
+                public void run()
+                {
 
-                            driver.get(p.getUrl());
+                    System.out.println("start testing url= " + p.getUrl());
+                    //DesiredCapabilities
+                    DesiredCapabilities capabilities = DesiredCapabilities.chrome();
+                    LoggingPreferences logPrefs = new LoggingPreferences();
+                    logPrefs.enable(LogType.PERFORMANCE, Level.INFO);
+                    ChromeOptions chromeOptions = new ChromeOptions();
+                    chromeOptions.addArguments("--headless");
+                    chromeOptions.setCapability(CapabilityType.LOGGING_PREFS, logPrefs);
+                    WebDriver driver = new ChromeDriver(chromeOptions);//chay an
 
-                            List<LogEntry> entries = driver.manage().logs().get(LogType.PERFORMANCE).getAll();
-                            List<Double> entrySize = new ArrayList<>();
-                            for (LogEntry entry : entries) {
-                                Matcher dataLengthMatcher = Pattern.compile("encodedDataLength\":(.*?),").matcher(entry.getMessage());
-                                if (dataLengthMatcher.find()) {
-                                    entrySize.add(Double.parseDouble(dataLengthMatcher.group().split(":")[1].split(",")[0]));
-                                }
-                            }
+                    driver.get(p.getUrl());
 
-                            double totalByte = new MathUtil().calculateSumDoubleList(entrySize);
-                            //page load page interact
-                            WebDriverWait myWait = new WebDriverWait(driver, 60);
-                            ExpectedCondition<Boolean> conditionCheck = new ExpectedCondition<Boolean>() {
-                                public Boolean apply(WebDriver input) {
-                                    return ((((JavascriptExecutor) input).executeScript("return document.readyState").equals("complete")));
-                                }
-                            };
-                            myWait.until(conditionCheck);
-
-                            Long loadPage = (Long) ((JavascriptExecutor) driver).executeScript(
-                                    "return performance.timing.loadEventEnd  - performance.timing.navigationStart;");
-                            double loadTime = loadPage;
-                            double loadTime1 = Math.floor(loadTime / 1000 * 10) / 10;
-                            Long interact = (Long) ((JavascriptExecutor) driver).executeScript(
-                                    "return performance.timing.domContentLoadedEventEnd  - performance.timing.navigationStart;");
-                            double interactTime = interact;
-                            double interactTime1 = Math.floor(interactTime / 1000 * 10) / 10;
-                            double sizeTransferred1 = Math.floor(totalByte / 1000000 * 10) / 10;
-                            SpeedTestReport speedTestReport = new SpeedTestReport(p.getUrl(), interactTime1 + "", loadTime1 + "", sizeTransferred1 + "");
-                            speedTestReport.setPageOption(option);
-                            speedTestReport.setCreatedTime(createdTime);
-                            speedTestReport.setCreatedUser(createdUser);
-                            resultList.add(speedTestReport);
-                            driver.quit();
-                        } catch (InterruptedException | BrokenBarrierException e) {
-                            Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
+                    List<LogEntry> entries = driver.manage().logs().get(LogType.PERFORMANCE).getAll();
+                    List<Double> entrySize = new ArrayList<>();
+                    for (LogEntry entry : entries) {
+                        Matcher dataLengthMatcher = Pattern.compile("encodedDataLength\":(.*?),").matcher(entry.getMessage());
+                        if (dataLengthMatcher.find()) {
+                            entrySize.add(Double.parseDouble(dataLengthMatcher.group().split(":")[1].split(",")[0]));
                         }
                     }
-                });
-            }
-        }
-        for (Thread t : listThread) {
-            System.out.println("Threed start");
-            t.start();
-        }
 
-        for (Thread t : listThread) {
-            System.out.println("Threed join");
-            t.join();
+                    double totalByte = new MathUtil().calculateSumDoubleList(entrySize);
+                    //page load page interact
+                    WebDriverWait myWait = new WebDriverWait(driver, 60);
+                    ExpectedCondition<Boolean> conditionCheck = new ExpectedCondition<Boolean>() {
+                        public Boolean apply(WebDriver input) {
+                            return ((((JavascriptExecutor) input).executeScript("return document.readyState").equals("complete")));
+                        }
+                    };
+                    myWait.until(conditionCheck);
+
+                    Long loadPage = (Long) ((JavascriptExecutor) driver).executeScript(
+                            "return performance.timing.loadEventEnd  - performance.timing.navigationStart;");
+                    double loadTime = loadPage;
+                    double loadTime1 = Math.floor(loadTime / 1000 * 10) / 10;
+                    Long interact = (Long) ((JavascriptExecutor) driver).executeScript(
+                            "return performance.timing.domContentLoadedEventEnd  - performance.timing.navigationStart;");
+                    double interactTime = interact;
+                    double interactTime1 = Math.floor(interactTime / 1000 * 10) / 10;
+                    double sizeTransferred1 = Math.floor(totalByte / 1000000 * 10) / 10;
+                    SpeedTestReport speedTestReport = new SpeedTestReport(p.getUrl(), interactTime1 + "", loadTime1 + "", sizeTransferred1 + "");
+                    speedTestReport.setPageOption(option);
+                    speedTestReport.setCreatedTime(createdTime);
+                    resultList.add(speedTestReport);
+                    driver.quit();
+
+                }
+            });
         }
+//        final CyclicBarrier gate = new CyclicBarrier(list.size());
+//        List<Thread> listThread = new ArrayList<>();
+//        for (Page p : list) {
+//            if (p.getType() == 1) {
+//                listThread.add(new Thread() {
+//                    public void run() {
+//
+//                    }
+//                });
+//            }
+//        }
+
+        executor.shutdown();
+        executor.awaitTermination(Long.MAX_VALUE,TimeUnit.MILLISECONDS);
 
         return resultList;
     }

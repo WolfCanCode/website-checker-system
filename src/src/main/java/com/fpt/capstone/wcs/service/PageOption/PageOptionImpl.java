@@ -181,7 +181,13 @@ public class PageOptionImpl implements PageOptionService {
         req.setUserId(request.getUserId());
         Website website = authenticate.isAuthGetSingleSite(req);
         if (website != null) {
-            pageOptionRepository.deleteById(request.getPageOptionId());
+            Optional<PageOption> p = pageOptionRepository.findById(request.getPageOptionId());
+            if(p.isPresent())
+            {
+                PageOption delPageOption = p.get();
+                delPageOption.setDelFlag(true);
+                pageOptionRepository.save(delPageOption);
+            }
             res.put("action", Constant.SUCCESS);
             return res;
         } else {

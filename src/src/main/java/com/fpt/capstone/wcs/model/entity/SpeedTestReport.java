@@ -21,10 +21,6 @@ public class SpeedTestReport {
     private String size;
     private Date createdTime;
 
-    @ManyToOne()
-    @JoinColumn(name="createdUser")
-    private User createdUser;
-
     private boolean delFlag = true;
 
 

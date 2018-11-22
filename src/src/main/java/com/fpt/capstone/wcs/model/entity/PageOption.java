@@ -40,8 +40,8 @@ public class PageOption {
                     CascadeType.MERGE
             })
     @JoinTable(name = "page_option_page",
-            joinColumns = { @JoinColumn(name = "page_id") },
-            inverseJoinColumns = { @JoinColumn(name = "page_option_id") })
+            joinColumns = { @JoinColumn(name = "page_option_id") },
+            inverseJoinColumns = { @JoinColumn(name = "page_id") })
     @JsonIgnore
     private List<Page> pages = new ArrayList<>();
 
