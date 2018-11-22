@@ -1,14 +1,15 @@
 import React, { Component } from 'react';
-import { Table, Button, Input, Modal, Transition } from 'semantic-ui-react'
+import { Table, Button, Input, Modal, Transition, Dropdown } from 'semantic-ui-react'
 import { Cookies } from "react-cookie";
 
 const cookies = new Cookies();
 
 export default class TableRow extends Component {
     state = {
-        open: false, open1: false, oldWord: this.props.word, word: this.props.word,type: this.props.type, isDisable: true, editLoading: false, loadingDelete: false
+        open: false, open1: false, word: this.props.word,type: this.props.type, isDisable: true, editLoading: false, loadingDelete: false, topicList:[], topicSelected:[]
     }
 
+    
     show = size => () => this.setState({ size, open: true })
     close1 = () => this.setState({ open1: false })
 
@@ -19,14 +20,14 @@ export default class TableRow extends Component {
 
 
 
-    _editWord() {
+    _editWarningWord() {
         this.setState({ editLoading: true, isDisable: false });
         var param = {
-            "managerId": cookies.get("u_id"), "managerToken": cookies.get("u_token"), word: {
-                "id": this.props.id, "word": this.state.word, "type": this.state.type
+            "managerId": cookies.get("u_id"), "managerToken": cookies.get("u_token"), warningWord: {
+                "id": this.props.id, "word": this.state.word, "topic": this.state.type
             }
         };
-        fetch("/api/word/editWord", {
+        fetch("/api/word/editWarningWord", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -37,21 +38,71 @@ export default class TableRow extends Component {
             if (data.action === "SUCCESS") {
                 this.setState({ editLoading: false });
                 this.setState({ open: false });
+                this.setState({isDisable : false})
                 this.props.refreshTable();
             } if (data.action === "DUPLICATE ERROR") {
                 alert("This word is existed");
             }
         });
     }
+    
+    _onchangeType(event, data) {
+        console.log(data);
+      var typeSelected=  this.state.topicList.find(item=>{          
+            return item.value === data.value
+        });
+        console.log(typeSelected);
+        
+        this.setState({
+            type: {
+                id:typeSelected.value,
+                typeName: typeSelected.text
+            }
+        },() => this._checkEditBtn());
+        
+    }
+    
+    componentDidMount() {
+        
+        this._getTopicList();
+        console.log("dsd" + this.props.type);
+        
+    }
 
-    _deleteWord() {
+    _getTopicList(){
+        fetch("/api/word/getTopicList", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ "managerId": cookies.get("u_id"), "managerToken": cookies.get("u_token") })
+           
+        }).then(response => response.json()).then((data) => {
+            if (data.action === "SUCCESS") {
+                
+                
+                var list = data.topicList.map((item, index) => {
+                    return { key:item.id, text:item.typeName, value:item.id};
+                });
+                console.log(list);
+                
+                this.setState({ topicList: list, isLoading: false});
+
+            }
+        });
+
+
+    }
+
+    _deleteWarmingWord() {
         this.setState({ loadingDelete: true });
         var param = {
-            "managerId": cookies.get("u_id"), "managerToken": cookies.get("u_token"), word: {
+            "managerId": cookies.get("u_id"), "managerToken": cookies.get("u_token"), warningWord: {
                 "id": this.props.id
             }
         };
-        fetch("/api/word/deleteWord", {
+        fetch("/api/word/deleteWarningWord", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -60,7 +111,7 @@ export default class TableRow extends Component {
             body: JSON.stringify(param)
         }).then(response => response.json()).then((data) => {
             if (data.action === "SUCCESS") {
-                this.setState({ open1: false, close1: true, loadingDelete: true });
+                this.setState({ open1: false, close1: true, loadingDelete: false });
                 this.props.refreshTable();
             }
         });
@@ -72,13 +123,14 @@ export default class TableRow extends Component {
     _onchangeWord(event) {
         this.setState({ word: event.target.value }, () => this._checkEditBtn());
     }
-    _onchangeType(event) {
-        this.setState({ type: event.target.value }, () => this._checkEditBtn());
-    }
+   
 
     _checkEditBtn() {
         var result = false;
-        if (this.state.word === "" || this.state.type === "" || this.state.word === this.state.oldWord ) {
+        console.log(this.state.word);
+        console.log(this.state.oldWord);
+        
+        if (this.state.word === ""  ) {
             result = true;
         }
         this.setState({ isDisable: result });
@@ -102,7 +154,7 @@ export default class TableRow extends Component {
                     </Modal.Content>
                     <Modal.Actions>
                         <Button onClick={this.close1}>No</Button>
-                        <Button color="blue" content='Yes' onClick={() => this._deleteWord()} loading={this.state.loadingDelete}
+                        <Button color="blue" content='Yes' onClick={() => this._deleteWarmingWord()} loading={this.state.loadingDelete}
                         />
                     </Modal.Actions>
                 </Modal>
@@ -118,11 +170,12 @@ export default class TableRow extends Component {
                     <Modal.Content >
                         <p >Type</p>
                     </Modal.Content>
-                    <Input type="text" style={{ marginLeft: '20px', width: '90%', marginBottom: '20px' }} onChange={(event) => this._onchangeType(event)} value={this.state.type}></Input>
+                    {/* <Input type="text" style={{ marginLeft: '20px', width: '90%', marginBottom: '20px' }} onChange={(event) => this._onchangeType(event)} value={this.state.type}></Input> */}
+                    <Dropdown style={{ marginLeft: '20px', width: '90%', marginBottom: '20px' }} placeholder='' fluid  selection value={this.state.type.id} options={this.state.topicList}  onChange={(event, data) => this._onchangeType(event, data)}/>
 
                     <Modal.Actions>
                         <Button onClick={this.close}>Cancel</Button>
-                        <Button content='Done' color='blue' disabled={this.state.isDisable} onClick={() => this._editWord()} />
+                        <Button content='Done' color='blue' disabled={this.state.isDisable} onClick={() => this._editWarningWord()} />
                     </Modal.Actions>
                 </Modal>
             </Transition>
@@ -130,10 +183,10 @@ export default class TableRow extends Component {
 
 
 
-            <Table.Cell ><a >{this.props.id}</a></Table.Cell>
+            <Table.Cell ><a >{this.props.no + 1}</a></Table.Cell>
             <Table.Cell ><a >{this.props.word}</a></Table.Cell>
             <Table.Cell ><a >{this.props.modifiedTime.split("T")[0]}</a></Table.Cell>
-            <Table.Cell ><a >{this.props.type}</a></Table.Cell>
+            <Table.Cell ><a >{this.props.type.typeName}</a></Table.Cell>
             <Table.Cell ><Button onClick={this.show('mini')} > Edit </Button><Button onClick={this.closeConfigShow(false, true)}> Delete</Button></Table.Cell>
 
         </Table.Row >

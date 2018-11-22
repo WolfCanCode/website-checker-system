@@ -1,24 +1,15 @@
 package com.fpt.capstone.wcs.controller;
 
-import com.fpt.capstone.wcs.model.entity.User;
-import com.fpt.capstone.wcs.model.entity.Version;
-import com.fpt.capstone.wcs.model.entity.Website;
-import com.fpt.capstone.wcs.model.entity.Word;
+import com.fpt.capstone.wcs.model.entity.*;
 import com.fpt.capstone.wcs.model.pojo.ManagerRequestPOJO;
 import com.fpt.capstone.wcs.model.pojo.RequestCommonPOJO;
 import com.fpt.capstone.wcs.model.pojo.WebsitePOJO;
-import com.fpt.capstone.wcs.repository.RoleRepository;
-import com.fpt.capstone.wcs.repository.UserRepository;
-import com.fpt.capstone.wcs.repository.WebsiteRepository;
-import com.fpt.capstone.wcs.repository.WordRepository;
+import com.fpt.capstone.wcs.repository.*;
 import com.fpt.capstone.wcs.utils.Authenticate;
 import com.fpt.capstone.wcs.utils.Constant;
 import com.fpt.capstone.wcs.utils.EncodeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.net.MalformedURLException;
 import java.util.*;
@@ -37,8 +28,9 @@ public class ManagerController {
     @Autowired
     SitemapController sitemapController;
     @Autowired
-    WordRepository wordRepository;
-
+    WarningWordRepository warningWordRepository;
+    @Autowired
+    TopicRepository  topicRepository;
 
     @CrossOrigin
     @PostMapping("/api/website/manage")
@@ -307,15 +299,36 @@ public class ManagerController {
 
     @CrossOrigin
     @PostMapping("/api/word/manage")
-    public Map<String, Object> getWordList(@RequestBody ManagerRequestPOJO request) {
+    public Map<String, Object> getWarningWordList(@RequestBody ManagerRequestPOJO request) {
         Map<String, Object> res = new HashMap<>();
         User manager = authenticate.isAuthAndManagerGet(request);
         if (manager != null) {
-            List<Word> wordList = wordRepository.findAllByUserAndDelFlagEquals(manager, false);
-            if (wordList != null) {
+            List<WarningWord> warningWordList = warningWordRepository.findAllByUserAndDelFlagEquals(manager, false);
+            if (warningWordList != null) {
 
                 res.put("action", Constant.SUCCESS);
-                res.put("wordList", wordList);
+                res.put("warningWordList", warningWordList);
+                return res;
+            } else {
+                res.put("action", Constant.INCORRECT);
+                return res;
+            }
+        } else {
+            res.put("action", Constant.INCORRECT);
+            return res;
+        }
+    }
+    @CrossOrigin
+    @PostMapping("/api/word/getTopicList")
+    public Map<String, Object> getTopicList(@RequestBody ManagerRequestPOJO request) {
+        Map<String, Object> res = new HashMap<>();
+        User manager = authenticate.isAuthAndManagerGet(request);
+        if (manager != null) {
+            List<Topic> topicList = topicRepository.findAll();
+            if (topicList != null) {
+
+                res.put("action", Constant.SUCCESS);
+                res.put("topicList", topicList);
                 return res;
             } else {
                 res.put("action", Constant.INCORRECT);
@@ -327,26 +340,30 @@ public class ManagerController {
         }
     }
 
+
     @CrossOrigin
-    @PostMapping("/api/word/addWord")
-    public Map<String, Object> addWord(@RequestBody ManagerRequestPOJO request) throws MalformedURLException {
-        Map<String, Object> res = new HashMap<>();
+    @PostMapping("/api/word/addWarningWord")
+    public Map<String, Object> addWarningWord(@RequestBody ManagerRequestPOJO request) throws MalformedURLException {
+       Map<String, Object> res = new HashMap<>();
+        System.out.println(request);
         User manager = authenticate.isAuthAndManagerGet(request);
         if (manager != null) {
-            Word tmp = wordRepository
+            WarningWord tmp = warningWordRepository
                     .findFirstByUserAndWordAndDelFlagEquals(
                             manager,
-                            request.getWord().getWord(),
+                            request.getWarningWord().getWord(),
                             false);
 
             if (tmp == null) {
                 List<User> managers = new ArrayList<>();
                 managers.add(manager);
-                Word word = new Word();
-                word.setWord(request.getWord().getWord());
-                word.setType(request.getWord().getType());
-                word.setUser(managers);
-                wordRepository.save(word);
+                WarningWord warningWord = new WarningWord();
+                warningWord.setWord(request.getWarningWord().getWord());
+                //word.setWordType(wordTypeRepository.findByTypeName(request.getWord().getWordType().getTypeName()));
+                warningWord.setUser(managers);
+                //word.setWordType(request.getWarningWord().getWordType());
+                warningWord.setTopic(request.getWarningWord().getTopic());
+                warningWordRepository.save(warningWord);
                 res.put("action", Constant.SUCCESS);
                 return res;
             } else {
@@ -360,17 +377,19 @@ public class ManagerController {
     }
 
     @CrossOrigin
-    @PostMapping("/api/word/editWord")
-    public Map<String, Object> editWord(@RequestBody ManagerRequestPOJO request) {
+    @PostMapping("/api/word/editWarningWord")
+    public Map<String, Object> editWarningWord(@RequestBody ManagerRequestPOJO request) {
         Map<String, Object> res = new HashMap<>();
         User manager = authenticate.isAuthAndManagerGet(request);
         if (manager != null) {
-            Word tmp = wordRepository.findOneByUserAndIdAndDelFlagEquals(manager, request.getWord().getId(), false);
-            if (tmp != null) {
-                tmp.setWord(request.getWord().getWord());
-                tmp.setType(request.getWord().getType());
 
-                wordRepository.save(tmp);
+
+            WarningWord tmp = warningWordRepository.findOneByUserAndIdAndDelFlagEquals(manager, request.getWarningWord().getId(), false);
+            if (tmp != null) {
+                tmp.setWord(request.getWarningWord().getWord());
+                //tmp.setWordType(wordTypeRepository.findByTypeName(request.getWord().getWordType().getTypeName()));
+                tmp.setTopic(request.getWarningWord().getTopic());
+                warningWordRepository.save(tmp);
                 res.put("action", Constant.SUCCESS);
                 return res;
             } else {
@@ -384,15 +403,16 @@ public class ManagerController {
     }
 
     @CrossOrigin
-    @PostMapping("/api/word/deleteWord")
-    public Map<String, Object> delWord(@RequestBody ManagerRequestPOJO request) {
+    @PostMapping("/api/word/deleteWarningWord")
+    public Map<String, Object> deleteWarningWord(@RequestBody ManagerRequestPOJO request) {
         Map<String, Object> res = new HashMap<>();
         User manager = authenticate.isAuthAndManagerGet(request);
+
         if (manager != null) {
-            Word tmp = wordRepository.findOneByUserAndIdAndDelFlagEquals(manager, request.getWord().getId(), false);
+            WarningWord tmp = warningWordRepository.findOneByUserAndIdAndDelFlagEquals(manager,request.getWarningWord().getId() , false);
             if (tmp != null) {
                 tmp.setDelFlag(true);
-                wordRepository.save(tmp);
+                warningWordRepository.save(tmp);
                 res.put("action", Constant.SUCCESS);
                 return res;
             } else {

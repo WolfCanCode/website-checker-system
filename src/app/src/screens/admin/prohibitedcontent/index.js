@@ -3,7 +3,7 @@ import { Segment, Button, Icon, Table, Input } from 'semantic-ui-react'
 import TableRow from './row-table';
 import { Cookies } from "react-cookie";
 import ReactToExcel from "react-html-table-to-excel";
-import './style.css';
+
 
 
 const cookies = new Cookies();
@@ -87,7 +87,7 @@ export default class ProhibitedContent extends Component {
                         <ReactToExcel
                             className="btn1"
                             table="table-to-xls"
-                            filename="cookie_test_file"
+                            filename="prohibited_test_file"
                             sheet="sheet 1"
                             buttonText={<Button ><Icon name="print" />Export</Button>}
                         />

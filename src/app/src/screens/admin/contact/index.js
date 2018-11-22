@@ -27,18 +27,44 @@ export default class Contact extends Component {
       },
       body: JSON.stringify(param)
     }).then(response => response.json()).then((data) => {
-      comp = data.contactReport.map((item, index) => {
+      var list = [];  // 2620184173 , [https://thanhnien.vn/van-hoa/,https://thanhnien.vn/the-gioi/quan-su/]
+     
+      var checkExist = false;
+      var pos = 0;
+
+      for (let i = 0; i < data.contactReport.length; i++) {
+        for (let j = 0; j < list.length; j++) {
+          pos = j;
+          if (list[j].phoneMail === data.contactReport[i].phoneMail) {
+            checkExist = true;
+            break;
+          }
+        }
+        
+        if (checkExist) {
+          checkExist = false;
+
+            list[pos].url.push(data.contactReport[i].url);
+          }
+          
+         else {
+          list.push({phoneMail:data.contactReport[i].phoneMail, url:[data.contactReport[i].url],type:data.contactReport[i].type});
+        }
+
+      }
+      console.log(list);
+      comp =list.map((item, index) => {
         return (<TableRow key={index} phoneMail={item.phoneMail} url={item.url} type={item.type} />);
       });
       let countP = 0;
-      data.contactReport.map((item) => {
+      list.map((item) => {
         if (item.type === 'Phone') {
           countP++;
         }
         return countP;
       });
       let countE = 0;
-      data.contactReport.map((item) => {
+      list.map((item) => {
         if (item.type === 'Mail') {
           countE++;
         }
@@ -76,34 +102,51 @@ export default class Contact extends Component {
       },
       body: JSON.stringify(param)
     }).then(response => response.json()).then((data) => {
-      console.log(data)
-      comp = data.contactReport.map((item, index) => {
+      var list = [];  // 2620184173 , [https://thanhnien.vn/van-hoa/,https://thanhnien.vn/the-gioi/quan-su/]
+     
+      var checkExist = false;
+      var pos = 0;
 
+      for (let i = 0; i < data.contactReport.length; i++) {
+        for (let j = 0; j < list.length; j++) {
+          pos = j;
+          if (list[j].phoneMail === data.contactReport[i].phoneMail) {
+            checkExist = true;
+            break;
+          }
+        }
+        
+        if (checkExist) {
+          checkExist = false;
 
+            list[pos].url.push(data.contactReport[i].url);
+          }
+          
+         else {
+          list.push({phoneMail:data.contactReport[i].phoneMail, url:[data.contactReport[i].url],type:data.contactReport[i].type});
+        }
+
+      }
+      console.log(list);
+      comp =list.map((item, index) => {
         return (<TableRow key={index} phoneMail={item.phoneMail} url={item.url} type={item.type} />);
       });
-
       let countP = 0;
-      data.contactReport.map((item) => {
+      list.map((item) => {
         if (item.type === 'Phone') {
           countP++;
         }
         return countP;
       });
       let countE = 0;
-      data.contactReport.map((item) => {
+      list.map((item) => {
         if (item.type === 'Mail') {
           countE++;
         }
         return countE;
       })
-      //  var 
-      //  listTest = data.map((item, index)=>{
-      //    return item.url;
-      //  });
-
       if (comp.length === 0) {
-        statusNotFound = "No Contact Detail Found";
+        statusNotFound = "This page haven't test yet, please try to test";
 
       }
 

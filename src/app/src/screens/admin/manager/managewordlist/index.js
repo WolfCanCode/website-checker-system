@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Segment, Button, SegmentGroup, Input, Table, Modal, Form } from 'semantic-ui-react'
+import { Segment, Button, SegmentGroup, Input, Table, Modal, Form, Dropdown } from 'semantic-ui-react'
 
 import TableRow from './row-table';
 // import logo1 from './images/mobile.png';
@@ -11,7 +11,7 @@ const cookies = new Cookies();
 export default class managewordlist extends Component {
 
 
-    state = { addModal: false, isLoading: false, listWord: null, word: "", type : "", isDisable: true, addLoading: false }
+    state = { addModal: false, isLoading: false, listWord: null, word: "", type : "", isDisable: true, addLoading: false, topicList:[], topicSelected:[] }
 
 
 
@@ -19,6 +19,7 @@ export default class managewordlist extends Component {
 
     componentDidMount() {
         this._refreshTable();
+        this._getTopicList();
     }
 
     _loadingTable(isLoading) {
@@ -35,43 +36,82 @@ export default class managewordlist extends Component {
             body: JSON.stringify({ "managerId": cookies.get("u_id"), "managerToken": cookies.get("u_token") })
         }).then(response => response.json()).then((data) => {
             if (data.action === "SUCCESS") {
-                var list = data.wordList.map((item, index) => {
-                    return (<TableRow key={index} id={item.id} word={item.word} type={item.type} modifiedTime={item.modifiedTime} loadingTable={(isLoading) => this._loadingTable(isLoading)} refreshTable={() => this._refreshTable()} />);
+                console.log(data);
+                
+                var list = data.warningWordList.map((item, index) => {
+                    return (<TableRow key={index} no = {index} id={item.id} word={item.word} type={item.topic} modifiedTime={item.modifiedTime} loadingTable={(isLoading) => this._loadingTable(isLoading)} refreshTable={() => this._refreshTable()} />);
                 });
                 this.setState({ listWord: list, isLoading: false });
 
             }
         });
+        
+    }
 
+    _getTopicList(){
+        fetch("/api/word/getTopicList", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ "managerId": cookies.get("u_id"), "managerToken": cookies.get("u_token") })
+           
+        }).then(response => response.json()).then((data) => {
+            if (data.action === "SUCCESS") {
+                
+                
+                var list = data.topicList.map((item, index) => {
+                    return {key:item.id, text:item.typeName, value:item.id};
+                });
+                console.log(list);
+                
+                this.setState({ topicList: list, isLoading: false });
+
+            }
+        });
+
+
+    }
+
+    _onchangeType(event, data) {
+        console.log(data);
+      var typeSelected=  this.state.topicList.find(item=>{          
+            return item.value === data.value
+        });
+        console.log(typeSelected);
+        
+        this.setState({
+            topicSelected: typeSelected
+        },() => this._checkAddBtn());
+        
     }
 
     _onchangeWord(event) {
         this.setState({ word: event.target.value }, () => this._checkAddBtn());
     }
 
-    _onchangeType(event) {
-        this.setState({ type: event.target.value }, () => this._checkAddBtn());
-    }
+    
 
 
 
     _checkAddBtn() {
         var result = false;
-        if (this.state.word === "" || this.state.type === "") {
+        if (this.state.word === "" || this.state.topicSelected.length ===0) {
             result = true;
         }
         this.setState({ isDisable: result });
     }
 
-    _addWord() {
+    _addWarningWord() {
         this.setState({ addLoading: true, isDisable: false });
         var param = {
             "managerId": cookies.get("u_id"), "managerToken": cookies.get("u_token")
-            , word: {
-                "word": this.state.word, "type": this.state.type
+            , warningWord: {
+                "word": this.state.word, "topic": {id:this.state.topicSelected.value, typeName: this.state.topicSelected.text}
             }
         };
-        fetch("/api/word/addWord", {
+        fetch("/api/word/addWarningWord", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -82,15 +122,21 @@ export default class managewordlist extends Component {
             if (data.action === "SUCCESS") {
                 this.setState({ addLoading: false });
                 this.setState({ addModal: false });
+                this.setState({topicSelected:[]}); 
+                this.setState({word:""});
+                this.setState({typeSelected:[]});
                 this._refreshTable();
 
             } if (data.action === "DUPLICATE ERROR") {
                 alert("This word is existed");
+                this.setState({ addLoading: false });
             }
         });
     }
 
     render() {
+        
+
         return (
             <div>
 
@@ -106,11 +152,12 @@ export default class managewordlist extends Component {
                                     <Form>
                                         <Form.Field>
                                             <label>Word</label>
-                                            <Input type="text" placeholder="Word" onChange={(event) => this._onchangeWord(event)} value={this.state.word}></Input>
+                                            <Input type="text" placeholder="Word" onChange={(event) => this._onchangeWord(event)} ></Input>
                                         </Form.Field>
                                         <Form.Field>
                                             <label>Type</label>
-                                            <Input type="text" placeholder="Type" onChange={(event) => this._onchangeType(event)} value={this.state.type}></Input>
+                                            <Dropdown placeholder='' fluid  selection options={this.state.topicList} onChange={(event, data) => this._onchangeType(event, data)}/>
+                                            {/* <Input type="text" placeholder="Type" onChange={(event) => this._onchangeType(event)} value={this.state.type}></Input> */}
                                         </Form.Field>
 
                                     </Form>
@@ -118,7 +165,7 @@ export default class managewordlist extends Component {
                                 </Modal.Content>
                                 <Modal.Actions>
                                     <Button onClick={() => this.setState({ addModal: false })}>Cancel</Button>
-                                    <Button content='Done' color='blue' loading={this.state.addLoading} disabled={this.state.isDisable} onClick={() => this._addWord()} />
+                                    <Button content='Done' color='blue' loading={this.state.addLoading} disabled={this.state.isDisable} onClick={() => this._addWarningWord()} />
                                 </Modal.Actions>
                             </Modal>
 

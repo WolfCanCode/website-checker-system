@@ -46,11 +46,15 @@ export default class managewebsitescreen extends Component {
         }).then(response => response.json()).then((data) => {
             if (data.action === "SUCCESS") {
                 var list = data.website.map((item, index) => {
+<<<<<<< HEAD
                     return (<TableRow key={index} id={item.id} name={item.name} url={item.url} version={item.version}
                         time={item.time} loadingTable={(isLoading) => this._loadingTable(isLoading)}
                         refreshTable={() => this._refreshTable()}
                         showingModal={(isShow) => this._showingModal(isShow)} 
                         getSelectedWebName= {(name) => this._getSelectedWebName(name)}/>);
+=======
+                    return (<TableRow key={index} no={index} id={item.id} name={item.name} url={item.url} version={item.version} time={item.time} loadingTable={(isLoading) => this._loadingTable(isLoading)} refreshTable={() => this._refreshTable()} />);
+>>>>>>> c92b6c40e88e838a623a86760065dac93325f325
                 });
                 this.setState({ listWeb: list, isLoading: false });
 
@@ -155,7 +159,7 @@ export default class managewebsitescreen extends Component {
                             <Table singleLine unstackable>
                                 <Table.Header>
                                     <Table.Row>
-                                        <Table.HeaderCell>ID</Table.HeaderCell>
+                                        <Table.HeaderCell>No</Table.HeaderCell>
                                         <Table.HeaderCell>Name</Table.HeaderCell>
                                         <Table.HeaderCell>URL</Table.HeaderCell>
                                         <Table.HeaderCell>Version</Table.HeaderCell>
