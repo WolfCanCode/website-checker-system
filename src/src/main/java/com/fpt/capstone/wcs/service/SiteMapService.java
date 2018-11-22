@@ -54,7 +54,7 @@ public class SiteMapService {
     }
 
     // list all page that url direct to
-    public void getLinks(String url) {
+    public void getLinksRefrencingTo(String url) {
         int mapId = urlMap.get(url);
         List<SiteLinkPOJO> list = graph.get(mapId);
         for (SiteLinkPOJO siteLink : list) {

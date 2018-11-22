@@ -1,20 +1,21 @@
 import React, { Component } from 'react';
-import { Segment, Button, SegmentGroup, Input, Table, Modal, Form } from 'semantic-ui-react'
+import { Segment, Button, Transition, SegmentGroup, Input, Table, Modal, Form } from 'semantic-ui-react'
 
 import TableRow from './row-table';
 // import logo1 from './images/mobile.png';
 
 import { Cookies } from "react-cookie";
+import Canvas from './canvas';
 
 const cookies = new Cookies();
 
 export default class managewebsitescreen extends Component {
 
 
-    state = { addModal: false, isLoading: false, listWeb: null, webName: "", webUrl: "", isDisable: true, addLoading: false }
-
-
-
+    state = {
+        addModal: false, isLoading: false, listWeb: null, webName: "", webUrl: "",
+        isDisable: true, addLoading: false, isShow: false, currWeb: "",
+    }
 
 
     componentDidMount() {
@@ -23,6 +24,15 @@ export default class managewebsitescreen extends Component {
 
     _loadingTable(isLoading) {
         this.setState({ isLoading: isLoading })
+
+    }
+
+    _showingModal(isShow) {
+        this.setState({ isShow: isShow })
+    }
+
+    _getSelectedWebName(name){
+        this.setState({currWeb : name})
     }
 
     _refreshTable() {
@@ -36,7 +46,15 @@ export default class managewebsitescreen extends Component {
         }).then(response => response.json()).then((data) => {
             if (data.action === "SUCCESS") {
                 var list = data.website.map((item, index) => {
+<<<<<<< HEAD
+                    return (<TableRow key={index} id={item.id} name={item.name} url={item.url} version={item.version}
+                        time={item.time} loadingTable={(isLoading) => this._loadingTable(isLoading)}
+                        refreshTable={() => this._refreshTable()}
+                        showingModal={(isShow) => this._showingModal(isShow)} 
+                        getSelectedWebName= {(name) => this._getSelectedWebName(name)}/>);
+=======
                     return (<TableRow key={index} no={index} id={item.id} name={item.name} url={item.url} version={item.version} time={item.time} loadingTable={(isLoading) => this._loadingTable(isLoading)} refreshTable={() => this._refreshTable()} />);
+>>>>>>> c92b6c40e88e838a623a86760065dac93325f325
                 });
                 this.setState({ listWeb: list, isLoading: false });
 
@@ -79,6 +97,7 @@ export default class managewebsitescreen extends Component {
             if (data.action === "SUCCESS") {
                 this.setState({ addLoading: false });
                 this.setState({ addModal: false });
+                this.setState({ showSitemapModal: false });
                 this._refreshTable();
             } if (data.action === "DUPLICATE ERROR") {
                 alert("This website is existed");
@@ -96,7 +115,8 @@ export default class managewebsitescreen extends Component {
                         <div style={{ marginBottom: '30px' }}>
 
                             <Button style={{ float: 'right' }} onClick={() => this.setState({ addModal: true })}> Add </Button>
-                            <Modal open={this.state.addModal}>
+
+                            <Modal open={this.state.addModal} closeOnEscape="true"> 
                                 <Modal.Header>Add Website</Modal.Header>
                                 <Modal.Content>
                                     <Form>
@@ -119,6 +139,22 @@ export default class managewebsitescreen extends Component {
                         </div>
                     </Segment>
                     <Segment.Group horizontal style={{ maxHeight: '63vh', overflow: "auto" }}>
+                        {/*View Sitemap*/}
+                        <Transition duration={600} divided size='huge' verticalAlign='middle' visible={this.state.isShow}>
+                            <Modal open={this.state.isShow} size="fullscreen" style={{left: '100 !important'}}>
+                                <Modal.Header>Visual Sitemap of Website: {this.state.currWeb}</Modal.Header>
+                                <Modal.Content scrolling>
+                                    
+                                    <Segment basic loading={this.state.isLoading}>
+                                        <Canvas/>   
+                                    </Segment>
+                                </Modal.Content>
+                                <Modal.Actions>
+                                    <Button onClick={() => this.setState({ isShow: false })}> Cancel</Button>
+                                </Modal.Actions>
+                            </Modal>
+                        </Transition>
+                        {/*End View Sitemap*/}
                         <Segment basic loading={this.state.isLoading}>
                             <Table singleLine unstackable>
                                 <Table.Header>
@@ -137,10 +173,9 @@ export default class managewebsitescreen extends Component {
                                     {this.state.listWeb}
                                 </Table.Body>
                             </Table>
+                            {/* <Canvas /> */}
                         </Segment>
-
                     </Segment.Group>
-
                     {/* <div>
 
 

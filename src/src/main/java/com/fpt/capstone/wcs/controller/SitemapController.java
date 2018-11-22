@@ -50,12 +50,42 @@ public class SitemapController {
 //        return res;
 //    }
 
+    @PostMapping("/api/sitemap/getVisualSitemap")
+    public List<SiteMapOutputPOJO> getSiteTree(@RequestBody RequestCommonPOJO request) throws MalformedURLException {
+        List<SiteMapOutputPOJO> sm = null;
+        Website website = authenticate.isAuthGetSingleSite(request);
+        if (website != null) {
+            String url = website.getUrl();
+            SiteMapService sms = new SiteMapService(url);
+            sms.buildSiteMap();
+            List<String> rs = sms.getDecodeGraph();
+            sm = new ArrayList<>() ;
+            sm.add(new SiteMapOutputPOJO(rs.get(0), rs.get(1), rs.get(2)));
+        }
+        return sm;
+    }
+
+    @PostMapping("/api/sitemap/getReferecingUrl")
+    public List<SiteMapOutputPOJO> getSiteTree(@RequestBody RequestCommonPOJO request) throws MalformedURLException {
+        List<SiteMapOutputPOJO> sm = null;
+        Website website = authenticate.isAuthGetSingleSite(request);
+        if (website != null) {
+            String url = website.getUrl();
+            SiteMapService sms = new SiteMapService(url);
+            sms.buildSiteMap();
+            List<String> rs = sms.getDecodeGraph();
+            sm = new ArrayList<>() ;
+            sm.add(new SiteMapOutputPOJO(rs.get(0), rs.get(1), rs.get(2)));
+        }
+        return sm;
+    }
+
     @CrossOrigin
     @PostMapping("/api/sitemap/getVer")
     public Map<String, Object> getLastestVer(@RequestBody RequestCommonPOJO request) {
         Map<String, Object> res = new HashMap<>();
         Website website = authenticate.isAuthGetSingleSite(request);
-        if(website!=null) {
+        if (website != null) {
             if (website != null) {
                 Version ver = versionRepository.findFirstByWebsiteOrderByVersionDesc(website);
                 if (ver == null) {
@@ -87,8 +117,8 @@ public class SitemapController {
     public Map<String, Object> makeNewVer(@RequestBody RequestCommonPOJO request) throws MalformedURLException {
         Map<String, Object> res = new HashMap<>();
         User user = authenticate.isAuthGetSingleUser(request);
-        if(user.getManager()==null) {
-            Website website = websiteRepository.findOneByUserAndIdAndDelFlagEquals(user, request.getWebsiteId(),false);
+        if (user.getManager() == null) {
+            Website website = websiteRepository.findOneByUserAndIdAndDelFlagEquals(user, request.getWebsiteId(), false);
             //Temp version
             Version ver = versionRepository.findFirstByWebsiteOrderByVersionDesc(website);
             Version verTmp = new Version();
@@ -112,7 +142,7 @@ public class SitemapController {
                 pageRepository.saveAll(pages);
                 res.put("action", Constant.SUCCESS);
                 res.put("version", ver.getVersion());
-                res.put("time",ver.getTime().getDate()+"/"+(ver.getTime().getMonth()+1)+"/2018");
+                res.put("time", ver.getTime().getDate() + "/" + (ver.getTime().getMonth() + 1) + "/2018");
                 return res;
             } else {
                 res.put("action", Constant.INCORRECT);
