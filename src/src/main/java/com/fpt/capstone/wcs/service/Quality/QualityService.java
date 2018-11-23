@@ -15,7 +15,7 @@ public interface QualityService {
     //Prohibited
     public Map<String, Object> getDataProhibitedContent(RequestCommonPOJO request) throws InterruptedException;
     public Map<String, Object> getLastestProhibitedContent(RequestCommonPOJO request);
-
+    //Missing File
     public Map<String, Object> getMissingFile(@RequestBody MissingFilePOJO request);
     public Map<String, Object> getLastestMissingFile(@RequestBody MissingFilePOJO request);
 }
