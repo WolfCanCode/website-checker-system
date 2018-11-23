@@ -184,7 +184,7 @@ public class ExperienceImpl implements ExperienceService {
         System.setProperty("webdriver.chrome.driver", Constant.CHROME_DRIVER);
         //Asign list speed info
         List<SpeedTestReport> resultList = new ArrayList<>();
-        ExecutorService executor = Executors.newFixedThreadPool(5);
+        ExecutorService executor = Executors.newFixedThreadPool(Constant.MAX_THREAD);
         for (Page p : list) {
             executor.submit(new Runnable() {
                 @Override

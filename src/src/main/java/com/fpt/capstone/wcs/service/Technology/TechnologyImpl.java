@@ -32,6 +32,8 @@ import java.net.URLConnection;
 import java.util.*;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -373,13 +375,14 @@ public class TechnologyImpl implements TechnologyService {
         System.setProperty("webdriver.chrome.driver", Constant.CHROME_DRIVER);
         //Asign list JS info
         List<JavascriptReport> resultList = new ArrayList<>();
-        final CyclicBarrier gate = new CyclicBarrier(list.size());
-        List<Thread> listThread = new ArrayList<>();
+        ExecutorService executor = Executors.newFixedThreadPool(Constant.MAX_THREAD);
+
         for (Page u : list) {
-            listThread.add(new Thread() {
-                public void run() {
-                    try {
-                        gate.await();
+            executor.submit(new Runnable() {
+                @Override
+                public void run()
+                {
+
                         System.out.println("start testing url= " + u.getUrl());
                         //DesiredCapabilities
                         DesiredCapabilities capabilities = DesiredCapabilities.chrome();
@@ -406,25 +409,11 @@ public class TechnologyImpl implements TechnologyService {
                             resultList.add(report);
                         }
                         driver.quit();
-                    } catch (InterruptedException | BrokenBarrierException e) {
-                        Logger.getLogger(TechnologyService.class.getName()).log(Level.SEVERE, null, e);
                     }
-                }
+
             });
         }
-        for (Thread t : listThread) {
-            System.out.println("Threed start");
-            t.start();
-        }
 
-        for (Thread t : listThread) {
-            System.out.println("Threed join");
-            try {
-                t.join();
-            } catch (InterruptedException e) {
-                Logger.getLogger(TechnologyService.class.getName()).log(Level.SEVERE, null, e);
-            }
-        }
 
         return resultList;
 
