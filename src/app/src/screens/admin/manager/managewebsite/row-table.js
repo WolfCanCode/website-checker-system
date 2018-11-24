@@ -8,11 +8,12 @@ export default class TableRow extends Component {
     state = {
         open: false, open1: false, oldWebName: this.props.name, webName: this.props.name,
         isDisable: true, editLoading: false, options: [], userAssign: [], defValue: [], loadingDelete: false,
-        urlRoot: "", map: [], typeMap: [], urlMap: []
+        urlRoot: "", map: [], typeMap: [], urlMap: [], selectedUrl: ""
     }
     constructor(props) {
         super(props);
         this._makeNewver = this._makeNewver.bind(this);
+        this._viewSitemap = this._viewSitemap.bind(this);
     }
     show = size => () => this.setState({ size, open: true })
     close1 = () => this.setState({ open1: false })
@@ -75,7 +76,6 @@ export default class TableRow extends Component {
             var map = [];
             var typeMap = [];
             var urlMap = [];
-            var shorthand = "";
             map = this.state.map;
             typeMap = this.state.typeMap;
             urlMap = this.state.urlMap;
@@ -123,7 +123,6 @@ export default class TableRow extends Component {
                     // alert(content);
                 }
                 else if (type === 2) {
-                    var distance = content.length - urlLength;
                     if (distance > 30) {
                         content = content.substring(0, 30) + "...";
                     } else {
@@ -248,7 +247,8 @@ export default class TableRow extends Component {
             ////Update UI
             this.setState({ isDisabled: false, isLoading: false });
             this.props.loadingTable(false);
-
+            var selectedRectangleValue = "";
+            var that = this;
             // add 'click event' to canvas
             canvas.addEventListener('click', function (event) {
 
@@ -278,15 +278,19 @@ export default class TableRow extends Component {
                 }
 
                 if (isInside === true) {
-                    // pop-up the url
-                    alert("Your URL: " + rectCoord[id].url);
-                    // var selectedUrl = rectCoord[id].url;
-                    // this._getAllLinksReferencingTo (selectedUrl);
+
+                    // alert("Your URL: " + rectCoord[id].url);
+                    selectedRectangleValue = rectCoord[id].url;
+                    console.log("Selected: " + selectedRectangleValue);
+                    
+                    // that.setState({selectedUrl : selectedRectangleValue});
+                    // console.log("State: " + that.state.selectedUrl);
+                    that.props.setSelectedRectValue(selectedRectangleValue);
                 }
             });
+
         });
     }
-
 
     _editWebsite() {
         this.setState({ editLoading: true, isDisable: false });
@@ -464,6 +468,7 @@ export default class TableRow extends Component {
                 </Modal>
             </Transition>
 
+
             {/* Assign */}
             <Transition duration={600} divided size='huge' verticalAlign='middle' visible={this.state.assignModal}>
                 <Modal
@@ -490,6 +495,20 @@ export default class TableRow extends Component {
                 </Modal>
             </Transition>
 
+            {/* <Transition duration={600} divided size='huge' verticalAlign='middle' visible={open}>
+                <Modal
+                    size={size}
+                    open={open}
+                    dimmer="blurring" >
+                    <Modal.Header>Bla bla</Modal.Header>
+                    <Modal.Content >
+                    </Modal.Content>
+                    <Modal.Content>
+                    </Modal.Content>
+                    <Modal.Actions>
+                    </Modal.Actions>
+                </Modal>
+            </Transition> */}
             <Table.Cell ><a >{this.props.no + 1}</a></Table.Cell>
             <Table.Cell ><a >{this.props.name}</a></Table.Cell>
             <Table.Cell ><a >{this.props.url}</a></Table.Cell>
