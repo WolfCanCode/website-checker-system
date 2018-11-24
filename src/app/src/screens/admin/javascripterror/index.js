@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Segment, Button, SegmentGroup, Table, Input, Icon } from 'semantic-ui-react'
 import TableRow from './row-table';
 import { Cookies } from "react-cookie";
+import ReactToExcel from "react-html-table-to-excel";
 
 const cookies = new Cookies();
 export default class JavascriptErrorScreen extends Component {
@@ -80,15 +81,25 @@ export default class JavascriptErrorScreen extends Component {
         <Segment.Group horizontal>
 
           <Segment basic loading={this.state.loadingTable}>
-            <Button icon labelPosition='right' disabled={this.state.isDisable} onClick={() => this._doJSTest()}>
+            <Button icon primary labelPosition='right' disabled={this.state.isDisable} onClick={() => this._doJSTest()}>
               Check
                        <Icon name='right arrow' />
             </Button>
-            <Button style={{ marginLeft: '10px' }} floated='right'><Icon name="print" />Export</Button>
+            <div style={{ marginBottom: '10px', float: 'right' }}>
+
+
+              <ReactToExcel
+                className="btn1"
+                table="table-to-xls"
+                filename="js_test_file"
+                sheet="sheet 1"
+                buttonText={<Button color="green"><Icon name="print" />Export</Button>}
+              />
+            </div>
             <div style={{ marginBottom: '10px', float: 'right' }}>
               <Input icon='search' placeholder='Search...' />
             </div>
-            <Table unstackable singleLine style={{ fontSize: '14px' }}>
+            <Table unstackable singleLine style={{ fontSize: '14px' }} id="table-to-xls">
               <Table.Header>
                 <Table.Row>
                   <Table.HeaderCell>Error Message</Table.HeaderCell>

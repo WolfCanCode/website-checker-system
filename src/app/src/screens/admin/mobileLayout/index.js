@@ -14,7 +14,7 @@ const cookies = new Cookies();
 
 
 class mobileLayoutScreen extends Component {
-    state = { list: [], list1: [], loadingTable: false, isDisable: false };
+    state = { list: [], list1: [], loadingTable: false, isDisable: false, isDoneTest: false, listReportId: [] };
 
 
     componentDidMount() {
@@ -71,19 +71,58 @@ class mobileLayoutScreen extends Component {
             },
             body: JSON.stringify(param)
         }).then(response => response.json()).then((data) => {
+            var listReport = [];
             comp = data.mobileLayoutTestReport.map((item, index) => {
                 return (<TableRow key={index} url={item.url} title={item.title} screenShot={item.screenShot} issue={item.issue} />);
             });
             comp1 = data.mobileLayoutTestReport.map((item, index) => {
+                listReport.push(item.id);
                 return (<TableRow1 key={index} url={item.url} title={item.title} screenShot={item.screenShot} issue={item.issue} />);
             });
             this.setState({ list: comp });
             this.setState({ list1: comp1 });
 
-            this.setState({ loadingTable: false, isDisable: false });
+            this.setState({ loadingTable: false, isDisable: false,  isDoneTest: true, listReportId: listReport });
         });
 
     }
+
+    _saveReport() {
+        this.setState({ loadingTable: true });
+        this.setState({ isDisable: true });
+        var comp = [];
+        var comp1 = [];
+        var param = {
+            "userId": cookies.get("u_id"),
+            "userToken": cookies.get("u_token"),
+            "websiteId": cookies.get("u_w_id"),
+            "pageOptionId": cookies.get("u_option"),
+            "listReportId": this.state.listReportId
+        };
+        fetch("/api/mobileLayoutTest/SaveReport", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(param)
+        }).then(response => response.json()).then((data) => {
+            // comp = data.mobileLayoutTestReport.map((item, index) => {
+            //     return (<TableRow key={index} url={item.url} title={item.title} screenShot={item.screenShot} issue={item.issue} />);
+            // });
+            comp1 = data.mobileLayoutTestReport.map((item, index) => {
+                return (<TableRow1 key={index} url={item.url} title={item.title} screenShot={item.screenShot} issue={item.issue} />);
+            });
+            //this.setState({ list: comp });
+            this.setState({ list1: comp1 });
+
+            this.setState({ loadingTable: false, isDisable: false,  isDoneTest: false });
+        });
+
+
+        
+    }
+
 
     render() {
         return (
@@ -91,10 +130,13 @@ class mobileLayoutScreen extends Component {
             <Segment.Group horizontal style={{ margin: 0 }}>
 
                 <Segment basic loading={this.state.loadingTable} >
-                    <Button icon labelPosition='right' disabled={this.state.isDisable} onClick={() => this._doMobileLayoutTest()}>
+                    <Button icon primary labelPosition='right' disabled={this.state.isDisable} onClick={() => this._doMobileLayoutTest()}>
                         Check
                    <Icon name='right arrow' />
                     </Button>
+                    {this.state.isDoneTest ? <Button icon color="green" labelPosition='right' onClick={() => this._saveReport()}>
+                                    Save <Icon name='check' />
+                                </Button> : ""}
 
                     <div style={{ marginBottom: '10px', float: 'right' }}>
 
@@ -104,7 +146,7 @@ class mobileLayoutScreen extends Component {
                             table="table-to-xls1"
                             filename="mobile_layout_test_file"
                             sheet="sheet 1"
-                            buttonText={<Button ><Icon name="print" />Export</Button>}
+                            buttonText={<Button color="green"><Icon name="print" />Export</Button>}
                         />
                     </div>
                     <div style={{ marginBottom: '10px', float: 'right' }}>

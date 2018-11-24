@@ -3,6 +3,7 @@ import 'semantic-ui-css/semantic.min.css';
 import { Segment, Button, Table, Icon, Input } from 'semantic-ui-react'
 import TableRow from '../missingFiles/row-table'
 import { Cookies } from "react-cookie";
+import ReactToExcel from "react-html-table-to-excel";
 
 const cookies = new Cookies();
 
@@ -34,10 +35,12 @@ class missingFilesScreen extends Component {
         var listMissingFileCount = [];
         var statusResult = "";
         this.setState({ loadingTable: true });
-        var param = { "userId": cookies.get("u_id"),
-        "userToken": cookies.get("u_token"),
-        "websiteId": cookies.get("u_w_id"),
-        "pageOptionId": cookies.get("u_option"), };
+        var param = {
+            "userId": cookies.get("u_id"),
+            "userToken": cookies.get("u_token"),
+            "websiteId": cookies.get("u_w_id"),
+            "pageOptionId": cookies.get("u_option"),
+        };
 
         fetch("/api/missingtest/lastest", {
             method: 'POST',
@@ -91,11 +94,13 @@ class missingFilesScreen extends Component {
     _doMissingFilePagesTest() {
         this.setState({ loadingTable: true, isDisable: true });
         var comp = [];
-        var param = {"userId": cookies.get("u_id"),
-        "userToken": cookies.get("u_token"),
-        "websiteId": cookies.get("u_w_id"),
-        "pageOptionId": cookies.get("u_option"),
-        "listType":this.state.listType};
+        var param = {
+            "userId": cookies.get("u_id"),
+            "userToken": cookies.get("u_token"),
+            "websiteId": cookies.get("u_w_id"),
+            "pageOptionId": cookies.get("u_option"),
+            "listType": this.state.listType
+        };
         var countPageAffected1 = 0;
         var countMissingFile1 = 0;
         let flag = false;
@@ -161,19 +166,19 @@ class missingFilesScreen extends Component {
         for (let i = 0; i < listTemp.length; i++) {
             if (listTemp[i] === 1) {
                 listTemp.splice(i, 1);
-                
+
                 flag = true;
-                
+
             }
 
         }
         if (!flag) {
-            listTemp.push(1 );
+            listTemp.push(1);
             active = true;
         }
 
 
-        console.log("Ac:"+active)
+        console.log("Ac:" + active)
         this.setState({ listType: listTemp, isActiveImg: active })
 
         console.log(listTemp);
@@ -193,7 +198,7 @@ class missingFilesScreen extends Component {
 
         }
         if (!flag) {
-            listTemp.push( 2 );
+            listTemp.push(2);
             active = true;
         }
 
@@ -216,7 +221,7 @@ class missingFilesScreen extends Component {
 
         }
         if (!flag) {
-            listTemp.push( 3 );
+            listTemp.push(3);
             active = true;
         }
 
@@ -239,7 +244,7 @@ class missingFilesScreen extends Component {
 
         }
         if (!flag) {
-            listTemp.push( 4 );
+            listTemp.push(4);
             active = true;
         }
 
@@ -257,7 +262,7 @@ class missingFilesScreen extends Component {
             <div style={{ height: 'auto' }}>
                 <Segment.Group>
                     <Segment>
-                        <Button icon labelPosition='right' disabled={this.state.isDisable} onClick={() => this._doMissingFilePagesTest()}>
+                        <Button icon primary labelPosition='right' disabled={this.state.isDisable} onClick={() => this._doMissingFilePagesTest()}>
                             Check
                        <Icon name='right arrow' />
                         </Button>
@@ -319,13 +324,23 @@ class missingFilesScreen extends Component {
                                         <Button onClick={() => this._doClickDOC()} active={this.state.isActiveDoc}>DOC</Button>
                                         <Button onClick={() => this._doClickARCHIRES()} active={this.state.isActiveARCHIRES}>ARCHIRES</Button>
                                     </Button.Group>
-                                    <Button style={{ float: 'right' }}><Icon name="print" />Export</Button>
+                                    <div style={{ marginBottom: '10px', float: 'right' }}>
+
+
+                                        <ReactToExcel
+                                            className="btn1"
+                                            table="table-to-xls"
+                                            filename="missingFiles_test_file"
+                                            sheet="sheet 1"
+                                            buttonText={<Button color="green"><Icon name="print" />Export</Button>}
+                                        />
+                                    </div>
 
                                     <Input icon='search' placeholder='Search...' style={{ float: 'right' }} />
                                 </div>
                             </Segment>
 
-                            <Table singleLine unstackable textAlign='center' style={{ tableLayout: 'auto' }} loading={this.state.loadingTable}>
+                            <Table singleLine unstackable textAlign='center' style={{ tableLayout: 'auto' }} loading={this.state.loadingTable} id="table-to-xls">
                                 <Table.Header >
                                     <Table.Row>
                                         <Table.HeaderCell>Files</Table.HeaderCell>

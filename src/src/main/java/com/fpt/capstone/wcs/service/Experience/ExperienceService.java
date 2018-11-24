@@ -13,5 +13,6 @@ public interface ExperienceService {
     //Mobile layout
     public Map<String, Object> getDataMobileLayout(RequestCommonPOJO request) throws InterruptedException;
     public Map<String, Object> getLastestDataMobileLayout(RequestCommonPOJO request);
+    public Map<String, Object> saveMobileReport(RequestReportPOJO request);
 
     }

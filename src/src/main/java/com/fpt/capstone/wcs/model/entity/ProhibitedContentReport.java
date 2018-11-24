@@ -4,6 +4,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
@@ -18,12 +19,17 @@ public class ProhibitedContentReport {
     private Long id;
     private String urlPage;
     private String word;
+    private String fragment;
     private String type;
+    private Date createdTime;
+
+    private boolean delFlag = true;
 
 
-    public ProhibitedContentReport(String urlPage, String word, String type) {
+    public ProhibitedContentReport(String urlPage, String word,String fragment, String type) {
         this.urlPage = urlPage;
         this.word = word;
+        this.fragment = fragment;
         this.type = type;
     }
 

@@ -259,6 +259,7 @@ public class ContentImpl implements  ContentService {
                         gate.await();
                         String title = getTitle(url.getUrl());
                         int  httpcode = getStatus(url.getUrl());
+                        System.out.println("HTTP  code"+getStatus(url.getUrl()));
                         String canoUrl = getCanonicalUrl(url.getUrl());
 
                         PageReport page = new PageReport(httpcode, url.getUrl(),title,canoUrl);
@@ -430,6 +431,9 @@ public class ContentImpl implements  ContentService {
             connection.setRequestProperty("User-Agent","Mozilla/5.0 ");
             code = connection.getResponseCode();
             String message = connection.getResponseMessage();
+            System.out.println("Message respone"+message);
+            System.out.println("Code respone"+code );
+
             if(code ==200){
                 result =  code;
             }
@@ -444,6 +448,9 @@ public class ContentImpl implements  ContentService {
                 connection.addRequestProperty("Referer", "google.com");
 
                 System.out.println("Addresses: "+url+" -Redirect to URL : " + newUrl+": Type: "+message);
+            }
+            else{
+                result =  code;
             }
         } catch (Exception e) {
             result=404;

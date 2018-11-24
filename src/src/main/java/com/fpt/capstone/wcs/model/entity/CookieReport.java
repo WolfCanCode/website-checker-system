@@ -20,6 +20,9 @@ public class CookieReport {
     private String category;
     private String party;
     private String description;
+    private Date createdTime;
+
+    private boolean delFlag = true;
 
     public CookieReport(String cookieName, String category, String party, String description) {
         this.cookieName = cookieName;

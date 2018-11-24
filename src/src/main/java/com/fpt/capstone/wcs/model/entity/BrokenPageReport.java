@@ -3,10 +3,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Data
 @Entity
@@ -22,6 +19,9 @@ public class BrokenPageReport {
     private String stt;
     private int httpCode;
     private String httpMessage;
+    private Date createdTime;
+
+    private boolean delFlag = true;
 
     public BrokenPageReport(String urlPage, String stt, int httpCode, String httpMessage) {
         this.urlPage = urlPage;

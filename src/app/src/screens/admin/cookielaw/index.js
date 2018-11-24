@@ -76,11 +76,11 @@ export default class CookieLaw extends Component {
             <Segment.Group horizontal style={{ margin: 0 }}>
 
                 <Segment basic loading={this.state.loadingTable} >
-                    <Button icon labelPosition='right' disabled={this.state.isDisable} onClick={() => this._doCookies()}>
+                    <Button icon  primary labelPosition='right' disabled={this.state.isDisable} onClick={() => this._doCookies()}>
                         Check
                        <Icon name='right arrow' />
                     </Button>
-                    <div style={{ marginBottom: '10px', float: 'right' }}>
+                    <div style={{ marginBottom: '10px', float: 'right', color : 'green' }}>
 
 
                         <ReactToExcel
@@ -88,7 +88,7 @@ export default class CookieLaw extends Component {
                             table="table-to-xls"
                             filename="cookie_test_file"
                             sheet="sheet 1"
-                            buttonText={<Button ><Icon name="print" />Export</Button>}
+                            buttonText={<Button color="green"><Icon name="print" />Export</Button>}
                         />
                     </div>
 

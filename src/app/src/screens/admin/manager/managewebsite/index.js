@@ -14,7 +14,8 @@ export default class managewebsitescreen extends Component {
 
     state = {
         addModal: false, isLoading: false, listWeb: null, webName: "", webUrl: "",
-        isDisable: true, addLoading: false, isShow: false, currWeb: "",
+        isDisable: true, addLoading: false, showSitemapModal: false, 
+        showRefModal: false, showRefResultModal: false, currWeb: "", selectedUrl: "",
     }
 
 
@@ -28,13 +29,37 @@ export default class managewebsitescreen extends Component {
     }
 
     _showingModal(isShow) {
-        this.setState({ isShow: isShow })
+        this.setState({ showSitemapModal: isShow })
     }
 
     _getSelectedWebName(name) {
         this.setState({ currWeb: name })
     }
 
+    _setSelectedRectValue(url) {
+        alert(url);
+        if(url !== ""){
+            this.setState({ selectedUrl: url, showRefModal: true });            
+        }
+        
+    }
+
+    _getRefTo(url) {
+        alert("URL: " + url)
+        fetch("/api/sitemap/getRefTo", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ "managerId": cookies.get("u_id"), "managerToken": cookies.get("u_token") })
+        }).then(response => response.json()).then((data) => {});
+
+    }
+
+    _getRefBy(url) {
+        alert("URL: " + url)
+    }
     _refreshTable() {
         fetch("/api/website/manage", {
             method: 'POST',
@@ -49,8 +74,10 @@ export default class managewebsitescreen extends Component {
                     return (<TableRow key={index} no={index} id={item.id} name={item.name} url={item.url} version={item.version}
                         time={item.time} loadingTable={(isLoading) => this._loadingTable(isLoading)}
                         refreshTable={() => this._refreshTable()}
+                        
                         showingModal={(isShow) => this._showingModal(isShow)}
-                        getSelectedWebName={(name) => this._getSelectedWebName(name)} />);
+                        getSelectedWebName={(name) => this._getSelectedWebName(name)}
+                        setSelectedRectValue={(url) => this._setSelectedRectValue(url)} />);
                 });
                 this.setState({ listWeb: list, isLoading: false });
 
@@ -136,8 +163,8 @@ export default class managewebsitescreen extends Component {
                     </Segment>
                     <Segment.Group horizontal style={{ maxHeight: '63vh', overflow: "auto" }}>
                         {/*View Sitemap*/}
-                        <Transition duration={600} divided size='huge' verticalAlign='middle' visible={this.state.isShow}>
-                            <Modal open={this.state.isShow} style={{ width: '100%', height: '100%', background: 'white' }}>
+                        <Transition duration={600} divided size='huge' verticalAlign='middle' visible={this.state.showSitemapModal}>
+                            <Modal open={this.state.showSitemapModal} style={{ width: '100%', height: '100%', background: 'white' }}>
                                 <Modal.Header style={{ textAlign: 'center', fontSize: 25, fontWeight: 'bold', color: 'black' }}>Visual Sitemap of Website: {this.state.currWeb}</Modal.Header>
                                 <Modal.Content style={{ maxHeight: 'calc(85vh)', overflow: 'auto' }}>
 
@@ -148,11 +175,31 @@ export default class managewebsitescreen extends Component {
                                     </Segment>
                                 </Modal.Content>
                                 <Modal.Actions >
-                                    <Button onClick={() => this.setState({ isShow: false })}> Cancel</Button>
+                                    <Button onClick={() => this.setState({ showSitemapModal: false })}> Cancel</Button>
                                 </Modal.Actions>
                             </Modal>
                         </Transition>
                         {/*End View Sitemap*/}
+                        {/*Handle reference*/}
+                        <Transition duration={600} divided verticalAlign='middle' visible={this.state.showRefModal}>
+                            <Modal open={this.state.showRefModal}>
+                                <Modal.Header style={{ textAlign: 'center', fontSize: 25, fontWeight: 'bold', color: 'black' }}>Choose your option:</Modal.Header>
+                                <Modal.Content>
+                                    <Form>
+                                        <Form.Field>
+                                            <Button onClick={() => this._getRefTo(this.state.selectedUrl)}> Reference To </Button>
+                                        </Form.Field>
+                                        <Form.Field>
+                                            <Button onClick={() => this._getRefBy(this.state.selectedUrl)}>Referenced By </Button>
+                                        </Form.Field>
+                                    </Form>
+                                </Modal.Content>
+                                <Modal.Actions >
+                                    <Button onClick={() => this.setState({ showRefModal: false })}> Cancel</Button>
+                                </Modal.Actions>
+                            </Modal>
+                        </Transition>
+                        {/*End reference*/}
                         <Segment basic loading={this.state.isLoading}>
                             <Table singleLine unstackable>
                                 <Table.Header>
