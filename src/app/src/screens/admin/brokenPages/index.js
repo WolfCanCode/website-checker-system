@@ -80,11 +80,7 @@ class brokenPagesScreen extends Component {
     render() {
         return (
             <Segment.Group>
-                <Segment basic>
-                    <Button icon labelPosition='right' disabled={this.state.isDisable} onClick={() => this._doBrokenPage()}>
-                        Check
-                       <Icon name='right arrow' />
-                    </Button></Segment>
+                
                 <Segment.Group horizontal style={{ margin: 0 }}>
 
                     <Segment basic loading={this.state.loadingTable}>
@@ -105,7 +101,11 @@ class brokenPagesScreen extends Component {
                                 <p style={{ fontSize: 24 }}>0 <br /> Error pages</p>
                             </Segment>
                         </Segment.Group>
-                        <Segment basic style={{ marginBottom: '60px' }}>
+                        <Segment basic style={{ marginBottom: '0px' }}>
+                        <Button icon primary labelPosition='right' disabled={this.state.isDisable} onClick={() => this._doBrokenPage()}>
+                        Check
+                       <Icon name='right arrow' />
+                    </Button>
                             <div style={{ marginBottom: '10px', float: 'right' }}>
 
 
@@ -114,12 +114,12 @@ class brokenPagesScreen extends Component {
                                     table="table-to-xls"
                                     filename="broken_page_test_file"
                                     sheet="sheet 1"
-                                    buttonText={<Button ><Icon name="print" />Export</Button>}
+                                    buttonText={<Button color="green"><Icon name="print" />Export</Button>}
                                 />
                             </div>
                             <Input icon='search' placeholder='Search...' style={{ float: 'right' }} />
                         </Segment>
-                        <Segment style={{ maxHeight: '30vh', overflow: "auto" }}>
+                        <Segment style={{ maxHeight: '50vh', overflow: "auto" }}>
 
                             <Table singleLine unstackable textAlign='center' style={{ tableLayout: 'auto' }} id="table-to-xls">
                                 <Table.Header >

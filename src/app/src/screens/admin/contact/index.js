@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Segment, Button, Table, Icon } from 'semantic-ui-react'
 import TableRow from './row-table';
 import { Cookies } from "react-cookie";
+import ReactToExcel from "react-html-table-to-excel";
 
 const cookies = new Cookies();
 export default class Contact extends Component {
@@ -28,7 +29,7 @@ export default class Contact extends Component {
       body: JSON.stringify(param)
     }).then(response => response.json()).then((data) => {
       var list = [];  // 2620184173 , [https://thanhnien.vn/van-hoa/,https://thanhnien.vn/the-gioi/quan-su/]
-     
+
       var checkExist = false;
       var pos = 0;
 
@@ -40,20 +41,20 @@ export default class Contact extends Component {
             break;
           }
         }
-        
+
         if (checkExist) {
           checkExist = false;
 
-            list[pos].url.push(data.contactReport[i].url);
-          }
-          
-         else {
-          list.push({phoneMail:data.contactReport[i].phoneMail, url:[data.contactReport[i].url],type:data.contactReport[i].type});
+          list[pos].url.push(data.contactReport[i].url);
+        }
+
+        else {
+          list.push({ phoneMail: data.contactReport[i].phoneMail, url: [data.contactReport[i].url], type: data.contactReport[i].type });
         }
 
       }
       console.log(list);
-      comp =list.map((item, index) => {
+      comp = list.map((item, index) => {
         return (<TableRow key={index} phoneMail={item.phoneMail} url={item.url} type={item.type} />);
       });
       let countP = 0;
@@ -103,7 +104,7 @@ export default class Contact extends Component {
       body: JSON.stringify(param)
     }).then(response => response.json()).then((data) => {
       var list = [];  // 2620184173 , [https://thanhnien.vn/van-hoa/,https://thanhnien.vn/the-gioi/quan-su/]
-     
+
       var checkExist = false;
       var pos = 0;
 
@@ -115,20 +116,20 @@ export default class Contact extends Component {
             break;
           }
         }
-        
+
         if (checkExist) {
           checkExist = false;
 
-            list[pos].url.push(data.contactReport[i].url);
-          }
-          
-         else {
-          list.push({phoneMail:data.contactReport[i].phoneMail, url:[data.contactReport[i].url],type:data.contactReport[i].type});
+          list[pos].url.push(data.contactReport[i].url);
+        }
+
+        else {
+          list.push({ phoneMail: data.contactReport[i].phoneMail, url: [data.contactReport[i].url], type: data.contactReport[i].type });
         }
 
       }
       console.log(list);
-      comp =list.map((item, index) => {
+      comp = list.map((item, index) => {
         return (<TableRow key={index} phoneMail={item.phoneMail} url={item.url} type={item.type} />);
       });
       let countP = 0;
@@ -164,7 +165,7 @@ export default class Contact extends Component {
       <div >
         <Segment.Group horizontal style={{ margin: 0 }} >
           <Segment basic>
-            <Button icon labelPosition='right' disabled={this.state.isDisable} onClick={() => this._doContactDetailTest()}>
+            <Button icon  primary labelPosition='right' disabled={this.state.isDisable} onClick={() => this._doContactDetailTest()}>
               Check
                        <Icon name='right arrow' />
             </Button>
@@ -183,8 +184,18 @@ export default class Contact extends Component {
                 <p style={{ fontSize: 24 }}>{isNaN(this.state.countEmail) ? 0 : (this.state.countEmail)}<br /> Emails</p>
               </Segment>
             </Segment.Group>
-            <Button style={{ marginBottom: '10px' }} floated='right'><Icon name="print" />Export</Button>
-            <Table singleLine>
+            <div style={{ marginBottom: '10px', float: 'right' }}>
+
+
+              <ReactToExcel
+                className="btn1"
+                table="table-to-xls"
+                filename="contact_test_file"
+                sheet="sheet 1"
+                buttonText={<Button color="green" ><Icon name="print" />Export</Button>}
+              />
+            </div>
+            <Table singleLine id="table-to-xls">
               <Table.Header>
                 <Table.Row>
                   <Table.HeaderCell>Contact</Table.HeaderCell>

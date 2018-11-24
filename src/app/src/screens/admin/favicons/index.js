@@ -3,6 +3,7 @@ import 'semantic-ui-css/semantic.min.css';
 import { Segment, Button, Table, Icon, Input } from 'semantic-ui-react'
 import TableRow from './row-table';
 import { Cookies } from "react-cookie";
+import ReactToExcel from "react-html-table-to-excel";
 
 const cookies = new Cookies();
 
@@ -34,7 +35,7 @@ class faviconScreen extends Component {
             "websiteId": cookies.get("u_w_id"),
             "pageOptionId": cookies.get("u_option"),
         };
-        console.log("U-Option"+cookies.get("u_option"))
+        console.log("U-Option" + cookies.get("u_option"))
         fetch("/api/faviconTest/lastest", {
             method: 'POST',
             headers: {
@@ -84,7 +85,7 @@ class faviconScreen extends Component {
             "websiteId": cookies.get("u_w_id"),
             "pageOptionId": cookies.get("u_option"),
         };
-        console.log("U-Option"+cookies.get("u_option"))
+        console.log("U-Option" + cookies.get("u_option"))
         fetch("/api/faviconTest", {
             method: 'POST',
             headers: {
@@ -124,7 +125,7 @@ class faviconScreen extends Component {
             <div>
                 <Segment.Group>
                     <Segment>
-                        <Button icon labelPosition='right' disabled={this.state.isDisable} onClick={() => this._doFaviconTest()}>
+                        <Button icon primary labelPosition='right' disabled={this.state.isDisable} onClick={() => this._doFaviconTest()}>
                             Check
                        <Icon name='right arrow' />
                         </Button>
@@ -163,12 +164,22 @@ class faviconScreen extends Component {
 
                                 <div style={{ marginBottom: '50px' }}>
 
-                                    <Button style={{ float: 'right' }}><Icon name="print" />Export</Button>
+                                    <div style={{ marginBottom: '10px', float: 'right' }}>
+
+
+                                        <ReactToExcel
+                                            className="btn1"
+                                            table="table-to-xls"
+                                            filename="favicons_test_file"
+                                            sheet="sheet 1"
+                                            buttonText={<Button color="green"><Icon name="print" />Export</Button>}
+                                        />
+                                    </div>
 
                                     <Input icon='search' placeholder='Search...' style={{ float: 'right' }} />
                                 </div>
                             </Segment>
-                            <Table unstackable singleLine textAlign='center' style={{ tableLayout: 'auto' }} loading={this.state.loadingTable}>
+                            <Table unstackable singleLine textAlign='center' style={{ tableLayout: 'auto' }} loading={this.state.loadingTable} id="table-to-xls">
                                 <Table.Header >
                                     <Table.Row>
                                         <Table.HeaderCell>Favicon</Table.HeaderCell>

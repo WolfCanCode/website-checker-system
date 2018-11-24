@@ -91,7 +91,7 @@ class mobileLayoutScreen extends Component {
             <Segment.Group horizontal style={{ margin: 0 }}>
 
                 <Segment basic loading={this.state.loadingTable} >
-                    <Button icon labelPosition='right' disabled={this.state.isDisable} onClick={() => this._doMobileLayoutTest()}>
+                    <Button icon primary labelPosition='right' disabled={this.state.isDisable} onClick={() => this._doMobileLayoutTest()}>
                         Check
                    <Icon name='right arrow' />
                     </Button>
@@ -104,7 +104,7 @@ class mobileLayoutScreen extends Component {
                             table="table-to-xls1"
                             filename="mobile_layout_test_file"
                             sheet="sheet 1"
-                            buttonText={<Button ><Icon name="print" />Export</Button>}
+                            buttonText={<Button color="green"><Icon name="print" />Export</Button>}
                         />
                     </div>
                     <div style={{ marginBottom: '10px', float: 'right' }}>

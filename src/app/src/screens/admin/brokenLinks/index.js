@@ -84,10 +84,7 @@ class brokenLinksScreen extends Component {
         return (
             <Segment.Group>
                 <Segment basic>
-                    <Button icon labelPosition='right' disabled={this.state.isDisable} onClick={() => this._doBrokenLink()}>
-                        Check
-                       <Icon name='right arrow' />
-                    </Button>
+
                 </Segment>
                 <Segment.Group horizontal style={{ margin: 0 }}>
 
@@ -106,20 +103,24 @@ class brokenLinksScreen extends Component {
                                 <p style={{ fontSize: 24 }}>0 <br /> External broken links</p>
                             </Segment>
                         </Segment.Group>
-                        <Segment basic style={{ marginBottom: '60px' }}>
+                        <Segment basic style={{ marginBottom: '0px' }}>
+                            <Button icon primary labelPosition='right' disabled={this.state.isDisable} onClick={() => this._doBrokenLink()}>
+                                Check
+                       <Icon name='right arrow' />
+                            </Button>
                             <div style={{ float: 'right' }}>
                                 <ReactToExcel
                                     className="btn1"
                                     table="table-to-xls"
                                     filename="broken_link_test_file"
                                     sheet="sheet 1"
-                                    buttonText={<Button ><Icon name="print" />Export</Button>}
+                                    buttonText={<Button color="green"><Icon name="print" />Export</Button>}
                                 />
                             </div>
 
                             <Input icon='search' placeholder='Search...' style={{ float: 'right' }} />
                         </Segment>
-                        <Segment style={{ maxHeight: '40vh', overflow: "auto" }}>
+                        <Segment style={{ maxHeight: '50vh', overflow: "auto" }}>
 
                             <Table singleLine unstackable textAlign='center' style={{ tableLayout: 'auto' }} id="table-to-xls">
                                 <Table.Header >

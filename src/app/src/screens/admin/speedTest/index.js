@@ -3,6 +3,7 @@ import 'semantic-ui-css/semantic.min.css';
 import { Segment, Button, Table, Icon, Input } from 'semantic-ui-react'
 import TableRow from './row-table';
 import { Cookies } from "react-cookie";
+import ReactToExcel from "react-html-table-to-excel";
 
 const cookies = new Cookies();
 
@@ -212,14 +213,24 @@ class speedTestScreen extends Component {
                                 {this.state.isDoneTest ? <Button icon color="green" labelPosition='right' onClick={() => this._saveReport()}>
                                     Save <Icon name='check' />
                                 </Button> : ""}
-                                <Button floated='right' color="green" ><Icon name="print" />Export</Button>
+                                <div style={{ marginBottom: '10px', float: 'right' }}>
+
+
+                                    <ReactToExcel
+                                        className="btn1"
+                                        table="table-to-xls"
+                                        filename="speed_test_file"
+                                        sheet="sheet 1"
+                                        buttonText={<Button color="green" ><Icon name="print" />Export</Button>}
+                                    />
+                                </div>
 
                                 <Input icon='search' placeholder='Search...' style={{ float: 'right', marginRight: 5 }} />
                             </Segment>
                         </Segment.Group>
                         <Segment basic style={{ maxHeight: '61vh', overflow: "auto" }}>
 
-                            <Table unstackable >
+                            <Table unstackable id="table-to-xls">
                                 <Table.Header >
                                     <Table.Row>
                                         <Table.HeaderCell>Page</Table.HeaderCell>

@@ -77,7 +77,7 @@ export default class ProhibitedContent extends Component {
             <Segment.Group horizontal style={{ margin: 0 }}>
 
                 <Segment basic loading={this.state.loadingTable} >
-                    <Button icon labelPosition='right' disabled={this.state.isDisable} onClick={() => this._doProhibitedContent()}>
+                    <Button icon primary labelPosition='right' disabled={this.state.isDisable} onClick={() => this._doProhibitedContent()}>
                         Check
                        <Icon name='right arrow' />
                     </Button>
@@ -89,7 +89,7 @@ export default class ProhibitedContent extends Component {
                             table="table-to-xls"
                             filename="prohibited_test_file"
                             sheet="sheet 1"
-                            buttonText={<Button ><Icon name="print" />Export</Button>}
+                            buttonText={<Button color="green"><Icon name="print" />Export</Button>}
                         />
                     </div>
 

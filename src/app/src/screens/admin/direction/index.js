@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Segment, Button, Table, Input, Icon } from 'semantic-ui-react'
 import TableRow from './row-table';
 import { Cookies } from "react-cookie";
+import ReactToExcel from "react-html-table-to-excel";
 
 const cookies = new Cookies();
 export default class Direction extends Component {
@@ -75,15 +76,26 @@ export default class Direction extends Component {
             <Segment.Group horizontal style={{ margin: 0 }}>
 
                 <Segment basic loading={this.state.loadingTable} >
-                    <Button icon labelPosition='right' disabled={this.state.isDisable} onClick={() => this._doLinkRedirection()}>
+                    <Button icon primary labelPosition='right' disabled={this.state.isDisable} onClick={() => this._doLinkRedirection()}>
                         Check
                        <Icon name='right arrow' />
                     </Button>
+                    <div style={{ marginBottom: '10px', float: 'right' }}>
+
+
+                        <ReactToExcel
+                            className="btn1"
+                            table="table-to-xls"
+                            filename="directions_test_file"
+                            sheet="sheet 1"
+                            buttonText={<Button color="green" ><Icon name="print" />Export</Button>}
+                        />
+                    </div>
                     <div style={{ float: 'right', marginBottom: '10px' }}>
                         <Input icon='search' placeholder='Search...' />
                     </div>
-                    <Button style={{ marginRight: '10px' }} floated='right'><Icon name="print" />Export</Button>
-                    <Table singleLine unstackable>
+                    
+                    <Table singleLine unstackable id="table-to-xls">
                         <Table.Header>
                             <Table.Row>
                                 <Table.HeaderCell>Web Address</Table.HeaderCell>
