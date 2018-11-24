@@ -55,4 +55,12 @@ public class ExperienceController {
         return experienceService.getLastestDataMobileLayout(request);
     }
 
+    @CrossOrigin
+    @PostMapping("/api/mobileLayoutTest/SaveReport")
+    public Map<String, Object> saveMobileReport(@RequestBody RequestReportPOJO request) {
+        return experienceService.saveMobileReport(request);
+    }
+
+
+
 }

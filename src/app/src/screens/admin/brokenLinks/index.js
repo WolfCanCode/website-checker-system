@@ -103,7 +103,7 @@ class brokenLinksScreen extends Component {
                                 <p style={{ fontSize: 24 }}>0 <br /> External broken links</p>
                             </Segment>
                         </Segment.Group>
-                        <Segment basic style={{ marginBottom: '0px' }}>
+                        <Segment basic style={{ marginBottom: '-18px', marginTop: '-18px' }}>
                             <Button icon primary labelPosition='right' disabled={this.state.isDisable} onClick={() => this._doBrokenLink()}>
                                 Check
                        <Icon name='right arrow' />

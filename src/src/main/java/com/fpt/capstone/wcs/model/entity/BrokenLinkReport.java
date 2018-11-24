@@ -4,6 +4,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
@@ -21,6 +22,9 @@ public class BrokenLinkReport {
     private String httpMessage;
     private String urlPage;
     private String urlLink;
+    private Date createdTime;
+
+    private boolean delFlag = true;
 
 
     public BrokenLinkReport(int httpCode, String httpMessage, String urlPage, String urlLink) {
