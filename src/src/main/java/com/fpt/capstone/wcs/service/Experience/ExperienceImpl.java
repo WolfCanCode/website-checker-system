@@ -119,7 +119,6 @@ public class ExperienceImpl implements ExperienceService {
         requestCommon.setUserToken(request.getUserToken());
         WebsiteUserPOJO userWebsite = authenticate.isAuthGetUserAndWebsite(requestCommon);
         if (userWebsite != null) {
-            PageOption pageOption = pageOptionRepository.findOneByIdAndWebsiteAndDelFlagEquals(request.getPageOptionId(), userWebsite.getWebsite(), false);
             List<SpeedTestReport> listReport = new ArrayList<>();
             for (int i = 0; i < request.getListReportId().size(); i++) {
                 Optional<SpeedTestReport> optionalReport = speedtestRepository.findById(request.getListReportId().get(i));
@@ -240,17 +239,6 @@ public class ExperienceImpl implements ExperienceService {
                 }
             });
         }
-//        final CyclicBarrier gate = new CyclicBarrier(list.size());
-//        List<Thread> listThread = new ArrayList<>();
-//        for (Page p : list) {
-//            if (p.getType() == 1) {
-//                listThread.add(new Thread() {
-//                    public void run() {
-//
-//                    }
-//                });
-//            }
-//        }
 
         executor.shutdown();
         executor.awaitTermination(Long.MAX_VALUE,TimeUnit.MILLISECONDS);
