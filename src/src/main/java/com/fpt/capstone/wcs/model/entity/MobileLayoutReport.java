@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Data
 @Entity
@@ -20,6 +21,9 @@ public class MobileLayoutReport {
     private String title;
     private String screenShot;
     private String issue;
+    private Date createdTime;
+
+    private boolean delFlag = true;
 
     public MobileLayoutReport(String url, String title, String screenShot, String issue) {
         this.url = url;

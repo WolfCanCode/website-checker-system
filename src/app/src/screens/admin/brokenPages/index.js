@@ -14,7 +14,7 @@ const cookies = new Cookies();
 
 class brokenPagesScreen extends Component {
 
-    state = { list: [], loadingTable: false, isDisable: false, tested: false };
+    state = { list: [], loadingTable: false, isDisable: false, tested: false , countErrorPage : 0 , countMissingPage : 0};
 
 
     componentDidMount() {
@@ -37,6 +37,27 @@ class brokenPagesScreen extends Component {
             comp = data.brokenPageReport.map((item, index) => {
                 return (<TableRow key={index} urlPage={item.urlPage} stt={item.stt} httpCode={item.httpCode} httpMessage={item.httpMessage} />);
             });
+            let countErrorPage = 0;
+            let countMissingPage = 0;
+
+             countErrorPage = data.brokenPageReport.reduce((stt,item) => {
+                 if(item.stt === 'Error Page'){
+                    countErrorPage++;
+                 }
+
+                return countErrorPage;
+            }, 0)
+
+            countMissingPage = data.brokenPageReport.reduce((stt,item) => {
+                if(item.stt === 'Missing Page'){
+                    countMissingPage++;
+                }
+
+               return countMissingPage;
+           }, 0)
+            
+            this.setState({ countErrorPage: countErrorPage })
+            this.setState({ countMissingPage: countMissingPage })
             this.setState({ list: comp });
             this.setState({ loadingTable: false });
         });
@@ -44,7 +65,9 @@ class brokenPagesScreen extends Component {
 
     }
 
+
     _doBrokenPage() {
+        
         var comp = [];
         this.setState({ loadingTable: true, isDisable: true });
         var param = {
@@ -69,6 +92,31 @@ class brokenPagesScreen extends Component {
             if (this.state.list.length === 0) {
                 this.setState({ tested: true });
             }
+            let countErrorPage = 0;
+            let countMissingPage = 0;
+
+             countErrorPage = data.brokenPageReport.reduce((stt,item) => {
+                 if(item.stt === 'Error Page'){
+                    countErrorPage++;
+                 }
+
+                return countErrorPage;
+            }, 0)
+
+            countMissingPage = data.brokenPageReport.reduce((stt,item) => {
+                if(item.stt === 'Missing Page'){
+                    countMissingPage++;
+                }
+
+               return countMissingPage;
+           }, 0)
+            
+            this.setState({ countErrorPage: countErrorPage })
+            this.setState({ countMissingPage: countMissingPage })
+
+           
+
+
             this.setState({ loadingTable: false, isDisable: false });
         });
 
@@ -91,17 +139,17 @@ class brokenPagesScreen extends Component {
                                 <Icon className="warning sign" size='huge' color='red' />
                             </Segment>
                             <Segment style={{ paddingLeft: '10px' }}>
-                                <p style={{ fontSize: 24 }}>0<br />
+                                <p style={{ fontSize: 24 }}>{this.state.countMissingPage}<br />
                                     Missing pages</p>
                             </Segment >
 
                             <Segment style={{ margin: 'auto', textAlign: 'center', padding: 0 }}>
                                 <Icon className="warning sign" size='huge' color='black' /></Segment>
                             <Segment>
-                                <p style={{ fontSize: 24 }}>0 <br /> Error pages</p>
+                                <p style={{ fontSize: 24 }}>{this.state.countErrorPage} <br /> Error pages</p>
                             </Segment>
                         </Segment.Group>
-                        <Segment basic style={{ marginBottom: '0px' }}>
+                        <Segment basic style={{ marginBottom: '-18px', marginTop: '-18px' }}>
                         <Button icon primary labelPosition='right' disabled={this.state.isDisable} onClick={() => this._doBrokenPage()}>
                         Check
                        <Icon name='right arrow' />

@@ -2054,7 +2054,8 @@ public class QualityImpl implements QualityService {
                         WebDriver driver = new ChromeDriver(chromeOptions);//chay an
                         driver.get(p.getUrl());
                         WebElement texts = driver.findElement(By.tagName("body"));
-                        String  bodyText = texts.getText().toLowerCase();
+                        String  bodyTextWithSpace = texts.getText().toLowerCase();
+                        String  bodyText = bodyTextWithSpace.replaceAll("\\s+"," ");
                         for (int i = 0; i< finalWordList.size(); i++){
                             //String a = finalWordList.get(i).getWord().concat("," + );
                             String a = finalWordList.get(i).getWord().concat(",");
@@ -2109,11 +2110,16 @@ public class QualityImpl implements QualityService {
                             System.out.println("dsad" + a);
                             String[] list1 = a.split(",");
                             for(int j = 0; j < list1.length;j++){
-                                if(bodyText.contains(list1[j].toLowerCase())){
 
-                                    ProhibitedContentReport prohibitedContentReport = new ProhibitedContentReport(p.getUrl(),list1[j],finalWordList.get(i).getTopic().getTypeName());
+                                int index = bodyText.indexOf(list1[j].toLowerCase());
+                                while (index >= 0){
+
+                                    String fragment = bodyText.substring(index, index + 30);
+
+                                    ProhibitedContentReport prohibitedContentReport = new ProhibitedContentReport(p.getUrl(),list1[j],fragment,finalWordList.get(i).getTopic().getTypeName());
                                     prohibitedContentReport.setPageOption(option);
                                     resultList.add(prohibitedContentReport);
+                                    index = bodyText.indexOf(list1[j].toLowerCase(), index +1 );
                                 }
                             }
 

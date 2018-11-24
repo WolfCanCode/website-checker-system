@@ -31,7 +31,7 @@ export default class ProhibitedContent extends Component {
             body: JSON.stringify(param)
         }).then(response => response.json()).then((data) => {
             comp = data.prohibitedContentReport.map((item, index) => {
-                return (<TableRow key={index} urlPage={item.urlPage} word={item.word} type={item.type} />);
+                return (<TableRow key={index} urlPage={item.urlPage} word={item.word} fragment={item.fragment} type={item.type} />);
             });
             this.setState({ list: comp });
             this.setState({ loadingTable: false });
@@ -59,7 +59,7 @@ export default class ProhibitedContent extends Component {
             body: JSON.stringify(param)
         }).then(response => response.json()).then((data) => {
             comp = data.prohibitedContentReport.map((item, index) => {
-                return (<TableRow key={index} urlPage={item.urlPage} word={item.word} type={item.type} />);
+                return (<TableRow key={index} urlPage={item.urlPage} word={item.word} fragment={item.fragment} type={item.type} />);
             });
             this.setState({ list: comp });
             this.setState({ loadingTable: false, isDisable: false });
@@ -102,6 +102,7 @@ export default class ProhibitedContent extends Component {
                                
                                 <Table.HeaderCell>Word</Table.HeaderCell>
                                 <Table.HeaderCell>Type</Table.HeaderCell>
+                                <Table.HeaderCell>Fragment</Table.HeaderCell>
                                 <Table.HeaderCell>UrlPage</Table.HeaderCell>
                                 
 
