@@ -21,42 +21,20 @@ import java.util.Map;
 
 @RestController
 public class TechnologyController {
-//    @Autowired
-//    JSCheckRepository jsCheckRepository;
-    @Autowired
-ServerBehaviorRepository serverBehaviorRepository;
-//    @Autowired
-//    MissingFilesPagesRepository missingFilesPagesRepository;
-    @Autowired
-CookieRepository cookieRepository;
-
-//
-
-//    @Autowired
-//    TechnologyService technologyService;
-    @Autowired
-PageRepository pageRepository;
-    @Autowired
-    VersionRepository versionRepository;
-    @Autowired
-    PageOptionRepository pageOptionRepository;
-    @Autowired
-    AuthenticateImpl authenticate;
-
 
     @Autowired
-    TechnologyService technologyServiceS1;
+    TechnologyService technologyService;
 
     @CrossOrigin
     @PostMapping("/api/jsTest")
     public Map<String, Object> getJavaErrrorTest(@RequestBody RequestCommonPOJO request) throws InterruptedException {
-         return  technologyServiceS1.getJavaErrrorTest(request);
+         return  technologyService.getJavaErrrorTest(request);
     }
 
     @CrossOrigin
     @PostMapping("/api/jsTest/lastest")
     public Map<String, Object> getLastestSpeedTest(@RequestBody RequestCommonPOJO request) {
-       return technologyServiceS1.getLastestSpeedTest(request);
+       return technologyService.getLastestSpeedTest(request);
     }
 
     @CrossOrigin
@@ -64,7 +42,7 @@ PageRepository pageRepository;
     public ServerBehaviorReport getServerBehavior(@RequestBody UrlPOJO url) throws InterruptedException, IOException {
 //        com.fpt.capstone.wcs.service.TechnologyService technologyService = new com.fpt.capstone.wcs.service.TechnologyService();
 //        ServerBehaviorReport result = technologyService.checkServerBehavior(url);
-////        serverBehaviorRepository.save(result);
+//        serverBehaviorRepository.save(result);
         return null;
     }
 
@@ -75,50 +53,35 @@ PageRepository pageRepository;
         return null;
     }
 
-//
-
-
-
-
-
     @CrossOrigin
     @Transactional
     @PostMapping("/api/cookie")
     public Map<String, Object> getCookies(@RequestBody RequestCommonPOJO request) throws InterruptedException {
-        return  technologyServiceS1.getCookies(request);
+        return  technologyService.getCookies(request);
     }
 
     @CrossOrigin
     @PostMapping("/api/cookie/lastest")
     public Map<String, Object> getLastestCookies(@RequestBody RequestCommonPOJO request) {
-        return  technologyServiceS1.getLastestCookies(request);
+        return  technologyService.getLastestCookies(request);
     }
 
     @CrossOrigin
     @PostMapping("/api/cookie/SaveReport")
     public Map<String, Object> saveCookiesReport(@RequestBody RequestReportPOJO request) {
-        return technologyServiceS1.saveCookieReport(request);
+        return technologyService.saveCookieReport(request);
     }
-
-    @CrossOrigin
-    @GetMapping("/api/cookie/isExist")
-    public boolean checkAlreadyCookieCheck() {
-        boolean success = cookieRepository.findAll().isEmpty();
-        return success;
-    }
-
 
     @Transactional
     @PostMapping("/api/faviconTest")
     public  Map<String, Object> getDataFaviconTest(@RequestBody  RequestCommonPOJO request) throws InterruptedException {
-        return  technologyServiceS1.getfaviconTest(request);
+        return  technologyService.getfaviconTest(request);
     }
 
-
-
+    
     @PostMapping("/api/faviconTest/lastest")
     public Map<String, Object> getLastestPageTest(@RequestBody RequestCommonPOJO request)
     {
-       return technologyServiceS1.getLastestFaviconTest(request);
+       return technologyService.getLastestFaviconTest(request);
     }
 }
