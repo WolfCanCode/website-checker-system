@@ -14,7 +14,7 @@ export default class managewebsitescreen extends Component {
 
     state = {
         addModal: false, isLoading: false, listWeb: null, webName: "", webUrl: "",
-        isDisable: true, addLoading: false, showSitemapModal: false, 
+        isDisable: true, addLoading: false, showSitemapModal: false,
         showRefModal: false, showRefResultModal: false, currWeb: "", selectedUrl: "",
     }
 
@@ -38,10 +38,10 @@ export default class managewebsitescreen extends Component {
 
     _setSelectedRectValue(url) {
         alert(url);
-        if(url !== ""){
-            this.setState({ selectedUrl: url, showRefModal: true });            
+        if (url !== "") {
+            this.setState({ selectedUrl: url, showRefModal: true });
         }
-        
+
     }
 
     _getRefTo(url) {
@@ -53,7 +53,7 @@ export default class managewebsitescreen extends Component {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({ "managerId": cookies.get("u_id"), "managerToken": cookies.get("u_token") })
-        }).then(response => response.json()).then((data) => {});
+        }).then(response => response.json()).then((data) => { });
 
     }
 
@@ -74,7 +74,7 @@ export default class managewebsitescreen extends Component {
                     return (<TableRow key={index} no={index} id={item.id} name={item.name} url={item.url} version={item.version}
                         time={item.time} loadingTable={(isLoading) => this._loadingTable(isLoading)}
                         refreshTable={() => this._refreshTable()}
-                        
+
                         showingModal={(isShow) => this._showingModal(isShow)}
                         getSelectedWebName={(name) => this._getSelectedWebName(name)}
                         setSelectedRectValue={(url) => this._setSelectedRectValue(url)} />);
@@ -211,7 +211,7 @@ export default class managewebsitescreen extends Component {
                                         <Table.HeaderCell>Lastest updated</Table.HeaderCell>
                                         <Table.HeaderCell>New version</Table.HeaderCell>
                                         <Table.HeaderCell>Action</Table.HeaderCell>
-
+                                        <Table.HeaderCell></Table.HeaderCell>
                                     </Table.Row>
                                 </Table.Header>
                                 <Table.Body>

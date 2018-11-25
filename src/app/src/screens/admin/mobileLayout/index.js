@@ -82,7 +82,7 @@ class mobileLayoutScreen extends Component {
             this.setState({ list: comp });
             this.setState({ list1: comp1 });
 
-            this.setState({ loadingTable: false, isDisable: false,  isDoneTest: true, listReportId: listReport });
+            this.setState({ loadingTable: false, isDisable: false, isDoneTest: true, listReportId: listReport });
         });
 
     }
@@ -90,7 +90,7 @@ class mobileLayoutScreen extends Component {
     _saveReport() {
         this.setState({ loadingTable: true });
         this.setState({ isDisable: true });
-        var comp = [];
+        // var comp = [];
         var comp1 = [];
         var param = {
             "userId": cookies.get("u_id"),
@@ -116,11 +116,11 @@ class mobileLayoutScreen extends Component {
             //this.setState({ list: comp });
             this.setState({ list1: comp1 });
 
-            this.setState({ loadingTable: false, isDisable: false,  isDoneTest: false });
+            this.setState({ loadingTable: false, isDisable: false, isDoneTest: false });
         });
 
 
-        
+
     }
 
 
@@ -135,8 +135,8 @@ class mobileLayoutScreen extends Component {
                    <Icon name='right arrow' />
                     </Button>
                     {this.state.isDoneTest ? <Button icon color="green" labelPosition='right' onClick={() => this._saveReport()}>
-                                    Save <Icon name='check' />
-                                </Button> : ""}
+                        Save <Icon name='check' />
+                    </Button> : ""}
 
                     <div style={{ marginBottom: '10px', float: 'right' }}>
 
