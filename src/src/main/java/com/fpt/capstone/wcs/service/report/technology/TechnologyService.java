@@ -1,6 +1,7 @@
 package com.fpt.capstone.wcs.service.report.technology;
 
 import com.fpt.capstone.wcs.model.pojo.RequestCommonPOJO;
+import com.fpt.capstone.wcs.model.pojo.RequestReportPOJO;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.Map;
@@ -15,4 +16,5 @@ public interface TechnologyService {
     //Test cookie
     public Map<String, Object> getCookies(@RequestBody RequestCommonPOJO request) throws InterruptedException;
     public Map<String, Object> getLastestCookies(@RequestBody RequestCommonPOJO request);
+    public Map<String, Object> saveCookieReport(RequestReportPOJO request);
 }

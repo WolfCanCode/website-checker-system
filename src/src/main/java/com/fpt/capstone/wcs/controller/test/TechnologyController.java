@@ -2,6 +2,7 @@ package com.fpt.capstone.wcs.controller.test;
 
 import com.fpt.capstone.wcs.model.entity.report.technology.ServerBehaviorReport;
 import com.fpt.capstone.wcs.model.pojo.RequestCommonPOJO;
+import com.fpt.capstone.wcs.model.pojo.RequestReportPOJO;
 import com.fpt.capstone.wcs.model.pojo.UrlPOJO;
 
 import com.fpt.capstone.wcs.repository.report.technology.CookieRepository;
@@ -91,6 +92,12 @@ PageRepository pageRepository;
     @PostMapping("/api/cookie/lastest")
     public Map<String, Object> getLastestCookies(@RequestBody RequestCommonPOJO request) {
         return  technologyServiceS1.getLastestCookies(request);
+    }
+
+    @CrossOrigin
+    @PostMapping("/api/cookie/SaveReport")
+    public Map<String, Object> saveCookiesReport(@RequestBody RequestReportPOJO request) {
+        return technologyServiceS1.saveCookieReport(request);
     }
 
     @CrossOrigin

@@ -17,6 +17,9 @@ import com.fpt.capstone.wcs.repository.report.technology.JSCheckRepository;
 import com.fpt.capstone.wcs.repository.website.PageOptionRepository;
 import com.fpt.capstone.wcs.service.report.content.ContentService;
 import com.fpt.capstone.wcs.service.system.authenticate.AuthenticateService;
+import com.fpt.capstone.wcs.model.pojo.RequestReportPOJO;
+import com.fpt.capstone.wcs.model.pojo.WebsiteUserPOJO;
+
 import com.fpt.capstone.wcs.utils.Constant;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -229,20 +232,22 @@ public class TechnologyImpl implements TechnologyService {
     @Override
     public Map<String, Object> getCookies(RequestCommonPOJO request) throws InterruptedException {
         Map<String, Object> res = new HashMap<>();
-        Website website = authenticate.isAuthGetSingleSite(request);
-        if (website != null) {
-            PageOption pageOption = pageOptionRepository.findOneByIdAndWebsiteAndDelFlagEquals(request.getPageOptionId(), website, false);
+        WebsiteUserPOJO userWebsite = authenticate.isAuthGetUserAndWebsite(request);
+        if (userWebsite != null) {
+            PageOption pageOption = pageOptionRepository.findOneByIdAndWebsiteAndDelFlagEquals(request.getPageOptionId(), userWebsite.getWebsite(), false);
             if(pageOption==null){
                 request.setPageOptionId((long)-1);
             }
 
-
-
             if(request.getPageOptionId()!=-1) { //page option list is null
                 List<Page> pages = pageOption.getPages();
-
+                if (pages.size() == 0) {
+                    Page page = new Page();
+                    page.setUrl(userWebsite.getWebsite().getUrl());
+                    page.setType(1);
+                    pages.add(page);
+                }
                 List<CookieReport> resultList = cookieService(pages, pageOption);
-                cookieRepository.removeAllByPageOption(pageOption);
                 cookieRepository.saveAll(resultList);
                 res.put("action", Constant.SUCCESS);
                 res.put("cookieReport", resultList);
@@ -251,7 +256,7 @@ public class TechnologyImpl implements TechnologyService {
             else {
                 List<Page> pages = new ArrayList<>();
                 Page page = new Page();
-                page.setUrl(website.getUrl());
+                page.setUrl(userWebsite.getWebsite().getUrl());
                 page.setType(1);
                 pages.add(page);
 
@@ -276,13 +281,21 @@ public class TechnologyImpl implements TechnologyService {
             if(pageOption==null){
                 request.setPageOptionId((long)-1);
             }
-
             if(request.getPageOptionId()!=-1) {
+                CookieReport cookieReport = cookieRepository.findFirstByPageOptionAndDelFlagEqualsOrderByCreatedTimeDesc(pageOption, false);
+                if(cookieReport != null){
+                    Date lastedCreatedTime = cookieReport.getCreatedTime();
+                    List<CookieReport> resultList = cookieRepository.findAllByPageOptionAndCreatedTime(pageOption, lastedCreatedTime);
+                    res.put("cookieReport", resultList);
+                    res.put("action", Constant.SUCCESS);
+                    return res;
+                } else {
+                    List<CookieReport> resultList = cookieRepository.findAllByPageOption(null);
+                    res.put("cookieReport", resultList);
+                    res.put("action", Constant.SUCCESS);
+                    return res;
+                }
 
-                List<CookieReport> resultList = cookieRepository.findAllByPageOption(pageOption);
-                res.put("cookieReport", resultList);
-                res.put("action", Constant.SUCCESS);
-                return res;
             } else {
                 List<CookieReport> resultList = cookieRepository.findAllByPageOption(null);
                 res.put("cookieReport", resultList);
@@ -295,10 +308,45 @@ public class TechnologyImpl implements TechnologyService {
         }
     }
 
+    @Override
+    public Map<String, Object> saveCookieReport(RequestReportPOJO request) {
+        Map<String, Object> res = new HashMap<>();
+        RequestCommonPOJO requestCommon = new RequestCommonPOJO();
+        requestCommon.setPageOptionId(request.getPageOptionId());
+        requestCommon.setUserId(request.getUserId());
+        requestCommon.setWebsiteId(request.getWebsiteId());
+        requestCommon.setUserToken(request.getUserToken());
+        WebsiteUserPOJO userWebsite = authenticate.isAuthGetUserAndWebsite(requestCommon);
+        if (userWebsite != null) {
+
+            List<CookieReport> listReport = new ArrayList<>();
+            for (int i = 0; i < request.getListReportId().size(); i++) {
+                Optional<CookieReport> optionalReport = cookieRepository.findById(request.getListReportId().get(i));
+                if (optionalReport.isPresent()) {
+                    CookieReport report = optionalReport.get();
+                    report.setDelFlag(false);
+                    listReport.add(report);
+                }
+            }
+            List<CookieReport> results = cookieRepository.saveAll(listReport);
+            if (results.size() != 0) {
+                res.put("action", Constant.SUCCESS);
+                res.put("cookieReport", results);
+                return res;
+            } else {
+                res.put("action", Constant.INCORRECT);
+                return res;
+            }
+        } else {
+            res.put("action", Constant.INCORRECT);
+            return res;
+        }
+    }
+
 
     public List<CookieReport> cookieService(List<Page> list, PageOption option) throws InterruptedException {
         System.setProperty("webdriver.chrome.driver", Constant.CHROME_DRIVER);
-        //Asign list JS info
+        Date createdTime = new Date();
         List<CookieData> cookieList = new ArrayList<>();
 
         cookieList = cookieDataRepository.findAll();
@@ -364,6 +412,7 @@ public class TechnologyImpl implements TechnologyService {
                 if (cookieName.getCookieName().equalsIgnoreCase(cookieList.get(i).getCookieName())) {
                     CookieReport cookieReport =  new CookieReport(cookieList.get(i).getCookieName(), cookieList.get(i).getCategory(), cookieList.get(i).getParty(), cookieList.get(i).getDescription());
                     cookieReport.setPageOption(option);
+                    cookieReport.setCreatedTime(createdTime);
                     resultList.add(cookieReport);
                     //resultList.add(new CookieReport(cookieList.get(i).getCookieName(), cookieList.get(i).getCategory(), cookieList.get(i).getParty(), cookieList.get(i).getDescription()));
                     a = 1;
@@ -372,6 +421,7 @@ public class TechnologyImpl implements TechnologyService {
             if (a == 0) {
                 CookieReport cookieReport = new CookieReport(cookieName.getCookieName(), "Unknown", cookieName.getParty(), "The purpose of these cookies in unknown.");
                 cookieReport.setPageOption(option);
+                cookieReport.setCreatedTime(createdTime);
                 resultList.add(cookieReport);
                 //resultList.add(new CookieReport(cookieName.getCookieName(), "Unknown", cookieName.getParty(), "The purpose of these cookies in unknown."));
 

@@ -348,7 +348,7 @@ public class ExperienceImpl implements ExperienceService {
             List<MobileLayoutReport> results = mobileLayoutRepository.saveAll(listReport);
             if (results.size() != 0) {
                 res.put("action", Constant.SUCCESS);
-                res.put("speedtestReport", results);
+                res.put("mobileLayoutTestReport", results);
                 return res;
             } else {
                 res.put("action", Constant.INCORRECT);

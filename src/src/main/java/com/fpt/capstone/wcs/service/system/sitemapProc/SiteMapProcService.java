@@ -1,8 +1,8 @@
-package com.fpt.capstone.wcs.service;
+package com.fpt.capstone.wcs.service.system.sitemapProc;
 
+import com.fpt.capstone.wcs.model.entity.user.Website;
 import com.fpt.capstone.wcs.model.entity.website.Page;
 import com.fpt.capstone.wcs.model.entity.website.Version;
-import com.fpt.capstone.wcs.model.entity.user.Website;
 import com.fpt.capstone.wcs.model.pojo.SiteLinkPOJO;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.*;
 
-public class SiteMapService {
+public class SiteMapProcService {
     private HashMap<String, Integer> urlMap = new HashMap<String, Integer>();
     private String rootDomain = "";
     private List<List<SiteLinkPOJO>> graph = new ArrayList<List<SiteLinkPOJO>>();
@@ -23,7 +23,7 @@ public class SiteMapService {
     private List<String> links = new ArrayList<String>();
 
     // init site-map with 'root Domain' link
-    public SiteMapService(String rootDomain) {
+    public SiteMapProcService(String rootDomain) {
         this.rootDomain = rootDomain;
         urlMap.clear();
         invGraph.clear();
@@ -388,7 +388,7 @@ public class SiteMapService {
             if (parentId != -1) {
                 subChild.get(parentId).add(i);
             }
-            //user.out.println("node: " + i + " parent: " + parentId);
+            //System.out.println("node: " + i + " parent: " + parentId);
         }
         // print tree
         for (int i = 0; i < verticesNum; i++)
