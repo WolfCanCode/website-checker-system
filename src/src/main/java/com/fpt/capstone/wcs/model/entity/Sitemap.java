@@ -34,7 +34,7 @@ public class Sitemap {
     @JsonIgnore
     private Website website;
 
-    @OneToMany(targetEntity = Version.class, mappedBy = "sitemap_id", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonIgnore
-    private List<Version> version= new ArrayList<>();
+    @ManyToOne()
+    @JoinColumn(name="ver_id")
+    private Version version;
 }

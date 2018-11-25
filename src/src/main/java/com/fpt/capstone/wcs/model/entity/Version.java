@@ -33,4 +33,8 @@ public class Version {
     @JsonIgnore
     @OneToMany(targetEntity = Page.class, mappedBy = "version", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Page> pages= new ArrayList<>();
+
+    @JsonIgnore
+    @OneToMany(targetEntity = Sitemap.class, mappedBy = "version", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Sitemap> listSitemap= new ArrayList<>();
 }
