@@ -11,6 +11,8 @@ import com.fpt.capstone.wcs.model.entity.website.PageOption;
 import com.fpt.capstone.wcs.model.entity.website.WarningWord;
 import com.fpt.capstone.wcs.model.pojo.MissingFilePOJO;
 import com.fpt.capstone.wcs.model.pojo.RequestCommonPOJO;
+import com.fpt.capstone.wcs.model.pojo.RequestReportPOJO;
+import com.fpt.capstone.wcs.model.pojo.WebsiteUserPOJO;
 import com.fpt.capstone.wcs.repository.report.quality.BrokenLinkRepository;
 import com.fpt.capstone.wcs.repository.report.quality.BrokenPageRepository;
 import com.fpt.capstone.wcs.repository.report.quality.MissingFilesPagesRepository;
@@ -41,8 +43,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.*;
-import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -91,16 +92,21 @@ public class QualityImpl implements QualityService {
     @Override
     public Map<String, Object> getDataBrokenLink(RequestCommonPOJO request) throws InterruptedException {
         Map<String, Object> res = new HashMap<>();
-        Website website = authenticate.isAuthGetSingleSite(request);
-        if (website != null) {
-            PageOption pageOption = pageOptionRepository.findOneByIdAndWebsiteAndDelFlagEquals(request.getPageOptionId(), website, false);
+        WebsiteUserPOJO userWebsite = authenticate.isAuthGetUserAndWebsite(request);
+        if (userWebsite != null) {
+            PageOption pageOption = pageOptionRepository.findOneByIdAndWebsiteAndDelFlagEquals(request.getPageOptionId(), userWebsite.getWebsite(), false);
             if(pageOption==null){
                 request.setPageOptionId((long)-1);
             }
             if(request.getPageOptionId()!=-1) { //page option list is null
                 List<Page> pages = pageOption.getPages();
+                if (pages.size() == 0) {
+                    Page page = new Page();
+                    page.setUrl(userWebsite.getWebsite().getUrl());
+                    page.setType(1);
+                    pages.add(page);
+                }
                 List<BrokenLinkReport> resultList = brokenLinkService(pages, pageOption);
-                brokenLinkRepository.removeAllByPageOption(pageOption);
                 brokenLinkRepository.saveAll(resultList);
                 res.put("action", Constant.SUCCESS);
                 res.put("brokenLinkReport", resultList);
@@ -109,7 +115,7 @@ public class QualityImpl implements QualityService {
             else {
                 List<Page> pages = new ArrayList<>();
                 Page page = new Page();
-                page.setUrl(website.getUrl());
+                page.setUrl(userWebsite.getWebsite().getUrl());
                 page.setType(1);
                 pages.add(page);
                 List<BrokenLinkReport> resultList = brokenLinkService(pages, null);
@@ -135,11 +141,21 @@ public class QualityImpl implements QualityService {
             }
 
             if(request.getPageOptionId()!=-1) {
+                BrokenLinkReport brokenLinkReport = brokenLinkRepository.findFirstByPageOptionAndDelFlagEqualsOrderByCreatedTimeDesc(pageOption, false);
+                if(brokenLinkReport != null){
+                    Date lastedCreatedTime = brokenLinkReport.getCreatedTime();
+                    List<BrokenLinkReport> resultList = brokenLinkRepository.findAllByPageOptionAndCreatedTime(pageOption,lastedCreatedTime);
+                    res.put("brokenLinkReport", resultList);
+                    res.put("action", Constant.SUCCESS);
+                    return res;
+                }else {
+                    List<BrokenLinkReport> resultList = brokenLinkRepository.findAllByPageOptionAndUrlLink(null, website.getUrl());
+                    res.put("brokenLinkReport", resultList);
+                    res.put("action", Constant.SUCCESS);
+                    return res;
+                }
 
-                List<BrokenLinkReport> resultList = brokenLinkRepository.findAllByPageOption(pageOption);
-                res.put("brokenLinkReport", resultList);
-                res.put("action", Constant.SUCCESS);
-                return res;
+
             } else {
                 List<BrokenLinkReport> resultList = brokenLinkRepository.findAllByPageOptionAndUrlLink(null,website.getUrl() );
                 res.put("brokenLinkReport", resultList);
@@ -152,18 +168,53 @@ public class QualityImpl implements QualityService {
         }
     }
 
+    @Override
+    public Map<String, Object> saveBrokenLinkReport(RequestReportPOJO request) {
+        Map<String, Object> res = new HashMap<>();
+        RequestCommonPOJO requestCommon = new RequestCommonPOJO();
+        requestCommon.setPageOptionId(request.getPageOptionId());
+        requestCommon.setUserId(request.getUserId());
+        requestCommon.setWebsiteId(request.getWebsiteId());
+        requestCommon.setUserToken(request.getUserToken());
+        WebsiteUserPOJO userWebsite = authenticate.isAuthGetUserAndWebsite(requestCommon);
+        if (userWebsite != null) {
+
+            List<BrokenLinkReport> listReport = new ArrayList<>();
+            for (int i = 0; i < request.getListReportId().size(); i++) {
+                Optional<BrokenLinkReport> optionalReport = brokenLinkRepository.findById(request.getListReportId().get(i));
+                if (optionalReport.isPresent()) {
+                    BrokenLinkReport report = optionalReport.get();
+                    report.setDelFlag(false);
+                    listReport.add(report);
+                }
+            }
+            List<BrokenLinkReport> results = brokenLinkRepository.saveAll(listReport);
+            if (results.size() != 0) {
+                res.put("action", Constant.SUCCESS);
+                res.put("brokenLinkReport", results);
+                return res;
+            } else {
+                res.put("action", Constant.INCORRECT);
+                return res;
+            }
+        } else {
+            res.put("action", Constant.INCORRECT);
+            return res;
+        }
+    }
+
     public List<BrokenLinkReport> brokenLinkService(List<Page> list, PageOption option) throws InterruptedException {
         //Asign list Broken Link
         List<BrokenLinkReport> resultList = new ArrayList<>();
-
-        final CyclicBarrier gate = new CyclicBarrier(list.size());
-        List<Thread> listThread = new ArrayList<>();
+        Date createdTime = new Date();
+        ExecutorService executor = Executors.newFixedThreadPool(Constant.MAX_THREAD);
 
         for (Page p : list) {
-            listThread.add(new Thread() {
+            executor.submit(new Runnable() {
+                @Override
                 public void run() {
                     try {
-                        gate.await();
+
                         HttpURLConnection connection = (HttpURLConnection) new URL(p.getUrl()).openConnection();
                         connection.connect();
                         String responseMessage = connection.getResponseMessage();
@@ -173,71 +224,51 @@ public class QualityImpl implements QualityService {
                         if(responseCode == HttpURLConnection.HTTP_NOT_FOUND){
                             BrokenLinkReport brokenLinkReport =  new BrokenLinkReport(responseCode, responseMessage,"https://www.nottingham.ac.uk/about", p.getUrl());
                             brokenLinkReport.setPageOption(option);
+                            brokenLinkReport.setCreatedTime(createdTime);
                             resultList.add(brokenLinkReport);
-
-
-
                         }
 
                         if(responseCode == HttpURLConnection.HTTP_BAD_REQUEST){
                             BrokenLinkReport brokenLinkReport =  new BrokenLinkReport(responseCode, responseMessage,"https://www.nottingham.ac.uk/about", p.getUrl());
                             brokenLinkReport.setPageOption(option);
+                            brokenLinkReport.setCreatedTime(createdTime);
                             resultList.add(brokenLinkReport);
-
-
                         }
 
 
                     }  catch (MalformedURLException e) {
-
-                        System.out.println("hihi 1");
                         System.out.println("message 1" + e.getMessage());
                         if(e.toString().contains("java.net.MalformedURLException")){
                             BrokenLinkReport brokenLinkReport =  new BrokenLinkReport(HttpURLConnection.HTTP_BAD_REQUEST, "Bad Request","https://www.nottingham.ac.uk/about", p.getUrl());
                             brokenLinkReport.setPageOption(option);
+                            brokenLinkReport.setCreatedTime(createdTime);
                             resultList.add(brokenLinkReport);
                             //resultList.add(new BrokenLinkReport(HttpURLConnection.HTTP_BAD_REQUEST, ,"https://www.nottingham.ac.uk/about", p.getUrl()));
                         }
                         // Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
                     } catch (IOException e) {
                         e.printStackTrace();
-                        System.out.println("hihi 2");
+
                         System.out.println("message 2" + e.getMessage());
                         System.out.println("message 2.1" + e.toString());
                         if(e.toString().contains("java.net.UnknownHostException")){
                             BrokenLinkReport brokenLinkReport =  new BrokenLinkReport(HttpURLConnection.HTTP_BAD_REQUEST, "Bad Request","https://www.nottingham.ac.uk/about", p.getUrl());
                             brokenLinkReport.setPageOption(option);
+                            brokenLinkReport.setCreatedTime(createdTime);
                             resultList.add(brokenLinkReport);
                             //resultList.add(new BrokenLinkReport(HttpURLConnection.HTTP_BAD_REQUEST, "Bad Request","https://www.nottingham.ac.uk/about", p.getUrl()));
                         }
+                    } catch (Exception e) {
 
-//                        if(e.toString().contains("java.net.ConnectException")){
-//                            resultList.add(new BrokenLinkReport(HttpURLConnection.HTTP_GATEWAY_TIMEOUT, "Gateway Timeout","https://www.nottingham.ac.uk/about", u.getUrl()));
-//                        }
-
-                        //Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
-                    } catch (InterruptedException e) {
-                        System.out.println("hihi 3");
                         System.out.println("message 3" + e.getMessage());
                         //Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
-                    } catch (BrokenBarrierException e) {
-                        System.out.println("hihi 4");
-                        System.out.println("message 4" + e.getMessage());
-                        // Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
                     }
                 }
             });
         }
-        for (Thread t : listThread) {
-            System.out.println("Threed start");
-            t.start();
-        }
 
-        for (Thread t : listThread) {
-            System.out.println("Threed join");
-            t.join();
-        }
-
+        executor.shutdown();
+        executor.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
         return resultList;
 
     }
@@ -247,19 +278,21 @@ public class QualityImpl implements QualityService {
     @Override
     public Map<String, Object> getDataBrokenPage(RequestCommonPOJO request) throws InterruptedException {
         Map<String, Object> res = new HashMap<>();
-        Website website = authenticate.isAuthGetSingleSite(request);
-        if (website != null) {
-            PageOption pageOption = pageOptionRepository.findOneByIdAndWebsiteAndDelFlagEquals(request.getPageOptionId(), website, false);
+        WebsiteUserPOJO userWebsite = authenticate.isAuthGetUserAndWebsite(request);
+        if (userWebsite != null) {
+            PageOption pageOption = pageOptionRepository.findOneByIdAndWebsiteAndDelFlagEquals(request.getPageOptionId(), userWebsite.getWebsite(), false);
             if(pageOption==null){
                 request.setPageOptionId((long)-1);
             }
-
-
-
             if(request.getPageOptionId()!=-1) { //page option list is null
                 List<Page> pages = pageOption.getPages();
+                if (pages.size() == 0) {
+                    Page page = new Page();
+                    page.setUrl(userWebsite.getWebsite().getUrl());
+                    page.setType(1);
+                    pages.add(page);
+                }
                 List<BrokenPageReport> resultList = brokenPageService(pages, pageOption);
-                brokenPageRepository.removeAllByPageOption(pageOption);
                 brokenPageRepository.saveAll(resultList);
                 res.put("action", Constant.SUCCESS);
                 res.put("brokenPageReport", resultList);
@@ -268,7 +301,7 @@ public class QualityImpl implements QualityService {
             else {
                 List<Page> pages = new ArrayList<>();
                 Page page = new Page();
-                page.setUrl(website.getUrl());
+                page.setUrl(userWebsite.getWebsite().getUrl());
                 page.setType(1);
                 pages.add(page);
                 List<BrokenPageReport> resultList = brokenPageService(pages, null);
@@ -294,11 +327,21 @@ public class QualityImpl implements QualityService {
             }
 
             if(request.getPageOptionId()!=-1) {
+                BrokenPageReport brokenPageReport = brokenPageRepository.findFirstByPageOptionAndDelFlagEqualsOrderByCreatedTimeDesc(pageOption, false);
+                if(brokenPageReport != null){
+                    Date lastedCreatedTime = brokenPageReport.getCreatedTime();
+                    List<BrokenPageReport> resultList = brokenPageRepository.findAllByPageOptionAndCreatedTime(pageOption, lastedCreatedTime);
+                    res.put("brokenPageReport", resultList);
+                    res.put("action", Constant.SUCCESS);
+                    return res;
+                }else {
+                    List<BrokenPageReport> resultList = brokenPageRepository.findAllByPageOptionAndUrlPage(null, website.getUrl());
+                    res.put("brokenPageReport", resultList);
+                    res.put("action", Constant.SUCCESS);
+                    return res;
+                }
 
-                List<BrokenPageReport> resultList = brokenPageRepository.findAllByPageOption(pageOption);
-                res.put("brokenPageReport", resultList);
-                res.put("action", Constant.SUCCESS);
-                return res;
+
             } else {
                 List<BrokenPageReport> resultList = brokenPageRepository.findAllByPageOptionAndUrlPage(null, website.getUrl());
                 res.put("brokenPageReport", resultList);
@@ -311,20 +354,51 @@ public class QualityImpl implements QualityService {
         }
     }
 
-
+    @Override
+    public Map<String, Object> saveBrokenPageReport(RequestReportPOJO request) {
+        Map<String, Object> res = new HashMap<>();
+        RequestCommonPOJO requestCommon = new RequestCommonPOJO();
+        requestCommon.setPageOptionId(request.getPageOptionId());
+        requestCommon.setUserId(request.getUserId());
+        requestCommon.setWebsiteId(request.getWebsiteId());
+        requestCommon.setUserToken(request.getUserToken());
+        WebsiteUserPOJO userWebsite = authenticate.isAuthGetUserAndWebsite(requestCommon);
+        if (userWebsite != null) {
+            List<BrokenPageReport> listReport = new ArrayList<>();
+            for (int i = 0; i < request.getListReportId().size(); i++) {
+                Optional<BrokenPageReport> optionalReport = brokenPageRepository.findById(request.getListReportId().get(i));
+                if (optionalReport.isPresent()) {
+                    BrokenPageReport report = optionalReport.get();
+                    report.setDelFlag(false);
+                    listReport.add(report);
+                }
+            }
+            List<BrokenPageReport> results = brokenPageRepository.saveAll(listReport);
+            if (results.size() != 0) {
+                res.put("action", Constant.SUCCESS);
+                res.put("brokenPageReport", results);
+                return res;
+            } else {
+                res.put("action", Constant.INCORRECT);
+                return res;
+            }
+        } else {
+            res.put("action", Constant.INCORRECT);
+            return res;
+        }
+    }
 
 
     public List<BrokenPageReport> brokenPageService(List<Page> list, PageOption option) throws InterruptedException {
         //Asign list Broken Page
+        Date createdTime = new Date();
         List<BrokenPageReport> resultList = new ArrayList<>();
-        final CyclicBarrier gate = new CyclicBarrier(list.size());
-        List<Thread> listThread = new ArrayList<>();
-
+        ExecutorService executor = Executors.newFixedThreadPool(Constant.MAX_THREAD);
         for (Page p : list) {
-            listThread.add(new Thread() {
+            executor.submit(new Runnable() {
                 public void run() {
                     try {
-                        gate.await();
+
                         HttpURLConnection connection = (HttpURLConnection) new URL(p.getUrl()).openConnection();
                         connection.connect();
                         String responseMessage = connection.getResponseMessage();
@@ -338,6 +412,7 @@ public class QualityImpl implements QualityService {
                             // resultList.add(new BrokenPageReport(p.getUrl(), "Missing Page", responseCode , responseMessage));
                             BrokenPageReport brokenPageReport = new BrokenPageReport(p.getUrl(), "Missing Page", responseCode , responseMessage);
                             brokenPageReport.setPageOption(option);
+                            brokenPageReport.setCreatedTime(createdTime);
                             resultList.add(brokenPageReport);
 
                         }
@@ -347,20 +422,19 @@ public class QualityImpl implements QualityService {
 
                                 BrokenPageReport brokenPageReport = new BrokenPageReport(p.getUrl(), "Error Page", responseCode , responseMessage);
                                 brokenPageReport.setPageOption(option);
+                                brokenPageReport.setCreatedTime(createdTime);
                                 resultList.add(brokenPageReport);
 
                             }
 
                         }
 
-
-
-
                     }  catch (MalformedURLException e) {
                         Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
                         if(e.toString().contains("java.net.MalformedURLException")){
                             BrokenPageReport brokenPageReport = new BrokenPageReport(p.getUrl(), "Error Page", HttpURLConnection.HTTP_BAD_REQUEST , "Bad Request");
                             brokenPageReport.setPageOption(option);
+                            brokenPageReport.setCreatedTime(createdTime);
                             resultList.add(brokenPageReport);
                             // resultList.add(new BrokenPageReport(u.getUrl(), "Error Page", HttpURLConnection.HTTP_BAD_REQUEST , "Bad Request"));
                         }
@@ -369,6 +443,7 @@ public class QualityImpl implements QualityService {
                         if(e.toString().contains("java.net.UnknownHostException")){
                             BrokenPageReport brokenPageReport = new BrokenPageReport(p.getUrl(), "Error Page", HttpURLConnection.HTTP_BAD_REQUEST , "Bad Request");
                             brokenPageReport.setPageOption(option);
+                            brokenPageReport.setCreatedTime(createdTime);
                             resultList.add(brokenPageReport);
                             // resultList.add(new BrokenPageReport(u.getUrl(), "Error Page", HttpURLConnection.HTTP_BAD_REQUEST , "Bad Request"));
                         }
@@ -377,26 +452,19 @@ public class QualityImpl implements QualityService {
                         if(e.toString().contains("java.net.ConnectException")){
                             BrokenPageReport brokenPageReport = new BrokenPageReport(p.getUrl(), "Error Page", HttpURLConnection.HTTP_GATEWAY_TIMEOUT , "Gateway Timeout");
                             brokenPageReport.setPageOption(option);
+                            brokenPageReport.setCreatedTime(createdTime);
                             resultList.add(brokenPageReport);
                             //resultList.add(new BrokenPageReport(u.getUrl(), "Error Page", HttpURLConnection.HTTP_GATEWAY_TIMEOUT , "Gateway Timeout"));
                         }
-                    } catch (InterruptedException e) {
-                        Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
-                    } catch (BrokenBarrierException e) {
+                    }
+                        catch (Exception e) {
                         Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
                     }
                 }
             });
         }
-        for (Thread t : listThread) {
-            System.out.println("Threed start");
-            t.start();
-        }
-
-        for (Thread t : listThread) {
-            System.out.println("Threed join");
-            t.join();
-        }
+        executor.shutdown();
+        executor.awaitTermination(Long.MAX_VALUE,TimeUnit.MILLISECONDS);
 
         return resultList;
 
@@ -405,9 +473,10 @@ public class QualityImpl implements QualityService {
     @Override
     public Map<String, Object> getDataProhibitedContent(RequestCommonPOJO request) throws InterruptedException {
         Map<String, Object> res = new HashMap<>();
-        Website website = authenticate.isAuthGetSingleSite(request);
-        if (website != null) {
-            PageOption pageOption = pageOptionRepository.findOneByIdAndWebsiteAndDelFlagEquals(request.getPageOptionId(), website, false);
+        WebsiteUserPOJO userWebsite = authenticate.isAuthGetUserAndWebsite(request);
+
+        if (userWebsite != null) {
+            PageOption pageOption = pageOptionRepository.findOneByIdAndWebsiteAndDelFlagEquals(request.getPageOptionId(), userWebsite.getWebsite(), false);
             if(pageOption==null){
                 request.setPageOptionId((long)-1);
             }
@@ -416,8 +485,13 @@ public class QualityImpl implements QualityService {
 
             if(request.getPageOptionId()!=-1) { //page option list is null
                 List<Page> pages = pageOption.getPages();
+                if (pages.size() == 0) {
+                    Page page = new Page();
+                    page.setUrl(userWebsite.getWebsite().getUrl());
+                    page.setType(1);
+                    pages.add(page);
+                }
                 List<ProhibitedContentReport> resultList = prohibitedContentService(pages, pageOption);
-                prohibitedContentRepository.removeAllByPageOption(pageOption);
                 prohibitedContentRepository.saveAll(resultList);
                 res.put("action", Constant.SUCCESS);
                 res.put("prohibitedContentReport", resultList);
@@ -426,7 +500,7 @@ public class QualityImpl implements QualityService {
             else {
                 List<Page> pages = new ArrayList<>();
                 Page page = new Page();
-                page.setUrl(website.getUrl());
+                page.setUrl(userWebsite.getWebsite().getUrl());
                 page.setType(1);
                 pages.add(page);
                 List<ProhibitedContentReport> resultList = prohibitedContentService(pages, null);
@@ -453,15 +527,60 @@ public class QualityImpl implements QualityService {
             }
 
             if(request.getPageOptionId()!=-1) {
+                ProhibitedContentReport prohibitedContentReport = prohibitedContentRepository.findFirstByPageOptionAndDelFlagEqualsOrderByCreatedTimeDesc(pageOption, false);
+                if(prohibitedContentReport != null){
+                    Date lastedCreatedTime = prohibitedContentReport.getCreatedTime();
+                    List<ProhibitedContentReport> resultList = prohibitedContentRepository.findAllByPageOptionAndCreatedTime(pageOption, lastedCreatedTime);
+                    res.put("prohibitedContentReport", resultList);
+                    res.put("action", Constant.SUCCESS);
+                    return res;
+                }else {
+                    List<ProhibitedContentReport> resultList = prohibitedContentRepository.findAllByPageOptionAndUrlPage(null, website.getUrl());
+                    res.put("prohibitedContentReport", resultList);
+                    res.put("action", Constant.SUCCESS);
+                    return res;
+                }
 
-                List<ProhibitedContentReport> resultList = prohibitedContentRepository.findAllByPageOption(pageOption);
-                res.put("prohibitedContentReport", resultList);
-                res.put("action", Constant.SUCCESS);
-                return res;
+
             } else {
                 List<ProhibitedContentReport> resultList = prohibitedContentRepository.findAllByPageOptionAndUrlPage(null,website.getUrl() );
                 res.put("prohibitedContentReport", resultList);
                 res.put("action", Constant.SUCCESS);
+                return res;
+            }
+        } else {
+            res.put("action", Constant.INCORRECT);
+            return res;
+        }
+    }
+
+    @Override
+    public Map<String, Object> saveProhibitedContentReport(RequestReportPOJO request) {
+
+        Map<String, Object> res = new HashMap<>();
+        RequestCommonPOJO requestCommon = new RequestCommonPOJO();
+        requestCommon.setPageOptionId(request.getPageOptionId());
+        requestCommon.setUserId(request.getUserId());
+        requestCommon.setWebsiteId(request.getWebsiteId());
+        requestCommon.setUserToken(request.getUserToken());
+        WebsiteUserPOJO userWebsite = authenticate.isAuthGetUserAndWebsite(requestCommon);
+        if (userWebsite != null) {
+            List<ProhibitedContentReport> listReport = new ArrayList<>();
+            for (int i = 0; i < request.getListReportId().size(); i++) {
+                Optional<ProhibitedContentReport> optionalReport = prohibitedContentRepository.findById(request.getListReportId().get(i));
+                if (optionalReport.isPresent()) {
+                    ProhibitedContentReport report = optionalReport.get();
+                    report.setDelFlag(false);
+                    listReport.add(report);
+                }
+            }
+            List<ProhibitedContentReport> results = prohibitedContentRepository.saveAll(listReport);
+            if (results.size() != 0) {
+                res.put("action", Constant.SUCCESS);
+                res.put("prohibitedContentReport", results);
+                return res;
+            } else {
+                res.put("action", Constant.INCORRECT);
                 return res;
             }
         } else {
@@ -2036,31 +2155,27 @@ public class QualityImpl implements QualityService {
 
     public List<ProhibitedContentReport> prohibitedContentService(List<Page> list, PageOption option) throws InterruptedException {
         System.setProperty("webdriver.chrome.driver", Constant.CHROME_DRIVER);
-
+        Date createdTime = new Date();
         List<WarningWord> wordList = new ArrayList<>();
 
         wordList = warningWordRepository.findAllByDelFlagEquals(false);
         System.out.println("wordlist " + wordList.size());
-
+        ExecutorService executor = Executors.newFixedThreadPool(Constant.MAX_THREAD);
         List<InrregularVerb> inrregularVerbList = new ArrayList<>();
 
         inrregularVerbList = inrregularVerbRepository.findAll();
         List<ProhibitedContentReport> resultList = new ArrayList<>();
-
-
-        final CyclicBarrier gate = new CyclicBarrier(list.size());
-        List<Thread> listThread = new ArrayList<>();
         List<Character> consonants = Arrays.asList('b','c','d','f','g','h','j','k','l','m','n','p','q','r','s','t','v','x','y','z');// phu am
         List<Character> vowels = Arrays.asList('a', 'e', 'i', 'o', 'u');//nguyen am
-
 
         for (Page p : list) {
             List<WarningWord> finalWordList = wordList;
             List<InrregularVerb> finalInrregularVerbList = inrregularVerbList;
-            listThread.add(new Thread() {
+            executor.submit(new Runnable() {
+                @Override
                 public void run() {
                     try {
-                        gate.await();
+
                         String verb,verb1, verb2, verb3, verbing, verbed;
 
                         ChromeOptions chromeOptions = new ChromeOptions();
@@ -2132,6 +2247,7 @@ public class QualityImpl implements QualityService {
 
                                     ProhibitedContentReport prohibitedContentReport = new ProhibitedContentReport(p.getUrl(),list1[j],fragment,finalWordList.get(i).getTopic().getTypeName());
                                     prohibitedContentReport.setPageOption(option);
+                                    prohibitedContentReport.setCreatedTime(createdTime);
                                     resultList.add(prohibitedContentReport);
                                     index = bodyText.indexOf(list1[j].toLowerCase(), index +1 );
                                 }
@@ -2144,26 +2260,19 @@ public class QualityImpl implements QualityService {
 
 
 
-                    }catch (InterruptedException | BrokenBarrierException e) {
+                    }catch (Exception e) {
                         Logger.getLogger(QualityImpl.class.getName()).log(Level.SEVERE, null, e);
                     }
                 }
             });
         }
-        for (Thread t : listThread) {
-            System.out.println("Threed start");
-            t.start();
-        }
-
-        for (Thread t : listThread) {
-            System.out.println("Threed join");
-            t.join();
-        }
 
 
 
 
-//
+
+        executor.shutdown();
+        executor.awaitTermination(Long.MAX_VALUE,TimeUnit.MILLISECONDS);
         return resultList;
     }
 

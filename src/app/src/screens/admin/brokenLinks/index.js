@@ -11,7 +11,7 @@ const cookies = new Cookies();
 
 class brokenLinksScreen extends Component {
 
-    state = { list: [], loadingTable: false, isDisable: false, tested: false };
+    state = { list: [], loadingTable: false, isDisable: false, tested: false, isDoneTest: false, listReportId: [] };
 
 
     componentDidMount() {
@@ -64,6 +64,42 @@ class brokenLinksScreen extends Component {
             },
             body: JSON.stringify(param)
         }).then(response => response.json()).then((data) => {
+            var listReport = [];
+            comp = data.brokenLinkReport.map((item, index) => {
+                listReport.push(item.id);
+                return (<TableRow key={index} urlPage={item.urlPage} urlLink={item.urlLink} httpCode={item.httpCode} httpMessage={item.httpMessage} />);
+            });
+
+
+            this.setState({ list: comp });
+            if (this.state.list.length === 0) {
+                this.setState({ tested: true });
+            }
+
+            this.setState({ loadingTable: false, isDisable: false, isDoneTest: true, listReportId: listReport  });
+        });
+
+    }
+
+    _saveReport() {
+        var comp = [];
+        this.setState({ loadingTable: true, isDisable: true });
+        var param = {
+            "userId": cookies.get("u_id"),
+            "userToken": cookies.get("u_token"),
+            "websiteId": cookies.get("u_w_id"),
+            "pageOptionId": cookies.get("u_option"),
+            "listReportId": this.state.listReportId
+        };
+
+        fetch("/api/brokenLink/SaveReport", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(param)
+        }).then(response => response.json()).then((data) => {
             comp = data.brokenLinkReport.map((item, index) => {
                 return (<TableRow key={index} urlPage={item.urlPage} urlLink={item.urlLink} httpCode={item.httpCode} httpMessage={item.httpMessage} />);
             });
@@ -74,7 +110,7 @@ class brokenLinksScreen extends Component {
                 this.setState({ tested: true });
             }
 
-            this.setState({ loadingTable: false, isDisable: false });
+            this.setState({ loadingTable: false, isDisable: false, isDoneTest: false  });
         });
 
     }
@@ -108,6 +144,9 @@ class brokenLinksScreen extends Component {
                                 Check
                        <Icon name='right arrow' />
                             </Button>
+                            {this.state.isDoneTest && this.state.list.length !== 0 ? <Button icon color="green" labelPosition='right' onClick={() => this._saveReport()}>
+                        Save <Icon name='check' />
+                    </Button> : ""}
                             <div style={{ float: 'right' }}>
                                 <ReactToExcel
                                     className="btn1"
