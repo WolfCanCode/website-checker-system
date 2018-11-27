@@ -13,7 +13,7 @@ import java.util.Date;
 @Entity
 @Getter
 @Setter
-@Table(name = "GrammarReport")
+@Table(name = "SpellingReport")
 public class SpellingReport {
     @Id
     @GeneratedValue
