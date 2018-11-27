@@ -2193,11 +2193,11 @@ public class QualityImpl implements QualityService {
                             verb = finalWordList.get(i).getWord().toLowerCase();
 
                             if( verb.length()>1 && consonants.contains( verb.charAt(verb.length()-2)) && vowels.contains( verb.charAt(verb.length()-1))){
-                                verbing = verb.substring(0, verb.length()-1) + "ing";
+                                verbing = verb.substring(0, verb.length()-1) + Constant.Verb_type[3];
                                 a = a.concat(verbing + ",");
                                 //tan cung khong phai y va w, , truoc la nguyen am, truoc nua khong phai la nguyen am
                             }else{
-                                verbing = verb + "ing";
+                                verbing = verb + Constant.Verb_type[3];
                                 a = a.concat(verbing + ",");
                             }
 
@@ -2218,15 +2218,15 @@ public class QualityImpl implements QualityService {
 
                                 if(check == true){
                                     if(verb.charAt(verb.length()-1)=='e'){//tan cung e
-                                        verbed = verb + "d";
+                                        verbed = verb + Constant.Verb_type[0];
                                         //tan cung y, truoc la phu am
                                     }else if(consonants.contains(verb.charAt(verb.length()-2)) && verb.charAt(verb.length()-1)=='y'){
-                                        verbed = verb.substring(0, verb.length()-1) + "ied";
+                                        verbed = verb.substring(0, verb.length()-1) + Constant.Verb_type[2];
                                         //tan cung khong phai y va w, , truoc la nguyen am, truoc nua khong phai la nguyen am
                                     }else if(verb.length()>2 && !vowels.contains(verb.charAt(verb.length()-3)) && vowels.contains(verb.charAt(verb.length()-2)) && ( consonants.contains(verb.charAt(verb.length()-1)) && verb.charAt(verb.length()-1)!='w' && verb.charAt(verb.length()-1)!='y' )){
-                                        verbed = verb + verb.charAt(verb.length()-1) + "ed";
+                                        verbed = verb + verb.charAt(verb.length()-1) + Constant.Verb_type[1];
                                     }else{
-                                        verbed = verb + "ed";
+                                        verbed = verb + Constant.Verb_type[1];
                                     }
                                     a = a.concat(verbed + ",");
 
