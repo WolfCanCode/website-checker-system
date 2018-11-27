@@ -62,7 +62,7 @@ class faviconScreen extends Component {
                     faviconMissCount++;
                 }
 
-                return (<TableRow key={index} image={item.faviconUrl} url={item.faviconUrl} sizeFav={item.sizeFavicon} webAddress={item.url} />);
+                return (<TableRow key={index} image={item.faviconUrl} url={item.faviconUrl} sizeFav={item.sizeFavicon} typeFavicon ={item.typeFavicon}webAddress={item.url} />);
             });
             this.setState({ faviconMissingCount: faviconMissCount })
             this.setState({ faviconCount: favUrlCount });
@@ -111,7 +111,7 @@ class faviconScreen extends Component {
                 if (item.faviconUrl === "Missing Favicon") {
                     faviconMissCount++;
                 }
-                return (<TableRow key={index} image={item.faviconUrl} url={item.faviconUrl} sizeFav={item.sizeFavicon} webAddress={item.url} />);
+                return (<TableRow key={index} image={item.faviconUrl} url={item.faviconUrl} sizeFav={item.sizeFavicon} typeFavicon ={item.typeFavicon}w webAddress={item.url} />);
             });
             this.setState({ faviconCount: favUrlCount });
             this.setState({ faviconMissingCount: faviconMissCount });
@@ -185,6 +185,7 @@ class faviconScreen extends Component {
                                         <Table.HeaderCell>Favicon</Table.HeaderCell>
                                         <Table.HeaderCell>URL</Table.HeaderCell>
                                         <Table.HeaderCell>Width</Table.HeaderCell>
+                                        <Table.HeaderCell>Type</Table.HeaderCell>
                                         <Table.HeaderCell>Pages</Table.HeaderCell>
 
                                     </Table.Row>

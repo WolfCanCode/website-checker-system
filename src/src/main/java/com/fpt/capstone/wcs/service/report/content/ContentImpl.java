@@ -24,12 +24,8 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.CyclicBarrier;
+import java.util.*;
+import java.util.concurrent.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -254,14 +250,17 @@ public class ContentImpl implements  ContentService {
 
 
     public List<PageReport> getPageInfor(List<Page> list, PageOption option)  {
+        Date createdTime = new Date();
         List<PageReport> pageCheck = new ArrayList<>();
         final CyclicBarrier gate = new CyclicBarrier(list.size());
-        List<Thread> listThread = new ArrayList<>();
+        ExecutorService executor = Executors.newFixedThreadPool(Constant.MAX_THREAD);
         for (Page url:list){
-            listThread.add(new Thread(){
+            executor.submit(new Runnable() {
+
+                @Override
                 public void run() {
                     try {
-                        gate.await();
+
                         String title = getTitle(url.getUrl());
                         int  httpcode = getStatus(url.getUrl());
                         System.out.println("HTTP  code"+getStatus(url.getUrl()));
@@ -269,42 +268,37 @@ public class ContentImpl implements  ContentService {
 
                         PageReport page = new PageReport(httpcode, url.getUrl(),title,canoUrl);
                         page.setPageOption(option);
+                        page.setCreatedTime(createdTime);
                         pageCheck.add(page);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    } catch (BrokenBarrierException e) {
-                        e.printStackTrace();
-                    } catch (IOException e) {
+                    }  catch (IOException e) {
                         e.printStackTrace();
                     }
-                }
-            });
+                }});
+
 
         }
-        for (Thread t : listThread) {
-            System.out.println("Threed start");
-            t.start();
-        }
-
-        for (Thread t : listThread) {
-            System.out.println("Threed join");
-            try {
-                t.join();
-            } catch (InterruptedException e) {
-                Logger.getLogger(ContentService.class.getName()).log(Level.SEVERE, null, e);
-            }
+        executor.shutdown();
+        try {
+            executor.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            Logger.getLogger(ContentImpl.class.getName()).log(Level.SEVERE, null, e);
         }
         return pageCheck;
     }
 
     public  List<RedirectionReport> redirectionTest(List<Page> list, PageOption option)  {
+        Date createdTime = new Date();
         List<RedirectionReport> pageCheck = new ArrayList<>();
         final CyclicBarrier gate = new CyclicBarrier(list.size());
-        List<Thread> listThread = new ArrayList<>();
+        ExecutorService executor = Executors.newFixedThreadPool(Constant.MAX_THREAD);
         for(Page url:list){
-            listThread.add(new Thread(){
+            executor.submit(new Runnable() {
+
+                @Override
                 public void run() {
+
                     try {
+
                         int  code =getStatus(url.getUrl());
                         if(code== HttpURLConnection.HTTP_MOVED_TEMP || code == HttpURLConnection.HTTP_MOVED_PERM){
                             URL siteURL = new URL(url.getUrl());
@@ -320,27 +314,20 @@ public class ContentImpl implements  ContentService {
                             String codeNew = ""+code;
                             RedirectionReport link = new RedirectionReport(code, url.getUrl(), message ,newUrl);
                             link.setPageOption(option);
+                            link.setCreatedTime(createdTime);
                             pageCheck.add(link);
                         }
                     }catch (IOException e){
                         Logger.getLogger(ContentService.class.getName()).log(Level.SEVERE, null, e);
                     }
-
-                }});
-
+                }
+            });
         }
-        for (Thread t : listThread) {
-            System.out.println("Threed start");
-            t.start();
-        }
-
-        for (Thread t : listThread) {
-            System.out.println("Threed join");
-            try {
-                t.join();
-            } catch (InterruptedException e) {
-                Logger.getLogger(ContentService.class.getName()).log(Level.SEVERE, null, e);
-            }
+        executor.shutdown();
+        try {
+            executor.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            Logger.getLogger(ContentImpl.class.getName()).log(Level.SEVERE, null, e);
         }
         return pageCheck;
     }
@@ -466,173 +453,188 @@ public class ContentImpl implements  ContentService {
     }
 
     public List<ContactReport> getContactDetail(List<Page> list, PageOption option){
+        Date createdTime = new Date();
         List<ContactReport> list1 = new ArrayList<>();
         final CyclicBarrier gate = new CyclicBarrier(list.size());
-        List<Thread> listThread = new ArrayList<>();
+
+        ExecutorService executor = Executors.newFixedThreadPool(Constant.MAX_THREAD);
         for (Page newList : list){
-            listThread.add(new Thread(){
+            executor.submit(new Runnable() {
+
+                @Override
                 public void run() {
+
                     try {
+
                         String url = newList.getUrl();
-                        Document doc = Jsoup.connect(url).ignoreContentType(true).get();
-                        doc.body().text();
-                        System.out.println("--------");
-                        String patternPhone0 = "\\((\\d{3})\\)[-.\\s]?(\\d{3})[-.\\s]?(\\d{4})";
-                        String patternPhone1 = "\\d{4}[-.\\s]?\\d{3}[-.\\s]?\\d{3}";
-                        String patternPhone2 = "\\(?\\d{3}\\)?([ ]\\d{1})?[ ]\\d{3,4}[ ]\\d{4}";
-                        String patternPhone3 = "\\((\\d{4})\\)[-.\\s]?(\\d{3})[-.\\s]?(\\d{4})";
-                        String patternPhone4 = "[+]\\d{2}?[-.\\s]?\\d{2,3}?[-.\\s]?\\d{4}[-.\\s]?\\d{2,4}";
-                        String patternPhone5 = "\\d{2}?[ ]?\\d{3}[ ]\\d{4}[ ]\\d{3,4}";
-                        String patternPhone6 = "\\d{4}[.]\\d{4}[.]\\d{3}";
-                        String patternPhone7 = "\\d{3}[.][ ]\\d{8}";
-                        String patternPhone8 = "[+]\\d{2}[ ]\\(\\d{2}\\)[ ]\\d{1}[ ]\\d{3}[ ]\\d{4}";
-                        String patternPhone9 = "\\d{3}-\\d{3}-\\d{4}";
-                        String patternphone10 = "\\d{3}[ ]\\d{2}[ ]\\d{3}[ ]\\d{3}";
-                        String patternPhone11 = "\\(\\d{3}\\)[ ]\\d{2}[ ]\\d{2}[ ]\\d{2}[ ]\\d{2}";
-                        Pattern pattern = Pattern.compile(patternPhone0);
-                        Matcher matcher = pattern.matcher(doc.wholeText());
-                        while (matcher.find()) {
-                            System.out.println("Phone0: " + matcher.group());
-                            ContactReport phoneNumber = new ContactReport(matcher.group(),url,doc.getElementsContainingOwnText(matcher.group()).toString(),"Phone");
-                            phoneNumber.setPageOption(option);
-                            list1.add(phoneNumber);
+                        int codeRespone = getStatus(url);
+                        if(codeRespone<400 || codeRespone>=500){
+                            Document doc = Jsoup.connect(url).ignoreContentType(true).get();
+                            doc.body().text();
+                            System.out.println("--------");
+                            String patternPhone0 = "\\((\\d{3})\\)[-.\\s]?(\\d{3})[-.\\s]?(\\d{4})";
+                            String patternPhone1 = "\\d{4}[-.\\s]?\\d{3}[-.\\s]?\\d{3}";
+                            String patternPhone2 = "\\(?\\d{3}\\)?([ ]\\d{1})?[ ]\\d{3,4}[ ]\\d{4}";
+                            String patternPhone3 = "\\((\\d{4})\\)[-.\\s]?(\\d{3})[-.\\s]?(\\d{4})";
+                            String patternPhone4 = "[+]\\d{2}?[-.\\s]?\\d{2,3}?[-.\\s]?\\d{4}[-.\\s]?\\d{2,4}";
+                            String patternPhone5 = "\\d{2}?[ ]?\\d{3}[ ]\\d{4}[ ]\\d{3,4}";
+                            String patternPhone6 = "\\d{4}[.]\\d{4}[.]\\d{3}";
+                            String patternPhone7 = "\\d{3}[.][ ]\\d{8}";
+                            String patternPhone8 = "[+]\\d{2}[ ]\\(\\d{2}\\)[ ]\\d{1}[ ]\\d{3}[ ]\\d{4}";
+                            String patternPhone9 = "\\d{3}-\\d{3}-\\d{4}";
+                            String patternphone10 = "\\d{3}[ ]\\d{2}[ ]\\d{3}[ ]\\d{3}";
+                            String patternPhone11 = "\\(\\d{3}\\)[ ]\\d{2}[ ]\\d{2}[ ]\\d{2}[ ]\\d{2}";
+                            Pattern pattern = Pattern.compile(patternPhone0);
+                            Matcher matcher = pattern.matcher(doc.wholeText());
+                            while (matcher.find()) {
+                                System.out.println("Phone0: " + matcher.group());
+                                ContactReport phoneNumber = new ContactReport(matcher.group(),url,"Phone");
+                                phoneNumber.setPageOption(option);
+                                phoneNumber.setCreatedTime(createdTime);
+                                list1.add(phoneNumber);
 
+                            }
+
+                            pattern = Pattern.compile(patternPhone1);
+                            matcher = pattern.matcher(doc.wholeText());
+                            // check all occurance
+                            while (matcher.find()) {
+                                System.out.println("Phone1: " + matcher.group() + " . " + matcher.start() + " " + matcher.end()+" ");
+                                ContactReport phoneNumber = new ContactReport(matcher.group(),url,"Phone");
+                                phoneNumber.setCreatedTime(createdTime);
+                                phoneNumber.setPageOption(option);
+                                list1.add(phoneNumber);
+                            }
+
+                            pattern = Pattern.compile(patternPhone2);
+                            matcher = pattern.matcher(doc.wholeText());
+                            // check all occurance
+                            while (matcher.find()) {
+                                System.out.println("PHONE 2:" + matcher.group());
+                                ContactReport phoneNumber = new ContactReport(matcher.group(),url,"Phone");
+                                phoneNumber.setPageOption(option);
+                                phoneNumber.setCreatedTime(createdTime);
+                                list1.add(phoneNumber);
+                            }
+
+                            pattern = Pattern.compile(patternPhone3);
+                            matcher = pattern.matcher(doc.wholeText());
+                            // check all occurance
+                            while (matcher.find()) {
+                                System.out.println("PHONE 3:" + matcher.group());
+                                ContactReport phoneNumber = new ContactReport(matcher.group(),url,"Phone");
+                                phoneNumber.setPageOption(option);
+                                phoneNumber.setCreatedTime(createdTime);
+                                list1.add(phoneNumber);
+                            }
+
+                            pattern = Pattern.compile(patternPhone4);
+                            matcher = pattern.matcher(doc.wholeText());
+                            // check all occurance
+                            while (matcher.find()) {
+                                System.out.println("PHONE 4:" + matcher.group());
+                                ContactReport phoneNumber = new ContactReport(matcher.group(),url,"Phone");
+                                phoneNumber.setPageOption(option);
+                                phoneNumber.setCreatedTime(createdTime);
+                                list1.add(phoneNumber);
+                            }
+
+                            pattern = Pattern.compile(patternPhone5);
+                            matcher = pattern.matcher(doc.wholeText());
+                            // check all occurance
+                            while (matcher.find()) {
+                                System.out.println("PHONE 5:" + matcher.group());
+                                ContactReport phoneNumber = new ContactReport(matcher.group(),url,"Phone");
+                                phoneNumber.setPageOption(option);
+                                phoneNumber.setCreatedTime(createdTime);
+                                list1.add(phoneNumber);
+                            }
+
+                            pattern = Pattern.compile(patternPhone6);
+                            matcher = pattern.matcher(doc.wholeText());
+                            // check all occurance
+                            while (matcher.find()) {
+                                System.out.println("PHONE 6:" + matcher.group());
+                                ContactReport phoneNumber = new ContactReport(matcher.group(),url,"Phone");
+                                phoneNumber.setPageOption(option);
+                                phoneNumber.setCreatedTime(createdTime);
+                                list1.add(phoneNumber);
+                            }
+
+                            pattern = Pattern.compile(patternPhone7);
+                            matcher = pattern.matcher(doc.wholeText());
+                            // check all occurance
+                            while (matcher.find()) {
+                                System.out.println("PHONE 7:" + matcher.group());
+                                ContactReport phoneNumber = new ContactReport(matcher.group(),url,"Phone");
+                                phoneNumber.setCreatedTime(createdTime);
+                                list1.add(phoneNumber);
+                            }
+
+                            pattern = Pattern.compile(patternPhone8);
+                            matcher = pattern.matcher(doc.wholeText());
+                            // check all occurance
+                            while (matcher.find()) {
+                                System.out.println("PHONE 8:" + matcher.group());
+                                ContactReport phoneNumber = new ContactReport(matcher.group(),url,"Phone");
+                                phoneNumber.setPageOption(option);
+                                phoneNumber.setCreatedTime(createdTime);
+                                list1.add(phoneNumber);
+                            }
+                            pattern = Pattern.compile(patternPhone9);
+                            matcher = pattern.matcher(doc.wholeText());
+                            // check all occurance
+                            while (matcher.find()) {
+                                System.out.println("PHONE 9:" + matcher.group());
+                                ContactReport phoneNumber = new ContactReport(matcher.group(),url,"Phone");
+                                phoneNumber.setPageOption(option);
+                                phoneNumber.setCreatedTime(createdTime);
+                                list1.add(phoneNumber);
+                            }
+                            pattern = Pattern.compile(patternphone10);
+                            matcher = pattern.matcher(doc.wholeText());
+                            // check all occurance
+                            while (matcher.find()) {
+                                System.out.println("PHONE 10:" + matcher.group());
+                                ContactReport phoneNumber = new ContactReport(matcher.group(),url,"Phone");
+                                phoneNumber.setPageOption(option);
+                                phoneNumber.setCreatedTime(createdTime);
+                                list1.add(phoneNumber);
+                            }
+                            pattern = Pattern.compile(patternPhone11);
+                            matcher = pattern.matcher(doc.wholeText());
+                            // check all occurance
+                            while (matcher.find()) {
+                                System.out.println("PHONE 11:" + matcher.group());
+                                ContactReport phoneNumber = new ContactReport(matcher.group(),url,"Phone");
+                                phoneNumber.setPageOption(option);
+                                phoneNumber.setCreatedTime(createdTime);
+                                list1.add(phoneNumber);
+                            }
+                            pattern = Pattern.compile("\\w+([.]|[-])?+\\w+@\\w+([-]\\w+)?[.]\\w+([.]\\w+)?+([.]\\w+)?");
+                            matcher = pattern.matcher(doc.body().text());
+                            while (matcher.find()) {
+                                ContactReport phoneNumber = new ContactReport(matcher.group(),url,"Mail");
+                                phoneNumber.setPageOption(option);
+                                phoneNumber.setCreatedTime(createdTime);
+                                list1.add(phoneNumber);
+                            }
                         }
 
-                        pattern = Pattern.compile(patternPhone1);
-                        matcher = pattern.matcher(doc.wholeText());
-                        // check all occurance
-                        while (matcher.find()) {
-                            System.out.println("Phone1: " + matcher.group() + " . " + matcher.start() + " " + matcher.end()+" ");
-                            ContactReport phoneNumber = new ContactReport(matcher.group(),url,doc.getElementsContainingOwnText(matcher.group()).toString(),"Phone");
-                            phoneNumber.setPageOption(option);
-                            list1.add(phoneNumber);
-                        }
-
-                        pattern = Pattern.compile(patternPhone2);
-                        matcher = pattern.matcher(doc.wholeText());
-                        // check all occurance
-                        while (matcher.find()) {
-                            System.out.println("PHONE 2:" + matcher.group());
-                            ContactReport phoneNumber = new ContactReport(matcher.group(),url,doc.getElementsContainingOwnText(matcher.group()).toString(),"Phone");
-                            phoneNumber.setPageOption(option);
-                            list1.add(phoneNumber);
-                        }
-
-                        pattern = Pattern.compile(patternPhone3);
-                        matcher = pattern.matcher(doc.wholeText());
-                        // check all occurance
-                        while (matcher.find()) {
-                            System.out.println("PHONE 3:" + matcher.group());
-                            ContactReport phoneNumber = new ContactReport(matcher.group(),url,doc.getElementsContainingOwnText(matcher.group()).toString(),"Phone");
-                            phoneNumber.setPageOption(option);
-                            list1.add(phoneNumber);
-                        }
-
-                        pattern = Pattern.compile(patternPhone4);
-                        matcher = pattern.matcher(doc.wholeText());
-                        // check all occurance
-                        while (matcher.find()) {
-                            System.out.println("PHONE 4:" + matcher.group());
-                            ContactReport phoneNumber = new ContactReport(matcher.group(),url,doc.getElementsContainingOwnText(matcher.group()).toString(),"Phone");
-                            phoneNumber.setPageOption(option);
-                            list1.add(phoneNumber);
-                        }
-
-                        pattern = Pattern.compile(patternPhone5);
-                        matcher = pattern.matcher(doc.wholeText());
-                        // check all occurance
-                        while (matcher.find()) {
-                            System.out.println("PHONE 5:" + matcher.group());
-                            ContactReport phoneNumber = new ContactReport(matcher.group(),url,doc.getElementsContainingOwnText(matcher.group()).toString(),"Phone");
-                            phoneNumber.setPageOption(option);
-                            list1.add(phoneNumber);
-                        }
-
-                        pattern = Pattern.compile(patternPhone6);
-                        matcher = pattern.matcher(doc.wholeText());
-                        // check all occurance
-                        while (matcher.find()) {
-                            System.out.println("PHONE 6:" + matcher.group());
-                            ContactReport phoneNumber = new ContactReport(matcher.group(),url,doc.getElementsContainingOwnText(matcher.group()).toString(),"Phone");
-                            phoneNumber.setPageOption(option);
-                            list1.add(phoneNumber);
-                        }
-
-                        pattern = Pattern.compile(patternPhone7);
-                        matcher = pattern.matcher(doc.wholeText());
-                        // check all occurance
-                        while (matcher.find()) {
-                            System.out.println("PHONE 7:" + matcher.group());
-                            ContactReport phoneNumber = new ContactReport(matcher.group(),url,doc.getElementsContainingOwnText(matcher.group()).toString(),"Phone");
-                            list1.add(phoneNumber);
-                        }
-
-                        pattern = Pattern.compile(patternPhone8);
-                        matcher = pattern.matcher(doc.wholeText());
-                        // check all occurance
-                        while (matcher.find()) {
-                            System.out.println("PHONE 8:" + matcher.group());
-                            ContactReport phoneNumber = new ContactReport(matcher.group(),url,doc.getElementsContainingOwnText(matcher.group()).toString(),"Phone");
-                            phoneNumber.setPageOption(option);
-                            list1.add(phoneNumber);
-                        }
-                        pattern = Pattern.compile(patternPhone9);
-                        matcher = pattern.matcher(doc.wholeText());
-                        // check all occurance
-                        while (matcher.find()) {
-                            System.out.println("PHONE 9:" + matcher.group());
-                            ContactReport phoneNumber = new ContactReport(matcher.group(),url,doc.getElementsContainingOwnText(matcher.group()).toString(),"Phone");
-                            phoneNumber.setPageOption(option);
-                            list1.add(phoneNumber);
-                        }
-                        pattern = Pattern.compile(patternphone10);
-                        matcher = pattern.matcher(doc.wholeText());
-                        // check all occurance
-                        while (matcher.find()) {
-                            System.out.println("PHONE 10:" + matcher.group());
-                            ContactReport phoneNumber = new ContactReport(matcher.group(),url,doc.getElementsContainingOwnText(matcher.group()).toString(),"Phone");
-                            phoneNumber.setPageOption(option);
-                            list1.add(phoneNumber);
-                        }
-                        pattern = Pattern.compile(patternPhone11);
-                        matcher = pattern.matcher(doc.wholeText());
-                        // check all occurance
-                        while (matcher.find()) {
-                            System.out.println("PHONE 11:" + matcher.group());
-                            ContactReport phoneNumber = new ContactReport(matcher.group(),url,doc.getElementsContainingOwnText(matcher.group()).toString(),"Phone");
-                            phoneNumber.setPageOption(option);
-                            list1.add(phoneNumber);
-                        }
-                        pattern = Pattern.compile("\\w+([.])?+\\w+@\\w+([-]\\w+)?[.]\\w+([.]\\w+)?+([.]\\w+)?");
-                        matcher = pattern.matcher(doc.body().text());
-                        while (matcher.find()) {
-                            ContactReport phoneNumber = new ContactReport(matcher.group(),url,doc.getElementsContainingOwnText(matcher.group()).toString(),"Mail");
-                            phoneNumber.setPageOption(option);
-                            list1.add(phoneNumber);
-                        }
                         // so my  ^\\(?(\\d{3,4})\\)?[-.\\s]?(\\d{3,4})[-.\\s]?(\\d{2,4})$
                         // \\d{3,4}
                     }catch (Exception ex){
                         Logger.getLogger(ContentService.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                }
-            });
+                }});
+        }
+        executor.shutdown();
+        try {
+            executor.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            Logger.getLogger(ContentImpl.class.getName()).log(Level.SEVERE, null, e);
+        }
 
-        }
-        for (Thread t : listThread) {
-            System.out.println("Threed start");
-            t.start();
-        }
-
-        for (Thread t : listThread) {
-            System.out.println("Threed join");
-            try {
-                t.join();
-            } catch (InterruptedException e) {
-                Logger.getLogger(ContentService.class.getName()).log(Level.SEVERE, null, e);
-            }
-        }
         return  list1;
     }
 }

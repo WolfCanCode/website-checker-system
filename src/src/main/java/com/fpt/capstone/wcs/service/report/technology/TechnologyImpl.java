@@ -479,16 +479,18 @@ public class TechnologyImpl implements TechnologyService {
 
 
     public List<FaviconReport> checkFavicon(List<Page> list, PageOption option, String urlRoot) {
-
+        Date createdTime = new Date();
         List<FaviconReport> resultList = new ArrayList<>();
-        final CyclicBarrier gate = new CyclicBarrier(list.size());
-        List<Thread> listThread = new ArrayList<>();
+
+        ExecutorService executor = Executors.newFixedThreadPool(Constant.MAX_THREAD);
+
         for(int i=0; i<list.size();i++){
             String urlNew = list.get(i).getUrl();
-            listThread.add(new Thread() {
+            executor.submit(new Runnable() {
+                @Override
                 public void run() {
-                    try {
-                        gate.await();
+
+
                         boolean flagMethod1 = false;
                         String urlFaviconMethod1 = urlRoot + "/favicon.ico";
                         int httpMessage = verifyHttpMessage(urlFaviconMethod1);
@@ -500,83 +502,89 @@ public class TechnologyImpl implements TechnologyService {
                             }
                         }
                         if (flagMethod1 == true) {
-                            System.out.println(urlNew.startsWith(urlRoot));
-                            if(urlNew.startsWith(urlRoot)){
-                                FaviconReport faviconMethod1 = new FaviconReport(urlFaviconMethod1, urlNew, "16x16");
-                                faviconMethod1.setPageOption(option);
-                                resultList.add(faviconMethod1);
+                            int codeResspone = verifyHttpMessage(urlNew);
+                            if(codeResspone<400||codeResspone>=500 ){
+                                System.out.println(urlNew.startsWith(urlRoot));
+
+                                if(urlNew.startsWith(urlRoot)){
+                                    FaviconReport faviconMethod1 = new FaviconReport(urlFaviconMethod1, urlNew,"any", "16x16");
+                                    faviconMethod1.setPageOption(option);
+                                    faviconMethod1.setCreatedTime(createdTime);
+                                    resultList.add(faviconMethod1);
+                                }
+                                else{
+                                    FaviconReport faviconMethod1 = new FaviconReport("External Link", urlNew,"" ,"");
+                                    faviconMethod1.setPageOption(option);
+                                    faviconMethod1.setCreatedTime(createdTime);
+                                    resultList.add(faviconMethod1);
+                                }
                             }
-                            else{
-                                FaviconReport faviconMethod1 = new FaviconReport("External Link", urlNew, "");
-                                faviconMethod1.setPageOption(option);
-                                resultList.add(faviconMethod1);
-                            }
+
                         } else if(flagMethod1 == false) {
                             try {
-                                Document doc = Jsoup.connect(urlNew).ignoreContentType(true).get();
-                                Elements elem = doc.head().select("link[rel~=(shortcut icon|icon|apple-touch-icon-precomposed|nokia-touch-icon)]");
-                                System.out.println(elem.size());
-                                if (elem.size() == 0) {
-                                    FaviconReport favicon = new FaviconReport("Missing Favicon", urlNew, "undefine");
-                                    favicon.setPageOption(option);
-                                    resultList.add(favicon);
-                                }
-                                for (Element element : elem) {
-                                    String size = element.attr("sizes");
-                                    if (size.equals("")) {
-                                        size = "undefine";
+                                int codeResspone = verifyHttpMessage(urlNew);
+                                System.out.println(urlNew);
+                                if(codeResspone<400||codeResspone>=500 ){
+                                    Document doc = Jsoup.connect(urlNew).ignoreContentType(true).get();
+                                    Elements elem = doc.head().select("link[rel~=(shortcut icon|icon|apple-touch-icon-precomposed|nokia-touch-icon)]");
+                                    System.out.println(elem.size());
+                                    if (elem.size() == 0) {
+                                        FaviconReport favicon = new FaviconReport("Missing Favicon", urlNew, "","undefine");
+                                        favicon.setPageOption(option);
+                                        favicon.setCreatedTime(createdTime);
+                                        resultList.add(favicon);
                                     }
-                                    String href = elem.attr("href");
-                                    int code = verifyHttpMessage(href);
-                                    if (code == 200) {
-                                        FaviconReport faviconMethod2 = new FaviconReport(href, urlNew, size);
-                                        faviconMethod2.setPageOption(option);
-                                        resultList.add(faviconMethod2);
-                                    }
-                                    if (code != 200) {
-                                        System.out.println("vao vao khac 200");
-                                        String urlFavAgain = urlRoot + href;
-                                        int checkFaviconResponeAgain = verifyHttpMessage(urlFavAgain);
-                                        if (checkFaviconResponeAgain == 200) {
-                                            FaviconReport faviconAgain = new FaviconReport(urlFavAgain, urlNew, size);
-                                            faviconAgain.setPageOption(option);
-                                            resultList.add(faviconAgain);
+                                    for (Element element : elem) {
+                                        String size = element.attr("sizes");
+                                        if (size.equals("")) {
+                                            size = "undefine";
                                         }
-                                        if (checkFaviconResponeAgain != 200) {
-                                            String urlFavLast = "https:" + href;
-                                            int checkFaviconResponeLast = verifyHttpMessage(urlFavLast);
-                                            if (checkFaviconResponeLast == 200) {
-                                                FaviconReport faviconLast  = new FaviconReport(urlFavLast, urlNew, size);
-                                                faviconLast.setPageOption(option);
-                                                resultList.add(faviconLast);
+                                        String rel =element.attr("rel");
+                                        String href = elem.attr("href");
+                                        int code = verifyHttpMessage(href);
+                                        if (code == 200) {
+                                            FaviconReport faviconMethod2 = new FaviconReport(href, urlNew,rel, size);
+                                            faviconMethod2.setPageOption(option);
+                                            faviconMethod2.setCreatedTime(createdTime);
+                                            resultList.add(faviconMethod2);
+                                        }
+                                        if (code != 200) {
+                                            System.out.println("vao vao khac 200");
+                                            String urlFavAgain = urlRoot + href;
+                                            int checkFaviconResponeAgain = verifyHttpMessage(urlFavAgain);
+                                            if (checkFaviconResponeAgain == 200) {
+                                                FaviconReport faviconAgain = new FaviconReport(urlFavAgain, urlNew,rel, size);
+                                                faviconAgain.setPageOption(option);
+                                                faviconAgain.setCreatedTime(createdTime);
+                                                resultList.add(faviconAgain);
+                                            }
+                                            if (checkFaviconResponeAgain != 200) {
+                                                String urlFavLast = "https:" + href;
+                                                int checkFaviconResponeLast = verifyHttpMessage(urlFavLast);
+                                                if (checkFaviconResponeLast == 200) {
+                                                    FaviconReport faviconLast  = new FaviconReport(urlFavLast, urlNew, rel, size);
+                                                    faviconLast.setPageOption(option);
+                                                    faviconLast.setCreatedTime(createdTime);
+                                                    resultList.add(faviconLast);
+                                                }
                                             }
                                         }
-                                    }
 
+                                    }
                                 }
+
                             } catch (IOException ex) {
                                 Logger.getLogger( TechnologyImpl .class.getName()).log(Level.SEVERE, null, ex);
                             }
                         }
-                    } catch (InterruptedException | BrokenBarrierException e) {
-                        Logger.getLogger(TechnologyImpl.class.getName()).log(Level.SEVERE, null, e);
-                    }
-                }
-            });
-        }
+                }});
 
-        for (Thread t : listThread) {
-            System.out.println("Threed start");
-            t.start();
         }
-
-        for (Thread t : listThread) {
-            System.out.println("Threed join");
-            try {
-                t.join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+        executor.shutdown();
+        try {
+            executor.awaitTermination(Long.MAX_VALUE,TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            Logger.getLogger(TechnologyImpl.class.getName()).log(Level.SEVERE, null, e);
         }
         return resultList;
     }
