@@ -110,7 +110,7 @@ export default class CookieLaw extends Component {
                         Check
                        <Icon name='right arrow' />
                     </Button>
-                    {this.state.isDoneTest ? <Button icon color="green" labelPosition='right' onClick={() => this._saveReport()}>
+                    {this.state.isDoneTest && this.state.list.length !== 0 ? <Button icon color="green" labelPosition='right' onClick={() => this._saveReport()}>
                                     Save <Icon name='check' />
                                 </Button> : ""}
                     <div style={{ marginBottom: '10px', float: 'right', color : 'green' }}>

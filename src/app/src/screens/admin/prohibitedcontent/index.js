@@ -10,7 +10,7 @@ const cookies = new Cookies();
 export default class ProhibitedContent extends Component {
     
 
-    state = { list: [], loadingTable: false, isDisable: false };
+    state = { list: [], loadingTable: false, isDisable: false, isDoneTest: false, listReportId: [] };
 
 
     componentDidMount() {
@@ -58,13 +58,42 @@ export default class ProhibitedContent extends Component {
             },
             body: JSON.stringify(param)
         }).then(response => response.json()).then((data) => {
+            var listReport = [];
+            comp = data.prohibitedContentReport.map((item, index) => {
+                listReport.push(item.id);
+                return (<TableRow key={index} urlPage={item.urlPage} word={item.word} fragment={item.fragment} type={item.type} />);
+            });
+            this.setState({ list: comp });
+            this.setState({ loadingTable: false, isDisable: false, isDoneTest: true, listReportId: listReport });
+        });
+
+    }
+
+    _saveReport() {
+        var comp = [];
+        this.setState({ loadingTable: true, isDisable: true });
+        var param = {
+            "userId": cookies.get("u_id"),
+            "userToken": cookies.get("u_token"),
+            "websiteId": cookies.get("u_w_id"),
+            "pageOptionId": cookies.get("u_option"),
+            "listReportId": this.state.listReportId
+        }
+
+        fetch("/api/prohibitedContent/SaveReport", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(param)
+        }).then(response => response.json()).then((data) => {
             comp = data.prohibitedContentReport.map((item, index) => {
                 return (<TableRow key={index} urlPage={item.urlPage} word={item.word} fragment={item.fragment} type={item.type} />);
             });
             this.setState({ list: comp });
-            this.setState({ loadingTable: false, isDisable: false });
+            this.setState({ loadingTable: false, isDisable: false, isDoneTest: false });
         });
-
     }
 
 
@@ -81,6 +110,9 @@ export default class ProhibitedContent extends Component {
                         Check
                        <Icon name='right arrow' />
                     </Button>
+                    {this.state.isDoneTest && this.state.list.length !== 0 ? <Button icon color="green" labelPosition='right' onClick={() => this._saveReport()}>
+                        Save <Icon name='check' />
+                    </Button> : ""}
                     <div style={{ marginBottom: '10px', float: 'right' }}>
 
 

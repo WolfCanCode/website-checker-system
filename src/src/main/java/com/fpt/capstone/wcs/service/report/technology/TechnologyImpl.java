@@ -353,16 +353,14 @@ public class TechnologyImpl implements TechnologyService {
 
         List<CookieReport> resultList = new ArrayList<>();
         List<CookieReport> resultList11 = new ArrayList<>();
-
-        final CyclicBarrier gate = new CyclicBarrier(list.size());
-        List<Thread> listThread = new ArrayList<>();
-        List<String> cookieNames = new ArrayList<String>();
+        ExecutorService executor = Executors.newFixedThreadPool(Constant.MAX_THREAD);
 
         for (Page p : list) {
-            listThread.add(new Thread() {
+            executor.submit(new Runnable() {
+                @Override
                 public void run() {
                     try {
-                        gate.await();
+
 
                         ChromeOptions chromeOptions = new ChromeOptions();
                         chromeOptions.addArguments("--headless");
@@ -384,21 +382,14 @@ public class TechnologyImpl implements TechnologyService {
                         System.out.println("size 1 " + resultList11.size());
 
 
-                    } catch (InterruptedException | BrokenBarrierException e) {
+                    } catch (Exception e) {
                         Logger.getLogger(TechnologyImpl.class.getName()).log(Level.SEVERE, null, e);
                     }
                 }
             });
         }
-        for (Thread t : listThread) {
-            System.out.println("Threed start");
-            t.start();
-        }
-
-        for (Thread t : listThread) {
-            System.out.println("Threed join");
-            t.join();
-        }
+        executor.shutdown();
+        executor.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
 
         //delete duplicate cookie
         List<CookieReport> resultList1 = resultList11.stream()
@@ -428,7 +419,8 @@ public class TechnologyImpl implements TechnologyService {
             }
 
         }
-//
+        executor.shutdown();
+        executor.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
         return resultList;
     }
 

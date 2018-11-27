@@ -11,5 +11,6 @@ public class Constant {
     public static final String CLOUDARY_API_KEY = "492747556868815";
     public static final String CLOUDARY_API_SECRET = "TOCMGp7qPI_ifjDCnFMt02T8kWY";
     public static final Integer MAX_THREAD = 5;
+    public static final String[] Verb_type = {"d", "ed", "ied", "ing"};
 
 }

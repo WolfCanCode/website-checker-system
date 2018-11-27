@@ -264,7 +264,6 @@ public class ExperienceImpl implements ExperienceService {
                     pages.add(page);
                 }
                 List<MobileLayoutReport> resultList = mobileLayoutTestService(pages, pageOption);
-
                 mobileLayoutRepository.saveAll(resultList);
                 res.put("action", Constant.SUCCESS);
                 res.put("mobileLayoutTestReport", resultList);
@@ -335,7 +334,6 @@ public class ExperienceImpl implements ExperienceService {
         requestCommon.setUserToken(request.getUserToken());
         WebsiteUserPOJO userWebsite = authenticate.isAuthGetUserAndWebsite(requestCommon);
         if (userWebsite != null) {
-            PageOption pageOption = pageOptionRepository.findOneByIdAndWebsiteAndDelFlagEquals(request.getPageOptionId(), userWebsite.getWebsite(), false);
             List<MobileLayoutReport> listReport = new ArrayList<>();
             for (int i = 0; i < request.getListReportId().size(); i++) {
                 Optional<MobileLayoutReport> optionalReport = mobileLayoutRepository.findById(request.getListReportId().get(i));

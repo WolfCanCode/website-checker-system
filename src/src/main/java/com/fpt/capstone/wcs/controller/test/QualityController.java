@@ -2,6 +2,7 @@ package com.fpt.capstone.wcs.controller.test;
 
 import com.fpt.capstone.wcs.model.pojo.MissingFilePOJO;
 import com.fpt.capstone.wcs.model.pojo.RequestCommonPOJO;
+import com.fpt.capstone.wcs.model.pojo.RequestReportPOJO;
 import com.fpt.capstone.wcs.service.report.quality.QualityService;
 
 
@@ -37,6 +38,12 @@ public class QualityController {
     }
 
     @CrossOrigin
+    @PostMapping("/api/brokenLink/SaveReport")
+    public Map<String, Object> saveBrokenLinkReport(@RequestBody RequestReportPOJO request) {
+        return qualityService.saveBrokenLinkReport(request);
+    }
+
+    @CrossOrigin
     @Transactional
     @PostMapping("/api/brokenPage")
     public Map<String, Object> getDataBrokenPage(@RequestBody RequestCommonPOJO request) throws InterruptedException {
@@ -47,6 +54,11 @@ public class QualityController {
     @PostMapping("/api/brokenPage/lastest")
     public Map<String, Object> getLastestBrokenPage(@RequestBody RequestCommonPOJO request) {
         return qualityService.getLastestBrokenPage(request);
+    }
+    @CrossOrigin
+    @PostMapping("/api/brokenPage/SaveReport")
+    public Map<String, Object> saveBrokenPageReport(@RequestBody RequestReportPOJO request) {
+        return qualityService.saveBrokenPageReport(request);
     }
 
     @CrossOrigin
@@ -60,6 +72,12 @@ public class QualityController {
     @PostMapping("/api/prohibitedContent/lastest")
     public Map<String, Object> getLastestProhibitedContent(@RequestBody RequestCommonPOJO request) {
         return qualityService.getLastestProhibitedContent(request);
+    }
+
+    @CrossOrigin
+    @PostMapping("/api/prohibitedContent/SaveReport")
+    public Map<String, Object> saveProhibitedContentReport(@RequestBody RequestReportPOJO request) {
+        return qualityService.saveProhibitedContentReport(request);
     }
 
     @Transactional

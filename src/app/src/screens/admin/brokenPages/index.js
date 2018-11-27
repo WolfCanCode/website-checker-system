@@ -14,7 +14,7 @@ const cookies = new Cookies();
 
 class brokenPagesScreen extends Component {
 
-    state = { list: [], loadingTable: false, isDisable: false, tested: false , countErrorPage : 0 , countMissingPage : 0};
+    state = { list: [], loadingTable: false, isDisable: false, tested: false , countErrorPage : 0 , countMissingPage : 0, isDoneTest: false, listReportId: []};
 
 
     componentDidMount() {
@@ -85,6 +85,65 @@ class brokenPagesScreen extends Component {
             },
             body: JSON.stringify(param)
         }).then(response => response.json()).then((data) => {
+            var listReport = [];
+            comp = data.brokenPageReport.map((item, index) => {
+                listReport.push(item.id);
+                return (<TableRow key={index} urlPage={item.urlPage} stt={item.stt} httpCode={item.httpCode} httpMessage={item.httpMessage} />);
+            });
+            this.setState({ list: comp });
+            if (this.state.list.length === 0) {
+                this.setState({ tested: true });
+            }
+            let countErrorPage = 0;
+            let countMissingPage = 0;
+
+             countErrorPage = data.brokenPageReport.reduce((stt,item) => {
+                 if(item.stt === 'Error Page'){
+                    countErrorPage++;
+                 }
+
+                return countErrorPage;
+            }, 0)
+
+            countMissingPage = data.brokenPageReport.reduce((stt,item) => {
+                if(item.stt === 'Missing Page'){
+                    countMissingPage++;
+                }
+
+               return countMissingPage;
+           }, 0)
+            
+            this.setState({ countErrorPage: countErrorPage })
+            this.setState({ countMissingPage: countMissingPage })
+
+           
+
+
+            this.setState({ loadingTable: false, isDisable: false, isDoneTest: true, listReportId: listReport });
+        });
+
+
+    }
+
+    _saveReport(){
+        var comp = [];
+        this.setState({ loadingTable: true, isDisable: true });
+        var param = {
+            "userId": cookies.get("u_id"),
+            "userToken": cookies.get("u_token"),
+            "websiteId": cookies.get("u_w_id"),
+            "pageOptionId": cookies.get("u_option"),
+            "listReportId": this.state.listReportId
+        }
+
+        fetch("/api/brokenPage/SaveReport", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(param)
+        }).then(response => response.json()).then((data) => {
             comp = data.brokenPageReport.map((item, index) => {
                 return (<TableRow key={index} urlPage={item.urlPage} stt={item.stt} httpCode={item.httpCode} httpMessage={item.httpMessage} />);
             });
@@ -117,10 +176,8 @@ class brokenPagesScreen extends Component {
            
 
 
-            this.setState({ loadingTable: false, isDisable: false });
+            this.setState({ loadingTable: false, isDisable: false, isDoneTest: false });
         });
-
-
     }
 
 
@@ -154,6 +211,9 @@ class brokenPagesScreen extends Component {
                         Check
                        <Icon name='right arrow' />
                     </Button>
+                    {this.state.isDoneTest && this.state.list.length !== 0 ? <Button icon color="green" labelPosition='right' onClick={() => this._saveReport()}>
+                        Save <Icon name='check' />
+                    </Button> : ""}
                             <div style={{ marginBottom: '10px', float: 'right' }}>
 
 
