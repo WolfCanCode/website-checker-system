@@ -20,6 +20,7 @@ import com.fpt.capstone.wcs.service.system.authenticate.AuthenticateService;
 import com.fpt.capstone.wcs.model.pojo.RequestReportPOJO;
 import com.fpt.capstone.wcs.model.pojo.WebsiteUserPOJO;
 
+import com.fpt.capstone.wcs.utils.CheckHTTPResponse;
 import com.fpt.capstone.wcs.utils.Constant;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -493,7 +494,7 @@ public class TechnologyImpl implements TechnologyService {
 
                         boolean flagMethod1 = false;
                         String urlFaviconMethod1 = urlRoot + "/favicon.ico";
-                        int httpMessage = verifyHttpMessage(urlFaviconMethod1);
+                        int httpMessage = CheckHTTPResponse.verifyHttpMessage(urlFaviconMethod1);
                         if (httpMessage == 200) {
                             byte[] capacity = getBytes(urlFaviconMethod1);
                             if (capacity.length != 0) {
@@ -502,7 +503,7 @@ public class TechnologyImpl implements TechnologyService {
                             }
                         }
                         if (flagMethod1 == true) {
-                            int codeResspone = verifyHttpMessage(urlNew);
+                            int codeResspone = CheckHTTPResponse.verifyHttpMessage(urlNew);
                             if(codeResspone<400||codeResspone>=500 ){
                                 System.out.println(urlNew.startsWith(urlRoot));
 
@@ -522,7 +523,7 @@ public class TechnologyImpl implements TechnologyService {
 
                         } else if(flagMethod1 == false) {
                             try {
-                                int codeResspone = verifyHttpMessage(urlNew);
+                                int codeResspone = CheckHTTPResponse.verifyHttpMessage(urlNew);
                                 System.out.println(urlNew);
                                 if(codeResspone<400||codeResspone>=500 ){
                                     Document doc = Jsoup.connect(urlNew).ignoreContentType(true).get();
@@ -541,17 +542,17 @@ public class TechnologyImpl implements TechnologyService {
                                         }
                                         String rel =element.attr("rel");
                                         String href = elem.attr("href");
-                                        int code = verifyHttpMessage(href);
-                                        if (code == 200) {
+                                        int code = CheckHTTPResponse.verifyHttpMessage(href);
+                                        if ( code<400||code>=500 ) {
                                             FaviconReport faviconMethod2 = new FaviconReport(href, urlNew,rel, size);
                                             faviconMethod2.setPageOption(option);
                                             faviconMethod2.setCreatedTime(createdTime);
                                             resultList.add(faviconMethod2);
                                         }
-                                        if (code != 200) {
+                                        if (code >=400 && code <500) {
                                             System.out.println("vao vao khac 200");
                                             String urlFavAgain = urlRoot + href;
-                                            int checkFaviconResponeAgain = verifyHttpMessage(urlFavAgain);
+                                            int checkFaviconResponeAgain = CheckHTTPResponse.verifyHttpMessage(urlFavAgain);
                                             if (checkFaviconResponeAgain == 200) {
                                                 FaviconReport faviconAgain = new FaviconReport(urlFavAgain, urlNew,rel, size);
                                                 faviconAgain.setPageOption(option);
@@ -560,7 +561,7 @@ public class TechnologyImpl implements TechnologyService {
                                             }
                                             if (checkFaviconResponeAgain != 200) {
                                                 String urlFavLast = "https:" + href;
-                                                int checkFaviconResponeLast = verifyHttpMessage(urlFavLast);
+                                                int checkFaviconResponeLast = CheckHTTPResponse.verifyHttpMessage(urlFavLast);
                                                 if (checkFaviconResponeLast == 200) {
                                                     FaviconReport faviconLast  = new FaviconReport(urlFavLast, urlNew, rel, size);
                                                     faviconLast.setPageOption(option);
@@ -609,19 +610,19 @@ public class TechnologyImpl implements TechnologyService {
         return b;
     }
 
-    private int verifyHttpMessage(String url) {
-        int message;
-        try {
-            URL urlTesst = new URL(url);
-            HttpURLConnection connection = (HttpURLConnection) urlTesst.openConnection();
-            connection.setRequestMethod("GET");
-            connection.setRequestProperty("User-Agent", "Mozilla/5.0 ");
-            message = connection.getResponseCode();
-        } catch (Exception e) {
-            message = 404;
-        }
-        return message;
-    }
+//    private int verifyHttpMessage(String url) {
+//        int message;
+//        try {
+//            URL urlTesst = new URL(url);
+//            HttpURLConnection connection = (HttpURLConnection) urlTesst.openConnection();
+//            connection.setRequestMethod("GET");
+//            connection.setRequestProperty("User-Agent", "Mozilla/5.0 ");
+//            message = connection.getResponseCode();
+//        } catch (Exception e) {
+//            message = 404;
+//        }
+//        return message;
+//    }
 
 
     public ServerBehaviorReport checkServerBehavior(UrlPOJO url) throws IOException {

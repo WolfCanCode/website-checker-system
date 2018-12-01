@@ -7,12 +7,15 @@ import com.fpt.capstone.wcs.model.entity.report.content.RedirectionReport;
 import com.fpt.capstone.wcs.model.entity.website.Page;
 import com.fpt.capstone.wcs.model.entity.website.PageOption;
 import com.fpt.capstone.wcs.model.pojo.RequestCommonPOJO;
+import com.fpt.capstone.wcs.model.pojo.RequestReportPOJO;
 import com.fpt.capstone.wcs.model.pojo.UrlPOJO;
+import com.fpt.capstone.wcs.model.pojo.WebsiteUserPOJO;
 import com.fpt.capstone.wcs.repository.report.content.ContactDetailRepository;
 import com.fpt.capstone.wcs.repository.report.content.LinkRedirectionRepository;
 import com.fpt.capstone.wcs.repository.website.PageOptionRepository;
 import com.fpt.capstone.wcs.repository.report.content.PageTestRepository;
 import com.fpt.capstone.wcs.service.system.authenticate.AuthenticateService;
+import com.fpt.capstone.wcs.utils.CheckHTTPResponse;
 import com.fpt.capstone.wcs.utils.Constant;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -63,7 +66,7 @@ public class ContentImpl implements  ContentService {
                 List<Page> pages = pageOption.getPages();
 
                 List<PageReport> resultList = getPageInfor(pages, pageOption);
-                pageTestRepository.removeAllByPageOption(pageOption);
+//                pageTestRepository.removeAllByPageOption(pageOption);
                 pageTestRepository.saveAll(resultList);
                 res.put("action", Constant.SUCCESS);
                 res.put("pagetestReport", resultList);
@@ -98,14 +101,56 @@ public class ContentImpl implements  ContentService {
                 request.setPageOptionId((long)-1);
             }
             if(request.getPageOptionId()!=-1) {
-                List<PageReport> resultList = pageTestRepository.findAllByPageOption(pageOption);
-                res.put("pagetestReport", resultList);
-                res.put("action", Constant.SUCCESS);
-                return res;
+                PageReport pageTestReport = pageTestRepository.findFirstByPageOptionAndDelFlagEqualsOrderByCreatedTimeDesc(pageOption, false);
+                if (pageTestReport != null) {
+                    Date lastedCreatedTime = pageTestReport.getCreatedTime();
+                    List<PageReport> resultList = pageTestRepository.findAllByPageOptionAndCreatedTime(pageOption, lastedCreatedTime);
+                    res.put("pagetestReport", resultList);
+                    res.put("action", Constant.SUCCESS);
+                    return res;
+                } else {
+                    res.put("pagetestReport", new ArrayList<>());
+                    res.put("action", Constant.SUCCESS);
+                    return res;
+                }
             } else {
                 List<PageReport> resultList = pageTestRepository.findAllByPageOptionAndUrl(null, website.getUrl());
                 res.put("pagetestReport", resultList);
                 res.put("action", Constant.SUCCESS);
+                return res;
+            }
+        } else {
+            res.put("action", Constant.INCORRECT);
+            return res;
+        }
+    }
+
+    @Override
+    public Map<String, Object> savePageReport(RequestReportPOJO request) {
+        Map<String, Object> res = new HashMap<>();
+        RequestCommonPOJO requestCommon = new RequestCommonPOJO();
+        requestCommon.setPageOptionId(request.getPageOptionId());
+        requestCommon.setUserId(request.getUserId());
+        requestCommon.setWebsiteId(request.getWebsiteId());
+        requestCommon.setUserToken(request.getUserToken());
+        WebsiteUserPOJO userWebsite = authenticate.isAuthGetUserAndWebsite(requestCommon);
+        if (userWebsite != null) {
+            List<PageReport> listReport = new ArrayList<>();
+            for (int i = 0; i < request.getListReportId().size(); i++) {
+                Optional<PageReport> optionalReport =  pageTestRepository.findById(request.getListReportId().get(i));
+                if (optionalReport.isPresent()) {
+                     PageReport report = optionalReport.get();
+                    report.setDelFlag(false);
+                    listReport.add(report);
+                }
+            }
+            List<PageReport> results = pageTestRepository.saveAll(listReport);
+            if (results.size() != 0) {
+                res.put("action", Constant.SUCCESS);
+                res.put("pagetestReport", results);
+                return res;
+            } else {
+                res.put("action", Constant.INCORRECT);
                 return res;
             }
         } else {
@@ -128,9 +173,8 @@ public class ContentImpl implements  ContentService {
 
                 List<RedirectionReport> resultList = null;
 
-                    resultList = redirectionTest(pages, pageOption);
+                resultList = redirectionTest(pages, pageOption);
 
-                linkRedirectionRepository.removeAllByPageOption(pageOption);
                 linkRedirectionRepository.saveAll(resultList);
                 res.put("action", Constant.SUCCESS);
                 res.put("redirectiontestReport", resultList);
@@ -165,14 +209,56 @@ public class ContentImpl implements  ContentService {
                 request.setPageOptionId((long)-1);
             }
             if(request.getPageOptionId()!=-1) {
-                List<RedirectionReport> resultList = linkRedirectionRepository.findAllByPageOption(pageOption);
-                res.put("redirectiontestReport", resultList);
-                res.put("action", Constant.SUCCESS);
-                return res;
+                RedirectionReport redirectionReport = linkRedirectionRepository.findFirstByPageOptionAndDelFlagEqualsOrderByCreatedTimeDesc(pageOption, false);
+                if (redirectionReport != null) {
+                    Date lastedCreatedTime = redirectionReport.getCreatedTime();
+                    List<RedirectionReport> resultList = linkRedirectionRepository.findAllByPageOptionAndCreatedTime(pageOption, lastedCreatedTime);
+                    res.put("redirectiontestReport", resultList);
+                    res.put("action", Constant.SUCCESS);
+                    return res;
+                } else {
+                    res.put("redirectiontestReport", new ArrayList<>());
+                    res.put("action", Constant.SUCCESS);
+                    return res;
+                }
             } else {
                 List<RedirectionReport> resultList = linkRedirectionRepository.findAllByPageOptionAndUrl(null, website.getUrl());
                 res.put("redirectiontestReport", resultList);
                 res.put("action", Constant.SUCCESS);
+                return res;
+            }
+        } else {
+            res.put("action", Constant.INCORRECT);
+            return res;
+        }
+    }
+
+    @Override
+    public Map<String, Object> saveRedirectionReport(RequestReportPOJO request) {
+        Map<String, Object> res = new HashMap<>();
+        RequestCommonPOJO requestCommon = new RequestCommonPOJO();
+        requestCommon.setPageOptionId(request.getPageOptionId());
+        requestCommon.setUserId(request.getUserId());
+        requestCommon.setWebsiteId(request.getWebsiteId());
+        requestCommon.setUserToken(request.getUserToken());
+        WebsiteUserPOJO userWebsite = authenticate.isAuthGetUserAndWebsite(requestCommon);
+        if (userWebsite != null) {
+            List<RedirectionReport> listReport = new ArrayList<>();
+            for (int i = 0; i < request.getListReportId().size(); i++) {
+                Optional< RedirectionReport> optionalReport =  linkRedirectionRepository.findById(request.getListReportId().get(i));
+                if (optionalReport.isPresent()) {
+                    RedirectionReport report = optionalReport.get();
+                    report.setDelFlag(false);
+                    listReport.add(report);
+                }
+            }
+            List<RedirectionReport> results = linkRedirectionRepository.saveAll(listReport);
+            if (results.size() != 0) {
+                res.put("action", Constant.SUCCESS);
+                res.put("redirectiontestReport", results);
+                return res;
+            } else {
+                res.put("action", Constant.INCORRECT);
                 return res;
             }
         } else {
@@ -192,10 +278,8 @@ public class ContentImpl implements  ContentService {
             }
             if(request.getPageOptionId()!=-1) { //page option list is null
                 List<Page> pages = pageOption.getPages();
-
                 List<ContactReport> resultList = null;
                 resultList = getContactDetail(pages, pageOption);
-                contactDetailRepository.removeAllByPageOption(pageOption);
                 contactDetailRepository.saveAll(resultList);
                 res.put("action", Constant.SUCCESS);
                 res.put("contactReport", resultList);
@@ -231,10 +315,18 @@ public class ContentImpl implements  ContentService {
                 request.setPageOptionId((long)-1);
             }
             if(request.getPageOptionId()!=-1) {
-                List<ContactReport> resultList = contactDetailRepository.findAllByPageOption(pageOption);
-                res.put("contactReport", resultList);
-                res.put("action", Constant.SUCCESS);
-                return res;
+                ContactReport contactReport = contactDetailRepository.findFirstByPageOptionAndDelFlagEqualsOrderByCreatedTimeDesc(pageOption, false);
+                if (contactReport != null) {
+                    Date lastedCreatedTime = contactReport.getCreatedTime();
+                    List<ContactReport> resultList = contactDetailRepository.findAllByPageOptionAndCreatedTime(pageOption, lastedCreatedTime);
+                    res.put("contactReport", resultList);
+                    res.put("action", Constant.SUCCESS);
+                    return res;
+                } else {
+                    res.put("contactReport", new ArrayList<>());
+                    res.put("action", Constant.SUCCESS);
+                    return res;
+                }
             } else {
                 List<ContactReport> resultList = contactDetailRepository.findAllByPageOptionAndUrl(null, website.getUrl());
                 res.put("contactReport", resultList);
@@ -247,35 +339,59 @@ public class ContentImpl implements  ContentService {
         }
     }
 
+    @Override
+    public Map<String, Object> saveContactDetailReport(RequestReportPOJO request) {
+
+        Map<String, Object> res = new HashMap<>();
+        RequestCommonPOJO requestCommon = new RequestCommonPOJO();
+        requestCommon.setPageOptionId(request.getPageOptionId());
+        requestCommon.setUserId(request.getUserId());
+        requestCommon.setWebsiteId(request.getWebsiteId());
+        requestCommon.setUserToken(request.getUserToken());
+        WebsiteUserPOJO userWebsite = authenticate.isAuthGetUserAndWebsite(requestCommon);
+        if (userWebsite != null) {
+            List<ContactReport> listReport = new ArrayList<>();
+            for (int i = 0; i < request.getListReportId().size(); i++) {
+                Optional<ContactReport> optionalReport =  contactDetailRepository.findById(request.getListReportId().get(i));
+                if (optionalReport.isPresent()) {
+                    ContactReport report = optionalReport.get();
+                    report.setDelFlag(false);
+                    listReport.add(report);
+                }
+            }
+            List<ContactReport> results = contactDetailRepository.saveAll(listReport);
+            if (results.size() != 0) {
+                res.put("action", Constant.SUCCESS);
+                res.put("contactReport", results);
+                return res;
+            } else {
+                res.put("action", Constant.INCORRECT);
+                return res;
+            }
+        } else {
+            res.put("action", Constant.INCORRECT);
+            return res;
+        }
+    }
 
 
     public List<PageReport> getPageInfor(List<Page> list, PageOption option)  {
         Date createdTime = new Date();
         List<PageReport> pageCheck = new ArrayList<>();
-        final CyclicBarrier gate = new CyclicBarrier(list.size());
         ExecutorService executor = Executors.newFixedThreadPool(Constant.MAX_THREAD);
         for (Page url:list){
             executor.submit(new Runnable() {
-
                 @Override
                 public void run() {
-                    try {
-
                         String title = getTitle(url.getUrl());
-                        int  httpcode = getStatus(url.getUrl());
-                        System.out.println("HTTP  code"+getStatus(url.getUrl()));
+                        int  httpcode = CheckHTTPResponse.verifyHttpMessage(url.getUrl());
+                        System.out.println("HTTP  code"+ CheckHTTPResponse.verifyHttpMessage(url.getUrl()));
                         String canoUrl = getCanonicalUrl(url.getUrl());
-
                         PageReport page = new PageReport(httpcode, url.getUrl(),title,canoUrl);
                         page.setPageOption(option);
                         page.setCreatedTime(createdTime);
                         pageCheck.add(page);
-                    }  catch (IOException e) {
-                        e.printStackTrace();
-                    }
                 }});
-
-
         }
         executor.shutdown();
         try {
@@ -289,7 +405,7 @@ public class ContentImpl implements  ContentService {
     public  List<RedirectionReport> redirectionTest(List<Page> list, PageOption option)  {
         Date createdTime = new Date();
         List<RedirectionReport> pageCheck = new ArrayList<>();
-        final CyclicBarrier gate = new CyclicBarrier(list.size());
+
         ExecutorService executor = Executors.newFixedThreadPool(Constant.MAX_THREAD);
         for(Page url:list){
             executor.submit(new Runnable() {
@@ -299,7 +415,7 @@ public class ContentImpl implements  ContentService {
 
                     try {
 
-                        int  code =getStatus(url.getUrl());
+                        int  code =CheckHTTPResponse.verifyHttpMessage(url.getUrl());
                         if(code== HttpURLConnection.HTTP_MOVED_TEMP || code == HttpURLConnection.HTTP_MOVED_PERM){
                             URL siteURL = new URL(url.getUrl());
                             HttpURLConnection connection = (HttpURLConnection) siteURL.openConnection();
@@ -344,7 +460,7 @@ public class ContentImpl implements  ContentService {
             listThread.add(new Thread(){
                 public void run() {
                     try {
-                        int  code =getStatus(url.getUrl());
+                        int  code =CheckHTTPResponse.verifyHttpMessage(url.getUrl());
                         if(code== HttpURLConnection.HTTP_MOVED_TEMP || code == HttpURLConnection.HTTP_MOVED_PERM){
                             URL siteURL = new URL(url.getUrl());
                             HttpURLConnection connection = (HttpURLConnection) siteURL.openConnection();
@@ -413,44 +529,44 @@ public class ContentImpl implements  ContentService {
         return canUrl;
     }
 
-    public int getStatus(String url) throws IOException {
-        int  result = 0;
-        int code = 200;
-        try {
-            URL siteURL = new URL(url);
-            HttpURLConnection connection = (HttpURLConnection) siteURL.openConnection();
-            connection.setRequestMethod("GET");
-            connection.setRequestProperty("User-Agent","Mozilla/5.0 ");
-            code = connection.getResponseCode();
-            String message = connection.getResponseMessage();
-            System.out.println("Message respone"+message);
-            System.out.println("Code respone"+code );
-
-            if(code ==200){
-                result =  code;
-            }
-            else if  (code == HttpURLConnection.HTTP_MOVED_PERM|| code== HttpURLConnection.HTTP_MOVED_TEMP){
-                result = code;
-
-
-                String newUrl = connection.getHeaderField("Location");
-                connection = (HttpURLConnection) new URL(newUrl).openConnection();
-                connection.addRequestProperty("Accept-Language", "en-US,en;q=0.8");
-                connection .addRequestProperty("User-Agent", "Mozilla");
-                connection.addRequestProperty("Referer", "google.com");
-
-                System.out.println("Addresses: "+url+" -Redirect to URL : " + newUrl+": Type: "+message);
-            }
-            else{
-                result =  code;
-            }
-        } catch (Exception e) {
-            result=404;
-        }
-        System.out.println(result);
-        return result;
-
-    }
+//    public int getStatus(String url) throws IOException {
+//        int  result = 0;
+//        int code = 200;
+//        try {
+//            URL siteURL = new URL(url);
+//            HttpURLConnection connection = (HttpURLConnection) siteURL.openConnection();
+//            connection.setRequestMethod("GET");
+//            connection.setRequestProperty("User-Agent","Mozilla/5.0 ");
+//            code = connection.getResponseCode();
+//            String message = connection.getResponseMessage();
+//            System.out.println("Message respone"+message);
+//            System.out.println("Code respone"+code );
+//
+//            if(code ==200){
+//                result =  code;
+//            }
+//            else if  (code == HttpURLConnection.HTTP_MOVED_PERM|| code== HttpURLConnection.HTTP_MOVED_TEMP){
+//                result = code;
+//
+//
+//                String newUrl = connection.getHeaderField("Location");
+//                connection = (HttpURLConnection) new URL(newUrl).openConnection();
+//                connection.addRequestProperty("Accept-Language", "en-US,en;q=0.8");
+//                connection .addRequestProperty("User-Agent", "Mozilla");
+//                connection.addRequestProperty("Referer", "google.com");
+//
+//                System.out.println("Addresses: "+url+" -Redirect to URL : " + newUrl+": Type: "+message);
+//            }
+//            else{
+//                result =  code;
+//            }
+//        } catch (Exception e) {
+//            result=404;
+//        }
+//        System.out.println(result);
+//        return result;
+//
+//    }
 
     public List<ContactReport> getContactDetail(List<Page> list, PageOption option){
         Date createdTime = new Date();
@@ -467,7 +583,7 @@ public class ContentImpl implements  ContentService {
                     try {
 
                         String url = newList.getUrl();
-                        int codeRespone = getStatus(url);
+                        int codeRespone = CheckHTTPResponse.verifyHttpMessage(url);
                         if(codeRespone<400 || codeRespone>=500){
                             Document doc = Jsoup.connect(url).ignoreContentType(true).get();
                             doc.body().text();
