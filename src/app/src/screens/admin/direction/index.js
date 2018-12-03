@@ -6,7 +6,7 @@ import ReactToExcel from "react-html-table-to-excel";
 
 const cookies = new Cookies();
 export default class Direction extends Component {
-    state = { list: [], loadingTable: false, isDisable: false, statusNoResult: "" };
+    state = { list: [], loadingTable: false, isDisable: false, statusNoResult: "", listReportId:[], isDoneTest: false};
 
 
     componentDidMount() {
@@ -45,6 +45,8 @@ export default class Direction extends Component {
         this.setState({ loadingTable: true, isDisable: true });
         var comp = [];
         var statusNotFound = "";
+        var flagDoneTest = false;
+        var listReport =[];
         var param = {
             "userId": cookies.get("u_id"),
             "userToken": cookies.get("u_token"),
@@ -60,14 +62,55 @@ export default class Direction extends Component {
             body: JSON.stringify(param)
         }).then(response => response.json()).then((data) => {
             comp = data.redirectiontestReport.map((item, index) => {
+                listReport.push(item.id)
                 return (<TableRow key={index} webAddress={item.url} redirectUrl={item.driectToUrl} type={item.type} httpcode={item.httpCode} />);
             });
+            if(comp.length!==0){
+                flagDoneTest=true;
+            }
             if (comp.length === 0) {
+                
                 statusNotFound = "No Redirection Found";
             }
             this.setState({ statusNoResult: statusNotFound });
-            this.setState({ list: comp });
-            this.setState({ loadingTable: false });
+            this.setState({ list: comp, listReportId:listReport});
+            this.setState({ loadingTable: false, isDoneTest:flagDoneTest, isDisable:false });
+        });
+    }
+
+    _saveReport() {
+        this.setState({ loadingTable: true });
+        this.setState({ isDisable: true });
+        var comp = [];
+        var param = {
+            "userId": cookies.get("u_id"),
+            "userToken": cookies.get("u_token"),
+            "websiteId": cookies.get("u_w_id"),
+            "pageOptionId": cookies.get("u_option"),
+            "listReportId": this.state.listReportId
+        };
+
+        fetch("/api/redirectiontest/saveReport", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(param)
+        }).then(response => response.json()).then((data) => {
+            console.log(data)
+            comp = data.redirectiontestReport.map((item, index) => {
+                return (<TableRow key={index} webAddress={item.url} redirectUrl={item.driectToUrl} type={item.type} httpcode={item.httpCode} />);
+            });
+
+          
+
+            this.setState({
+                list: comp,
+                loadingTable: false,
+                isDisable: false,
+                isDoneTest: false
+            });
         });
     }
     render() {
@@ -80,6 +123,9 @@ export default class Direction extends Component {
                         Check
                        <Icon name='right arrow' />
                     </Button>
+                     {this.state.isDoneTest ? <Button icon color="green" labelPosition='right' onClick={() => this._saveReport()}>
+                                    Save <Icon name='check' />
+                                </Button> : ""}
                     <div style={{ marginBottom: '10px', float: 'right' }}>
 
 

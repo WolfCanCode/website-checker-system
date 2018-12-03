@@ -6,7 +6,7 @@ import ReactToExcel from "react-html-table-to-excel";
 
 const cookies = new Cookies();
 export default class Pages extends Component {
-    state = { list: [], loadingTable: false, isDisable: false };
+    state = { list: [], loadingTable: false, isDisable: false, listReportId:[], isDoneTest: false};
 
 
     componentDidMount() {
@@ -39,6 +39,8 @@ export default class Pages extends Component {
     _doPageTest() {
         this.setState({ loadingTable: true, isDisable: true });
         var comp = [];
+        var listReport=[];
+        var flagDontest=false;
         var param = {
             "userId": cookies.get("u_id"),
             "userToken": cookies.get("u_token"),
@@ -53,14 +55,55 @@ export default class Pages extends Component {
             },
             body: JSON.stringify(param)
         }).then(response => response.json()).then((data) => {
+            
+            comp = data.pagetestReport.map((item, index) => {
+                listReport.push(item.id);
+                return (<TableRow key={index} url={item.url} titleWeb={item.titleWeb} canonicalUrl={item.canonicalUrl} httpCode={item.httpCode} />);
+            });
+            if(comp.length!==0){
+                flagDontest=true
+            }
+           
+            this.setState({ list: comp, isDisable: false ,  isDoneTest: flagDontest,loadingTable: false,listReportId:listReport});
+           
+        });
+    }
+    
+    _saveReport() {
+        this.setState({ loadingTable: true });
+        this.setState({ isDisable: true });
+        var comp = [];
+        var param = {
+            "userId": cookies.get("u_id"),
+            "userToken": cookies.get("u_token"),
+            "websiteId": cookies.get("u_w_id"),
+            "pageOptionId": cookies.get("u_option"),
+            "listReportId": this.state.listReportId
+        };
+
+        fetch("/api/pageTest/saveReport", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(param)
+        }).then(response => response.json()).then((data) => {
             comp = data.pagetestReport.map((item, index) => {
                 return (<TableRow key={index} url={item.url} titleWeb={item.titleWeb} canonicalUrl={item.canonicalUrl} httpCode={item.httpCode} />);
             });
 
-            this.setState({ list: comp });
-            this.setState({ loadingTable: false });
+          
+
+            this.setState({
+                list: comp,
+                loadingTable: false,
+                isDisable: false,
+                isDoneTest: false
+            });
         });
     }
+    
 
     render() {
         return (
@@ -70,6 +113,9 @@ export default class Pages extends Component {
                         Check
                        <Icon name='right arrow' />
                     </Button>
+                    {this.state.isDoneTest ? <Button icon color="green" labelPosition='right' onClick={() => this._saveReport()}>
+                                    Save <Icon name='check' />
+                                </Button> : ""}
                     <div style={{ marginBottom: '10px', float: 'right' }}>
 
 
