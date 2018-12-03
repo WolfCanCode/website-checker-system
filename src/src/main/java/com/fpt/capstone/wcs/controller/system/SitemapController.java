@@ -1,5 +1,6 @@
 package com.fpt.capstone.wcs.controller.system;
 
+import com.fpt.capstone.wcs.model.pojo.ReferencePOJO;
 import com.fpt.capstone.wcs.model.pojo.RequestCommonPOJO;
 import com.fpt.capstone.wcs.service.system.sitemap.SiteMapService;
 import com.fpt.capstone.wcs.model.pojo.SiteMapOutputPOJO;
@@ -20,16 +21,20 @@ public class SitemapController {
         return siteMapService.getVisualSitemap(request);
     }
 
-    @PostMapping("/api/sitemap/getAllLinksReferencingOnSelectetUrl")
-    public List<SiteMapOutputPOJO> getAllLinksReferencingOnSelectetUrl(@RequestBody RequestCommonPOJO request) throws MalformedURLException {
-        return siteMapService.getAllLinksReferencingOnSelectetUrl(request);
+    @PostMapping("/api/sitemap/getRefTo")
+    public Map<String, Object> getRefTo(@RequestBody ReferencePOJO request) throws MalformedURLException {
+        return siteMapService.getPagesReferenceToThisURL(request);
     }
 
+    @PostMapping("/api/sitemap/getRefBy")
+    public Map<String, Object> getRefBy(@RequestBody ReferencePOJO request) throws MalformedURLException {
+        return siteMapService.getUrlsReferencedByThisPage(request);
+    }
 
     @CrossOrigin
     @PostMapping("/api/sitemap/getVer")
     public Map<String, Object> getLastestVer(@RequestBody RequestCommonPOJO request) {
-        return siteMapService.getLastestVer(request);
+        return siteMapService.getLatestVer(request);
     }
 
     @CrossOrigin
