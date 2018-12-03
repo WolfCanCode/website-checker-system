@@ -84,4 +84,9 @@ public class TechnologyController {
     {
        return technologyService.getLastestFaviconTest(request);
     }
+
+    @PostMapping("/api/faviconTest/saveReport")
+    public Map<String, Object> saveFaviconReport(@RequestBody RequestReportPOJO report){
+        return technologyService.saveFaviconTest(report);
+    }
 }

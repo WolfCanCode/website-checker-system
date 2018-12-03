@@ -91,4 +91,9 @@ public class QualityController {
     public Map<String, Object> getLastestMissingFile(@RequestBody MissingFilePOJO request) {
         return  qualityService.getLastestMissingFile(request);
     }
+
+    @PostMapping("/api/missingtest/saveReport")
+    public Map<String, Object> saveMissingFileReport(@RequestBody RequestReportPOJO request) {
+        return qualityService.saveMissingFileReport(request);
+    }
 }

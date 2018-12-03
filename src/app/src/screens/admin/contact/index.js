@@ -275,6 +275,8 @@ export default class Contact extends Component {
                 <p style={{ fontSize: 24 }}>{isNaN(this.state.countEmail) ? 0 : (this.state.countEmail)}<br /> Emails</p>
               </Segment>
             </Segment.Group>
+            
+            <Segment loading={this.state.loadingTable} basic>
             <Button icon  primary labelPosition='right' disabled={this.state.isDisable} onClick={() => this._doContactDetailTest()}>
               Check
                        <Icon name='right arrow' />
@@ -305,6 +307,8 @@ export default class Contact extends Component {
                 {this.state.list.length === 0 ? <Table.Row><Table.Cell>{this.state.statusNoResult}</Table.Cell></Table.Row> : this.state.list}
               </Table.Body>
             </Table>
+            </Segment>
+            
           </Segment>
         </Segment.Group>
       </div>

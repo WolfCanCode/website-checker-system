@@ -22,6 +22,8 @@ class missingFilesScreen extends Component {
         isActiveDoc: false,
         isActiveARCHIRES: false,
         statusNoResult: "",
+        isDoneTest: false,
+        listReportId:[]
 
     };
 
@@ -94,6 +96,7 @@ class missingFilesScreen extends Component {
     _doMissingFilePagesTest() {
         this.setState({ loadingTable: true, isDisable: true });
         var comp = [];
+        var listReport=[];
         var param = {
             "userId": cookies.get("u_id"),
             "userToken": cookies.get("u_token"),
@@ -118,6 +121,7 @@ class missingFilesScreen extends Component {
             body: JSON.stringify(param)
         }).then(response => response.json()).then((data) => {
             comp = data.missingFileReport.map((item, index) => {
+                listReport.push(item.id)
                 for (let i = 0; i < listCom.length; i++) {
                     if (item.pages === listCom[i]) {
                         flag = true;
@@ -147,6 +151,9 @@ class missingFilesScreen extends Component {
             if (comp.length === 0) {
                 statusResult = "No Missing File Found";
             }
+            if(comp.length !== 0){
+                this.setState({isDoneTest:true})
+            }
             console.log(comp.length)
             this.setState({ statusNoResult: statusResult })
             this.setState({ countMissingFile: countMissingFile1 });
@@ -154,6 +161,8 @@ class missingFilesScreen extends Component {
             this.setState({ list: comp });
             this.setState({ loadingTable: false });
             this.setState({ isDisable: false });
+            this.setState({listReportId:listReport})
+           
 
         });
     }
@@ -176,12 +185,7 @@ class missingFilesScreen extends Component {
             listTemp.push(1);
             active = true;
         }
-
-
-        console.log("Ac:" + active)
         this.setState({ listType: listTemp, isActiveImg: active })
-
-        console.log(listTemp);
 
     }
 
@@ -254,6 +258,74 @@ class missingFilesScreen extends Component {
         console.log(listTemp);
     }
 
+    _saveReport() {
+        this.setState({ loadingTable: true });
+        this.setState({ isDisable: true });
+        var comp = [];
+        var countPageAffected1 = 0;
+        var countMissingFile1 = 0;
+        let flag = false;
+        var listCom = [];
+        var flagMissingFile = false;
+        var listMissingFileCount = [];
+        var statusResult = "";
+        var param = {
+            "userId": cookies.get("u_id"),
+            "userToken": cookies.get("u_token"),
+            "websiteId": cookies.get("u_w_id"),
+            "pageOptionId": cookies.get("u_option"),
+            "listReportId": this.state.listReportId
+        };
+
+        fetch("/api/missingtest/saveReport", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(param)
+        }).then(response => response.json()).then((data) => {
+            comp = data.missingFileReport.map((item, index) => {
+                for (let i = 0; i < listCom.length; i++) {
+                    if (item.pages === listCom[i]) {
+                        flag = true;
+                    }
+                }
+                if (flag === false) {
+                    listCom.push(item.pages);
+                    countPageAffected1++;
+                } else {
+                    flag = false;
+                }
+
+                for (let i = 0; i < listMissingFileCount.length; i++) {
+                    if (item.fileMissing === listMissingFileCount[i]) {
+                        flagMissingFile = true;
+                    }
+                }
+                if (flagMissingFile === false) {
+                    listMissingFileCount.push(item.fileMissing);
+                    countMissingFile1++;
+                }
+                else {
+                    flagMissingFile = false;
+                }
+                return (<TableRow key={index} fileMissing={item.fileMissing} description={item.description} pages={item.pages} />);
+            });
+            if (comp.length === 0) {
+                statusResult = "No Missing File Found";
+            }
+           
+            console.log(comp.length)
+            this.setState({ statusNoResult: statusResult })
+            this.setState({ countMissingFile: countMissingFile1 });
+            this.setState({ countPageAffected: countPageAffected1 });
+            this.setState({ list: comp });
+            this.setState({ loadingTable: false });
+            this.setState({ isDisable: false });
+            this.setState({isDoneTest:false})
+        });
+    }
 
 
 
@@ -261,12 +333,7 @@ class missingFilesScreen extends Component {
         return (
             <div style={{ height: 'auto' }}>
                 <Segment.Group>
-                    <Segment>
-                        <Button icon primary labelPosition='right' disabled={this.state.isDisable} onClick={() => this._doMissingFilePagesTest()}>
-                            Check
-                       <Icon name='right arrow' />
-                        </Button>
-                    </Segment>
+
                     <Segment.Group horizontal>
 
                         <Segment basic>
@@ -314,9 +381,18 @@ class missingFilesScreen extends Component {
                             </div>
                            
                         </Segment> */}
-                            <SegmentGroup>
+                            <SegmentGroup basic>
                                 <Segment basic>
-
+                                <div style={{ marginBottom: '10px' }}>
+                                <Button icon primary labelPosition='right' disabled={this.state.isDisable} onClick={() => this._doMissingFilePagesTest()}>
+                                        Check
+                       <Icon name='right arrow' />
+                                    </Button>
+                                    {this.state.isDoneTest ? <Button icon color="green" labelPosition='right' onClick={() => this._saveReport()}>
+                                    Save <Icon name='check' />
+                                </Button> : ""}
+                                </div>
+                                
                                     <div style={{ marginBottom: '50px' }}>
                                         <Button.Group style={{ float: 'left' }}>
                                             <Button onClick={() => this._doClickImage()} active={this.state.isActiveImg}>Image</Button>
@@ -325,8 +401,6 @@ class missingFilesScreen extends Component {
                                             <Button onClick={() => this._doClickARCHIRES()} active={this.state.isActiveARCHIRES}>ARCHIRES</Button>
                                         </Button.Group>
                                         <div style={{ marginBottom: '10px', float: 'right' }}>
-
-
                                             <ReactToExcel
                                                 className="btn1"
                                                 table="table-to-xls"
@@ -335,47 +409,34 @@ class missingFilesScreen extends Component {
                                                 buttonText={<Button color="green"><Icon name="print" />Export</Button>}
                                             />
                                         </div>
-
                                         <Input icon='search' placeholder='Search...' style={{ float: 'right' }} />
                                     </div>
-
-
                                 </Segment>
-                                
-
                             </SegmentGroup>
-                         
                         </Segment>
-
-
-
-
-
-
                     </Segment.Group>
-                    
                 </Segment.Group>
                 <Segment singleLine loading={this.state.loadingTable}>
-                                    <Table singleLine unstackable textAlign='center' style={{ tableLayout: 'auto' }} id="table-to-xls">
-                                        <Table.Header >
-                                            <Table.Row>
-                                                <Table.HeaderCell>Files</Table.HeaderCell>
-                                                <Table.HeaderCell>Description</Table.HeaderCell>
-                                                <Table.HeaderCell>Pages</Table.HeaderCell>
-                                                <Table.HeaderCell>Action</Table.HeaderCell>
+                    <Table singleLine unstackable textAlign='center' style={{ tableLayout: 'auto' }} id="table-to-xls">
+                        <Table.Header >
+                            <Table.Row>
+                                <Table.HeaderCell>Files</Table.HeaderCell>
+                                <Table.HeaderCell>Description</Table.HeaderCell>
+                                <Table.HeaderCell>Pages</Table.HeaderCell>
+                                <Table.HeaderCell>Action</Table.HeaderCell>
 
-                                            </Table.Row>
-                                        </Table.Header>
-                                        <Table.Body>
-                                            {this.state.list.length === 0 ? <Table.Row><Table.Cell>{this.state.statusNoResult}</Table.Cell></Table.Row> : this.state.list}
-
-
+                            </Table.Row>
+                        </Table.Header>
+                        <Table.Body>
+                            {this.state.list.length === 0 ? <Table.Row><Table.Cell>{this.state.statusNoResult}</Table.Cell></Table.Row> : this.state.list}
 
 
-                                        </Table.Body>
-                                    </Table>
 
-                                </Segment>
+
+                        </Table.Body>
+                    </Table>
+
+                </Segment>
             </div>
 
         );

@@ -21,4 +21,5 @@ public interface QualityService {
     //Missing File
     public Map<String, Object> getMissingFile(MissingFilePOJO request);
     public Map<String, Object> getLastestMissingFile(MissingFilePOJO request);
+    public Map<String, Object> saveMissingFileReport(RequestReportPOJO request);
 }
