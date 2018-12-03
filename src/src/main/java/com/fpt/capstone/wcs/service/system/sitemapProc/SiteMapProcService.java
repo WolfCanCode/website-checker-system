@@ -1,5 +1,7 @@
 package com.fpt.capstone.wcs.service.system.sitemapProc;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fpt.capstone.wcs.model.entity.user.Website;
 import com.fpt.capstone.wcs.model.entity.website.Page;
 import com.fpt.capstone.wcs.model.entity.website.Version;
@@ -22,12 +24,50 @@ public class SiteMapProcService {
     private List<Integer> typeNode = new ArrayList<Integer>(); //Type link: 1 is internal, 2 is external and 3 is error internal link
     private List<String> links = new ArrayList<String>();
 
+    public void convert() throws JsonProcessingException {
+        ObjectMapper obj = new ObjectMapper();
+        String rs = obj.writeValueAsString(this.graph);
+        System.out.println("CONVERT: " + rs);
+    }
     // init site-map with 'root Domain' link
     public SiteMapProcService(String rootDomain) {
         this.rootDomain = rootDomain;
         urlMap.clear();
         invGraph.clear();
+        graph.clear();
         verticesNum = 0;
+    }
+
+    public HashMap<String, Integer> getUrlMap() {
+        return urlMap;
+    }
+
+    public String getRootDomain() {
+        return rootDomain;
+    }
+
+    public List<List<SiteLinkPOJO>> getGraph() {
+        return graph;
+    }
+
+    public List<List<SiteLinkPOJO>> getInvGraph() {
+        return invGraph;
+    }
+
+    public int getVerticesNum() {
+        return verticesNum;
+    }
+
+    public List<Integer> getTypeNode() {
+        return typeNode;
+    }
+
+    public List<String> getLinks() {
+        return links;
+    }
+
+    public List<List<Integer>> getSubChild() {
+        return subChild;
     }
 
     public List<String> crawlHtmlSource(String url) throws MalformedURLException {

@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
-import { Segment, Button, Transition, SegmentGroup, Input, Table, Modal, Form } from 'semantic-ui-react'
+import { Segment, Button, Transition, SegmentGroup, Input, Table, Modal, Form, Icon, Label } from 'semantic-ui-react'
 
 import TableRow from './row-table';
+import PageTableRow from './page-row-table';
+
 // import logo1 from './images/mobile.png';
 
 import { Cookies } from "react-cookie";
@@ -15,7 +17,9 @@ export default class managewebsitescreen extends Component {
     state = {
         addModal: false, isLoading: false, listWeb: null, webName: "", webUrl: "",
         isDisable: true, addLoading: false, showSitemapModal: false,
-        showRefModal: false, showRefResultModal: false, currWeb: "", selectedUrl: "",
+        showRefModal: false, showRefToResultModal: false, showRefByResultModal: false,
+        currWeb: "", currWebId: "", selectedUrl: "",
+        listPageRefTo: null, listPageRefBy: null
     }
 
 
@@ -36,29 +40,59 @@ export default class managewebsitescreen extends Component {
         this.setState({ currWeb: name })
     }
 
+    _getSelectedWebId(id) {
+        this.setState({ currWebId: id })
+    }
     _setSelectedRectValue(url) {
-        alert(url);
         if (url !== "") {
             this.setState({ selectedUrl: url, showRefModal: true });
         }
 
     }
 
-    _getRefTo(url) {
-        alert("URL: " + url)
+    _getRefTo(url, id) { // others to urls
+        var param = { "userId": cookies.get("u_id"), "userToken": cookies.get("u_token"), "websiteId": id, "url": url };
+        var comp = [];
         fetch("/api/sitemap/getRefTo", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ "managerId": cookies.get("u_id"), "managerToken": cookies.get("u_token") })
-        }).then(response => response.json()).then((data) => { });
-
+            body: JSON.stringify(param)
+        }).then(response => response.json()).then((data) => {
+            if (data.action === "SUCCESS") {
+                comp = data.pageList.map((item, index) => {
+                    return (<PageTableRow key={index} srcUrl={item.srcUrl} desUrl={item.desUrl} desType={item.desType} />);
+                });
+                this.setState({ listPageRefTo: comp, });
+                this.setState({showRefToResultModal: true});
+            }
+        }
+        );
     }
 
-    _getRefBy(url) {
-        alert("URL: " + url)
+    _getRefBy(url, id) {
+        var param = { "userId": cookies.get("u_id"), "userToken": cookies.get("u_token"), "websiteId": id, "url": url };
+        var comp = [];
+        fetch("/api/sitemap/getRefBy", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(param)
+        }).then(response => response.json()).then((data) => {
+            if (data.action === "SUCCESS") {
+                comp = data.pageList.map((item, index) => {
+                    return (<PageTableRow key={index} srcUrl={item.srcUrl} desUrl={item.desUrl} desType={item.desType} />);
+                });
+                this.setState({ listPageRefBy: comp, });
+                this.setState({showRefByResultModal: true});
+            }
+        }
+        );
+
     }
     _refreshTable() {
         fetch("/api/website/manage", {
@@ -77,6 +111,7 @@ export default class managewebsitescreen extends Component {
 
                         showingModal={(isShow) => this._showingModal(isShow)}
                         getSelectedWebName={(name) => this._getSelectedWebName(name)}
+                        getSelectedWebId={(id) => this._getSelectedWebId(id)}
                         setSelectedRectValue={(url) => this._setSelectedRectValue(url)} />);
                 });
                 this.setState({ listWeb: list, isLoading: false });
@@ -131,12 +166,9 @@ export default class managewebsitescreen extends Component {
     render() {
         return (
             <div>
-
                 <SegmentGroup vertical='true'>
-
                     <Segment basic>
                         <div style={{ marginBottom: '30px' }}>
-
                             <Button style={{ float: 'right' }} onClick={() => this.setState({ addModal: true })}> Add </Button>
                             <Transition duration={600} divided size='huge' verticalAlign='middle' visible={this.state.addModal}>
                                 <Modal open={this.state.addModal} closeOnEscape="true">
@@ -182,16 +214,40 @@ export default class managewebsitescreen extends Component {
                         {/*End View Sitemap*/}
                         {/*Handle reference*/}
                         <Transition duration={600} divided verticalAlign='middle' visible={this.state.showRefModal}>
-                            <Modal open={this.state.showRefModal}>
+                            <Modal open={this.state.showRefModal} style={{ width: '30%', height: '30%', background: 'white' }}>
                                 <Modal.Header style={{ textAlign: 'center', fontSize: 25, fontWeight: 'bold', color: 'black' }}>Choose your option:</Modal.Header>
-                                <Modal.Content>
+                                <Modal.Content >
                                     <Form>
-                                        <Form.Field>
-                                            <Button onClick={() => this._getRefTo(this.state.selectedUrl)}> Reference To </Button>
-                                        </Form.Field>
-                                        <Form.Field>
-                                            <Button onClick={() => this._getRefBy(this.state.selectedUrl)}>Referenced By </Button>
-                                        </Form.Field>
+                                        <Form.Group widths='equal'>
+                                            {/* <Form.Field>
+                                                <Button onClick={() => this._getRefTo(this.state.selectedUrl)}>Pages Referencing => This URL</Button>
+                                                <Button icon labelPosition='right'>
+                                                    Pages Referencing <Icon name='right arrow' />  This URL
+                                                </Button>
+                                            </Form.Field> */}
+                                            <Form.Field>
+
+                                                <Button as='div' labelPosition='right' onClick={() => this._getRefBy(this.state.selectedUrl, this.state.currWebId)}>
+                                                    <Label as='a' basic color='blue' pointing='right'>
+                                                        <Icon name='fork' />This URL </Label>
+                                                    <Button basic color='blue'>
+
+                                                        Pages     </Button>
+
+                                                </Button>
+                                            </Form.Field>
+                                            <Form.Field>
+
+                                                <Button as='div' labelPosition='right' onClick={() => this._getRefTo(this.state.selectedUrl, this.state.currWebId)}>
+                                                    <Label as='a' basic color='blue' pointing='right'>
+                                                        <Icon name='linkify' /> Pages </Label>
+                                                    <Button basic color='blue'>
+
+                                                        This URL     </Button>
+
+                                                </Button>
+                                            </Form.Field>
+                                        </Form.Group>
                                     </Form>
                                 </Modal.Content>
                                 <Modal.Actions >
@@ -199,7 +255,66 @@ export default class managewebsitescreen extends Component {
                                 </Modal.Actions>
                             </Modal>
                         </Transition>
+                        
                         {/*End reference*/}
+
+
+                        {/*Page Reference Result*/}
+                        <Transition duration={600} divided verticalAlign='middle' visible={this.state.showRefToResultModal}>
+                            <Modal open={this.state.showRefToResultModal} style={{ width: '400', height: 'auto', background: 'white' }}>
+                                <Modal.Header style={{ textAlign: 'left', fontSize: 25, fontWeight: 'bold', color: 'black' }}>
+                                Pages are referencing to: {this.state.selectedUrl}
+                                </Modal.Header>
+                                <Modal.Content >
+                                <Table singleLine unstackable>
+                                
+                                <Table.Header>
+                                    <Table.Row>
+                                        
+                                        <Table.HeaderCell>Destination</Table.HeaderCell>
+                                        <Table.HeaderCell>Type</Table.HeaderCell>
+                                    </Table.Row>
+                                </Table.Header>
+                                <Table.Body>
+                                {this.state.listPageRefTo}
+                                </Table.Body>
+                            </Table>
+                                </Modal.Content>
+                                <Modal.Actions >
+                                    <Button onClick={() => this.setState({ showRefToResultModal: false })}> Cancel</Button>
+                                </Modal.Actions>
+                            </Modal>
+                        </Transition>
+                        {/*Page Reference Result End*/}
+
+                        {/*Page Reference Result*/}
+                        <Transition duration={600} divided verticalAlign='middle' visible={this.state.showRefByResultModal}>
+                            <Modal open={this.state.showRefByResultModal} style={{ width: '400', height: 'auto', background: 'white' }}>
+                                <Modal.Header style={{ textAlign: 'left', fontSize: 25, fontWeight: 'bold', color: 'black' }}>
+                                Pages are referencing to: {this.state.selectedUrl}
+                                </Modal.Header>
+                                <Modal.Content >
+                                <Table singleLine unstackable>
+                                
+                                <Table.Header>
+                                    <Table.Row>
+                                        
+                                        <Table.HeaderCell>Destination</Table.HeaderCell>
+                                        <Table.HeaderCell>Type</Table.HeaderCell>
+                                    </Table.Row>
+                                </Table.Header>
+                                <Table.Body>
+                                {this.state.listPageRefBy}
+                                </Table.Body>
+                            </Table>
+                                </Modal.Content>
+                                <Modal.Actions >
+                                    <Button onClick={() => this.setState({ showRefByResultModal: false })}> Cancel</Button>
+                                </Modal.Actions>
+                            </Modal>
+                        </Transition>
+                        {/*Page Reference Result End*/}
+
                         <Segment basic loading={this.state.isLoading}>
                             <Table singleLine unstackable>
                                 <Table.Header>
@@ -221,19 +336,6 @@ export default class managewebsitescreen extends Component {
                             {/* <Canvas /> */}
                         </Segment>
                     </Segment.Group>
-                    {/* <div>
-
-
-                        <div class='ui medium images'>
-
-                            <img src={require('./images/' + 'mobile.png')} class='ui image' />
-                            <img src={logo1} class='ui image' />
-                            <img src={logo1} class='ui image' />
-
-
-                        </div>
-                    </div> */}
-
                 </SegmentGroup>
             </div>
         );
