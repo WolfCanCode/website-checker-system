@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import 'semantic-ui-css/semantic.min.css';
-import { Segment, Button, Table, Icon, Input } from 'semantic-ui-react'
+import { Segment, Button, Table, Icon, Input, SegmentGroup } from 'semantic-ui-react'
 import TableRow from '../missingFiles/row-table'
 import { Cookies } from "react-cookie";
 import ReactToExcel from "react-html-table-to-excel";
@@ -314,51 +314,37 @@ class missingFilesScreen extends Component {
                             </div>
                            
                         </Segment> */}
+                            <SegmentGroup>
+                                <Segment basic>
 
-                            <Segment basic>
-
-                                <div style={{ marginBottom: '50px' }}>
-                                    <Button.Group style={{ float: 'left' }}>
-                                        <Button onClick={() => this._doClickImage()} active={this.state.isActiveImg}>Image</Button>
-                                        <Button onClick={() => this._doClickCSS()} active={this.state.isActiveCss}>CSS</Button>
-                                        <Button onClick={() => this._doClickDOC()} active={this.state.isActiveDoc}>DOC</Button>
-                                        <Button onClick={() => this._doClickARCHIRES()} active={this.state.isActiveARCHIRES}>ARCHIRES</Button>
-                                    </Button.Group>
-                                    <div style={{ marginBottom: '10px', float: 'right' }}>
+                                    <div style={{ marginBottom: '50px' }}>
+                                        <Button.Group style={{ float: 'left' }}>
+                                            <Button onClick={() => this._doClickImage()} active={this.state.isActiveImg}>Image</Button>
+                                            <Button onClick={() => this._doClickCSS()} active={this.state.isActiveCss}>CSS</Button>
+                                            <Button onClick={() => this._doClickDOC()} active={this.state.isActiveDoc}>DOC</Button>
+                                            <Button onClick={() => this._doClickARCHIRES()} active={this.state.isActiveARCHIRES}>ARCHIRES</Button>
+                                        </Button.Group>
+                                        <div style={{ marginBottom: '10px', float: 'right' }}>
 
 
-                                        <ReactToExcel
-                                            className="btn1"
-                                            table="table-to-xls"
-                                            filename="missingFiles_test_file"
-                                            sheet="sheet 1"
-                                            buttonText={<Button color="green"><Icon name="print" />Export</Button>}
-                                        />
+                                            <ReactToExcel
+                                                className="btn1"
+                                                table="table-to-xls"
+                                                filename="missingFiles_test_file"
+                                                sheet="sheet 1"
+                                                buttonText={<Button color="green"><Icon name="print" />Export</Button>}
+                                            />
+                                        </div>
+
+                                        <Input icon='search' placeholder='Search...' style={{ float: 'right' }} />
                                     </div>
 
-                                    <Input icon='search' placeholder='Search...' style={{ float: 'right' }} />
-                                </div>
-                            </Segment>
 
-                            <Table singleLine unstackable textAlign='center' style={{ tableLayout: 'auto' }} loading={this.state.loadingTable} id="table-to-xls">
-                                <Table.Header >
-                                    <Table.Row>
-                                        <Table.HeaderCell>Files</Table.HeaderCell>
-                                        <Table.HeaderCell>Description</Table.HeaderCell>
-                                        <Table.HeaderCell>Pages</Table.HeaderCell>
-                                        <Table.HeaderCell>Action</Table.HeaderCell>
+                                </Segment>
+                                
 
-                                    </Table.Row>
-                                </Table.Header>
-                                <Table.Body>
-                                    {this.state.list.length === 0 ? <Table.Row><Table.Cell>{this.state.statusNoResult}</Table.Cell></Table.Row> : this.state.list}
-
-
-
-
-                                </Table.Body>
-                            </Table>
-
+                            </SegmentGroup>
+                         
                         </Segment>
 
 
@@ -367,7 +353,29 @@ class missingFilesScreen extends Component {
 
 
                     </Segment.Group>
+                    
                 </Segment.Group>
+                <Segment singleLine loading={this.state.loadingTable}>
+                                    <Table singleLine unstackable textAlign='center' style={{ tableLayout: 'auto' }} id="table-to-xls">
+                                        <Table.Header >
+                                            <Table.Row>
+                                                <Table.HeaderCell>Files</Table.HeaderCell>
+                                                <Table.HeaderCell>Description</Table.HeaderCell>
+                                                <Table.HeaderCell>Pages</Table.HeaderCell>
+                                                <Table.HeaderCell>Action</Table.HeaderCell>
+
+                                            </Table.Row>
+                                        </Table.Header>
+                                        <Table.Body>
+                                            {this.state.list.length === 0 ? <Table.Row><Table.Cell>{this.state.statusNoResult}</Table.Cell></Table.Row> : this.state.list}
+
+
+
+
+                                        </Table.Body>
+                                    </Table>
+
+                                </Segment>
             </div>
 
         );

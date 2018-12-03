@@ -22,6 +22,7 @@ import com.fpt.capstone.wcs.repository.website.PageOptionRepository;
 import com.fpt.capstone.wcs.repository.website.WarningWordRepository;
 import com.fpt.capstone.wcs.service.report.experience.ExperienceImpl;
 import com.fpt.capstone.wcs.service.system.authenticate.AuthenticateService;
+import com.fpt.capstone.wcs.utils.CheckHTTPResponse;
 import com.fpt.capstone.wcs.utils.Constant;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -593,7 +594,6 @@ public class QualityImpl implements QualityService {
     @Override
     public Map<String, Object> getMissingFile(MissingFilePOJO request) {
         Map<String, Object> res = new HashMap<>();
-
         RequestCommonPOJO pojo = new RequestCommonPOJO();
         pojo.setPageOptionId(request.getPageOptionId());
         pojo.setUserId(request.getUserId());
@@ -765,1372 +765,205 @@ public class QualityImpl implements QualityService {
     }
 
     public List<MissingFileReport> getMissingFileImg(List<Page> list,PageOption option, String urlNew) {
+        Date createdTime = new Date();
         List<MissingFileReport> missing = new ArrayList<>();
-        final CyclicBarrier gate = new CyclicBarrier(list.size());
-        List<Thread> listThread = new ArrayList<>();
+        ExecutorService executor = Executors.newFixedThreadPool(Constant.MAX_THREAD);
         String urlRoot = urlNew;
         for (Page u : list) {
-            listThread.add(new Thread() {
-                public void run() {
-                    try {
-                        gate.await();
-                        Document doc = Jsoup.connect(u.getUrl()).get();
-                        Elements elemBase = doc.select("base");
-                        boolean flagBase = false;
-                        String baseHref = "";
-
-                        for (Element element : elemBase) {
-                            System.out.println(element);
-                            baseHref = element.attr("href");
-                            System.out.println();
-                            flagBase = true;
-                        }
-                        System.out.println("Flag Base: "+flagBase);
-                        int i = 0;
-                        //check missing image
-                        Pattern pattern = Pattern.compile("((http\\:|https\\:)?//?([\\w\\-?\\.?]+)?\\.([a-zA-Z]{2,3})?)?((\\w*)?(\\.\\.)?/\\S*)\\.(jpg|gif|jp2|jpeg|png|psd|tga|svg)", Pattern.CASE_INSENSITIVE);
-                        Matcher matcher = pattern.matcher(doc.html());
-                        while (matcher.find()) {
-                            i++;
-                            String strChcek = matcher.group();
-                            String checkCode = verifyHttpMessage(strChcek);
-                            if (checkCode.equals("OK")) {
-                                byte[] capacity =  getBytes(strChcek);
-                                if(capacity.length==0){
-                                    MissingFileReport fileNew = new MissingFileReport(strChcek, checkCode+" size: "+capacity.length, u.getUrl());
-                                    fileNew.setPageOption(option);
-                                    missing.add(fileNew);
-                                }
-                                System.out.println("Image: " + strChcek + " - Code:" + checkCode);
-                            }
-                            if (!checkCode.equals("OK")) {
-                                String checkAgain = urlRoot + strChcek;
-                                String codeCheckAgain = verifyHttpMessage(checkAgain);
-                                if (codeCheckAgain.equals("OK")) {
-                                    byte[] capacity =  getBytes(checkAgain);
-                                    if(capacity.length==0){
-                                        MissingFileReport fileNew = new MissingFileReport(checkAgain, codeCheckAgain+" size: "+capacity.length, u.getUrl());
-                                        fileNew.setPageOption(option);
-                                        missing.add(fileNew);
-                                    }
-                                    System.out.println("Image Again: " + checkAgain + " - Code:" + codeCheckAgain);
-                                }
-                                if (!codeCheckAgain.equals("OK")) {
-                                    String checkLast = "https:" + strChcek;
-                                    String codeCheclast = verifyHttpMessage(checkLast);
-                                    if (codeCheclast.equals("OK")) {
-                                        byte[] capacity =  getBytes(checkLast);
-                                        if(capacity.length==0){
-                                            MissingFileReport fileNew = new MissingFileReport(checkLast, codeCheclast+" size: "+capacity.length, u.getUrl());
-                                            fileNew.setPageOption(option);
-                                            missing.add(fileNew);
-                                        }
-                                        System.out.println("Image Last: " + checkLast + " - Code:" + codeCheclast);
-                                    } else {
-                                        if (flagBase == true) {
-                                            if (strChcek.startsWith("../")) {
-                                                List<String> partoFBase = new ArrayList<>();
-                                                System.out.println(baseHref.replaceFirst("", ""));;
-                                                StringTokenizer strToken = new StringTokenizer(baseHref, "/");
-                                                while (strToken.hasMoreTokens()) {
-                                                    partoFBase.add(strToken.nextToken());
-                                                }
-                                                String newBaseurl = baseHref.replaceFirst(partoFBase.get(partoFBase.size() - 1), "");
-                                                String newStrcheck = strChcek.replaceFirst("../", "");
-                                                String checkLastBase =newBaseurl+newStrcheck;
-                                                String codeCheckLastBase = verifyHttpMessage(checkLastBase);
-                                                if (codeCheckLastBase.equals("OK")) {
-                                                    byte[] weBase = getBytes(checkLastBase);
-                                                    if (weBase.length == 0) {
-                                                        MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheckLastBase+"size "+weBase.length, u.getUrl());
-                                                        fileNew.setPageOption(option);
-                                                        missing.add(fileNew);
-
-                                                    } else {
-                                                        System.out.println("Image Base: " + checkLastBase + " - Code:" + codeCheckLastBase + " Size: " + weBase.length);
-                                                    }
-
-                                                } else {
-                                                    MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheckLastBase, u.getUrl());
-                                                    fileNew.setPageOption(option);
-                                                    missing.add(fileNew);
-                                                }
-
-                                            } else {
-                                                String checkBaseLast = baseHref + strChcek;
-                                                String codeCheckLastBase = verifyHttpMessage(checkBaseLast);
-                                                if (codeCheckLastBase.equals("OK")) {
-                                                    byte[] weBase = getBytes(checkBaseLast);
-                                                    if (weBase.length == 0) {
-                                                        MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheckLastBase+"size: "+weBase.length, u.getUrl());
-                                                        fileNew.setPageOption(option);
-                                                        missing.add(fileNew);
-                                                    } else {
-                                                        System.out.println("Image Base: " + checkBaseLast + " - Code:" + codeCheckLastBase + " Size: " + weBase.length);
-                                                    }
-
-                                                } else {
-
-                                                    MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheckLastBase, u.getUrl());
-                                                    fileNew.setPageOption(option);
-                                                    missing.add(fileNew);
-                                                }
-                                            }
-                                        } else {
-                                            MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheclast, u.getUrl());
-                                            fileNew.setPageOption(option);
-                                            missing.add(fileNew);
-                                            System.out.println("Image Last Fail: " + strChcek + " -Code: " + codeCheclast);
-                                        }
+            executor.submit(new Runnable() {
+                                @Override
+                                public void run() {
+                                    try {
+                                        List<MissingFileReport> missingFileImage  =  checkMissingFile(Constant.PATTERN_IMAGE, urlRoot, createdTime, u, option);
+                                            missing.addAll(missingFileImage);
+                                    } catch (IOException e) {
+                                        Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
                                     }
                                 }
-                            }
-                        }
-                    } catch (IOException e) {
-                        Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
-                    } catch (InterruptedException e) {
-                        Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
-                    } catch (BrokenBarrierException e) {
-                        Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
-                    }
-                }
-            });
-            System.out.println(urlRoot);
 
+                            });
         }
-        for (Thread t : listThread) {
-            System.out.println("Threed start");
-            t.start();
-        }
-
-        for (Thread t : listThread) {
-            System.out.println("Threed join");
-            try {
-                t.join();
-            } catch (InterruptedException e) {
-                Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
-            }
+        executor.shutdown();
+        try {
+            executor.awaitTermination(Long.MAX_VALUE,TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
         }
         return missing;
     }
+
 
     public List<MissingFileReport> getMissingFileDoc(List<Page> list,PageOption option, String urlNew)  {
+        Date createdTime = new Date();
         List<MissingFileReport> missing = new ArrayList<>();
-        final CyclicBarrier gate = new CyclicBarrier(list.size());
-        List<Thread> listThread = new ArrayList<>();
+        ExecutorService executor = Executors.newFixedThreadPool(Constant.MAX_THREAD);
         String urlRoot = urlNew;
         for ( Page u : list) {
-            listThread.add(new Thread() {
+            executor.submit(new Runnable() {
+                @Override
                 public void run() {
                     try {
-                        gate.await();
-                        Document doc = Jsoup.connect(u.getUrl()).get();
-                        Elements elemBase = doc.select("base");
-                        boolean flagBase = false;
-                        String baseHref = "";
+                        List<MissingFileReport> missingFileDOC  =  checkMissingFile(Constant.PATTERN_DOC, urlRoot, createdTime, u, option);
+                        missing.addAll(missingFileDOC);
 
-                        for (Element element : elemBase) {
-                            System.out.println(element);
-                            baseHref = element.attr("href");
-                            System.out.println();
-                            flagBase = true;
-                        }
-                        int i = 0;
-                        //check missing image
-                        Pattern pattern = Pattern.compile("((http\\:|https\\:)?//?([\\w\\-?\\.?]+)?\\.([a-zA-Z]{2,3})?)?((\\w*)?(\\.\\.)?/\\S*)\\.(doc|docx|ppt|pptx|pdf|ps|txt|xls|xlsx)");
-                        Matcher matcher = pattern.matcher(doc.html());
-                        while (matcher.find()) {
-                            String strChcek = matcher.group();
-                            String checkCode = verifyHttpMessage(strChcek);
-                            if (checkCode.equals("OK")) {
-                                byte[] capacity =  getBytes(strChcek);
-                                if(capacity.length==0){
-                                    MissingFileReport fileNew = new MissingFileReport(strChcek, checkCode+" size: "+capacity.length, u.getUrl());
-                                    fileNew.setPageOption(option);
-                                    missing.add(fileNew);
-                                }
-                                System.out.println("DOC: " + strChcek + " - Code:" + checkCode);
-                            }
-                            if (!checkCode.equals("OK")) {
-                                String checkAgain = urlRoot + strChcek;
-                                String codeCheckAgain = verifyHttpMessage(checkAgain);
-                                if (codeCheckAgain.equals("OK")) {
-                                    byte[] capacity =  getBytes(checkAgain);
-                                    if(capacity.length==0){
-                                        MissingFileReport fileNew = new MissingFileReport(checkAgain, codeCheckAgain+" size: "+capacity.length, u.getUrl());
-                                        fileNew.setPageOption(option);
-                                        missing.add(fileNew);
-                                    }
-                                    System.out.println("DOC Again: " + checkAgain + " - Code:" + codeCheckAgain);
-                                }
-                                if (!codeCheckAgain.equals("OK")) {
-                                    String checkLast = "https:" + strChcek;
-                                    String codeCheclast = verifyHttpMessage(checkLast);
-                                    System.out.println("Code Check Last: " + codeCheclast);
-                                    if (codeCheclast.equals("OK")) {
-                                        byte[] capacity =  getBytes(checkLast);
-                                        if(capacity.length==0){
-                                            MissingFileReport fileNew = new MissingFileReport(checkLast, codeCheclast+" size: "+capacity.length, u.getUrl());
-                                            fileNew.setPageOption(option);
-                                            missing.add(fileNew);
-                                        }
-                                        System.out.println("DOC Last: " + checkLast + " - Code:" + codeCheclast);
-                                    } else {
-                                        if (flagBase == true) {
-                                            if (strChcek.startsWith("../")) {
-                                                List<String> partoFBase = new ArrayList<>();
-                                                System.out.println(baseHref.replaceFirst("", ""));;
-                                                StringTokenizer strToken = new StringTokenizer(baseHref, "/");
-                                                while (strToken.hasMoreTokens()) {
-                                                    partoFBase.add(strToken.nextToken());
-                                                }
-                                                String newBaseurl = baseHref.replaceFirst(partoFBase.get(partoFBase.size() - 1), "");
-                                                String newStrcheck = strChcek.replaceFirst("../", "");
-                                                String checkLastBase =newBaseurl+newStrcheck;
-                                                String codeCheckLastBase = verifyHttpMessage(checkLastBase);
-                                                if (codeCheckLastBase.equals("OK")) {
-                                                    byte[] weBase = getBytes(checkLastBase);
-                                                    if (weBase.length == 0) {
-                                                        MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheckLastBase+"size "+weBase.length, u.getUrl());
-                                                        fileNew.setPageOption(option);
-                                                        missing.add(fileNew);
-
-                                                    } else {
-                                                        System.out.println("DOC Base: " + checkLastBase + " - Code:" + codeCheckLastBase + " Size: " + weBase.length);
-                                                    }
-
-                                                } else {
-                                                    MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheckLastBase, u.getUrl());
-                                                    fileNew.setPageOption(option);
-                                                    missing.add(fileNew);
-                                                }
-
-                                            } else {
-                                                String checkBaseLast = baseHref + strChcek;
-                                                String codeCheckLastBase = verifyHttpMessage(checkBaseLast);
-                                                if (codeCheckLastBase.equals("OK")) {
-                                                    byte[] weBase = getBytes(checkBaseLast);
-                                                    if (weBase.length == 0) {
-                                                        MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheckLastBase+"size: "+weBase.length, u.getUrl());
-                                                        fileNew.setPageOption(option);
-                                                        missing.add(fileNew);
-                                                    } else {
-                                                        System.out.println("DOC Base: " + checkBaseLast + " - Code:" + codeCheckLastBase + " Size: " + weBase.length);
-                                                    }
-
-                                                } else {
-
-                                                    MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheckLastBase, u.getUrl());
-                                                    fileNew.setPageOption(option);
-                                                    missing.add(fileNew);
-                                                }
-                                            }
-                                        } else {
-                                            MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheclast, u.getUrl());
-                                            fileNew.setPageOption(option);
-                                            missing.add(fileNew);
-                                            System.out.println("DOC Last Fail: " + strChcek + " -Code: " + codeCheclast);
-                                        }
-                                    }
-                                }
-                            }
-
-                        }
                     } catch (IOException e) {
                         Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
-                    } catch (InterruptedException e) {
-                        Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
-                    } catch (BrokenBarrierException e) {
-                        Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
                     }
-                }
-            });
+                }});
+
             System.out.println(urlRoot);
-
         }
-        for (Thread t : listThread) {
-            System.out.println("Threed start");
-            t.start();
-        }
-
-        for (Thread t : listThread) {
-            System.out.println("Threed join");
-            try {
-                t.join();
-            } catch (InterruptedException e) {
-                Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
-            }
+        executor.shutdown();
+        try {
+            executor.awaitTermination(Long.MAX_VALUE,TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
         }
         return missing;
     }
 
+
     public List<MissingFileReport> getMissingFileCss(List<Page> list,PageOption option, String urlNew)  {
+        Date createdTime = new Date();
         List<MissingFileReport> missing = new ArrayList<>();
-        final CyclicBarrier gate = new CyclicBarrier(list.size());
-        List<Thread> listThread = new ArrayList<>();
+        ExecutorService executor = Executors.newFixedThreadPool(Constant.MAX_THREAD);
         String urlRoot = urlNew;
         for (Page u : list) {
-            listThread.add(new Thread() {
+            executor.submit(new Runnable() {
+                @Override
                 public void run() {
                     try {
-                        gate.await();
-                        Document doc = Jsoup.connect(u.getUrl()).get();
-                        Elements elemBase = doc.select("base");
-                        boolean flagBase = false;
-                        String baseHref = "";
+                        List<MissingFileReport> missingFileCSS  =  checkMissingFile(Constant.PATTERN_CSS, urlRoot, createdTime, u, option);
+                        missing.addAll(missingFileCSS);
 
-                        for (Element element : elemBase) {
-                            System.out.println(element);
-                            baseHref = element.attr("href");
-                            System.out.println();
-                            flagBase = true;
-                        }
-                        int i = 0;
-                        //check missing image
-                        Pattern pattern = Pattern.compile("((http\\:|https\\:)?//?([\\w\\-?\\.?]+)?\\.([a-zA-Z]{2,3})?)?((\\w*)?(\\.\\.)?/\\S*)\\.(css)(([\\?\\.\\=]\\w*)*)?", Pattern.CASE_INSENSITIVE);
-                        Matcher matcher = pattern.matcher(doc.html());
-                        while (matcher.find()) {
-//            user.out.println(matcher.group());
-                            String strChcek = matcher.group();
-                            String checkCode = verifyHttpMessage(strChcek);
-                            if (checkCode.equals("OK")) {
-                                byte[] capacity =  getBytes(strChcek);
-                                if(capacity.length==0){
-                                    MissingFileReport fileNew = new MissingFileReport(strChcek, checkCode+" size: "+capacity.length, u.getUrl());
-                                    fileNew.setPageOption(option);
-                                    missing.add(fileNew);
-                                }
-                                System.out.println("CSS 2: " + strChcek + " - Code:" + checkCode);
-                            }
-                            if (!checkCode.equals("OK")) {
-                                String checkAgain = urlRoot + strChcek;
-                                String codeCheckAgain = verifyHttpMessage(checkAgain);
-                                if (codeCheckAgain.equals("OK")) {
-                                    byte[] capacity =  getBytes(checkAgain);
-                                    if(capacity.length==0){
-                                        MissingFileReport fileNew = new MissingFileReport(checkAgain, codeCheckAgain+" size: "+capacity.length, u.getUrl());
-                                        fileNew.setPageOption(option);
-                                        missing.add(fileNew);
-                                    }
-                                    System.out.println("CSS 2 Again: " + checkAgain + " - Code:" + codeCheckAgain);
-                                }
-                                if (!codeCheckAgain.equals("OK")) {
-                                    String checkLast = "https:" + strChcek;
-                                    String codeCheclast = verifyHttpMessage(checkLast);
-                                    System.out.println("Code Check Last: " + codeCheclast);
-                                    if (codeCheclast.equals("OK")) {
-                                        byte[] capacity =  getBytes(checkLast);
-                                        System.out.println("CSS 2 Last: " + checkLast + " - Code:" + codeCheclast);
-                                        if(capacity.length==0){
-                                            MissingFileReport fileNew = new MissingFileReport(checkLast, codeCheclast+" size: "+capacity.length, u.getUrl());
-                                            fileNew.setPageOption(option);
-                                            missing.add(fileNew);
-                                        }
-                                    } else {
-                                        if (flagBase == true) {
-                                            if (strChcek.startsWith("../")) {
-                                                List<String> partoFBase = new ArrayList<>();
-                                                System.out.println(baseHref.replaceFirst("", ""));;
-                                                StringTokenizer strToken = new StringTokenizer(baseHref, "/");
-                                                while (strToken.hasMoreTokens()) {
-                                                    partoFBase.add(strToken.nextToken());
-                                                }
-                                                String newBaseurl = baseHref.replaceFirst(partoFBase.get(partoFBase.size() - 1), "");
-                                                String newStrcheck = strChcek.replaceFirst("../", "");
-                                                String checkLastBase =newBaseurl+newStrcheck;
-                                                String codeCheckLastBase = verifyHttpMessage(checkLastBase);
-                                                if (codeCheckLastBase.equals("OK")) {
-                                                    byte[] weBase = getBytes(checkLastBase);
-                                                    if (weBase.length == 0) {
-                                                        MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheckLastBase+"size "+weBase.length, u.getUrl());
-                                                        fileNew.setPageOption(option);
-                                                        missing.add(fileNew);
-
-                                                    } else {
-                                                        System.out.println("CSS Base: " + checkLastBase + " - Code:" + codeCheckLastBase + " Size: " + weBase.length);
-                                                    }
-
-                                                } else {
-                                                    MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheckLastBase, u.getUrl());
-                                                    fileNew.setPageOption(option);
-                                                    missing.add(fileNew);
-                                                }
-
-                                            } else {
-                                                String checkBaseLast = baseHref + strChcek;
-                                                String codeCheckLastBase = verifyHttpMessage(checkBaseLast);
-                                                if (codeCheckLastBase.equals("OK")) {
-                                                    byte[] weBase = getBytes(checkBaseLast);
-                                                    if (weBase.length == 0) {
-                                                        MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheckLastBase+"size: "+weBase.length, u.getUrl());
-                                                        fileNew.setPageOption(option);
-                                                        missing.add(fileNew);
-                                                    } else {
-                                                        System.out.println("CSS Base: " + checkBaseLast + " - Code:" + codeCheckLastBase + " Size: " + weBase.length);
-                                                    }
-
-                                                } else {
-
-                                                    MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheckLastBase, u.getUrl());
-                                                    fileNew.setPageOption(option);
-                                                    missing.add(fileNew);
-                                                }
-                                            }
-                                        } else {
-                                            MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheclast, u.getUrl());
-                                            fileNew.setPageOption(option);
-                                            missing.add(fileNew);
-                                            System.out.println("CSS Last Fail: " + strChcek + " -Code: " + codeCheclast);
-                                        }
-                                    }
-                                }
-                            }
-                        }
                     } catch (IOException e) {
-                        Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
-                    } catch (InterruptedException e) {
-                        Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
-                    } catch (BrokenBarrierException e) {
                         Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
                     }
                 }
             });
+
             System.out.println(urlRoot);
 
         }
-        for (Thread t : listThread) {
-            System.out.println("Threed start");
-            t.start();
-        }
-
-        for (Thread t : listThread) {
-            System.out.println("Threed join");
-            try {
-                t.join();
-            } catch (InterruptedException e) {
-                Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
-            }
+        executor.shutdown();
+        try {
+            executor.awaitTermination(Long.MAX_VALUE,TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
         }
         return missing;
     }
 
     public List<MissingFileReport> getMissingFileMP3andMP4(List<Page> list,PageOption option, String urlNew) {
+
+        Date createdTime = new Date();
         List<MissingFileReport> missing = new ArrayList<>();
-        final CyclicBarrier gate = new CyclicBarrier(list.size());
-        List<Thread> listThread = new ArrayList<>();
+        ExecutorService executor = Executors.newFixedThreadPool(Constant.MAX_THREAD);
         String urlRoot = urlNew;
-        for (Page u : list) {
-            listThread.add(new Thread() {
+        for ( Page u : list) {
+            executor.submit(new Runnable() {
+                @Override
                 public void run() {
                     try {
-                        gate.await();
-                        Document doc = Jsoup.connect(u.getUrl()).get();
-                        int i = 0;
-                        //check missing image
-                        Pattern pattern = Pattern.compile("(http\\:|https\\:)?//?([\\w\\-?\\.?]+)?\\.([a-zA-Z]{2,3})?((\\w*)?/\\S*)\\.(mp3|avi|flv|mp4)(\\w*)?", Pattern.CASE_INSENSITIVE);
-                        Matcher matcher = pattern.matcher(doc.html());
-                        while (matcher.find()) {
-                            String strChcek = matcher.group();
-                            String checkCode = verifyHttpMessage(strChcek);
-                            if (checkCode.equals("OK")) {
-                                byte[] capacity =  getBytes(strChcek);
-                                System.out.println("MP4: " + strChcek + " - Code:" + checkCode);
-                                if(capacity.length==0){
-                                    MissingFileReport fileNew = new MissingFileReport(strChcek, checkCode+" size: "+capacity.length, u.getUrl());
-                                    fileNew.setPageOption(option);
-                                    missing.add(fileNew);
-                                }
-                            }
-                            if (!checkCode.equals("OK")) {
-                                String checkAgain = urlRoot + strChcek;
-                                String codeCheckAgain = verifyHttpMessage(checkAgain);
-                                if (codeCheckAgain.equals("OK")) {
-                                    byte[] capacity =  getBytes(checkAgain);
-                                    System.out.println("MP4 Again: " + checkAgain + " - Code:" + codeCheckAgain);
-                                    if(capacity.length==0){
-                                        MissingFileReport fileNew = new MissingFileReport( checkAgain, codeCheckAgain+" size: "+capacity.length, u.getUrl());
-                                        fileNew.setPageOption(option);
-                                        missing.add(fileNew);
-                                    }
-                                }
-                                if (!codeCheckAgain.equals("OK")) {
-                                    String checkLast = "https:" + strChcek;
-                                    String codeCheclast = verifyHttpMessage(checkLast);
-                                    System.out.println("Code Check Last: " + codeCheclast);
-                                    if (codeCheclast.equals("OK")) {
-                                        byte[] capacity =  getBytes(checkLast);
-                                        System.out.println("MP4 Last: " + checkLast + " - Code:" + codeCheclast);
-                                        if(capacity.length==0){
-                                            MissingFileReport fileNew = new MissingFileReport( checkLast,  codeCheclast+" size: "+capacity.length, u.getUrl());
-                                            fileNew.setPageOption(option);
-                                            missing.add(fileNew);
-                                        }
-                                    } else {
-                                        MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheclast, u.getUrl());
-                                        fileNew.setPageOption(option);
-                                        missing.add(fileNew);
-                                        System.out.println("MP4 Last Fail: " + strChcek + " -Code: " + codeCheclast);
-                                    }
-                                }
-                            }
+                        List<MissingFileReport> missingFileImage  =  checkMissingFile(Constant.PATTERN_MP3_PM4, urlRoot, createdTime, u, option);
+                        missing.addAll(missingFileImage);
 
-                        }
                     } catch (IOException e) {
                         Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
-                    } catch (InterruptedException e) {
-                        Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
-                    } catch (BrokenBarrierException e) {
-                        Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
                     }
-                }
-            });
+                }});
+
             System.out.println(urlRoot);
-
         }
-        for (Thread t : listThread) {
-            System.out.println("Threed start");
-            t.start();
-        }
-
-        for (Thread t : listThread) {
-            System.out.println("Threed join");
-            try {
-                t.join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+        executor.shutdown();
+        try {
+            executor.awaitTermination(Long.MAX_VALUE,TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
         }
         return missing;
     }
 
     public List<MissingFileReport> getMissingFileARCHIVES(List<Page> list,PageOption option, String urlNew)  {
+        Date createdTime = new Date();
         List<MissingFileReport> missing = new ArrayList<>();
-        final CyclicBarrier gate = new CyclicBarrier(list.size());
-        List<Thread> listThread = new ArrayList<>();
+        ExecutorService executor = Executors.newFixedThreadPool(Constant.MAX_THREAD);
         String urlRoot = urlNew;
         for (Page u : list) {
-            listThread.add(new Thread() {
+            executor.submit(new Runnable() {
+                @Override
                 public void run() {
                     try {
-                        gate.await();
-                        Document doc = Jsoup.connect(u.getUrl()).get();
-                        Elements elemBase = doc.select("base");
-                        boolean flagBase = false;
-                        String baseHref = "";
 
-                        for (Element element : elemBase) {
-                            System.out.println(element);
-                            baseHref = element.attr("href");
-                            System.out.println();
-                            flagBase = true;
-                        }
-                        int i = 0;
-                        //check missing image
-                        Pattern pattern = Pattern.compile("((http\\:|https\\:)?//?([\\w\\-?\\.?]+)?\\.([a-zA-Z]{2,3})?)((\\w*)?(\\.\\.)?/\\S*)\\.(7z|zip|rar|jar|tar|tar|gz|cab)", Pattern.CASE_INSENSITIVE);
-                        Matcher matcher = pattern.matcher(doc.html());
-                        while (matcher.find()) {
-                            String strChcek = matcher.group();
-                            String checkCode = verifyHttpMessage(strChcek);
-                            if (checkCode.equals("OK")) {
-                                byte[] capacity =  getBytes(strChcek);
-                                if(capacity.length==0){
-                                    MissingFileReport fileNew = new MissingFileReport(strChcek, checkCode+" size: "+capacity.length, u.getUrl());
-                                    fileNew.setPageOption(option);
-                                    missing.add(fileNew);
-                                }
-                                System.out.println("ARCHIRE: " + strChcek + " - Code:" + checkCode);
-                            }
-                            if (!checkCode.equals("OK")) {
-                                String checkAgain = urlRoot + strChcek;
-                                String codeCheckAgain = verifyHttpMessage(checkAgain);
-                                if (codeCheckAgain.equals("OK")) {
-                                    byte[] capacity =  getBytes(checkAgain);
-                                    if(capacity.length==0){
-                                        MissingFileReport fileNew = new MissingFileReport(checkAgain, codeCheckAgain+" size: "+capacity.length, u.getUrl());
-                                        fileNew.setPageOption(option);
-                                        missing.add(fileNew);
-                                    }
-                                    System.out.println("ARCHIVES Again: " + checkAgain + " - Code:" + codeCheckAgain);
-                                }
-                                if (!codeCheckAgain.equals("OK")) {
-                                    String checkLast = "https:" + strChcek;
-                                    String codeCheclast = verifyHttpMessage(checkLast);
-                                    System.out.println("Code Check Last: " + codeCheclast);
-                                    if (codeCheclast.equals("OK")) {
-                                        byte[] capacity =  getBytes(checkLast);
-                                        if(capacity.length==0){
-                                            MissingFileReport fileNew = new MissingFileReport(checkLast, codeCheclast+" size: "+capacity.length, u.getUrl());
-                                            fileNew.setPageOption(option);
-                                            missing.add(fileNew);
-                                        }
-                                        System.out.println("ARCHIVES Last: " + checkLast + " - Code:" + codeCheclast);
-                                    } else {
-                                        if (flagBase == true) {
-                                            if (strChcek.startsWith("../")) {
-                                                List<String> partoFBase = new ArrayList<>();
-                                                System.out.println(baseHref.replaceFirst("", ""));;
-                                                StringTokenizer strToken = new StringTokenizer(baseHref, "/");
-                                                while (strToken.hasMoreTokens()) {
-                                                    partoFBase.add(strToken.nextToken());
-                                                }
-                                                String newBaseurl = baseHref.replaceFirst(partoFBase.get(partoFBase.size() - 1), "");
-                                                String newStrcheck = strChcek.replaceFirst("../", "");
-                                                String checkLastBase =newBaseurl+newStrcheck;
-                                                String codeCheckLastBase = verifyHttpMessage(checkLastBase);
-                                                if (codeCheckLastBase.equals("OK")) {
-                                                    byte[] weBase = getBytes(checkLastBase);
-                                                    if (weBase.length == 0) {
-                                                        MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheckLastBase+"size "+weBase.length, u.getUrl());
-                                                        fileNew.setPageOption(option);
-                                                        missing.add(fileNew);
-
-                                                    } else {
-                                                        System.out.println("ARCHIVES Base: " + checkLastBase + " - Code:" + codeCheckLastBase + " Size: " + weBase.length);
-                                                    }
-
-                                                } else {
-                                                    MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheckLastBase, u.getUrl());
-                                                    fileNew.setPageOption(option);
-                                                    missing.add(fileNew);
-                                                }
-
-                                            } else {
-                                                String checkBaseLast = baseHref + strChcek;
-                                                String codeCheckLastBase = verifyHttpMessage(checkBaseLast);
-                                                if (codeCheckLastBase.equals("OK")) {
-                                                    byte[] weBase = getBytes(checkBaseLast);
-                                                    if (weBase.length == 0) {
-                                                        MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheckLastBase+"size: "+weBase.length, u.getUrl());
-                                                        fileNew.setPageOption(option);
-                                                        missing.add(fileNew);
-                                                    } else {
-                                                        System.out.println("ARCHIVES Base: " + checkBaseLast + " - Code:" + codeCheckLastBase + " Size: " + weBase.length);
-                                                    }
-
-                                                } else {
-
-                                                    MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheckLastBase, u.getUrl());
-                                                    fileNew.setPageOption(option);
-                                                    missing.add(fileNew);
-                                                }
-                                            }
-                                        } else {
-                                            MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheclast, u.getUrl());
-                                            fileNew.setPageOption(option);
-                                            missing.add(fileNew);
-                                            System.out.println("ARCHIVES Last Fail: " + strChcek + " -Code: " + codeCheclast);
-                                        }
-                                    }
-                                }
-                            }
-
-                        }
+                        List<MissingFileReport> missingFileARCHIVES  =  checkMissingFile(Constant.PATTERN_ACRHIVES, urlRoot, createdTime, u, option);
+                        missing.addAll(missingFileARCHIVES);
                     } catch (IOException e) {
                         Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
-                    } catch (InterruptedException e) {
-                        Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
-                    } catch (BrokenBarrierException e) {
-                        Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
                     }
-                }
-            });
+                }});
+
             System.out.println(urlRoot);
 
         }
-        for (Thread t : listThread) {
-            System.out.println("Threed start");
-            t.start();
-        }
-
-        for (Thread t : listThread) {
-            System.out.println("Threed join");
-            try {
-                t.join();
-            } catch (InterruptedException e) {
-                Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
-            }
+        executor.shutdown();
+        try {
+            executor.awaitTermination(Long.MAX_VALUE,TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
         }
         return missing;
     }
 
     public List<MissingFileReport> getMissingFile(List<Page> list,PageOption option, String urlNew) {
+        Date createdTime = new Date();
         List<MissingFileReport> missing = new ArrayList<>();
-        final CyclicBarrier gate = new CyclicBarrier(list.size());
-        List<Thread> listThread = new ArrayList<>();
+        ExecutorService executor = Executors.newFixedThreadPool(Constant.MAX_THREAD);
         String urlRoot = urlNew;
         for (Page u : list) {
-            listThread.add(new Thread() {
+            executor.submit(new Runnable() {
+                @Override
                 public void run() {
                     try {
-                        gate.await();
-                        Document doc = Jsoup.connect(u.getUrl()).get();
-                        Elements elemBase = doc.select("base");
-                        boolean flagBase = false;
-                        String baseHref = "";
 
-                        for (Element element : elemBase) {
-                            System.out.println(element);
-                            baseHref = element.attr("href");
-                            System.out.println();
-                            flagBase = true;
-                        }
-                        int i = 0;
-                        //check missing image
-                        Pattern pattern = Pattern.compile("((http\\:|https\\:)?//?([\\w\\-?\\.?]+)?\\.([a-zA-Z]{2,3})?)?((\\w*)?(\\.\\.)?/\\S*)\\.(jpg|gif|jp2|jpeg|pbm|pcx|pgm|png|ppm|psd|tiff|tga|svg)", Pattern.CASE_INSENSITIVE);
-                        Matcher matcher = pattern.matcher(doc.html());
-                        while (matcher.find()) {
-                            i++;
-                            String strChcek = matcher.group();
-                            String checkCode = verifyHttpMessage(strChcek);
-                            if (checkCode.equals("OK")) {
-                                byte[] capacity =  getBytes(strChcek);
-                                if(capacity.length==0){
-                                    MissingFileReport fileNew = new MissingFileReport(strChcek, checkCode+" size: "+capacity.length, u.getUrl());
-                                    fileNew.setPageOption(option);
-                                    missing.add(fileNew);
-                                }
-                                System.out.println("Image: " + strChcek + " - Code:" + checkCode);
-                            }
-                            if (!checkCode.equals("OK")) {
-                                String checkAgain = urlRoot + strChcek;
-                                String codeCheckAgain = verifyHttpMessage(checkAgain);
-                                if (codeCheckAgain.equals("OK")) {
-                                    byte[] capacity =  getBytes(checkAgain);
-                                    if(capacity.length==0){
-                                        MissingFileReport fileNew = new MissingFileReport(checkAgain, codeCheckAgain+" size: "+capacity.length, u.getUrl());
-                                        fileNew.setPageOption(option);
-                                        missing.add(fileNew);
-                                    }
-                                    System.out.println("Image Again: " + checkAgain + " - Code:" + codeCheckAgain);
-                                }
-                                if (!codeCheckAgain.equals("OK")) {
-                                    String checkLast = "https:" + strChcek;
-                                    String codeCheclast = verifyHttpMessage(checkLast);
-                                    if (codeCheclast.equals("OK")) {
-                                        byte[] capacity =  getBytes(checkLast);
-                                        if(capacity.length==0){
-                                            MissingFileReport fileNew = new MissingFileReport(checkLast, codeCheclast+" size: "+capacity.length, u.getUrl());
-                                            fileNew.setPageOption(option);
-                                            missing.add(fileNew);
-                                        }
-                                        System.out.println("Image Last: " + checkLast + " - Code:" + codeCheclast);
-                                    } else {
-                                        if (flagBase == true) {
-                                            if (strChcek.startsWith("../")) {
-                                                List<String> partoFBase = new ArrayList<>();
-                                                System.out.println(baseHref.replaceFirst("", ""));;
-                                                StringTokenizer strToken = new StringTokenizer(baseHref, "/");
-                                                while (strToken.hasMoreTokens()) {
-                                                    partoFBase.add(strToken.nextToken());
-                                                }
-                                                String newBaseurl = baseHref.replaceFirst(partoFBase.get(partoFBase.size() - 1), "");
-                                                String newStrcheck = strChcek.replaceFirst("../", "");
-                                                String checkLastBase =newBaseurl+newStrcheck;
-                                                String codeCheckLastBase = verifyHttpMessage(checkLastBase);
-                                                if (codeCheckLastBase.equals("OK")) {
-                                                    byte[] weBase = getBytes(checkLastBase);
-                                                    if (weBase.length == 0) {
-                                                        MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheckLastBase+"size "+weBase.length, u.getUrl());
-                                                        fileNew.setPageOption(option);
-                                                        missing.add(fileNew);
-
-                                                    } else {
-                                                        System.out.println("Image Base: " + checkLastBase + " - Code:" + codeCheckLastBase + " Size: " + weBase.length);
-                                                    }
-
-                                                } else {
-                                                    MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheckLastBase, u.getUrl());
-                                                    fileNew.setPageOption(option);
-                                                    missing.add(fileNew);
-                                                }
-
-                                            } else {
-                                                String checkBaseLast = baseHref + strChcek;
-                                                String codeCheckLastBase = verifyHttpMessage(checkBaseLast);
-                                                if (codeCheckLastBase.equals("OK")) {
-                                                    byte[] weBase = getBytes(checkBaseLast);
-                                                    if (weBase.length == 0) {
-                                                        MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheckLastBase+"size: "+weBase.length, u.getUrl());
-                                                        fileNew.setPageOption(option);
-                                                        missing.add(fileNew);
-                                                    } else {
-                                                        System.out.println("Image Base: " + checkBaseLast + " - Code:" + codeCheckLastBase + " Size: " + weBase.length);
-                                                    }
-
-                                                } else {
-
-                                                    MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheckLastBase, u.getUrl());
-                                                    fileNew.setPageOption(option);
-                                                    missing.add(fileNew);
-                                                }
-                                            }
-                                        } else {
-                                            MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheclast, u.getUrl());
-                                            fileNew.setPageOption(option);
-                                            missing.add(fileNew);
-                                            System.out.println("Image Last Fail: " + strChcek + " -Code: " + codeCheclast);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        //End check missing file
-
-
-                        //Check missing doc
-                        pattern = Pattern.compile("((http\\:|https\\:)?//?([\\w\\-?\\.?]+)?\\.([a-zA-Z]{2,3})?)?((\\w*)?(\\.\\.)?/\\S*)\\.(doc|docx|djvu|odp|ods|odt|pps|ppsx|ppt|pptx|pdf|ps|eps|rtf|txt|wks|wps|xls|xlsx|xps)");
-                        matcher = pattern.matcher(doc.html());
-                        while (matcher.find()) {
-                            String strChcek = matcher.group();
-                            String checkCode = verifyHttpMessage(strChcek);
-                            if (checkCode.equals("OK")) {
-                                byte[] capacity =  getBytes(strChcek);
-                                if(capacity.length==0){
-                                    MissingFileReport fileNew = new MissingFileReport(strChcek, checkCode+" size: "+capacity.length, u.getUrl());
-                                    fileNew.setPageOption(option);
-                                    missing.add(fileNew);
-                                }
-                                System.out.println("DOC: " + strChcek + " - Code:" + checkCode);
-                            }
-                            if (!checkCode.equals("OK")) {
-                                String checkAgain = urlRoot + strChcek;
-                                String codeCheckAgain = verifyHttpMessage(checkAgain);
-                                if (codeCheckAgain.equals("OK")) {
-                                    byte[] capacity =  getBytes(checkAgain);
-                                    if(capacity.length==0){
-                                        MissingFileReport fileNew = new MissingFileReport(checkAgain, codeCheckAgain+" size: "+capacity.length, u.getUrl());
-                                        fileNew.setPageOption(option);
-                                        missing.add(fileNew);
-                                    }
-                                    System.out.println("DOC Again: " + checkAgain + " - Code:" + codeCheckAgain);
-                                }
-                                if (!codeCheckAgain.equals("OK")) {
-                                    String checkLast = "https:" + strChcek;
-                                    String codeCheclast = verifyHttpMessage(checkLast);
-                                    System.out.println("Code Check Last: " + codeCheclast);
-                                    if (codeCheclast.equals("OK")) {
-                                        byte[] capacity =  getBytes(checkLast);
-                                        if(capacity.length==0){
-                                            MissingFileReport fileNew = new MissingFileReport(checkLast, codeCheclast+" size: "+capacity.length, u.getUrl());
-                                            fileNew.setPageOption(option);
-                                            missing.add(fileNew);
-                                        }
-                                        System.out.println("DOC Last: " + checkLast + " - Code:" + codeCheclast);
-                                    } else {
-                                        if (flagBase == true) {
-                                            if (strChcek.startsWith("../")) {
-                                                List<String> partoFBase = new ArrayList<>();
-                                                System.out.println(baseHref.replaceFirst("", ""));;
-                                                StringTokenizer strToken = new StringTokenizer(baseHref, "/");
-                                                while (strToken.hasMoreTokens()) {
-                                                    partoFBase.add(strToken.nextToken());
-                                                }
-                                                String newBaseurl = baseHref.replaceFirst(partoFBase.get(partoFBase.size() - 1), "");
-                                                String newStrcheck = strChcek.replaceFirst("../", "");
-                                                String checkLastBase =newBaseurl+newStrcheck;
-                                                String codeCheckLastBase = verifyHttpMessage(checkLastBase);
-                                                if (codeCheckLastBase.equals("OK")) {
-                                                    byte[] weBase = getBytes(checkLastBase);
-                                                    if (weBase.length == 0) {
-                                                        MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheckLastBase+"size "+weBase.length, u.getUrl());
-                                                        fileNew.setPageOption(option);
-                                                        missing.add(fileNew);
-
-                                                    } else {
-                                                        System.out.println("DOC Base: " + checkLastBase + " - Code:" + codeCheckLastBase + " Size: " + weBase.length);
-                                                    }
-
-                                                } else {
-                                                    MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheckLastBase, u.getUrl());
-                                                    fileNew.setPageOption(option);
-                                                    missing.add(fileNew);
-                                                }
-
-                                            } else {
-                                                String checkBaseLast = baseHref + strChcek;
-                                                String codeCheckLastBase = verifyHttpMessage(checkBaseLast);
-                                                if (codeCheckLastBase.equals("OK")) {
-                                                    byte[] weBase = getBytes(checkBaseLast);
-                                                    if (weBase.length == 0) {
-                                                        MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheckLastBase+"size: "+weBase.length, u.getUrl());
-                                                        fileNew.setPageOption(option);
-                                                        missing.add(fileNew);
-                                                    } else {
-                                                        System.out.println("DOC Base: " + checkBaseLast + " - Code:" + codeCheckLastBase + " Size: " + weBase.length);
-                                                    }
-
-                                                } else {
-
-                                                    MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheckLastBase, u.getUrl());
-                                                    fileNew.setPageOption(option);
-                                                    missing.add(fileNew);
-                                                }
-                                            }
-                                        } else {
-                                            MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheclast, u.getUrl());
-                                            fileNew.setPageOption(option);
-                                            missing.add(fileNew);
-                                            System.out.println("DOC Last Fail: " + strChcek + " -Code: " + codeCheclast);
-                                        }
-                                    }
-                                }
-                            }
-
-                        }
-                        // end check missing doc
-
-                        //check missing ARCHIVES
-                        pattern = Pattern.compile("((http\\:|https\\:)?//?([\\w\\-?\\.?]+)?\\.([a-zA-Z]{2,3})?)((\\w*)?(\\.\\.)?/\\S*)\\.(7z|zip|rar|jar|tar|tar|gz|cab)", Pattern.CASE_INSENSITIVE);
-                        matcher = pattern.matcher(doc.html());
-                        while (matcher.find()) {
-                            String strChcek = matcher.group();
-                            String checkCode = verifyHttpMessage(strChcek);
-                            if (checkCode.equals("OK")) {
-                                byte[] capacity =  getBytes(strChcek);
-                                if(capacity.length==0){
-                                    MissingFileReport fileNew = new MissingFileReport(strChcek, checkCode+" size: "+capacity.length, u.getUrl());
-                                    fileNew.setPageOption(option);
-                                    missing.add(fileNew);
-                                }
-                                System.out.println("ARCHIRE: " + strChcek + " - Code:" + checkCode);
-                            }
-                            if (!checkCode.equals("OK")) {
-                                String checkAgain = urlRoot + strChcek;
-                                String codeCheckAgain = verifyHttpMessage(checkAgain);
-                                if (codeCheckAgain.equals("OK")) {
-                                    byte[] capacity =  getBytes(checkAgain);
-                                    if(capacity.length==0){
-                                        MissingFileReport fileNew = new MissingFileReport(checkAgain, codeCheckAgain+" size: "+capacity.length, u.getUrl());
-                                        fileNew.setPageOption(option);
-                                        missing.add(fileNew);
-                                    }
-                                    System.out.println("ARCHIVES Again: " + checkAgain + " - Code:" + codeCheckAgain);
-                                }
-                                if (!codeCheckAgain.equals("OK")) {
-                                    String checkLast = "https:" + strChcek;
-                                    String codeCheclast = verifyHttpMessage(checkLast);
-                                    System.out.println("Code Check Last: " + codeCheclast);
-                                    if (codeCheclast.equals("OK")) {
-                                        byte[] capacity =  getBytes(checkLast);
-                                        if(capacity.length==0){
-                                            MissingFileReport fileNew = new MissingFileReport(checkLast, codeCheclast+" size: "+capacity.length, u.getUrl());
-                                            fileNew.setPageOption(option);
-                                            missing.add(fileNew);
-                                        }
-                                        System.out.println("ARCHIVES Last: " + checkLast + " - Code:" + codeCheclast);
-                                    } else {
-                                        if (flagBase == true) {
-                                            if (strChcek.startsWith("../")) {
-                                                List<String> partoFBase = new ArrayList<>();
-                                                System.out.println(baseHref.replaceFirst("", ""));;
-                                                StringTokenizer strToken = new StringTokenizer(baseHref, "/");
-                                                while (strToken.hasMoreTokens()) {
-                                                    partoFBase.add(strToken.nextToken());
-                                                }
-                                                String newBaseurl = baseHref.replaceFirst(partoFBase.get(partoFBase.size() - 1), "");
-                                                String newStrcheck = strChcek.replaceFirst("../", "");
-                                                String checkLastBase =newBaseurl+newStrcheck;
-                                                String codeCheckLastBase = verifyHttpMessage(checkLastBase);
-                                                if (codeCheckLastBase.equals("OK")) {
-                                                    byte[] weBase = getBytes(checkLastBase);
-                                                    if (weBase.length == 0) {
-                                                        MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheckLastBase+"size "+weBase.length, u.getUrl());
-                                                        fileNew.setPageOption(option);
-                                                        missing.add(fileNew);
-
-                                                    } else {
-                                                        System.out.println("ARCHIVES Base: " + checkLastBase + " - Code:" + codeCheckLastBase + " Size: " + weBase.length);
-                                                    }
-
-                                                } else {
-                                                    MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheckLastBase, u.getUrl());
-                                                    fileNew.setPageOption(option);
-                                                    missing.add(fileNew);
-                                                }
-
-                                            } else {
-                                                String checkBaseLast = baseHref + strChcek;
-                                                String codeCheckLastBase = verifyHttpMessage(checkBaseLast);
-                                                if (codeCheckLastBase.equals("OK")) {
-                                                    byte[] weBase = getBytes(checkBaseLast);
-                                                    if (weBase.length == 0) {
-                                                        MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheckLastBase+"size: "+weBase.length, u.getUrl());
-                                                        fileNew.setPageOption(option);
-                                                        missing.add(fileNew);
-                                                    } else {
-                                                        System.out.println("ARCHIVES Base: " + checkBaseLast + " - Code:" + codeCheckLastBase + " Size: " + weBase.length);
-                                                    }
-
-                                                } else {
-
-                                                    MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheckLastBase, u.getUrl());
-                                                    fileNew.setPageOption(option);
-                                                    missing.add(fileNew);
-                                                }
-                                            }
-                                        } else {
-                                            MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheclast, u.getUrl());
-                                            fileNew.setPageOption(option);
-                                            missing.add(fileNew);
-                                            System.out.println("ARCHIVES Last Fail: " + strChcek + " -Code: " + codeCheclast);
-                                        }
-                                    }
-                                }
-                            }
-
-                        }
-                        //end check ARCHIVES
-
-                        //check missing css
-                        pattern = Pattern.compile("((http\\:|https\\:)?//?([\\w\\-?\\.?]+)?\\.([a-zA-Z]{2,3})?)?((\\w*)?(\\.\\.)?/\\S*)\\.(css)(([\\?\\.\\=]\\w*)*)?", Pattern.CASE_INSENSITIVE);
-                        matcher = pattern.matcher(doc.html());
-                        while (matcher.find()) {
-//            user.out.println(matcher.group());
-                            String strChcek = matcher.group();
-                            String checkCode = verifyHttpMessage(strChcek);
-                            if (checkCode.equals("OK")) {
-                                byte[] capacity =  getBytes(strChcek);
-                                if(capacity.length==0){
-                                    MissingFileReport fileNew = new MissingFileReport(strChcek, checkCode+" size: "+capacity.length, u.getUrl());
-                                    fileNew.setPageOption(option);
-                                    missing.add(fileNew);
-                                }
-                                System.out.println("CSS 2: " + strChcek + " - Code:" + checkCode);
-                            }
-                            if (!checkCode.equals("OK")) {
-                                String checkAgain = urlRoot + strChcek;
-                                String codeCheckAgain = verifyHttpMessage(checkAgain);
-                                if (codeCheckAgain.equals("OK")) {
-                                    byte[] capacity =  getBytes(checkAgain);
-                                    if(capacity.length==0){
-                                        MissingFileReport fileNew = new MissingFileReport(checkAgain, codeCheckAgain+" size: "+capacity.length, u.getUrl());
-                                        fileNew.setPageOption(option);
-                                        missing.add(fileNew);
-                                    }
-                                    System.out.println("CSS 2 Again: " + checkAgain + " - Code:" + codeCheckAgain);
-                                }
-                                if (!codeCheckAgain.equals("OK")) {
-                                    String checkLast = "https:" + strChcek;
-                                    String codeCheclast = verifyHttpMessage(checkLast);
-                                    System.out.println("Code Check Last: " + codeCheclast);
-                                    if (codeCheclast.equals("OK")) {
-                                        byte[] capacity =  getBytes(checkLast);
-                                        System.out.println("CSS 2 Last: " + checkLast + " - Code:" + codeCheclast);
-                                        if(capacity.length==0){
-                                            MissingFileReport fileNew = new MissingFileReport(checkLast, codeCheclast+" size: "+capacity.length, u.getUrl());
-                                            fileNew.setPageOption(option);
-                                            missing.add(fileNew);
-                                        }
-                                    } else {
-                                        if (flagBase == true) {
-                                            if (strChcek.startsWith("../")) {
-                                                List<String> partoFBase = new ArrayList<>();
-                                                System.out.println(baseHref.replaceFirst("", ""));;
-                                                StringTokenizer strToken = new StringTokenizer(baseHref, "/");
-                                                while (strToken.hasMoreTokens()) {
-                                                    partoFBase.add(strToken.nextToken());
-                                                }
-                                                String newBaseurl = baseHref.replaceFirst(partoFBase.get(partoFBase.size() - 1), "");
-                                                String newStrcheck = strChcek.replaceFirst("../", "");
-                                                String checkLastBase =newBaseurl+newStrcheck;
-                                                String codeCheckLastBase = verifyHttpMessage(checkLastBase);
-                                                if (codeCheckLastBase.equals("OK")) {
-                                                    byte[] weBase = getBytes(checkLastBase);
-                                                    if (weBase.length == 0) {
-                                                        MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheckLastBase+"size "+weBase.length, u.getUrl());
-                                                        fileNew.setPageOption(option);
-                                                        missing.add(fileNew);
-
-                                                    } else {
-                                                        System.out.println("CSS Base: " + checkLastBase + " - Code:" + codeCheckLastBase + " Size: " + weBase.length);
-                                                    }
-
-                                                } else {
-                                                    MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheckLastBase, u.getUrl());
-                                                    fileNew.setPageOption(option);
-                                                    missing.add(fileNew);
-                                                }
-
-                                            } else {
-                                                String checkBaseLast = baseHref + strChcek;
-                                                String codeCheckLastBase = verifyHttpMessage(checkBaseLast);
-                                                if (codeCheckLastBase.equals("OK")) {
-                                                    byte[] weBase = getBytes(checkBaseLast);
-                                                    if (weBase.length == 0) {
-                                                        MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheckLastBase+"size: "+weBase.length, u.getUrl());
-                                                        fileNew.setPageOption(option);
-                                                        missing.add(fileNew);
-                                                    } else {
-                                                        System.out.println("CSS Base: " + checkBaseLast + " - Code:" + codeCheckLastBase + " Size: " + weBase.length);
-                                                    }
-
-                                                } else {
-
-                                                    MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheckLastBase, u.getUrl());
-                                                    fileNew.setPageOption(option);
-                                                    missing.add(fileNew);
-                                                }
-                                            }
-                                        } else {
-                                            MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheclast, u.getUrl());
-                                            fileNew.setPageOption(option);
-                                            missing.add(fileNew);
-                                            System.out.println("CSS Last Fail: " + strChcek + " -Code: " + codeCheclast);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        //end check missing css
-                        // check missing file js
-
-                        //end check missing file js
-                        //check missing mp4 file
-                        pattern = Pattern.compile("(http\\:|https\\:)?//?([\\w\\-?\\.?]+)?\\.([a-zA-Z]{2,3})?((\\w*)?(\\.\\.)?/\\S*)\\.(3gp|avi|flv|m4v|mkv|mov|mp4|mpeg|ogv|wmv|webm)(\\w*)?", Pattern.CASE_INSENSITIVE);
-                        matcher = pattern.matcher(doc.html());
-                        while (matcher.find()) {
-                            String strChcek = matcher.group();
-                            String checkCode = verifyHttpMessage(strChcek);
-                            if (checkCode.equals("OK")) {
-                                byte[] capacity =  getBytes(strChcek);
-                                System.out.println("MP4: " + strChcek + " - Code:" + checkCode);
-                                if(capacity.length==0){
-                                    MissingFileReport fileNew = new MissingFileReport(strChcek, checkCode+" size: "+capacity.length, u.getUrl());
-                                    fileNew.setPageOption(option);
-                                    missing.add(fileNew);
-                                }
-                            }
-                            if (!checkCode.equals("OK")) {
-                                String checkAgain = urlRoot + strChcek;
-                                String codeCheckAgain = verifyHttpMessage(checkAgain);
-                                if (codeCheckAgain.equals("OK")) {
-                                    byte[] capacity =  getBytes(checkAgain);
-                                    System.out.println("MP4 Again: " + checkAgain + " - Code:" + codeCheckAgain);
-                                    if(capacity.length==0){
-                                        MissingFileReport fileNew = new MissingFileReport( checkAgain, codeCheckAgain+" size: "+capacity.length, u.getUrl());
-                                        fileNew.setPageOption(option);
-                                        missing.add(fileNew);
-                                    }
-                                }
-                                if (!codeCheckAgain.equals("OK")) {
-                                    String checkLast = "https:" + strChcek;
-                                    String codeCheclast = verifyHttpMessage(checkLast);
-                                    System.out.println("Code Check Last: " + codeCheclast);
-                                    if (codeCheclast.equals("OK")) {
-                                        byte[] capacity =  getBytes(checkLast);
-                                        System.out.println("MP4 Last: " + checkLast + " - Code:" + codeCheclast);
-                                        if(capacity.length==0){
-                                            MissingFileReport fileNew = new MissingFileReport( checkLast,  codeCheclast+" size: "+capacity.length, u.getUrl());
-                                            fileNew.setPageOption(option);
-                                            missing.add(fileNew);
-                                        }
-                                    } else {
-                                        if (flagBase == true) {
-                                            if (strChcek.startsWith("../")) {
-                                                List<String> partoFBase = new ArrayList<>();
-                                                System.out.println(baseHref.replaceFirst("", ""));;
-                                                StringTokenizer strToken = new StringTokenizer(baseHref, "/");
-                                                while (strToken.hasMoreTokens()) {
-                                                    partoFBase.add(strToken.nextToken());
-                                                }
-                                                String newBaseurl = baseHref.replaceFirst(partoFBase.get(partoFBase.size() - 1), "");
-                                                String newStrcheck = strChcek.replaceFirst("../", "");
-                                                String checkLastBase =newBaseurl+newStrcheck;
-                                                String codeCheckLastBase = verifyHttpMessage(checkLastBase);
-                                                if (codeCheckLastBase.equals("OK")) {
-                                                    byte[] weBase = getBytes(checkLastBase);
-                                                    if (weBase.length == 0) {
-                                                        MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheckLastBase+"size "+weBase.length, u.getUrl());
-                                                        fileNew.setPageOption(option);
-                                                        missing.add(fileNew);
-
-                                                    } else {
-                                                        System.out.println("MP4 Base: " + checkLastBase + " - Code:" + codeCheckLastBase + " Size: " + weBase.length);
-                                                    }
-
-                                                } else {
-                                                    MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheckLastBase, u.getUrl());
-                                                    fileNew.setPageOption(option);
-                                                    missing.add(fileNew);
-                                                }
-
-                                            } else {
-                                                String checkBaseLast = baseHref + strChcek;
-                                                String codeCheckLastBase = verifyHttpMessage(checkBaseLast);
-                                                if (codeCheckLastBase.equals("OK")) {
-                                                    byte[] weBase = getBytes(checkBaseLast);
-                                                    if (weBase.length == 0) {
-                                                        MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheckLastBase+"size: "+weBase.length, u.getUrl());
-                                                        fileNew.setPageOption(option);
-                                                        missing.add(fileNew);
-                                                    } else {
-                                                        System.out.println("MP4 Base: " + checkBaseLast + " - Code:" + codeCheckLastBase + " Size: " + weBase.length);
-                                                    }
-
-                                                } else {
-
-                                                    MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheckLastBase, u.getUrl());
-                                                    fileNew.setPageOption(option);
-                                                    missing.add(fileNew);
-                                                }
-                                            }
-                                        } else {
-                                            MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheclast, u.getUrl());
-                                            fileNew.setPageOption(option);
-                                            missing.add(fileNew);
-                                            System.out.println("MP4 Last Fail: " + strChcek + " -Code: " + codeCheclast);
-                                        }
-                                    }
-                                }
-                            }
-
-                        }
-                        //end check mp4 file
-
-                        //check missing mp3 file
-                        pattern = Pattern.compile("(http\\:|https\\:)?//?([\\w\\-?\\.?]+)?\\.([a-zA-Z]{2,3})?((\\w*)?(\\.\\.)?/\\S*)\\.(aac|ac3|aiff|amr|ape|flac|m4a|mka|mp3|mpc|ogg|wav|wma)", Pattern.CASE_INSENSITIVE);
-                        matcher = pattern.matcher(doc.html());
-                        while (matcher.find()) {
-                            String strChcek = matcher.group();
-                            String checkCode = verifyHttpMessage(strChcek);
-                            if (checkCode.equals("OK")) {
-                                byte[] capacity =  getBytes(strChcek);
-                                System.out.println("MP3: " + strChcek + " - Code:" + checkCode);
-                                if(capacity.length==0){
-                                    MissingFileReport fileNew = new MissingFileReport(strChcek, checkCode+" size:: "+capacity.length, u.getUrl());
-                                    fileNew.setPageOption(option);
-                                    missing.add(fileNew);
-                                }
-                            }
-                            if (!checkCode.equals("OK")) {
-                                String checkAgain = urlRoot + strChcek;
-                                String codeCheckAgain = verifyHttpMessage(checkAgain);
-                                if (codeCheckAgain.equals("OK")) {
-                                    byte[] capacity =  getBytes(checkAgain);
-                                    System.out.println("MP3 Again: " + checkAgain + " - Code:" + codeCheckAgain);
-                                    if(capacity.length==0){
-                                        MissingFileReport fileNew = new MissingFileReport(checkAgain, codeCheckAgain+" size:: "+capacity.length, u.getUrl());
-                                        fileNew.setPageOption(option);
-                                        missing.add(fileNew);
-                                    }
-                                }
-                                if (!codeCheckAgain.equals("OK")) {
-                                    String checkLast = "https:" + strChcek;
-                                    String codeCheclast = verifyHttpMessage(checkLast);
-                                    System.out.println("Code Check Last: " + codeCheclast);
-                                    if (codeCheclast.equals("OK")) {
-                                        byte[] capacity =  getBytes(checkLast);
-                                        if(capacity.length==0){
-                                            MissingFileReport fileNew = new MissingFileReport(checkLast, codeCheclast+" size:: "+capacity.length, u.getUrl());
-                                            fileNew.setPageOption(option);
-                                            missing.add(fileNew);
-                                        }
-                                        System.out.println("MP3 Last: " + checkLast + " - Code:" + codeCheclast);
-                                    } else {
-                                        if (flagBase == true) {
-                                            if (strChcek.startsWith("../")) {
-                                                List<String> partoFBase = new ArrayList<>();
-                                                System.out.println(baseHref.replaceFirst("", ""));;
-                                                StringTokenizer strToken = new StringTokenizer(baseHref, "/");
-                                                while (strToken.hasMoreTokens()) {
-                                                    partoFBase.add(strToken.nextToken());
-                                                }
-                                                String newBaseurl = baseHref.replaceFirst(partoFBase.get(partoFBase.size() - 1), "");
-                                                String newStrcheck = strChcek.replaceFirst("../", "");
-                                                String checkLastBase =newBaseurl+newStrcheck;
-                                                String codeCheckLastBase = verifyHttpMessage(checkLastBase);
-                                                if (codeCheckLastBase.equals("OK")) {
-                                                    byte[] weBase = getBytes(checkLastBase);
-                                                    if (weBase.length == 0) {
-                                                        MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheckLastBase+"size "+weBase.length, u.getUrl());
-                                                        fileNew.setPageOption(option);
-                                                        missing.add(fileNew);
-
-                                                    } else {
-                                                        System.out.println("MP3 Base: " + checkLastBase + " - Code:" + codeCheckLastBase + " Size: " + weBase.length);
-                                                    }
-
-                                                } else {
-                                                    MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheckLastBase, u.getUrl());
-                                                    fileNew.setPageOption(option);
-                                                    missing.add(fileNew);
-                                                }
-
-                                            } else {
-                                                String checkBaseLast = baseHref + strChcek;
-                                                String codeCheckLastBase = verifyHttpMessage(checkBaseLast);
-                                                if (codeCheckLastBase.equals("OK")) {
-                                                    byte[] weBase = getBytes(checkBaseLast);
-                                                    if (weBase.length == 0) {
-                                                        MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheckLastBase+"size: "+weBase.length, u.getUrl());
-                                                        fileNew.setPageOption(option);
-                                                        missing.add(fileNew);
-                                                    } else {
-                                                        System.out.println("MP3 Base: " + checkBaseLast + " - Code:" + codeCheckLastBase + " Size: " + weBase.length);
-                                                    }
-
-                                                } else {
-
-                                                    MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheckLastBase, u.getUrl());
-                                                    fileNew.setPageOption(option);
-                                                    missing.add(fileNew);
-                                                }
-                                            }
-                                        } else {
-                                            MissingFileReport fileNew = new MissingFileReport(strChcek, codeCheclast, u.getUrl());
-                                            fileNew.setPageOption(option);
-                                            missing.add(fileNew);
-                                            System.out.println("MP3 Last Fail: " + strChcek + " -Code: " + codeCheclast);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        //end check Missing mp3 file
+                        List<MissingFileReport> missingFileImage  =  checkMissingFile(Constant.PATTERN_IMAGE, urlRoot, createdTime, u, option);
+                        missing.addAll(missingFileImage);
+                        List<MissingFileReport> missingFileARCHIVES  =  checkMissingFile(Constant.PATTERN_ACRHIVES, urlRoot, createdTime, u, option);
+                        missing.addAll( missingFileARCHIVES);
+                        List<MissingFileReport> missingFileCSS  =  checkMissingFile(Constant.PATTERN_CSS, urlRoot, createdTime, u, option);
+                        missing.addAll(missingFileCSS);
+                        List<MissingFileReport> missingFileDOC  =  checkMissingFile(Constant.PATTERN_DOC, urlRoot, createdTime, u, option);
+                        missing.addAll(missingFileDOC);
+                        List<MissingFileReport> missingFileMP3MP4  =  checkMissingFile(Constant.PATTERN_MP3_PM4, urlRoot, createdTime, u, option);
+                        missing.addAll(missingFileMP3MP4);
                     } catch (IOException e) {
                         Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
-                    } catch (InterruptedException e) {
-                        Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
-                    } catch (BrokenBarrierException e) {
-                        Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
                     }
-                }
-            });
-            System.out.println(urlRoot);
-
+                }});
         }
-        for (Thread t : listThread) {
-            System.out.println("Threed start");
-            t.start();
+        executor.shutdown();
+        try {
+            executor.awaitTermination(Long.MAX_VALUE,TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
         }
-
-        for (Thread t : listThread) {
-            System.out.println("Threed join");
-            try {
-                t.join();
-            } catch (InterruptedException e) {
-                Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
-            }
-        }
-
         return missing;
     }
 
 
-    // Function check http message Phúc Anh
-    private String verifyHttpMessage(String url) {
-        String message = "";
-        try {
-            URL urlTesst = new URL(url);
-            HttpURLConnection connection = (HttpURLConnection) urlTesst.openConnection();
-            connection.setRequestMethod("GET");
-            connection.setRequestProperty("User-Agent", "Mozilla/5.0 ");
-            message = connection.getResponseMessage();
-        } catch (Exception e) {
-            message = "Not Found";
-        }
-        return message;
-    }
+
+//    private int verifyHttpMessage(String url) {
+//         int message = 0;
+//        try {
+//            URL urlTesst = new URL(url);
+//            HttpURLConnection connection = (HttpURLConnection) urlTesst.openConnection();
+//            connection.setRequestMethod("GET");
+//            connection.setRequestProperty("User-Agent", "Mozilla/5.0 ");
+//            message = connection.getResponseCode();
+//        } catch (Exception e) {
+//            message = 404;
+//        }
+//        return message;
+//    }
 
     //Function get size file
     private  byte[] getBytes(String url)  {
@@ -2153,6 +986,133 @@ public class QualityImpl implements QualityService {
         return b;
     }
 
+
+    private List<MissingFileReport> checkMissingFile(String patternForma, String urlRoot, Date createdTime, Page u, PageOption option) throws IOException {
+        Document doc = Jsoup.connect(u.getUrl()).get();
+        List<MissingFileReport> missing = new ArrayList<>();
+        Elements elemBase = doc.select("base");
+        boolean flagBase = false;
+        String baseHref = "";
+        for (Element element : elemBase) {
+            System.out.println(element);
+            baseHref = element.attr("href");
+            System.out.println();
+            flagBase = true;
+        }
+        Pattern pattern = Pattern.compile(patternForma, Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(doc.html());
+        while (matcher.find()) {
+            String strChcek = matcher.group();
+            int checkCode = CheckHTTPResponse.verifyHttpMessage(strChcek);
+            if (checkCode<400 || checkCode>=500) {
+                byte[] capacity =  getBytes(strChcek);
+                System.out.println();
+                if(capacity.length==0){
+                    MissingFileReport fileNew = new MissingFileReport(strChcek, " size: "+capacity.length, u.getUrl());
+                    fileNew.setPageOption(option);
+                    fileNew.setCreatedTime(createdTime);
+                    missing.add(fileNew);
+                }
+                System.out.println("Image: " + strChcek + " - Code:" + checkCode);
+            }
+            if (400<=checkCode && checkCode<500) {
+                String checkAgain = urlRoot + strChcek;
+                System.out.println("Check Again: "+ checkAgain);
+                int codeCheckAgain = CheckHTTPResponse.verifyHttpMessage(checkAgain);
+                System.out.println("Code respone "+checkAgain+" code: "+ codeCheckAgain);
+                if (codeCheckAgain<400||codeCheckAgain>=500) {
+                    if(codeCheckAgain>=300 && codeCheckAgain<400){
+                        String newUrl = CheckHTTPResponse.getURLDirectsTo(checkAgain);
+                         urlRoot=newUrl;
+                    }
+                    byte[] capacity =  getBytes(checkAgain);
+                    if(capacity.length==0){
+                        MissingFileReport fileNew = new MissingFileReport(checkAgain, " size: "+capacity.length, u.getUrl());
+                        fileNew.setPageOption(option);
+                        fileNew.setCreatedTime(createdTime);
+                        missing.add(fileNew);
+                    }
+                    System.out.println("Image Again: " + checkAgain + " - Code:" + codeCheckAgain);
+                }
+                if (400<=codeCheckAgain && codeCheckAgain<500) {
+                    String checkLast = "https:" + strChcek;
+                    int codeCheclast = CheckHTTPResponse.verifyHttpMessage(checkLast);
+                    if ( codeCheclast<400 || codeCheclast>=500) {
+                        byte[] capacity =  getBytes(checkLast);
+                        if(capacity.length==0){
+                            MissingFileReport fileNew = new MissingFileReport(checkLast, " size: "+capacity.length, u.getUrl());
+                            fileNew.setPageOption(option);
+                            fileNew.setCreatedTime(createdTime);
+                            missing.add(fileNew);
+                        }
+                        System.out.println("Image Last: " + checkLast + " - Code:" + codeCheclast);
+                    } else {
+                        if (flagBase == true) {
+                            if (strChcek.startsWith("../")) {
+                                List<String> partoFBase = new ArrayList<>();
+                                System.out.println(baseHref.replaceFirst("", ""));;
+                                StringTokenizer strToken = new StringTokenizer(baseHref, "/");
+                                while (strToken.hasMoreTokens()) {
+                                    partoFBase.add(strToken.nextToken());
+                                }
+                                String newBaseurl = baseHref.replaceFirst(partoFBase.get(partoFBase.size() - 1), "");
+                                String newStrcheck = strChcek.replaceFirst("../", "");
+                                String checkLastBase =newBaseurl+newStrcheck;
+                                int codeCheckLastBase = CheckHTTPResponse.verifyHttpMessage(checkLastBase);
+                                if (codeCheckLastBase<400 || codeCheckLastBase>=500) {
+                                    byte[] weBase = getBytes(checkLastBase);
+                                    if (weBase.length == 0) {
+                                        MissingFileReport fileNew = new MissingFileReport(strChcek, "size "+weBase.length, u.getUrl());
+                                        fileNew.setPageOption(option);
+                                        fileNew.setCreatedTime(createdTime);
+                                        missing.add(fileNew);
+
+                                    } else {
+                                        System.out.println("Image Base: " + checkLastBase + " - Code:" + codeCheckLastBase + " Size: " + weBase.length);
+                                    }
+
+                                } else {
+                                    MissingFileReport fileNew = new MissingFileReport(strChcek,""+ codeCheckLastBase, u.getUrl());
+                                    fileNew.setPageOption(option);
+                                    fileNew.setCreatedTime(createdTime);
+                                    missing.add(fileNew);
+                                }
+
+                            } else {
+                                String checkBaseLast = baseHref + strChcek;
+                                int codeCheckLastBase = CheckHTTPResponse.verifyHttpMessage(checkBaseLast);
+                                if (codeCheckLastBase<400 || codeCheckLastBase>=500) {
+                                    byte[] weBase = getBytes(checkBaseLast);
+                                    if (weBase.length == 0) {
+                                        MissingFileReport fileNew = new MissingFileReport(strChcek, "size: "+weBase.length, u.getUrl());
+                                        fileNew.setPageOption(option);
+                                        fileNew.setCreatedTime(createdTime);
+                                        missing.add(fileNew);
+                                    } else {
+                                        System.out.println("Image Base: " + checkBaseLast + " - Code:" + codeCheckLastBase + " Size: " + weBase.length);
+                                    }
+
+                                } else {
+
+                                    MissingFileReport fileNew = new MissingFileReport(strChcek,""+ codeCheckLastBase, u.getUrl());
+                                    fileNew.setPageOption(option);
+                                    fileNew.setCreatedTime(createdTime);
+                                    missing.add(fileNew);
+                                }
+                            }
+                        } else {
+                            MissingFileReport fileNew = new MissingFileReport(strChcek, ""+codeCheclast, u.getUrl());
+                            fileNew.setPageOption(option);
+                            fileNew.setCreatedTime(createdTime);
+                            missing.add(fileNew);
+                            System.out.println("Image Last Fail: " + strChcek + " -Code: " + codeCheclast);
+                        }
+                    }
+                }
+            }
+        }
+        return  missing;
+    }
     public List<ProhibitedContentReport> prohibitedContentService(List<Page> list, PageOption option) throws InterruptedException {
         System.setProperty("webdriver.chrome.driver", Constant.CHROME_DRIVER);
         Date createdTime = new Date();
@@ -2193,11 +1153,11 @@ public class QualityImpl implements QualityService {
                             verb = finalWordList.get(i).getWord().toLowerCase();
 
                             if( verb.length()>1 && consonants.contains( verb.charAt(verb.length()-2)) && vowels.contains( verb.charAt(verb.length()-1))){
-                                verbing = verb.substring(0, verb.length()-1) + "ing";
+                                verbing = verb.substring(0, verb.length()-1) + Constant.Verb_type[3];
                                 a = a.concat(verbing + ",");
                                 //tan cung khong phai y va w, , truoc la nguyen am, truoc nua khong phai la nguyen am
                             }else{
-                                verbing = verb + "ing";
+                                verbing = verb + Constant.Verb_type[3];
                                 a = a.concat(verbing + ",");
                             }
 
@@ -2218,15 +1178,15 @@ public class QualityImpl implements QualityService {
 
                                 if(check == true){
                                     if(verb.charAt(verb.length()-1)=='e'){//tan cung e
-                                        verbed = verb + "d";
+                                        verbed = verb + Constant.Verb_type[0];
                                         //tan cung y, truoc la phu am
                                     }else if(consonants.contains(verb.charAt(verb.length()-2)) && verb.charAt(verb.length()-1)=='y'){
-                                        verbed = verb.substring(0, verb.length()-1) + "ied";
+                                        verbed = verb.substring(0, verb.length()-1) + Constant.Verb_type[2];
                                         //tan cung khong phai y va w, , truoc la nguyen am, truoc nua khong phai la nguyen am
                                     }else if(verb.length()>2 && !vowels.contains(verb.charAt(verb.length()-3)) && vowels.contains(verb.charAt(verb.length()-2)) && ( consonants.contains(verb.charAt(verb.length()-1)) && verb.charAt(verb.length()-1)!='w' && verb.charAt(verb.length()-1)!='y' )){
-                                        verbed = verb + verb.charAt(verb.length()-1) + "ed";
+                                        verbed = verb + verb.charAt(verb.length()-1) + Constant.Verb_type[1];
                                     }else{
-                                        verbed = verb + "ed";
+                                        verbed = verb + Constant.Verb_type[1];
                                     }
                                     a = a.concat(verbed + ",");
 

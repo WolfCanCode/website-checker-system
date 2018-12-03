@@ -78,7 +78,7 @@ public class TechnologyController {
         return  technologyService.getfaviconTest(request);
     }
 
-    
+
     @PostMapping("/api/faviconTest/lastest")
     public Map<String, Object> getLastestPageTest(@RequestBody RequestCommonPOJO request)
     {

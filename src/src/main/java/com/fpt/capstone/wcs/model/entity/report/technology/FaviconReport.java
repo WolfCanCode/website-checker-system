@@ -22,11 +22,13 @@ public class FaviconReport {
     private String faviconUrl;
     private String url;
     private String sizeFavicon;
+    private String typeFavicon;
     private Date createdTime;
     private boolean delFlag = true;
 
-    public  FaviconReport(String faviconUrl, String url, String sizeFavicon){
+    public  FaviconReport(String faviconUrl, String url, String typeFavicon, String sizeFavicon){
         this.faviconUrl=faviconUrl;
+        this.typeFavicon = typeFavicon;
         this.url = url;
         this.sizeFavicon  = sizeFavicon;
     }

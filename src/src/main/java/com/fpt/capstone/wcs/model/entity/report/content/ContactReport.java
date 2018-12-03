@@ -20,13 +20,13 @@ public class ContactReport {
     private long id;
     private String phoneMail;
     private String url;
-    private String position;
+
     private String type;
     private Date createdTime;
     private boolean delFlag = true;
-    public ContactReport(String phoneMail, String url, String position, String type){
+    public ContactReport(String phoneMail, String url , String type){
         this.phoneMail=phoneMail;
-        this.position = position;
+
         this.url=url;
         this.type=type;
     }
