@@ -98,6 +98,7 @@ class DesktopContainer extends Component {
                 </Menu.Item>
                 <Menu.Item as='a' >TESTS WHAT?</Menu.Item>
                 <Menu.Item as='a' >PRICING</Menu.Item>
+                <Menu.Item as={Link} to={'/wcs-lab'} >WCS LAB</Menu.Item>
                 <Menu.Item >
                   <Button inverted={!fixed} as={Link} to={'/login'}>
                     {/* <Link to={'/login'} style={{color:'white'}}>Log in</Link> */}

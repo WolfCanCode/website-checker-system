@@ -552,10 +552,9 @@ export default class HeaderContent extends Component {
 
     render() {
         return (
-            <Segment basic>
+            <Segment basic style={{ marginBottom: 0 }}>
 
-                <Header as='h1' >{this.props.title} </Header>
-                <span style={{ fontStyle: 'italic' }}>{this.props.alt}</span><br />
+                <Header as='h1' >{this.props.title} <span style={{ fontStyle: 'italic' }}>{this.props.alt}</span></Header>
                 {cookies.get("u_isManager") !== "true" ?
                     <Segment>
                         <Button

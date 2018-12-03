@@ -8,6 +8,8 @@ import {
 
 //Import component
 import HomeScreen from '../screens/homepage/index';
+import LAB from '../screens/techlab/index';
+
 import AdminScreen from '../screens/admin/index';
 import LoginScreen from '../screens/login/index';
 import RegisterScreen from '../screens/register/index';
@@ -103,6 +105,7 @@ export class RouteClient extends Component {
                 {/* Router for client page*/}
                 <Route path="/" exact component={HomeScreen} />
                 <Route path="/admin" component={AdminScreen} />
+                <Route path="/wcs-lab" component={LAB} />
                 <Route path="/manager" component={AdminScreen} />
                 <Route path="/login" exact component={LoginScreen} />
                 <Route path="/register" component={RegisterScreen} />
@@ -116,7 +119,7 @@ export class RouteClient extends Component {
 }
 
 export const RouteStaff = withRouter(({ location }) => (
-    <div style={{ background: "#fff", boxShadow: "-5px 5px 15px rgba(0,0,0,0.1)", maxHeight: '90%', overflowX: "auto" }}>
+    <div style={{ background: "#fff", boxShadow: "-5px 5px 15px rgba(0,0,0,0.1)", maxHeight: '74%', overflowX: "auto", margin: 'auto' }}>
         <TransitionGroup>
             <CSSTransition
                 key={location.key}
@@ -155,7 +158,7 @@ export const RouteStaff = withRouter(({ location }) => (
 
 
 export const RouteManager = withRouter(({ location }) => (
-    <div style={{ background: "#fff", boxShadow: "-5px 5px 15px rgba(0,0,0,0.1)", maxHeight: '90', overflowX: "auto" }}>
+    <div style={{ background: "#fff", boxShadow: "-5px 5px 15px rgba(0,0,0,0.1)", maxHeight: '74%', overflowX: "auto", margin: 'auto' }}>
         <TransitionGroup>
             <CSSTransition
                 key={location.key}
@@ -168,7 +171,8 @@ export const RouteManager = withRouter(({ location }) => (
                     <Route path="/manager/home" exact component={DashboardManager} />
                     <Route path="/manager/managestaff" component={ManageStaffManagerScreen} />
                     <Route path="/manager/managewebsite" component={ManageWebsiteManagerScreen} />
-                    <Route path="/manager/managewordlist" component={ManageWordListManagerScreen} />
+                    <Route path="/manager/managewordlist" c
+                        omponent={ManageWordListManagerScreen} />
                     <Route path="/manager/setting" component={ConfigScreen} />
                     <Route path='/manager/logout' component={() => window.location = '../../login'} />
                     <Route path="*" component={Error404} />

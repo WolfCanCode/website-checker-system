@@ -173,4 +173,136 @@ export const menuMan = [
     // },
 ]
 
-export default [menu, menuMan];
+export const menuGuest = [
+    {
+        name: "Dashboard",
+        to: "/guest/home",
+        key: "d",
+        items: null
+    },
+    {
+        name: "SiteMap",
+        to: "/#",
+        key: "sitemap",
+        alt: "The sitemap of page",
+        items: null
+    },
+    {
+        name: "Quality",
+        items: [
+            {
+                name: "Spelling test",
+                to: "/#",
+                key: "test1",
+                alt: "Spelling test for checking right or wrong spelling in your website",
+                image: Spelling
+            },
+            {
+                name: "Grammar test",
+                to: "/#",
+                key: "test 2",
+                alt: "This for test alt title",
+                image: Grammar
+            }, {
+                name: "Broken links test",
+                to: "/#",
+                key: "test3",
+                alt: "This for test alt title",
+                image: BrokenLinks
+            }, {
+                name: "Broken pages test",
+                to: "/#",
+                key: "test4",
+                alt: "This for test alt title",
+                image: BrokenPage
+            }, {
+                name: "Missing files test",
+                to: "/#",
+                key: "test5",
+                alt: "This for test alt title",
+                image: MissingFile
+            }, {
+                name: "Prohibited content test",
+                to: "/#",
+                key: "test6",
+                alt: "This for test alt title",
+                image: Prohibited
+            },
+
+        ]
+    },
+    {
+        name: "Experience",
+        items: [
+            {
+                name: "Mobile layout test",
+                to: "/#",
+                key: "test7",
+                alt: "This for test alt title"
+            },
+            {
+                name: "Speed test",
+                to: "/#",
+                key: "test8",
+                alt: "This for test alt title",
+                image: SpeedTest
+            },
+
+        ]
+    },
+
+    {
+        name: "Technology Test",
+        items: [
+            {
+                name: "Javascript Test",
+                to: "/#",
+                key: "test9",
+                alt: "This for test alt title"
+            },
+            {
+                name: "Favicons Test",
+                to: "/admin/favicons",
+                key: "test10",
+                alt: "This for test alt title",
+                image: Favicons
+            },
+            {
+                name: "Law Cookie Test",
+                to: "/#",
+                key: "test11",
+                alt: "This for test alt title"
+            }, {
+                name: "Server Behavior Test",
+                to: "/admin/serverBehavior",
+                key: "test12",
+                alt: "This for test alt title"
+            },
+        ]
+    }, {
+        name: "Content Test",
+        items: [
+            {
+                name: "Contact Details",
+                to: "/#",
+                key: "test13",
+                alt: "This for test alt title"
+            },
+            {
+                name: "Redirection Test",
+                to: "/#",
+                key: "test14",
+                alt: "This for test alt title"
+            }, {
+                name: "Pages Test",
+                to: "/#",
+                key: "test15",
+                alt: "This for test alt title"
+            }
+        ]
+    }
+
+
+];
+
+export default [menu, menuMan, menuGuest];
