@@ -171,8 +171,7 @@ export const RouteManager = withRouter(({ location }) => (
                     <Route path="/manager/home" exact component={DashboardManager} />
                     <Route path="/manager/managestaff" component={ManageStaffManagerScreen} />
                     <Route path="/manager/managewebsite" component={ManageWebsiteManagerScreen} />
-                    <Route path="/manager/managewordlist" c
-                        omponent={ManageWordListManagerScreen} />
+                    <Route path="/manager/managewordlist" component={ManageWordListManagerScreen} />
                     <Route path="/manager/setting" component={ConfigScreen} />
                     <Route path='/manager/logout' component={() => window.location = '../../login'} />
                     <Route path="*" component={Error404} />

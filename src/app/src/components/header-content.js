@@ -44,7 +44,7 @@ export default class HeaderContent extends Component {
             })
         }).then(async response => response.json()).then(async (data) => {
             if (data.action === "SUCCESS") {
-                if (cookies.get("u_option") === undefined || cookies.get("u_option") === null) {
+                if (cookies.get("u_option") === undefined || cookies.get("u_option") === null || data.size === undefined) {
                     cookies.set("u_option", data.id, { path: '/' });
                 }
                 this.setState({ pageNum: data.size, pageName: data.name, activeItem: parseInt(data.id, 10) });
