@@ -1,5 +1,6 @@
 package com.fpt.capstone.wcs.service.system.pageoption;
 
+import com.fpt.capstone.wcs.model.entity.user.User;
 import com.fpt.capstone.wcs.model.entity.website.Page;
 import com.fpt.capstone.wcs.model.entity.website.PageOption;
 import com.fpt.capstone.wcs.model.entity.website.Version;
@@ -233,9 +234,15 @@ public class PageOptionImpl implements PageOptionService {
         req.setUserId(request.getUserId());
         Website website = authenticate.isAuthGetSingleSite(req);
         if (website != null) {
+            User user = userRepository.findOneById(request.getUserId());
             if (request.getPageOptionId() != null && request.getPageOptionId() != -1) {
                 PageOption pageOption = pageOptionRepository.findOneByIdAndWebsiteAndDelFlagEquals(request.getPageOptionId(), website, false);
                 if (pageOption != null) {
+                    res.put("id", pageOption.getId());
+                    res.put("size", pageOption.getPages().size());
+                    res.put("name", pageOption.getName());
+                }else {
+                    pageOption = pageOptionRepository.findFirstByWebsiteAndDelFlagEqualsAndNameEqualsAndCreatedUser(website,false,"root", user);
                     res.put("id", pageOption.getId());
                     res.put("size", pageOption.getPages().size());
                     res.put("name", pageOption.getName());

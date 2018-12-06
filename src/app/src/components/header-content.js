@@ -40,11 +40,11 @@ export default class HeaderContent extends Component {
                 "userId": cookies.get("u_id"),
                 "userToken": cookies.get("u_token"),
                 "websiteId": cookies.get("u_w_id"),
-                "pageOptionId": cookies.get("u_option"),
+                "pageOptionId": cookies.get("u_option") !== undefined ? cookies.get("u_option") : null,
             })
         }).then(async response => response.json()).then(async (data) => {
             if (data.action === "SUCCESS") {
-                if (cookies.get("u_option") === undefined || cookies.get("u_option") === null || data.size === undefined) {
+                if (cookies.get("u_option") !== undefined) {
                     cookies.set("u_option", data.id, { path: '/' });
                 }
                 this.setState({ pageNum: data.size, pageName: data.name, activeItem: parseInt(data.id, 10) });
