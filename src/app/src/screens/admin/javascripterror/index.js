@@ -6,7 +6,9 @@ import ReactToExcel from "react-html-table-to-excel";
 
 const cookies = new Cookies();
 export default class JavascriptErrorScreen extends Component {
-  state = { list: [], loadingTable: false, isDisable: false };
+  state = {
+    list: [], loadingTable: false, isDisable: false, listReportId: [], isDoneTest: false
+  };
 
   componentDidMount() {
     var comp = [];
@@ -29,9 +31,9 @@ export default class JavascriptErrorScreen extends Component {
       console.log(data)
       // if (data.jsErrorReport.length !== 0) {
       comp = data.jsErrorReport.map((item, index) => {
-        var msg = item.messages.replace("-", "");
-        msg = msg.replace(msg.split(" ")[0], "");
-        return (<TableRow key={index} page={item.pages} type={item.type} messages={msg} />);
+        // var msg = item.messages.replace(item.messages.split(" ")[0], "");
+        // alert(msg);
+        return (<TableRow key={index} page={item.pages} type={item.type} messages={item.messages} />);
       });
       this.setState({ list: comp });
       // }
@@ -61,20 +63,49 @@ export default class JavascriptErrorScreen extends Component {
     }).then(response => response.json()).then((data) => {
       console.log(data.jsErrorReport)
       // if (data.jsErrorReport.length !== 0) {
+      var listReport = [];
       comp = data.jsErrorReport.map((item, index) => {
+        listReport.push(item.id);
 
-        var msg = item.messages.replace("-", "");
-        msg = msg.replace(msg.split(" ")[0], "");
-        if (data.type !== "WARNING") {
-          var messages = msg.split(" at");
-        }
-        return (<TableRow key={index} page={item.pages} type={item.type} messages={messages} />);
+        // var msg = item.messages.replace("-", "");
+        // msg = msg.replace(msg.split(" ")[0], "");
+        // if (data.type !== "WARNING") {
+        //   var messages = msg.split(" at");
+        // }
+        return (<TableRow key={index} page={item.pages} type={item.type} messages={item.messages} />);
       });
-      this.setState({ list: comp });
-      // }
-      this.setState({ loadingTable: false });
+      this.setState({ list: comp, listReportId: listReport, loadingTable: false, isDoneTest: true, isDisable: false });
     });
   }
+
+  _saveReport() {
+    this.setState({ loadingTable: true });
+    this.setState({ isDisable: true });
+    var param = {
+      "userId": cookies.get("u_id"),
+      "userToken": cookies.get("u_token"),
+      "websiteId": cookies.get("u_w_id"),
+      "pageOptionId": cookies.get("u_option"),
+      "listReportId": this.state.listReportId
+    };
+
+    fetch("/api/jsTest/saveReport", {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(param)
+    }).then(response => response.json()).then((data) => {
+      var comp = data.jsErrorReport.map((item, index) => {
+        return (<TableRow key={index} page={item.pages} type={item.type} messages={item.messages} />);
+      });
+      this.setState({ list: comp, loadingTable: false, isDoneTest: false, isDisable: false });
+
+    });
+  }
+
+
   render() {
     return (
       <SegmentGroup vertical='true'>
@@ -85,6 +116,9 @@ export default class JavascriptErrorScreen extends Component {
               Check
                        <Icon name='right arrow' />
             </Button>
+            {this.state.isDoneTest ? <Button icon color="green" labelPosition='right' onClick={() => this._saveReport()}>
+              Save <Icon name='check' />
+            </Button> : ""}
             <div style={{ marginBottom: '10px', float: 'right' }}>
 
 

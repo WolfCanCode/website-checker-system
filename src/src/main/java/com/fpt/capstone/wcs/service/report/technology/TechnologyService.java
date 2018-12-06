@@ -8,13 +8,14 @@ import java.util.Map;
 
 public interface TechnologyService {
     //Test Favicon
-    public Map<String, Object> getfaviconTest(@RequestBody RequestCommonPOJO request);
-    public Map<String, Object> getLastestFaviconTest(@RequestBody RequestCommonPOJO request);
+    public Map<String, Object> getfaviconTest(RequestCommonPOJO request);
+    public Map<String, Object> getLastestFaviconTest(RequestCommonPOJO request);
     //Test JS error
-    public Map<String, Object> getJavaErrrorTest(@RequestBody RequestCommonPOJO request) throws InterruptedException;
-    public Map<String, Object> getLastestSpeedTest(@RequestBody RequestCommonPOJO request);
+    public Map<String, Object> getJavaErrrorTest(RequestCommonPOJO request) throws InterruptedException;
+    public Map<String, Object> getLastestJS(RequestCommonPOJO request);
+    public Map<String, Object> saveJSTestReport(RequestReportPOJO request) ;
     //Test cookie
-    public Map<String, Object> getCookies(@RequestBody RequestCommonPOJO request) throws InterruptedException;
-    public Map<String, Object> getLastestCookies(@RequestBody RequestCommonPOJO request);
+    public Map<String, Object> getCookies(RequestCommonPOJO request) throws InterruptedException;
+    public Map<String, Object> getLastestCookies(RequestCommonPOJO request);
     public Map<String, Object> saveCookieReport(RequestReportPOJO request);
 }

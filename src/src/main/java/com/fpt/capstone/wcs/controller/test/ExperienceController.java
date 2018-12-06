@@ -39,7 +39,7 @@ public class ExperienceController {
     @CrossOrigin
     @PostMapping("/api/speedTest/saveReport")
     public Map<String, Object> saveReport(@RequestBody RequestReportPOJO request) {
-        return experienceService.saveReport(request);
+        return experienceService.saveSpeedTestReport(request);
     }
 
     @CrossOrigin

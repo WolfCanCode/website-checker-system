@@ -208,21 +208,38 @@ public class SiteMapImpl implements SiteMapService {
                 pageRepository.saveAll(pages);
                 List<Page> newPages = pageRepository.findAllByVersion(ver);
                 List<PageOption> pageOptionList = pageOptionRepository.findAllByWebsiteAndDelFlagEquals(website, false);
-                for (int i = 0; i < pageOptionList.size(); i++) {
-                    PageOption item = pageOptionList.get(i);
-                    List<Page> pagesOfPageOption = item.getPages();
+                if(pageOptionList.size()!=0) {
+                    for (int i = 0; i < pageOptionList.size(); i++) {
+                        PageOption item = pageOptionList.get(i);
+                        List<Page> pagesOfPageOption = item.getPages();
 
-                    //map find new url with new version pages
-                    for (int k = 0; k < newPages.size(); k++) {
-                        for (int h = 0; h < pagesOfPageOption.size(); h++) {
-                            if (newPages.get(k).getUrl().equals(pagesOfPageOption.get(h).getUrl())) {
-                                pagesOfPageOption.set(h, newPages.get(k));
+                        //map find new url with new version pages
+                        for (int k = 0; k < newPages.size(); k++) {
+                            for (int h = 0; h < pagesOfPageOption.size(); h++) {
+                                if (newPages.get(k).getUrl().equals(pagesOfPageOption.get(h).getUrl())) {
+                                    pagesOfPageOption.set(h, newPages.get(k));
+                                }
                             }
                         }
+                        pageOptionRepository.delete(item);
+                        item.setPages(pagesOfPageOption);
+                        pageOptionRepository.save(item);
                     }
-                    pageOptionRepository.delete(item);
-                    item.setPages(pagesOfPageOption);
-                    pageOptionRepository.save(item);
+                } else {
+                    List<User> listU = userRepository.findAllByWebsiteAndDelFlagEquals(website,false);
+                    for(User u : listU) {
+                        PageOption root = new PageOption();
+                        root.setName("root");
+                        Page rootPage = pageRepository.findAllByWebsiteAndVersionAndUrlEquals(website, ver, website.getUrl());
+                        List<Page> list = new ArrayList<>();
+                        list.add(rootPage);
+                        root.setPages(list);
+                        root.setCreatedUser(u);
+                        root.setTime(new Date());
+                        root.setWebsite(website);
+                        root.setDelFlag(false);
+                        pageOptionRepository.save(root);
+                    }
                 }
                 res.put("action", Constant.SUCCESS);
                 res.put("version", ver.getVersion());

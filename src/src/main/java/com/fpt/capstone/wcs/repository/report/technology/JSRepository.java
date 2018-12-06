@@ -8,8 +8,8 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface JSCheckRepository extends JpaRepository<JavascriptReport,Long> {
-    List<JavascriptReport> findAllByPageOption(PageOption pageOption);
+public interface JSRepository extends JpaRepository<JavascriptReport,Long> {
+    List<JavascriptReport> findAllByPageOptionAndDelFlagEquals(PageOption pageOption, boolean delFlag);
     List<JavascriptReport> findAllByPageOptionAndPages(PageOption pageOption, String url);
     void removeAllByPageOption(PageOption pageOption);
 }

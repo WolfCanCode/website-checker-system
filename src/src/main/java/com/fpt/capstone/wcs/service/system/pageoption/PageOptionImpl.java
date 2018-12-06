@@ -50,12 +50,13 @@ public class PageOptionImpl implements PageOptionService {
         if (websiteUser != null) {
             PageOption firstPageOption = pageOptionRepository.findFirstByWebsiteAndDelFlagEqualsOrderByTimeDesc(websiteUser.getWebsite(), false);
             List<PageOption> pageOptions = pageOptionRepository
-                    .findAllByWebsiteAndCreatedUserAndDelFlagEqualsOrderByTimeDesc(
+                    .findAllByWebsiteAndCreatedUserAndDelFlagEqualsOrderByTimeAsc(
                             websiteUser.getWebsite(),
                             websiteUser.getUser(),
                             false);
             Version version = versionRepository.findFirstByWebsiteOrderByVersionDesc(websiteUser.getWebsite());
             if (version != null) {
+                //internal
                 List<Page> listPage = pageRepository.findAllByWebsiteAndVersionAndTypeEquals(websiteUser.getWebsite(), version, 1);
                 if (firstPageOption == null) {
                 } else {
@@ -88,17 +89,17 @@ public class PageOptionImpl implements PageOptionService {
         req.setUserId(request.getUserId());
         Website website = authenticate.isAuthGetSingleSite(req);
         if (website != null) {
-            PageOption selPageOption = pageOptionRepository.findOneByIdAndWebsiteAndDelFlagEquals(request.getPageOptionId(), website,false);
+            PageOption selPageOption = pageOptionRepository.findOneByIdAndWebsiteAndDelFlagEquals(request.getPageOptionId(), website, false);
 
             if (selPageOption == null) {
             } else {
+                res.put("isRoot", selPageOption.getName().equals("root"));
                 res.put("currentPageOption", selPageOption.getPages());
                 res.put("websiteName", website.getUrl());
             }
             res.put("action", Constant.SUCCESS);
             return res;
-        }
-        else {
+        } else {
             res.put("action", Constant.INCORRECT);
             res.put("message", "Auth invalid");
             return res;
@@ -114,14 +115,19 @@ public class PageOptionImpl implements PageOptionService {
         req.setUserId(request.getUserId());
         WebsiteUserPOJO websiteUser = authenticate.isAuthGetUserAndWebsite(req);
         if (websiteUser != null) {
-            PageOption pageOption = new PageOption();
-            pageOption.setWebsite(websiteUser.getWebsite());
-            pageOption.setName(request.getPageOptionName());
-            pageOption.setCreatedUser(websiteUser.getUser());
-            pageOption.setTime(new Date());
+            if(!request.getPageOptionName().toLowerCase().equals("root")) {
+                PageOption pageOption = new PageOption();
+                pageOption.setWebsite(websiteUser.getWebsite());
+                pageOption.setName(request.getPageOptionName());
+                pageOption.setCreatedUser(websiteUser.getUser());
+                pageOption.setTime(new Date());
 
             pageOptionRepository.save(pageOption);
             res.put("action", Constant.SUCCESS);
+            } else {
+                res.put("action", Constant.INCORRECT);
+                res.put("message", "Cannot add page option with name root");
+            }
             return res;
         } else {
             res.put("action", Constant.INCORRECT);
@@ -139,15 +145,21 @@ public class PageOptionImpl implements PageOptionService {
         req.setUserId(request.getUserId());
         Website website = authenticate.isAuthGetSingleSite(req);
         if (website != null) {
-            PageOption pageOption = pageOptionRepository.findOneByIdAndWebsiteAndDelFlagEquals(request.getPageOptionId(), website,false);
-            List<Page> pages = new ArrayList<>();
-            for (int i = 0; i< request.getListPageId().size();i++){
-                pages.add(pageRepository.findById(request.getListPageId().get(i)).get());
+            PageOption pageOption = pageOptionRepository.findOneByIdAndWebsiteAndDelFlagEquals(request.getPageOptionId(), website, false);
+            if(!pageOption.getName().equals("root")) {
+                List<Page> pages = new ArrayList<>();
+                for (int i = 0; i < request.getListPageId().size(); i++) {
+                    pages.add(pageRepository.findById(request.getListPageId().get(i)).get());
+                }
+                pageOption.setPages(pages);
+                pageOptionRepository.save(pageOption);
+                res.put("action", Constant.SUCCESS);
+                return res;
+            } else {
+                res.put("message", "Cannot add page to root");
+                res.put("action", Constant.INCORRECT);
+                return res;
             }
-            pageOption.setPages(pages);
-            pageOptionRepository.save(pageOption);
-            res.put("action", Constant.SUCCESS);
-            return res;
         } else {
             res.put("action", Constant.INCORRECT);
             res.put("message", "Auth invalid");
@@ -164,10 +176,16 @@ public class PageOptionImpl implements PageOptionService {
         req.setUserId(request.getUserId());
         Website website = authenticate.isAuthGetSingleSite(req);
         if (website != null) {
-            PageOption pageOption = pageOptionRepository.findOneByIdAndWebsiteAndDelFlagEquals(request.getPageOptionId(),website,false);
-            pageOption.setName(request.getPageOptionName());
-            pageOptionRepository.save(pageOption);
-            res.put("action", Constant.SUCCESS);
+            PageOption pageOption = pageOptionRepository.findOneByIdAndWebsiteAndDelFlagEquals(request.getPageOptionId(), website, false);
+            if(!pageOption.getName().equals("root")) {
+                pageOption.setName(request.getPageOptionName());
+                pageOptionRepository.save(pageOption);
+                res.put("action", Constant.SUCCESS);
+            } else {
+                res.put("message", "Cannot edit root pageoption");
+                res.put("action", Constant.INCORRECT);
+                return res;
+            }
             return res;
         } else {
             res.put("action", Constant.INCORRECT);
@@ -186,11 +204,16 @@ public class PageOptionImpl implements PageOptionService {
         Website website = authenticate.isAuthGetSingleSite(req);
         if (website != null) {
             Optional<PageOption> p = pageOptionRepository.findById(request.getPageOptionId());
-            if(p.isPresent())
-            {
-                PageOption delPageOption = p.get();
-                delPageOption.setDelFlag(true);
-                pageOptionRepository.save(delPageOption);
+            if (p.isPresent()) {
+                if (!p.get().getName().equals("root")) {
+                    PageOption delPageOption = p.get();
+                    delPageOption.setDelFlag(true);
+                    pageOptionRepository.save(delPageOption);
+                } else {
+                    res.put("action", Constant.INCORRECT);
+                    res.put("message", "Cannot delete root page option");
+                    return res;
+                }
             }
             res.put("action", Constant.SUCCESS);
             return res;
@@ -210,12 +233,23 @@ public class PageOptionImpl implements PageOptionService {
         req.setUserId(request.getUserId());
         Website website = authenticate.isAuthGetSingleSite(req);
         if (website != null) {
-            PageOption pageOption = pageOptionRepository.findOneByIdAndWebsiteAndDelFlagEquals(request.getPageOptionId(),website,false);
-            if(pageOption != null) {
-                res.put("size",pageOption.getPages().size());
+            if (request.getPageOptionId() != null && request.getPageOptionId() != -1) {
+                PageOption pageOption = pageOptionRepository.findOneByIdAndWebsiteAndDelFlagEquals(request.getPageOptionId(), website, false);
+                if (pageOption != null) {
+                    res.put("id", pageOption.getId());
+                    res.put("size", pageOption.getPages().size());
+                    res.put("name", pageOption.getName());
+                }
+                res.put("action", Constant.SUCCESS);
+                return res;
+            } else {
+                PageOption pageOption = pageOptionRepository.findFirstByWebsiteAndDelFlagEqualsOrderByTimeDesc(website, false);
+                res.put("id", pageOption.getId());
+                res.put("size", pageOption.getPages().size());
+                res.put("name", pageOption.getName());
+                res.put("action", Constant.SUCCESS);
+                return res;
             }
-            res.put("action", Constant.SUCCESS);
-            return res;
         } else {
             res.put("action", Constant.INCORRECT);
             res.put("message", "Auth invalid");

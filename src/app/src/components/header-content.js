@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Segment, Header, Button, Modal, Icon, Transition, Checkbox, Table, Menu, Label, Input } from 'semantic-ui-react';
+import { Segment, Header, Button, Modal, Icon, Transition, Checkbox, Table, Menu, Label, Input, Image } from 'semantic-ui-react';
 import { Cookies } from "react-cookie";
 import _ from 'lodash';
 
@@ -44,10 +44,10 @@ export default class HeaderContent extends Component {
             })
         }).then(async response => response.json()).then(async (data) => {
             if (data.action === "SUCCESS") {
-                if (data.size === undefined) {
-                    this.setState({ pageNum: 0 });
-                } else
-                    this.setState({ pageNum: data.size });
+                if (cookies.get("u_option") === undefined || cookies.get("u_option") === null) {
+                    cookies.set("u_option", data.id, { path: '/' });
+                }
+                this.setState({ pageNum: data.size, pageName: data.name, activeItem: parseInt(data.id, 10) });
             } else if (data.action === "INCORRECT") {
             }
         });
@@ -88,6 +88,8 @@ export default class HeaderContent extends Component {
         }).then(async response => response.json()).then(async (data) => {
             if (data.action === "SUCCESS") {
                 console.log("Add thành công");
+            } else if (data.action === "INCORRECT") {
+                alert(data.message);
             }
         });
         flag = false;
@@ -119,9 +121,15 @@ export default class HeaderContent extends Component {
 
                     if (data.allPageOption.length === 0) {
                         cookies.set('u_option', -1, { path: '/' });
+                        this.setState({ activeItem: -1 })
                     }
-                    this.setState({ activeItem: parseInt(cookies.get('u_option'), 10) })
 
+                    if (cookies.get('u_option') !== undefined) {
+                        this.setState({ activeItem: parseInt(cookies.get('u_option'), 10) })
+                    }
+                    else {
+                        this.setState({ activeItem: -1 })
+                    }
                     this.setState({
                         openPageOption: true,
                         websiteName: data.websiteName,
@@ -236,7 +244,7 @@ export default class HeaderContent extends Component {
 
                         });
                     } else if (data.action === "INCORRECT") {
-                        this.state.message = data.message;
+                        alert(data.message);
                     }
                 });
             });
@@ -345,7 +353,7 @@ export default class HeaderContent extends Component {
                             pageOptionsList: data.allPageOption
                         });
                     } else if (data.action === "INCORRECT") {
-                        this.state.message = data.message;
+                        alert(data.message);
                     }
                 });
             }
@@ -408,10 +416,11 @@ export default class HeaderContent extends Component {
                             pageOptions: pageOptions,
                             isLoading: false,
                             editPageOption: false,
+                            pageName: this.state.editPOName,
                             pageOptionsList: data.allPageOption
                         });
                     } else if (data.action === "INCORRECT") {
-                        this.state.message = data.message;
+                        alert(data.message);
                     }
                 });
             }
@@ -421,7 +430,6 @@ export default class HeaderContent extends Component {
 
     /* select page option */
     _selectPageOption(id) {
-        this._getPageNum();
         fetch("/api/page/pageOption/select", {
             method: 'POST',
             headers: {
@@ -443,8 +451,10 @@ export default class HeaderContent extends Component {
                         pages.push(defaultCheckedList[i].id);
                     }
                 }
+                var pageOptions = [];
 
-                var pageOptions = this.state.pageOptionsList.map((item, index) => {
+                var pageOptionBinding = this.state.pageOptionsList.map((item, index) => {
+
                     return (<Menu.Item
                         key={index}
                         name={item.name} id={item.id}
@@ -452,13 +462,37 @@ export default class HeaderContent extends Component {
                         onClick={(event, context) => this.handleClick(event, context)}
                         style={{ fontSize: 18, fontWeight: 'bolder' }}
                     />);
-                })
+                });
+                pageOptions.push(pageOptionBinding);
                 var list = [];
                 this.setState({ listPage: [] });
-
-                if (defaultCheckedList !== null) {
-                    list = this.state.listDataPage.map((item, index) => {
-                        if (!this._checkIfItsInList(defaultCheckedList, item)) {
+                if (!data.isRoot === true) {
+                    if (defaultCheckedList !== null) {
+                        list = this.state.listDataPage.map((item, index) => {
+                            if (!this._checkIfItsInList(defaultCheckedList, item)) {
+                                return (
+                                    <Table.Row key={index}>
+                                        <Table.Cell collapsing>
+                                            <Checkbox toggle onClick={() => this._addPage(item.id)} />
+                                        </Table.Cell>
+                                        <Table.Cell>
+                                            <a href={item.url} style={{ fontSize: 16 }}>{item.url}</a>
+                                        </Table.Cell>
+                                    </Table.Row>
+                                );
+                            } else return (
+                                <Table.Row key={index}>
+                                    <Table.Cell collapsing>
+                                        <Checkbox toggle onClick={() => this._addPage(item.id)} defaultChecked />
+                                    </Table.Cell>
+                                    <Table.Cell>
+                                        <a href={item.url} style={{ fontSize: 16 }}>{item.url}</a>
+                                    </Table.Cell>
+                                </Table.Row>
+                            );
+                        });
+                    } else {
+                        list = this.state.listDataPage.map((item, index) => {
                             return (
                                 <Table.Row key={index}>
                                     <Table.Cell collapsing>
@@ -469,30 +503,11 @@ export default class HeaderContent extends Component {
                                     </Table.Cell>
                                 </Table.Row>
                             );
-                        } else return (
-                            <Table.Row key={index}>
-                                <Table.Cell collapsing>
-                                    <Checkbox toggle onClick={() => this._addPage(item.id)} defaultChecked />
-                                </Table.Cell>
-                                <Table.Cell>
-                                    <a href={item.url} style={{ fontSize: 16 }}>{item.url}</a>
-                                </Table.Cell>
-                            </Table.Row>
-                        );
-                    });
+                        });
+                    }
                 } else {
-                    list = this.state.listDataPage.map((item, index) => {
-                        return (
-                            <Table.Row key={index}>
-                                <Table.Cell collapsing>
-                                    <Checkbox toggle onClick={() => this._addPage(item.id)} />
-                                </Table.Cell>
-                                <Table.Cell>
-                                    <a href={item.url} style={{ fontSize: 16 }}>{item.url}</a>
-                                </Table.Cell>
-                            </Table.Row>
-                        );
-                    });
+                    list = null;
+                    pages = null;
                 }
                 this.setState({
                     listPage: list,
@@ -560,8 +575,8 @@ export default class HeaderContent extends Component {
                         <Button
                             color='grey'
                             icon='settings'
-                            content="Page option"
-                            label={{ basic: true, color: 'green', pointing: 'left', content: this.state.pageNum }}
+                            content={`Page option`}
+                            label={{ basic: true, color: 'green', pointing: 'left', content: `[${this.state.pageName}]: ${this.state.pageNum} ${this.state.pageNum === 1 ? 'page' : 'pages'}` }}
                             onClick={() => this._onOpenPageOptionMode()}
                         />
                     </Segment> : ""}
@@ -638,7 +653,10 @@ export default class HeaderContent extends Component {
                                     {this.state.activeItem !== -1 ?
                                         <Table unstackable>
                                             <Table.Body>
-                                                {this.state.message !== null && this.state.message !== "" ? <Table.Row><font color="red">{this.state.message}</font></Table.Row> :
+                                                {this.state.listPage === null ?
+                                                    <Table.Row>
+                                                        <Image src="http://static1.squarespace.com/static/56eb2794cf80a1a469d140fb/t/5ab2a39203ce646492fb16aa/1542738603632/" centered />
+                                                    </Table.Row> :
                                                     this.state.listPage
                                                 }</Table.Body>
                                         </Table> : ""}

@@ -13,7 +13,7 @@ import com.fpt.capstone.wcs.model.pojo.UrlPOJO;
 import com.fpt.capstone.wcs.repository.website.CookieDataRepository;
 import com.fpt.capstone.wcs.repository.report.technology.CookieRepository;
 import com.fpt.capstone.wcs.repository.report.technology.FaviconRepository;
-import com.fpt.capstone.wcs.repository.report.technology.JSCheckRepository;
+import com.fpt.capstone.wcs.repository.report.technology.JSRepository;
 import com.fpt.capstone.wcs.repository.website.PageOptionRepository;
 import com.fpt.capstone.wcs.service.report.content.ContentService;
 import com.fpt.capstone.wcs.service.system.authenticate.AuthenticateService;
@@ -42,7 +42,6 @@ import sun.misc.IOUtils;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.*;
@@ -64,19 +63,20 @@ public class TechnologyImpl implements TechnologyService {
 
     final FaviconRepository faviconRepository;
 
-    final JSCheckRepository jsCheckRepository;
+    final JSRepository jsRepository;
 
     final CookieRepository cookieRepository;
 
     final CookieDataRepository cookieDataRepository;
 
     final ContentService contentService; //reuse redirection
+
     @Autowired
-    public TechnologyImpl(PageOptionRepository pageOptionRepository, AuthenticateService authenticate, FaviconRepository faviconRepository, JSCheckRepository jsCheckRepository, CookieRepository cookieRepository, CookieDataRepository cookieDataRepository, ContentService contentService) {
+    public TechnologyImpl(PageOptionRepository pageOptionRepository, AuthenticateService authenticate, FaviconRepository faviconRepository, JSRepository jsRepository, CookieRepository cookieRepository, CookieDataRepository cookieDataRepository, ContentService contentService) {
         this.pageOptionRepository = pageOptionRepository;
         this.authenticate = authenticate;
         this.faviconRepository = faviconRepository;
-        this.jsCheckRepository = jsCheckRepository;
+        this.jsRepository = jsRepository;
         this.cookieRepository = cookieRepository;
         this.cookieDataRepository = cookieDataRepository;
         this.contentService = contentService;
@@ -84,20 +84,20 @@ public class TechnologyImpl implements TechnologyService {
 
     @Override
     public Map<String, Object> getfaviconTest(RequestCommonPOJO request) {
-        Map<String,Object> res = new HashMap<>();
-        Website website =authenticate.isAuthGetSingleSite(request);
+        Map<String, Object> res = new HashMap<>();
+        Website website = authenticate.isAuthGetSingleSite(request);
         if (website != null) {
             PageOption pageOption = pageOptionRepository.findOneByIdAndWebsiteAndDelFlagEquals(request.getPageOptionId(), website, false);
-            if(pageOption==null){
-                request.setPageOptionId((long)-1);
+            if (pageOption == null) {
+                request.setPageOptionId((long) -1);
             }
-            if(request.getPageOptionId()!=-1) { //page option list is null
+            if (request.getPageOptionId() != -1) { //page option list is null
                 List<Page> pages = pageOption.getPages();
-                String urlRoot="";
-                for(int i =0; i< pages.size();i++ ){
-                    Pattern pattern = Pattern.compile("(http\\:|https\\:)//([\\w\\-?\\.?]+)?\\.([a-zA-Z]{2,3})?",Pattern.CASE_INSENSITIVE);
+                String urlRoot = "";
+                for (int i = 0; i < pages.size(); i++) {
+                    Pattern pattern = Pattern.compile("(http\\:|https\\:)//([\\w\\-?\\.?]+)?\\.([a-zA-Z]{2,3})?", Pattern.CASE_INSENSITIVE);
                     Matcher matcher = pattern.matcher(pages.get(i).getUrl());
-                    while (matcher.find()){
+                    while (matcher.find()) {
                         urlRoot = matcher.group();
                     }
                 }
@@ -107,23 +107,22 @@ public class TechnologyImpl implements TechnologyService {
                 res.put("action", Constant.SUCCESS);
                 res.put("favicontestReport", resultList);
                 return res;
-            }
-            else {
+            } else {
                 List<Page> pages = new ArrayList<>();
                 Page page = new Page();
                 page.setUrl(website.getUrl());
                 page.setType(1);
                 pages.add(page);
-                String urlRoot="";
-                for(int i =0; i< pages.size();i++ ){
-                    Pattern pattern = Pattern.compile("(http\\:|https\\:)//([\\w\\-?\\.?]+)?\\.([a-zA-Z]{2,3})?",Pattern.CASE_INSENSITIVE);
+                String urlRoot = "";
+                for (int i = 0; i < pages.size(); i++) {
+                    Pattern pattern = Pattern.compile("(http\\:|https\\:)//([\\w\\-?\\.?]+)?\\.([a-zA-Z]{2,3})?", Pattern.CASE_INSENSITIVE);
                     Matcher matcher = pattern.matcher(pages.get(i).getUrl());
-                    while (matcher.find()){
+                    while (matcher.find()) {
                         urlRoot = matcher.group();
                     }
                 }
 
-                List<FaviconReport> resultList = checkFavicon(pages, null,urlRoot);
+                List<FaviconReport> resultList = checkFavicon(pages, null, urlRoot);
                 faviconRepository.saveAll(resultList);
                 res.put("action", Constant.SUCCESS);
                 res.put("favicontestReport", resultList);
@@ -141,10 +140,10 @@ public class TechnologyImpl implements TechnologyService {
         Website website = authenticate.isAuthGetSingleSite(request);
         if (website != null) {
             PageOption pageOption = pageOptionRepository.findOneByIdAndWebsiteAndDelFlagEquals(request.getPageOptionId(), website, false);
-            if(pageOption==null){
-                request.setPageOptionId((long)-1);
+            if (pageOption == null) {
+                request.setPageOptionId((long) -1);
             }
-            if(request.getPageOptionId()!=-1) {
+            if (request.getPageOptionId() != -1) {
                 List<FaviconReport> resultList = faviconRepository.findAllByPageOption(pageOption);
                 res.put("favicontestReport", resultList);
                 res.put("action", Constant.SUCCESS);
@@ -168,30 +167,28 @@ public class TechnologyImpl implements TechnologyService {
         Website website = authenticate.isAuthGetSingleSite(request);
         if (website != null) {
             PageOption pageOption = pageOptionRepository.findOneByIdAndWebsiteAndDelFlagEquals(request.getPageOptionId(), website, false);
-            if(pageOption==null){
-                request.setPageOptionId((long)-1);
+            if (pageOption == null) {
+                request.setPageOptionId((long) -1);
             }
 
 
-
-            if(request.getPageOptionId()!=-1) { //page option list is null
+            if (request.getPageOptionId() != -1) { //page option list is null
                 List<Page> pages = pageOption.getPages();
                 List<JavascriptReport> resultList = jsTestService(pages, pageOption);
-                jsCheckRepository.removeAllByPageOption(pageOption);
-                jsCheckRepository.saveAll(resultList);
+                jsRepository.removeAllByPageOption(pageOption);
+                jsRepository.saveAll(resultList);
                 res.put("action", Constant.SUCCESS);
                 res.put("jsErrorReport", resultList);
                 return res;
-            }
-            else {
+            } else {
                 List<Page> pages = new ArrayList<>();
                 Page page = new Page();
                 page.setUrl(website.getUrl());
                 page.setType(1);
                 pages.add(page);
 
-                List<JavascriptReport> resultList =jsTestService(pages, null);
-                jsCheckRepository.saveAll(resultList);
+                List<JavascriptReport> resultList = jsTestService(pages, null);
+                jsRepository.saveAll(resultList);
                 res.put("action", Constant.SUCCESS);
                 res.put("jsErrorReport", resultList);
                 return res;
@@ -203,25 +200,59 @@ public class TechnologyImpl implements TechnologyService {
     }
 
     @Override
-    public Map<String, Object> getLastestSpeedTest(RequestCommonPOJO request) {
+    public Map<String, Object> getLastestJS(RequestCommonPOJO request) {
         Map<String, Object> res = new HashMap<>();
         Website website = authenticate.isAuthGetSingleSite(request);
         if (website != null) {
             PageOption pageOption = pageOptionRepository.findOneByIdAndWebsiteAndDelFlagEquals(request.getPageOptionId(), website, false);
-            if(pageOption==null){
-                request.setPageOptionId((long)-1);
+            if (pageOption == null) {
+                request.setPageOptionId((long) -1);
             }
 
-            if(request.getPageOptionId()!=-1) {
+            if (request.getPageOptionId() != -1) {
 
-                List<JavascriptReport> resultList = jsCheckRepository.findAllByPageOption(pageOption);
+                List<JavascriptReport> resultList = jsRepository.findAllByPageOptionAndDelFlagEquals(pageOption, false);
                 res.put("jsErrorReport", resultList);
                 res.put("action", Constant.SUCCESS);
                 return res;
             } else {
-                List<JavascriptReport> resultList = jsCheckRepository.findAllByPageOption(null);
+                List<JavascriptReport> resultList = jsRepository.findAllByPageOptionAndDelFlagEquals(null, false);
                 res.put("jsErrorReport", resultList);
                 res.put("action", Constant.SUCCESS);
+                return res;
+            }
+        } else {
+            res.put("action", Constant.INCORRECT);
+            return res;
+        }
+    }
+
+    @Override
+    public Map<String, Object> saveJSTestReport(RequestReportPOJO request) {
+        Map<String, Object> res = new HashMap<>();
+        RequestCommonPOJO requestCommon = new RequestCommonPOJO();
+        requestCommon.setPageOptionId(request.getPageOptionId());
+        requestCommon.setUserId(request.getUserId());
+        requestCommon.setWebsiteId(request.getWebsiteId());
+        requestCommon.setUserToken(request.getUserToken());
+        WebsiteUserPOJO userWebsite = authenticate.isAuthGetUserAndWebsite(requestCommon);
+        if (userWebsite != null) {
+            List<JavascriptReport> listReport = new ArrayList<>();
+            for (int i = 0; i < request.getListReportId().size(); i++) {
+                Optional<JavascriptReport> optionalReport = jsRepository.findById(request.getListReportId().get(i));
+                if (optionalReport.isPresent()) {
+                    JavascriptReport report = optionalReport.get();
+                    report.setDelFlag(false);
+                    listReport.add(report);
+                }
+            }
+            List<JavascriptReport> results = jsRepository.saveAll(listReport);
+            if (results.size() != 0) {
+                res.put("action", Constant.SUCCESS);
+                res.put("jsErrorReport", results);
+                return res;
+            } else {
+                res.put("action", Constant.INCORRECT);
                 return res;
             }
         } else {
@@ -236,11 +267,11 @@ public class TechnologyImpl implements TechnologyService {
         WebsiteUserPOJO userWebsite = authenticate.isAuthGetUserAndWebsite(request);
         if (userWebsite != null) {
             PageOption pageOption = pageOptionRepository.findOneByIdAndWebsiteAndDelFlagEquals(request.getPageOptionId(), userWebsite.getWebsite(), false);
-            if(pageOption==null){
-                request.setPageOptionId((long)-1);
+            if (pageOption == null) {
+                request.setPageOptionId((long) -1);
             }
 
-            if(request.getPageOptionId()!=-1) { //page option list is null
+            if (request.getPageOptionId() != -1) { //page option list is null
                 List<Page> pages = pageOption.getPages();
                 if (pages.size() == 0) {
                     Page page = new Page();
@@ -253,8 +284,7 @@ public class TechnologyImpl implements TechnologyService {
                 res.put("action", Constant.SUCCESS);
                 res.put("cookieReport", resultList);
                 return res;
-            }
-            else {
+            } else {
                 List<Page> pages = new ArrayList<>();
                 Page page = new Page();
                 page.setUrl(userWebsite.getWebsite().getUrl());
@@ -279,12 +309,12 @@ public class TechnologyImpl implements TechnologyService {
         Website website = authenticate.isAuthGetSingleSite(request);
         if (website != null) {
             PageOption pageOption = pageOptionRepository.findOneByIdAndWebsiteAndDelFlagEquals(request.getPageOptionId(), website, false);
-            if(pageOption==null){
-                request.setPageOptionId((long)-1);
+            if (pageOption == null) {
+                request.setPageOptionId((long) -1);
             }
-            if(request.getPageOptionId()!=-1) {
+            if (request.getPageOptionId() != -1) {
                 CookieReport cookieReport = cookieRepository.findFirstByPageOptionAndDelFlagEqualsOrderByCreatedTimeDesc(pageOption, false);
-                if(cookieReport != null){
+                if (cookieReport != null) {
                     Date lastedCreatedTime = cookieReport.getCreatedTime();
                     List<CookieReport> resultList = cookieRepository.findAllByPageOptionAndCreatedTime(pageOption, lastedCreatedTime);
                     res.put("cookieReport", resultList);
@@ -402,7 +432,7 @@ public class TechnologyImpl implements TechnologyService {
             a = 0;
             for (int i = 0; i < cookieList.size(); i++) {
                 if (cookieName.getCookieName().equalsIgnoreCase(cookieList.get(i).getCookieName())) {
-                    CookieReport cookieReport =  new CookieReport(cookieList.get(i).getCookieName(), cookieList.get(i).getCategory(), cookieList.get(i).getParty(), cookieList.get(i).getDescription());
+                    CookieReport cookieReport = new CookieReport(cookieList.get(i).getCookieName(), cookieList.get(i).getCategory(), cookieList.get(i).getParty(), cookieList.get(i).getDescription());
                     cookieReport.setPageOption(option);
                     cookieReport.setCreatedTime(createdTime);
                     resultList.add(cookieReport);
@@ -435,48 +465,58 @@ public class TechnologyImpl implements TechnologyService {
         for (Page u : list) {
             executor.submit(new Runnable() {
                 @Override
-                public void run()
-                {
+                public void run() {
 
-                        System.out.println("start testing url= " + u.getUrl());
-                        //DesiredCapabilities
-                        DesiredCapabilities capabilities = DesiredCapabilities.chrome();
-                        LoggingPreferences loggingprefs = new LoggingPreferences();
-                        loggingprefs.enable(LogType.BROWSER, Level.ALL);
-                        capabilities.setCapability(CapabilityType.LOGGING_PREFS, loggingprefs);
-                        ChromeOptions chromeOptions = new ChromeOptions();
-                        chromeOptions.addArguments("--headless");
-                        WebDriver driver = new ChromeDriver(chromeOptions);
+                    System.out.println("start testing url= " + u.getUrl());
+                    //DesiredCapabilities
+                    DesiredCapabilities capabilities = DesiredCapabilities.chrome();
+                    LoggingPreferences loggingprefs = new LoggingPreferences();
+                    loggingprefs.enable(LogType.BROWSER, Level.ALL);
+                    capabilities.setCapability(CapabilityType.LOGGING_PREFS, loggingprefs);
+                    ChromeOptions chromeOptions = new ChromeOptions();
+                    chromeOptions.addArguments("--headless");
+                    WebDriver driver = new ChromeDriver(chromeOptions);
 
-                        driver.get(u.getUrl());
+                    driver.get(u.getUrl());
+                    Set<String> errorStrings = new HashSet<>();
+                    errorStrings.add("SyntaxError");
+                    errorStrings.add("EvalError");
+                    errorStrings.add("ReferenceError");
+                    errorStrings.add("RangeError");
+                    errorStrings.add("TypeError");
+                    errorStrings.add("URIError");
+                    LogEntries logEntries = driver.manage().logs().get(LogType.BROWSER);
+                    for (LogEntry entry : logEntries) {
+                        for (String errorString : errorStrings) {
+                            if (entry.getMessage().contains(errorString)) {
+                                String pattern = "(http(.*?)\\s)";
+                                Pattern pt = Pattern.compile(pattern);
+                                Matcher matcher = pt.matcher(entry.getMessage().toString());
+                                String messages = "";
+                                if (matcher.find()) {
+                                    messages = entry.getMessage().toString().replace(matcher.group(0), "");
+                                }
 
-                        LogEntries logEntries = driver.manage().logs().get(LogType.BROWSER);
-                        for (LogEntry entry : logEntries) {
-                            String pattern = "(http(.*?)\\s)";
-                            Pattern pt = Pattern.compile(pattern);
-                            Matcher matcher = pt.matcher(entry.getMessage().toString());
-                            String messages = "";
-                            if (matcher.find()) {
-                                messages = entry.getMessage().toString().replace(matcher.group(0), "");
+                                messages = messages.replace(messages.split(" ")[0],"");
+                                JavascriptReport report = new JavascriptReport(messages+"WCSLINK"+entry.getMessage().split(" ")[0]+" ("+entry.getMessage().split(" ")[1]+") ", errorString.split("Error")[0], u.getUrl());
+                                report.setPageOption(option);
+                                resultList.add(report);
                             }
-                            JavascriptReport report = new JavascriptReport(messages, entry.getLevel().toString(), u.getUrl());
-                            report.setPageOption(option);
-                            resultList.add(report);
                         }
-                        driver.quit();
                     }
+                    driver.quit();
+                }
 
             });
 
-            executor.shutdown();
-            executor.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
-        }
 
+        }
+        executor.shutdown();
+        executor.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
 
         return resultList;
 
     }
-
 
 
     public List<FaviconReport> checkFavicon(List<Page> list, PageOption option, String urlRoot) {
@@ -485,105 +525,105 @@ public class TechnologyImpl implements TechnologyService {
 
         ExecutorService executor = Executors.newFixedThreadPool(Constant.MAX_THREAD);
 
-        for(int i=0; i<list.size();i++){
+        for (int i = 0; i < list.size(); i++) {
             String urlNew = list.get(i).getUrl();
             executor.submit(new Runnable() {
                 @Override
                 public void run() {
 
 
-                        boolean flagMethod1 = false;
-                        String urlFaviconMethod1 = urlRoot + "/favicon.ico";
-                        int httpMessage = CheckHTTPResponse.verifyHttpMessage(urlFaviconMethod1);
-                        if (httpMessage == 200) {
-                            byte[] capacity = getBytes(urlFaviconMethod1);
-                            if (capacity.length != 0) {
-                                System.out.println("Favicon URL: " + urlFaviconMethod1 + " Message: " + httpMessage + " Capacity: " + capacity.length);
-                                flagMethod1 = true;
+                    boolean flagMethod1 = false;
+                    String urlFaviconMethod1 = urlRoot + "/favicon.ico";
+                    int httpMessage = CheckHTTPResponse.verifyHttpMessage(urlFaviconMethod1);
+                    if (httpMessage == 200) {
+                        byte[] capacity = getBytes(urlFaviconMethod1);
+                        if (capacity.length != 0) {
+                            System.out.println("Favicon URL: " + urlFaviconMethod1 + " Message: " + httpMessage + " Capacity: " + capacity.length);
+                            flagMethod1 = true;
+                        }
+                    }
+                    if (flagMethod1 == true) {
+                        int codeResspone = CheckHTTPResponse.verifyHttpMessage(urlNew);
+                        if (codeResspone < 400 || codeResspone >= 500) {
+                            System.out.println(urlNew.startsWith(urlRoot));
+
+                            if (urlNew.startsWith(urlRoot)) {
+                                FaviconReport faviconMethod1 = new FaviconReport(urlFaviconMethod1, urlNew, "any", "16x16");
+                                faviconMethod1.setPageOption(option);
+                                faviconMethod1.setCreatedTime(createdTime);
+                                resultList.add(faviconMethod1);
+                            } else {
+                                FaviconReport faviconMethod1 = new FaviconReport("External Link", urlNew, "", "");
+                                faviconMethod1.setPageOption(option);
+                                faviconMethod1.setCreatedTime(createdTime);
+                                resultList.add(faviconMethod1);
                             }
                         }
-                        if (flagMethod1 == true) {
+
+                    } else if (flagMethod1 == false) {
+                        try {
                             int codeResspone = CheckHTTPResponse.verifyHttpMessage(urlNew);
-                            if(codeResspone<400||codeResspone>=500 ){
-                                System.out.println(urlNew.startsWith(urlRoot));
-
-                                if(urlNew.startsWith(urlRoot)){
-                                    FaviconReport faviconMethod1 = new FaviconReport(urlFaviconMethod1, urlNew,"any", "16x16");
-                                    faviconMethod1.setPageOption(option);
-                                    faviconMethod1.setCreatedTime(createdTime);
-                                    resultList.add(faviconMethod1);
+                            System.out.println(urlNew);
+                            if (codeResspone < 400 || codeResspone >= 500) {
+                                Document doc = Jsoup.connect(urlNew).ignoreContentType(true).get();
+                                Elements elem = doc.head().select("link[rel~=(shortcut icon|icon|apple-touch-icon-precomposed|nokia-touch-icon)]");
+                                System.out.println(elem.size());
+                                if (elem.size() == 0) {
+                                    FaviconReport favicon = new FaviconReport("Missing Favicon", urlNew, "", "undefine");
+                                    favicon.setPageOption(option);
+                                    favicon.setCreatedTime(createdTime);
+                                    resultList.add(favicon);
                                 }
-                                else{
-                                    FaviconReport faviconMethod1 = new FaviconReport("External Link", urlNew,"" ,"");
-                                    faviconMethod1.setPageOption(option);
-                                    faviconMethod1.setCreatedTime(createdTime);
-                                    resultList.add(faviconMethod1);
+                                for (Element element : elem) {
+                                    String size = element.attr("sizes");
+                                    if (size.equals("")) {
+                                        size = "undefine";
+                                    }
+                                    String rel = element.attr("rel");
+                                    String href = elem.attr("href");
+                                    int code = CheckHTTPResponse.verifyHttpMessage(href);
+                                    if (code < 400 || code >= 500) {
+                                        FaviconReport faviconMethod2 = new FaviconReport(href, urlNew, rel, size);
+                                        faviconMethod2.setPageOption(option);
+                                        faviconMethod2.setCreatedTime(createdTime);
+                                        resultList.add(faviconMethod2);
+                                    }
+                                    if (code >= 400 && code < 500) {
+                                        System.out.println("vao vao khac 200");
+                                        String urlFavAgain = urlRoot + href;
+                                        int checkFaviconResponeAgain = CheckHTTPResponse.verifyHttpMessage(urlFavAgain);
+                                        if (checkFaviconResponeAgain == 200) {
+                                            FaviconReport faviconAgain = new FaviconReport(urlFavAgain, urlNew, rel, size);
+                                            faviconAgain.setPageOption(option);
+                                            faviconAgain.setCreatedTime(createdTime);
+                                            resultList.add(faviconAgain);
+                                        }
+                                        if (checkFaviconResponeAgain != 200) {
+                                            String urlFavLast = "https:" + href;
+                                            int checkFaviconResponeLast = CheckHTTPResponse.verifyHttpMessage(urlFavLast);
+                                            if (checkFaviconResponeLast == 200) {
+                                                FaviconReport faviconLast = new FaviconReport(urlFavLast, urlNew, rel, size);
+                                                faviconLast.setPageOption(option);
+                                                faviconLast.setCreatedTime(createdTime);
+                                                resultList.add(faviconLast);
+                                            }
+                                        }
+                                    }
+
                                 }
                             }
 
-                        } else if(flagMethod1 == false) {
-                            try {
-                                int codeResspone = CheckHTTPResponse.verifyHttpMessage(urlNew);
-                                System.out.println(urlNew);
-                                if(codeResspone<400||codeResspone>=500 ){
-                                    Document doc = Jsoup.connect(urlNew).ignoreContentType(true).get();
-                                    Elements elem = doc.head().select("link[rel~=(shortcut icon|icon|apple-touch-icon-precomposed|nokia-touch-icon)]");
-                                    System.out.println(elem.size());
-                                    if (elem.size() == 0) {
-                                        FaviconReport favicon = new FaviconReport("Missing Favicon", urlNew, "","undefine");
-                                        favicon.setPageOption(option);
-                                        favicon.setCreatedTime(createdTime);
-                                        resultList.add(favicon);
-                                    }
-                                    for (Element element : elem) {
-                                        String size = element.attr("sizes");
-                                        if (size.equals("")) {
-                                            size = "undefine";
-                                        }
-                                        String rel =element.attr("rel");
-                                        String href = elem.attr("href");
-                                        int code = CheckHTTPResponse.verifyHttpMessage(href);
-                                        if ( code<400||code>=500 ) {
-                                            FaviconReport faviconMethod2 = new FaviconReport(href, urlNew,rel, size);
-                                            faviconMethod2.setPageOption(option);
-                                            faviconMethod2.setCreatedTime(createdTime);
-                                            resultList.add(faviconMethod2);
-                                        }
-                                        if (code >=400 && code <500) {
-                                            System.out.println("vao vao khac 200");
-                                            String urlFavAgain = urlRoot + href;
-                                            int checkFaviconResponeAgain = CheckHTTPResponse.verifyHttpMessage(urlFavAgain);
-                                            if (checkFaviconResponeAgain == 200) {
-                                                FaviconReport faviconAgain = new FaviconReport(urlFavAgain, urlNew,rel, size);
-                                                faviconAgain.setPageOption(option);
-                                                faviconAgain.setCreatedTime(createdTime);
-                                                resultList.add(faviconAgain);
-                                            }
-                                            if (checkFaviconResponeAgain != 200) {
-                                                String urlFavLast = "https:" + href;
-                                                int checkFaviconResponeLast = CheckHTTPResponse.verifyHttpMessage(urlFavLast);
-                                                if (checkFaviconResponeLast == 200) {
-                                                    FaviconReport faviconLast  = new FaviconReport(urlFavLast, urlNew, rel, size);
-                                                    faviconLast.setPageOption(option);
-                                                    faviconLast.setCreatedTime(createdTime);
-                                                    resultList.add(faviconLast);
-                                                }
-                                            }
-                                        }
-
-                                    }
-                                }
-
-                            } catch (IOException ex) {
-                                Logger.getLogger( TechnologyImpl .class.getName()).log(Level.SEVERE, null, ex);
-                            }
+                        } catch (IOException ex) {
+                            Logger.getLogger(TechnologyImpl.class.getName()).log(Level.SEVERE, null, ex);
                         }
-                }});
+                    }
+                }
+            });
 
         }
         executor.shutdown();
         try {
-            executor.awaitTermination(Long.MAX_VALUE,TimeUnit.MILLISECONDS);
+            executor.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             Logger.getLogger(TechnologyImpl.class.getName()).log(Level.SEVERE, null, e);
         }
@@ -638,7 +678,7 @@ public class TechnologyImpl implements TechnologyService {
     }
 
     private boolean[] checkIsRedirect(String url) throws IOException {
-        boolean[] result= new boolean[2];
+        boolean[] result = new boolean[2];
 //        result[0] = false;
 //        result[1] = false;
 //        String url1=url;

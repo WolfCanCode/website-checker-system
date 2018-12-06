@@ -34,7 +34,13 @@ public class TechnologyController {
     @CrossOrigin
     @PostMapping("/api/jsTest/lastest")
     public Map<String, Object> getLastestSpeedTest(@RequestBody RequestCommonPOJO request) {
-       return technologyService.getLastestSpeedTest(request);
+       return technologyService.getLastestJS(request);
+    }
+
+    @CrossOrigin
+    @PostMapping("/api/jsTest/saveReport")
+    public Map<String, Object> saveJSTestReport(@RequestBody RequestReportPOJO request) {
+        return technologyService.saveJSTestReport(request);
     }
 
     @CrossOrigin

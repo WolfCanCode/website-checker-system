@@ -110,7 +110,7 @@ public class ExperienceImpl implements ExperienceService {
     }
 
     @Override
-    public Map<String, Object> saveReport(RequestReportPOJO request) {
+    public Map<String, Object> saveSpeedTestReport(RequestReportPOJO request) {
         Map<String, Object> res = new HashMap<>();
         RequestCommonPOJO requestCommon = new RequestCommonPOJO();
         requestCommon.setPageOptionId(request.getPageOptionId());

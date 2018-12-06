@@ -84,6 +84,8 @@ export default class AdminScreen extends Component {
 
     _changeWebsiteConfirm(id) {
         cookies.set("u_w_id", id, { path: '/' });
+        window.location.reload();
+
     }
 
     _logoutLoading(load) {

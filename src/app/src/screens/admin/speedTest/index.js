@@ -186,6 +186,18 @@ class speedTestScreen extends Component {
     render() {
         return (
             <Segment.Group>
+                <Segment>
+                    <div style={{ marginBottom: '10px', float: 'right' }}>
+                        <ReactToExcel
+                            className="btn1"
+                            table="table-to-xls"
+                            filename="speed_test_file"
+                            sheet="sheet 1"
+                            buttonText={<Button color="green" ><Icon name="print" />Export</Button>}
+                        />
+                    </div>
+
+                    <Input icon='search' placeholder='Search...' style={{ float: 'right', marginRight: 5 }} /></Segment>
                 <Segment.Group horizontal >
                     <Segment basic loading={this.state.loadingTable} >
 
@@ -213,19 +225,7 @@ class speedTestScreen extends Component {
                                 {this.state.isDoneTest ? <Button icon color="green" labelPosition='right' onClick={() => this._saveReport()}>
                                     Save <Icon name='check' />
                                 </Button> : ""}
-                                <div style={{ marginBottom: '10px', float: 'right' }}>
 
-
-                                    <ReactToExcel
-                                        className="btn1"
-                                        table="table-to-xls"
-                                        filename="speed_test_file"
-                                        sheet="sheet 1"
-                                        buttonText={<Button color="green" ><Icon name="print" />Export</Button>}
-                                    />
-                                </div>
-
-                                <Input icon='search' placeholder='Search...' style={{ float: 'right', marginRight: 5 }} />
                             </Segment>
                         </Segment.Group>
                         <Segment basic style={{ maxHeight: '61vh', overflow: "auto" }}>
