@@ -113,7 +113,7 @@ export default class AdminScreen extends Component {
                         <SideMenu currKey={this.state.currKey} updateHeader={(title, alt, image) => this._onUpdateHeader(title, alt, image)} visible={this.state.sideShow} />
                         <HeaderAdmin changeWebsite={(id) => this._changeWebsiteConfirm(id)} logout={(load) => this._logoutLoading(load)} hideShowSideBar={() => this._hideShowSideBar()} />
                         <Sidebar.Pusher>
-                            <Image src={this.state.imageSrc} size='medium' style={{ margin: 'auto', position: 'absolute', zIndex: '999999', marginLeft: '82vw', marginTop: '8vh', height: 150, width: 'auto', transition: 'all 1s' }} />
+                            <Image src={this.state.imageSrc} size='medium' style={{ margin: 'auto', position: 'absolute', zIndex: '999999', marginLeft: '86vw', marginTop: '8vh', height: 120, width: 'auto', transition: 'all 1s' }} />
                             <Segment style={{ background: "#F5F5F5", marginLeft: `${this.state.marginBody}px`, marginRight: '10px', marginTop: '60px', height: '90vh', minWidth: 300, overflow: 'auto', transition: "all 0.6s" }}>
                                 <HeaderContent title={this.state.titleHeader} alt={this.state.altHeader} />
                                 {cookies.get("u_isManager") === "true" ? <RouteManager /> : <RouteStaff />}

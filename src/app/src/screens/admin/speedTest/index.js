@@ -186,8 +186,17 @@ class speedTestScreen extends Component {
     render() {
         return (
             <Segment.Group>
-                <Segment>
-                    <div style={{ marginBottom: '10px', float: 'right' }}>
+                <Segment style={{ border: 0, minWidth: 300, overflow: "auto" }}>
+                    <Button icon primary labelPosition='right' disabled={this.state.isDisable} onClick={() => this._doSpeedTest()}>
+                        Check
+                       <Icon name='right arrow' />
+                    </Button>
+                    {this.state.isDoneTest ? <Button icon color="green" labelPosition='right' onClick={() => this._saveReport()}>
+                        Save <Icon name='check' />
+                    </Button> : ""}
+
+
+                    <div style={{ float: 'right' }}>
                         <ReactToExcel
                             className="btn1"
                             table="table-to-xls"
@@ -197,7 +206,9 @@ class speedTestScreen extends Component {
                         />
                     </div>
 
-                    <Input icon='search' placeholder='Search...' style={{ float: 'right', marginRight: 5 }} /></Segment>
+                    <Input icon='search' placeholder='Search...' style={{ float: 'right', marginRight: 5 }} />
+                </Segment>
+
                 <Segment.Group horizontal >
                     <Segment basic loading={this.state.loadingTable} >
 
@@ -216,18 +227,7 @@ class speedTestScreen extends Component {
                                 <p style={{ fontSize: 24 }}>{isNaN(this.state.averageSize) ? 0 : this.state.averageSize} MB <br /> Average page size</p>
                             </Segment>
                         </Segment.Group>
-                        <Segment.Group style={{ border: 0, minWidth: 300, overflow: "auto" }}>
-                            <Segment style={{ border: 0 }}>
-                                <Button icon primary labelPosition='right' disabled={this.state.isDisable} onClick={() => this._doSpeedTest()}>
-                                    Check
-                       <Icon name='right arrow' />
-                                </Button>
-                                {this.state.isDoneTest ? <Button icon color="green" labelPosition='right' onClick={() => this._saveReport()}>
-                                    Save <Icon name='check' />
-                                </Button> : ""}
 
-                            </Segment>
-                        </Segment.Group>
                         <Segment basic style={{ maxHeight: '61vh', overflow: "auto" }}>
 
                             <Table unstackable id="table-to-xls">

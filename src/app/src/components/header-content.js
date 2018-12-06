@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Segment, Header, Button, Modal, Icon, Transition, Checkbox, Table, Menu, Label, Input, Image } from 'semantic-ui-react';
+import { Segment, Header, Button, Modal, Icon, Transition, Checkbox, Table, Menu, Label, Input, Image, Popup } from 'semantic-ui-react';
 import { Cookies } from "react-cookie";
 import _ from 'lodash';
 
@@ -569,7 +569,13 @@ export default class HeaderContent extends Component {
         return (
             <Segment basic style={{ marginBottom: 0 }}>
 
-                <Header as='h1' >{this.props.title} <span style={{ fontStyle: 'italic' }}>{this.props.alt}</span></Header>
+                <Header as='h1' >{this.props.title} <span style={{ fontStyle: 'italic' }}>
+                    <Popup
+                        trigger={<Icon className="question circle" avatar />}
+                        header={this.props.title}
+                        content={this.props.alt}
+                    />
+                </span></Header>
                 {cookies.get("u_isManager") !== "true" ?
                     <Segment>
                         <Button
