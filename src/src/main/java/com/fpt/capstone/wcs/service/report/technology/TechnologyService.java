@@ -10,6 +10,7 @@ public interface TechnologyService {
     //Test Favicon
     public Map<String, Object> getfaviconTest(RequestCommonPOJO request);
     public Map<String, Object> getLastestFaviconTest(RequestCommonPOJO request);
+    public Map<String, Object> saveFaviconTest(RequestReportPOJO request);
     //Test JS error
     public Map<String, Object> getJavaErrrorTest(RequestCommonPOJO request) throws InterruptedException;
     public Map<String, Object> getLastestJS(RequestCommonPOJO request);

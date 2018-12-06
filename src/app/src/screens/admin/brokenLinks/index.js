@@ -172,7 +172,7 @@ class brokenLinksScreen extends Component {
                                     </Table.Row>
                                 </Table.Header>
                                 <Table.Body>
-                                    {this.state.list.length === 0 ? <Table.Row><Table.Cell>{this.state.tested ? "This page has no broken links!" : "This page haven't test yet, please try to test!"}</Table.Cell></Table.Row> : this.state.list}
+                                    {this.state.list.length === 0 ? <Table.Row><Table.Cell>{this.state.tested ? "This site has no broken links!" : "This page haven't test yet, please try to test!"}</Table.Cell></Table.Row> : this.state.list}
                                 </Table.Body>
                             </Table>
                         </Segment>

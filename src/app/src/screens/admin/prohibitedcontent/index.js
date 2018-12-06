@@ -10,7 +10,7 @@ const cookies = new Cookies();
 export default class ProhibitedContent extends Component {
     
 
-    state = { list: [], loadingTable: false, isDisable: false, isDoneTest: false, listReportId: [] };
+    state = { list: [], loadingTable: false, isDisable: false,tested:false, isDoneTest: false, listReportId: [] };
 
 
     componentDidMount() {
@@ -64,6 +64,9 @@ export default class ProhibitedContent extends Component {
                 return (<TableRow key={index} urlPage={item.urlPage} word={item.word} fragment={item.fragment} type={item.type} />);
             });
             this.setState({ list: comp });
+            if (this.state.list.length === 0) {
+                this.setState({ tested: true });
+            }
             this.setState({ loadingTable: false, isDisable: false, isDoneTest: true, listReportId: listReport });
         });
 
@@ -135,13 +138,13 @@ export default class ProhibitedContent extends Component {
                                 <Table.HeaderCell>Word</Table.HeaderCell>
                                 <Table.HeaderCell>Type</Table.HeaderCell>
                                 <Table.HeaderCell>Fragment</Table.HeaderCell>
-                                <Table.HeaderCell>UrlPage</Table.HeaderCell>
+                                <Table.HeaderCell>Page</Table.HeaderCell>
                                 
 
                             </Table.Row>
                         </Table.Header>
                         <Table.Body>
-                            {this.state.list.length === 0 ? <Table.Row><Table.Cell>This page haven't test yet, please try to test</Table.Cell></Table.Row> : this.state.list}
+                            {this.state.list.length === 0 ? <Table.Row><Table.Cell>{this.state.tested ? "This site has no prohibited content!" : "This page haven't test yet, please try to test!"}</Table.Cell></Table.Row> : this.state.list}
                            
 
                         </Table.Body>
