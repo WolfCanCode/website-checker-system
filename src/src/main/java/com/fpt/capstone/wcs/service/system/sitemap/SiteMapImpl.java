@@ -1,5 +1,6 @@
 package com.fpt.capstone.wcs.service.system.sitemap;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpt.capstone.wcs.model.entity.user.User;
 import com.fpt.capstone.wcs.model.entity.user.Website;
 import com.fpt.capstone.wcs.model.entity.website.Page;
@@ -39,15 +40,7 @@ public class SiteMapImpl implements SiteMapService {
     final AuthenticateImpl authenticate;
     final PageOptionRepository pageOptionRepository;
     final SitemapRepository sitemapRepository;
-
-//    private HashMap<String, Integer> urlMap = new HashMap<String, Integer>();
-//    private String rootDomain = "";
-//    private List<List<SiteLinkPOJO>> graph = new ArrayList<List<SiteLinkPOJO>>();
-//    private List<List<SiteLinkPOJO>> invGraph = new ArrayList<List<SiteLinkPOJO>>();
-//    private int verticesNum;
-//    private List<Integer> typeNode = new ArrayList<Integer>(); //Type link: 1 is internal, 2 is external and 3 is error internal link
-//    private List<String> links = new ArrayList<String>();
-
+    String value = "";
 
     @Autowired
     public SiteMapImpl(WebsiteRepository websiteRepository, UserRepository userRepository, PageRepository pageRepository, VersionRepository versionRepository, AuthenticateImpl authenticate, PageOptionRepository pageOptionRepository, SitemapRepository sitemapRepository) {
@@ -58,10 +51,6 @@ public class SiteMapImpl implements SiteMapService {
         this.authenticate = authenticate;
         this.pageOptionRepository = pageOptionRepository;
         this.sitemapRepository = sitemapRepository;
-//
-//        urlMap.clear();
-//        invGraph.clear();
-//        verticesNum = 0;
     }
 
     @Override
@@ -100,7 +89,6 @@ public class SiteMapImpl implements SiteMapService {
         }
         res.put("action", Constant.INCORRECT);
         return res;
-
     }
 
     @Override
@@ -121,14 +109,11 @@ public class SiteMapImpl implements SiteMapService {
             } else {
                 res.put("action", Constant.INCORRECT);
                 return res;
-
             }
         }
-
         res.put("action", Constant.INCORRECT);
         return res;
     }
-
 
     @Override
     public Map<String, Object> getLatestVer(RequestCommonPOJO request) {
@@ -162,7 +147,7 @@ public class SiteMapImpl implements SiteMapService {
     }
 
     @Override
-    public Map<String, Object> makeNewVer(RequestCommonPOJO request) throws MalformedURLException {
+    public Map<String, Object> makeNewVer(RequestCommonPOJO request) throws MalformedURLException, JsonProcessingException {
         Map<String, Object> res = new HashMap<>();
         User user = authenticate.isAuthGetSingleUser(request);
         if (user.getManager() == null) {
@@ -185,20 +170,19 @@ public class SiteMapImpl implements SiteMapService {
             ver = versionRepository.findVersionByWebsiteAndVersion(website, verTmp.getVersion());
             if (website != null) {
                 SiteMapProcService sms = new SiteMapProcService(website.getUrl());
-//                rootDomain = website.getUrl();
                 sms.buildSiteMap();
-//                sms.buildInverseGraph();
+                sms.buildInverseGraph();
+
+                value = sms.convertToJson(ver.getVersion());
                 Sitemap sm = new Sitemap();
                 List<String> decodeInfo = sms.getDecodeGraph();
-                System.out.println("-------------------------------");
-                System.out.println("Map: " + decodeInfo.get(0).length());
-                System.out.println("TypeMap: " + decodeInfo.get(1).length());
-                System.out.println("UrlMap: " + decodeInfo.get(2).length());
+
                 sm.setMap(decodeInfo.get(0));
                 sm.setTypeMap(decodeInfo.get(1));
                 sm.setUrlMap(decodeInfo.get(2));
                 sm.setWebsite(website);
                 sm.setVersion(ver);
+                sm.setStructureValue(value);
 
                 sitemapRepository.save(sm);
 
