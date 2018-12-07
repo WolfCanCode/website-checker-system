@@ -1,5 +1,6 @@
 package com.fpt.capstone.wcs.controller.system;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpt.capstone.wcs.model.pojo.ReferencePOJO;
 import com.fpt.capstone.wcs.model.pojo.RequestCommonPOJO;
 import com.fpt.capstone.wcs.service.system.sitemap.SiteMapService;
@@ -39,7 +40,7 @@ public class SitemapController {
 
     @CrossOrigin
     @PostMapping("/api/sitemap/makeVer")
-    public Map<String, Object> makeNewVer(@RequestBody RequestCommonPOJO request) throws MalformedURLException {
+    public Map<String, Object> makeNewVer(@RequestBody RequestCommonPOJO request) throws MalformedURLException, JsonProcessingException {
         return siteMapService.makeNewVer(request);
     }
 

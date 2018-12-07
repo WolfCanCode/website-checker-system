@@ -35,8 +35,14 @@ public class Sitemap {
     @JsonIgnore
     private String urlMap;
 
-    @ManyToOne()
+    @NotNull
+//    @Basic(fetch = FetchType.LAZY)
+//    @Column(columnDefinition = "LONGTEXT")
+    @Lob
+    @JsonIgnore
+    private String structureValue;
 
+    @ManyToOne()
     @JoinColumn(name = "website_id")
     @JsonIgnore
     private Website website;

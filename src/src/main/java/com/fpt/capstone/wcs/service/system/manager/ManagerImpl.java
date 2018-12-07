@@ -1,6 +1,7 @@
 package com.fpt.capstone.wcs.service.system.manager;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpt.capstone.wcs.controller.system.SitemapController;
 import com.fpt.capstone.wcs.model.entity.user.User;
 import com.fpt.capstone.wcs.model.entity.user.Website;
@@ -95,7 +96,7 @@ public class ManagerImpl implements ManagerService{
     }
 
     @Override
-    public Map<String, Object> addWebsite(ManagerRequestPOJO request) throws MalformedURLException {
+    public Map<String, Object> addWebsite(ManagerRequestPOJO request) throws MalformedURLException, JsonProcessingException {
         Map<String, Object> res = new HashMap<>();
         User manager = authenticate.isAuthAndManagerGet(request);
         if (manager != null) {

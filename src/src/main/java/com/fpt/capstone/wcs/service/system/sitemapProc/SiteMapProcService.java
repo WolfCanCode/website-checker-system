@@ -5,7 +5,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fpt.capstone.wcs.model.entity.user.Website;
 import com.fpt.capstone.wcs.model.entity.website.Page;
 import com.fpt.capstone.wcs.model.entity.website.Version;
+import com.fpt.capstone.wcs.model.pojo.LinkPOJO;
 import com.fpt.capstone.wcs.model.pojo.SiteLinkPOJO;
+import com.fpt.capstone.wcs.model.pojo.SitemapValuePOJO;
+import com.fpt.capstone.wcs.model.pojo.VerticePOJO;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -23,12 +26,10 @@ public class SiteMapProcService {
     private int verticesNum;
     private List<Integer> typeNode = new ArrayList<Integer>(); //Type link: 1 is internal, 2 is external and 3 is error internal link
     private List<String> links = new ArrayList<String>();
+//    private String originDomain = "";
 
-    public void convert() throws JsonProcessingException {
-        ObjectMapper obj = new ObjectMapper();
-        String rs = obj.writeValueAsString(this.graph);
-        System.out.println("CONVERT: " + rs);
-    }
+
+
     // init site-map with 'root Domain' link
     public SiteMapProcService(String rootDomain) {
         this.rootDomain = rootDomain;
@@ -36,6 +37,7 @@ public class SiteMapProcService {
         invGraph.clear();
         graph.clear();
         verticesNum = 0;
+//        this.originDomain = getOriginUrl(rootDomain);
     }
 
     public HashMap<String, Integer> getUrlMap() {
@@ -78,6 +80,10 @@ public class SiteMapProcService {
             Elements aElements = doc.getElementsByTag("a");
             for (Element e : aElements) {
                 String candidateUrl = e.attr("href");
+//                candidateUrl = remakeCandidateUrl(candidateUrl);
+//                if (candidateUrl.length() > 0)
+//                    newURL.add(candidateUrl);
+
                 if (candidateUrl.length() > 0 && candidateUrl.charAt(0) == '/') {
                     candidateUrl = rootDomain + candidateUrl;
                 }
@@ -150,12 +156,80 @@ public class SiteMapProcService {
                     // existed node
                     int mapCurUrl = urlMap.get(url);
                     int typeCurUrl = typeNode.get(mapCurUrl);
+
+//                    if(mapCurUrl == mapId){
+//                        continue;
+//                    }
+
                     SiteLinkPOJO sl = new SiteLinkPOJO(curUrl, url, typeCurUrl);
                     graph.get(mapId).add(sl);
                 }
             }
         }
     }
+
+
+//    private String getOriginUrl(String rootDomain) {
+//        String originDomain = rootDomain;
+//        String[] ignoreSTR = {"https://", "http://"};
+//        for (String ignore : ignoreSTR) {
+//            if (originDomain.contains(ignore)) {
+//                originDomain = originDomain.replace(ignore, "");
+//            }
+//        }
+//        String[] igonreSTROFF = {"javascript:", "mailto:", "tel:"};
+//        for (String ignore : igonreSTROFF) {
+//            if (originDomain.contains(ignore)) {
+//                int pos = originDomain.indexOf(ignore);
+//                originDomain = originDomain.substring(0, pos);
+//            }
+//        }
+//
+//        int fly_pos = -1;
+//        for (int i = 0; i < originDomain.length(); i++)
+//            if (originDomain.charAt(i) == '#' || originDomain.charAt(i) == '(' || originDomain.charAt(i) == ':') {
+//                fly_pos = i;
+//            }
+//
+//        if (fly_pos != -1) {
+//            originDomain = originDomain.substring(0, fly_pos);
+//        }
+//
+//        //System.out.println("after: " + originDomain);
+//
+//        while (originDomain.length() > 0 && originDomain.charAt(originDomain.length() - 1) == '/') {
+//            originDomain = originDomain.substring(0, originDomain.length() - 1);
+//        }
+//
+//        while (originDomain.length() > 0 && originDomain.charAt(0) == '/') {
+//            originDomain = originDomain.substring(1);
+//        }
+//
+//        return originDomain;
+//    }
+
+//    private String remakeCandidateUrl(String Url) {
+//        Url = getOriginUrl(Url);
+//        if (Url.length() == 0) return "";
+//
+//        if (Url.contains(originDomain)) {
+//            return "https://" + Url;
+//        }
+//        else {
+//            boolean could = true;
+//            for (int i = 0; i < Url.length(); i++)
+//                if (Url.charAt(i) == '.') {
+//                    could = false;
+//                    break;
+//                }
+//            if (could) {
+//                return "https://" + originDomain + "/" + Url;
+//            }
+//            else
+//                return originDomain;
+//        }
+//    }
+
 
     public List<String> getDecodeGraph() {
         int root = 0;
@@ -360,7 +434,7 @@ public class SiteMapProcService {
         return result;
     }
 
-    public List<Page> getAllPage(Website web, Version ver){
+    public List<Page> getAllPage(Website web, Version ver) {
         List<Page> pages = new ArrayList<>();
         for (Map.Entry<String, Integer> entry : urlMap.entrySet()) {
             String url = entry.getKey();
@@ -434,6 +508,35 @@ public class SiteMapProcService {
         for (int i = 0; i < verticesNum; i++)
             if (parent[i] == -1)
                 printTree(i, 0);
+    }
+
+    public String convertToJson(int version) throws JsonProcessingException {
+        SitemapValuePOJO valueObj = new SitemapValuePOJO();
+        valueObj.setWebsiteUrl(rootDomain);
+        valueObj.setVersion(version);
+        List<VerticePOJO> vertices = new ArrayList<>();
+        for (int i = 0; i <graph.size(); i++) {
+            List<SiteLinkPOJO> linkList = graph.get(i);
+            if(linkList.size() > 0){
+                String url = linkList.get(0).getSrcUrl();
+                List<LinkPOJO> refTo = new ArrayList<>();
+                List<LinkPOJO> refBy = new ArrayList<>();
+                for (int j = 0; j < linkList.size(); j++) {
+                    SiteLinkPOJO siteLink = linkList.get(j);
+                    refTo.add(new LinkPOJO(siteLink.getDesUrl(), siteLink.getDesType()));
+                }
+                for (int k = 0; k < linkList.size(); k++) {
+                    SiteLinkPOJO siteLink = linkList.get(k);
+                    refBy.add(new LinkPOJO(siteLink.getDesUrl(), siteLink.getDesType()));
+                }
+                vertices.add(new VerticePOJO(url, refTo, refBy));
+            }
+        }
+
+        valueObj.setVertices(vertices);
+        ObjectMapper obj = new ObjectMapper();
+        String rs = obj.writeValueAsString(valueObj);
+        return rs;
     }
 
 }

@@ -1,5 +1,6 @@
 package com.fpt.capstone.wcs.controller.system;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpt.capstone.wcs.model.entity.user.User;
 import com.fpt.capstone.wcs.model.entity.user.Website;
 import com.fpt.capstone.wcs.model.entity.website.Topic;
@@ -38,7 +39,7 @@ public class ManagerController {
 
     @CrossOrigin
     @PostMapping("/api/manager/addWebsite")
-    public Map<String, Object> addWebsite(@RequestBody ManagerRequestPOJO request) throws MalformedURLException {
+    public Map<String, Object> addWebsite(@RequestBody ManagerRequestPOJO request) throws MalformedURLException, JsonProcessingException {
         return  managerService.addWebsite(request);
     }
 

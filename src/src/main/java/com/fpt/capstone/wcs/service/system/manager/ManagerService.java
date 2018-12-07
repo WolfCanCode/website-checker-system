@@ -1,5 +1,6 @@
 package com.fpt.capstone.wcs.service.system.manager;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpt.capstone.wcs.model.pojo.ManagerRequestPOJO;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -10,7 +11,7 @@ import java.util.Map;
 @Service
 public interface ManagerService {
     public Map<String, Object> getmanageWesite(ManagerRequestPOJO request);
-    public Map<String, Object> addWebsite(ManagerRequestPOJO request) throws MalformedURLException;
+    public Map<String, Object> addWebsite(ManagerRequestPOJO request) throws MalformedURLException, JsonProcessingException;
     public Map<String, Object> editWebsite(ManagerRequestPOJO request);
     public Map<String, Object> delWebsite(ManagerRequestPOJO request);
     public Map<String, Object> assignWebsite(ManagerRequestPOJO request);
