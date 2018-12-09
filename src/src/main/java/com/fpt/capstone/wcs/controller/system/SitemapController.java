@@ -8,6 +8,7 @@ import com.fpt.capstone.wcs.model.pojo.SiteMapOutputPOJO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.*;
 
@@ -23,12 +24,12 @@ public class SitemapController {
     }
 
     @PostMapping("/api/sitemap/getRefTo")
-    public Map<String, Object> getRefTo(@RequestBody ReferencePOJO request) throws MalformedURLException {
+    public Map<String, Object> getRefTo(@RequestBody ReferencePOJO request) throws IOException {
         return siteMapService.getPagesReferenceToThisURL(request);
     }
 
     @PostMapping("/api/sitemap/getRefBy")
-    public Map<String, Object> getRefBy(@RequestBody ReferencePOJO request) throws MalformedURLException {
+    public Map<String, Object> getRefBy(@RequestBody ReferencePOJO request) throws IOException {
         return siteMapService.getUrlsReferencedByThisPage(request);
     }
 

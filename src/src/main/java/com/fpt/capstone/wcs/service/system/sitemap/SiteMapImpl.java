@@ -1,16 +1,14 @@
 package com.fpt.capstone.wcs.service.system.sitemap;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fpt.capstone.wcs.model.entity.user.User;
 import com.fpt.capstone.wcs.model.entity.user.Website;
 import com.fpt.capstone.wcs.model.entity.website.Page;
 import com.fpt.capstone.wcs.model.entity.website.PageOption;
 import com.fpt.capstone.wcs.model.entity.website.Sitemap;
 import com.fpt.capstone.wcs.model.entity.website.Version;
-import com.fpt.capstone.wcs.model.pojo.ReferencePOJO;
-import com.fpt.capstone.wcs.model.pojo.RequestCommonPOJO;
-import com.fpt.capstone.wcs.model.pojo.SiteLinkPOJO;
-import com.fpt.capstone.wcs.model.pojo.SiteMapOutputPOJO;
+import com.fpt.capstone.wcs.model.pojo.*;
 import com.fpt.capstone.wcs.repository.user.UserRepository;
 import com.fpt.capstone.wcs.repository.user.WebsiteRepository;
 import com.fpt.capstone.wcs.repository.website.PageOptionRepository;
@@ -47,7 +45,7 @@ public class SiteMapImpl implements SiteMapService {
         this.websiteRepository = websiteRepository;
         this.userRepository = userRepository;
         this.pageRepository = pageRepository;
-        this.versionRepository =    versionRepository;
+        this.versionRepository = versionRepository;
         this.authenticate = authenticate;
         this.pageOptionRepository = pageOptionRepository;
         this.sitemapRepository = sitemapRepository;
@@ -67,18 +65,36 @@ public class SiteMapImpl implements SiteMapService {
     }
 
     @Override
-    public Map<String, Object> getPagesReferenceToThisURL(ReferencePOJO request) throws MalformedURLException {
+    public Map<String, Object> getPagesReferenceToThisURL(ReferencePOJO request) throws IOException {
         Map<String, Object> res = new HashMap<>();
         RequestCommonPOJO requestCommonPOJO = new RequestCommonPOJO(request.getUserId(), request.getUserToken(), request.getWebsiteId(), request.getPageOptionId());
         User user = authenticate.isAuthGetSingleUser(requestCommonPOJO);
         if (user.getManager() == null) {
             Website website = websiteRepository.findOneByUserAndIdAndDelFlagEquals(user, request.getWebsiteId(), false);
             if (website != null) {
-                SiteMapProcService sms = new SiteMapProcService(website.getUrl());
-                sms.buildSiteMap();
-                sms.buildInverseGraph();
-                int id = sms.getUrlMap().get(request.getUrl());
-                List<SiteLinkPOJO> resultList = sms.getInvGraph().get(id);
+                Version ver = versionRepository.findFirstByWebsiteOrderByVersionDesc(website);
+                Sitemap smData = sitemapRepository.findByWebsiteAndVersion(website, ver);
+
+                ObjectMapper mapper = new ObjectMapper();
+                String jsonString = smData.getStructureValue();
+                SitemapValuePOJO smVal = mapper.readValue(jsonString, SitemapValuePOJO.class);
+
+                String curPage = "";
+                List<SiteLinkPOJO> resultList = new ArrayList<>();
+                List<VerticePOJO> vertices = smVal.getVertices();
+                for (int i = 0; i < vertices.size(); i++) {
+                    List<LinkPOJO> list = vertices.get(i).getRefTo();
+                    for (int j = 0; j < list.size(); j++) {
+                        resultList.add(new SiteLinkPOJO(curPage, list.get(j).getValue(), list.get(j).getType()));
+                    }
+                }
+
+//                SiteMapProcService sms = new SiteMapProcService(website.getUrl());
+//                sms.buildSiteMap();
+//                sms.buildInverseGraph();
+//                int id = sms.getUrlMap().get(request.getUrl());
+//                List<SiteLinkPOJO> resultList = sms.getInvGraph().get(id);
+
                 res.put("pageList", resultList);
                 res.put("action", Constant.SUCCESS);
                 return res;
@@ -92,17 +108,33 @@ public class SiteMapImpl implements SiteMapService {
     }
 
     @Override
-    public Map<String, Object> getUrlsReferencedByThisPage(ReferencePOJO request) throws MalformedURLException {
+    public Map<String, Object> getUrlsReferencedByThisPage(ReferencePOJO request) throws IOException {
         Map<String, Object> res = new HashMap<>();
         RequestCommonPOJO requestCommonPOJO = new RequestCommonPOJO(request.getUserId(), request.getUserToken(), request.getWebsiteId(), request.getPageOptionId());
         User user = authenticate.isAuthGetSingleUser(requestCommonPOJO);
         if (user.getManager() == null) {
             Website website = websiteRepository.findOneByUserAndIdAndDelFlagEquals(user, request.getWebsiteId(), false);
             if (website != null) {
-                SiteMapProcService sms = new SiteMapProcService(website.getUrl());
-                sms.buildSiteMap();
-                int mapId = sms.getUrlMap().get(request.getUrl());
-                List<SiteLinkPOJO> resultList = sms.getGraph().get(mapId);
+//                SiteMapProcService sms = new SiteMapProcService(website.getUrl());
+//                sms.buildSiteMap();
+//                int mapId = sms.getUrlMap().get(request.getUrl());
+//                List<SiteLinkPOJO> resultList = sms.getGraph().get(mapId);
+                Version ver = versionRepository.findFirstByWebsiteOrderByVersionDesc(website);
+                Sitemap smData = sitemapRepository.findByWebsiteAndVersion(website, ver);
+
+                ObjectMapper mapper = new ObjectMapper();
+                String jsonString = smData.getStructureValue();
+                SitemapValuePOJO smVal = mapper.readValue(jsonString, SitemapValuePOJO.class);
+
+                String curPage = "";
+                List<SiteLinkPOJO> resultList = new ArrayList<>();
+                List<VerticePOJO> vertices = smVal.getVertices();
+                for (int i = 0; i < vertices.size(); i++) {
+                    List<LinkPOJO> list = vertices.get(i).getRefBy();
+                    for (int j = 0; j < list.size(); j++) {
+                        resultList.add(new SiteLinkPOJO(curPage, list.get(j).getValue(), list.get(j).getType()));
+                    }
+                }
                 res.put("pageList", resultList);
                 res.put("action", Constant.SUCCESS);
                 return res;
@@ -192,7 +224,7 @@ public class SiteMapImpl implements SiteMapService {
                 pageRepository.saveAll(pages);
                 List<Page> newPages = pageRepository.findAllByVersion(ver);
                 List<PageOption> pageOptionList = pageOptionRepository.findAllByWebsiteAndDelFlagEquals(website, false);
-                if(pageOptionList.size()!=0) {
+                if (pageOptionList.size() != 0) {
                     for (int i = 0; i < pageOptionList.size(); i++) {
                         PageOption item = pageOptionList.get(i);
                         List<Page> pagesOfPageOption = item.getPages();
@@ -210,8 +242,8 @@ public class SiteMapImpl implements SiteMapService {
                         pageOptionRepository.save(item);
                     }
                 } else {
-                    List<User> listU = userRepository.findAllByWebsiteAndDelFlagEquals(website,false);
-                    for(User u : listU) {
+                    List<User> listU = userRepository.findAllByWebsiteAndDelFlagEquals(website, false);
+                    for (User u : listU) {
                         PageOption root = new PageOption();
                         root.setName("root");
                         Page rootPage = pageRepository.findAllByWebsiteAndVersionAndUrlEquals(website, ver, website.getUrl());
