@@ -22,7 +22,7 @@ public class Page {
     private long id;
     @NotNull
     private int type;
-    @Column(length = 256)
+    @Column(columnDefinition = "TEXT")
     private String url;
 
     @ManyToOne()

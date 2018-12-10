@@ -23,6 +23,7 @@ export default class AdminScreen extends Component {
         successLoad: false,
         marginBody: 190,
         sideShow: true,
+        done: false
     }
 
     componentWillMount() {
@@ -38,6 +39,7 @@ export default class AdminScreen extends Component {
             if (data.action === "SUCCESS") {
                 await cookies.set("u_token", data.token, { path: "/" });
                 await cookies.set("u_isManager", data.isManager, { path: "/" });
+                this.setState({ done: true });
                 this.setState({ loadingContent: false, successLoad: true });
             } else {
                 alert("Phiên đăng nhập hết hạn");
@@ -103,6 +105,12 @@ export default class AdminScreen extends Component {
         }
     }
 
+    _doneRenderWeb(done) {
+        if (done) {
+            this.setState({ done: true });
+        }
+    }
+
 
     render() {
         return (
@@ -111,11 +119,11 @@ export default class AdminScreen extends Component {
                 <Segment style={{ height: '100vh', padding: 0, border: 0 }} loading={this.state.loadingContent}>
                     {this.state.successLoad ? <Sidebar.Pushable as={Segment} style={{ background: "#E0E0E0" }}>
                         <SideMenu currKey={this.state.currKey} updateHeader={(title, alt, image) => this._onUpdateHeader(title, alt, image)} visible={this.state.sideShow} />
-                        <HeaderAdmin changeWebsite={(id) => this._changeWebsiteConfirm(id)} logout={(load) => this._logoutLoading(load)} hideShowSideBar={() => this._hideShowSideBar()} />
+                        <HeaderAdmin changeWebsite={(id) => this._changeWebsiteConfirm(id)} logout={(load) => this._logoutLoading(load)} hideShowSideBar={() => this._hideShowSideBar()} isRenderWeb={(done) => this._doneRenderWeb(done)} />
                         <Sidebar.Pusher>
                             <Image src={this.state.imageSrc} size='medium' style={{ margin: 'auto', position: 'absolute', zIndex: '999999', marginLeft: '86vw', marginTop: '8vh', height: 120, width: 'auto', transition: 'all 1s' }} />
                             <Segment style={{ background: "#F5F5F5", marginLeft: `${this.state.marginBody}px`, marginRight: '10px', marginTop: '60px', height: '90vh', minWidth: 300, overflow: 'auto', transition: "all 0.6s" }}>
-                                <HeaderContent title={this.state.titleHeader} alt={this.state.altHeader} />
+                                <HeaderContent title={this.state.titleHeader} alt={this.state.altHeader} doneRenderWeb={this.state.done} />
                                 {cookies.get("u_isManager") === "true" ? <RouteManager /> : <RouteStaff />}
                             </Segment>
                         </Sidebar.Pusher>

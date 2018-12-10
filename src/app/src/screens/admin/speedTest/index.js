@@ -195,7 +195,6 @@ class speedTestScreen extends Component {
                         Save <Icon name='check' />
                     </Button> : ""}
 
-
                     <div style={{ float: 'right' }}>
                         <ReactToExcel
                             className="btn1"

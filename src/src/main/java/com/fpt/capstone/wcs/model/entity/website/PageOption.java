@@ -35,15 +35,20 @@ public class PageOption {
     @GeneratedValue
     long id;
     String name;
+    @JsonIgnore
     Date time;
     @ManyToOne()
     @JoinColumn(name="createdUser")
+    @JsonIgnore
     private User createdUser;
+
+    @JsonIgnore
     boolean delFlag=false;
 
     @NotNull
     @ManyToOne()
     @JoinColumn(name="website_id")
+    @JsonIgnore
     private Website website;
 
     @ManyToMany(fetch = FetchType.LAZY,

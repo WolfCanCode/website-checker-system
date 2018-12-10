@@ -7,7 +7,7 @@ import ReactToExcel from "react-html-table-to-excel";
 const cookies = new Cookies();
 export default class JavascriptErrorScreen extends Component {
   state = {
-    list: [], loadingTable: false, isDisable: false, listReportId: [], isDoneTest: false
+    list: [], loadingTable: false, isDisable: false, listReportId: [], isDoneTest: false, messages: "This page haven't test yet, please try to test"
   };
 
   componentDidMount() {
@@ -64,17 +64,22 @@ export default class JavascriptErrorScreen extends Component {
       console.log(data.jsErrorReport)
       // if (data.jsErrorReport.length !== 0) {
       var listReport = [];
-      comp = data.jsErrorReport.map((item, index) => {
-        listReport.push(item.id);
+      if (data.jsErrorReport.length === 0) {
+        this.setState({ list: comp, loadingTable: false, isDisable: false, messages: "The selected pageoption don't have any page with js error" });
+      } else {
+        comp = data.jsErrorReport.map((item, index) => {
+          listReport.push(item.id);
 
-        // var msg = item.messages.replace("-", "");
-        // msg = msg.replace(msg.split(" ")[0], "");
-        // if (data.type !== "WARNING") {
-        //   var messages = msg.split(" at");
-        // }
-        return (<TableRow key={index} page={item.pages} type={item.type} messages={item.messages} />);
-      });
-      this.setState({ list: comp, listReportId: listReport, loadingTable: false, isDoneTest: true, isDisable: false });
+          // var msg = item.messages.replace("-", "");
+          // msg = msg.replace(msg.split(" ")[0], "");
+          // if (data.type !== "WARNING") {
+          //   var messages = msg.split(" at");
+          // }
+          return (<TableRow key={index} page={item.pages} type={item.type} messages={item.messages} />);
+        });
+        this.setState({ list: comp, listReportId: listReport, loadingTable: false, isDoneTest: true, isDisable: false });
+
+      }
     });
   }
 
@@ -142,7 +147,7 @@ export default class JavascriptErrorScreen extends Component {
                 </Table.Row>
               </Table.Header>
               <Table.Body>
-                {this.state.list.length === 0 ? <Table.Row><Table.Cell>This page haven't test yet, please try to test</Table.Cell></Table.Row> : this.state.list}
+                {this.state.list.length === 0 ? <Table.Row><Table.Cell>{this.state.messages}</Table.Cell></Table.Row> : this.state.list}
               </Table.Body>
             </Table>
           </Segment>

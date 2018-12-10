@@ -53,6 +53,8 @@ class HeaderAdmin extends Component {
                             cookies.set('u_w_id', list[0].value, { path: '/' });
                             this.setState({ valWebpage: list[0].value, });
                         }
+
+                        this.props.isRenderWeb(true);
                     });
                 } else {
                     this._doLogout();

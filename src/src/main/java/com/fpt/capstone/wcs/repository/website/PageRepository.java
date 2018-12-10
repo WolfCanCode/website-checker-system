@@ -16,4 +16,5 @@ public interface PageRepository extends JpaRepository<Page,Long> {
     List<Page> findAllByWebsiteAndVersionAndTypeEquals(Website website, Version version, int type);
     List<Page> findAllByVersion(Version version);
     Page findAllByWebsiteAndVersionAndUrlEquals(Website website,Version version, String url);
+    Page findFirstByUrlAndWebsiteAndVersion(String url, Website website, Version version);
 }

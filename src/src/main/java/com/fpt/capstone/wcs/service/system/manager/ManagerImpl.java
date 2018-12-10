@@ -5,17 +5,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpt.capstone.wcs.controller.system.SitemapController;
 import com.fpt.capstone.wcs.model.entity.user.User;
 import com.fpt.capstone.wcs.model.entity.user.Website;
-import com.fpt.capstone.wcs.model.entity.website.Topic;
-import com.fpt.capstone.wcs.model.entity.website.Version;
-import com.fpt.capstone.wcs.model.entity.website.WarningWord;
+import com.fpt.capstone.wcs.model.entity.website.*;
 import com.fpt.capstone.wcs.model.pojo.ManagerRequestPOJO;
 import com.fpt.capstone.wcs.model.pojo.RequestCommonPOJO;
 import com.fpt.capstone.wcs.model.pojo.WebsitePOJO;
 import com.fpt.capstone.wcs.repository.user.RoleRepository;
 import com.fpt.capstone.wcs.repository.user.UserRepository;
 import com.fpt.capstone.wcs.repository.user.WebsiteRepository;
-import com.fpt.capstone.wcs.repository.website.TopicRepository;
-import com.fpt.capstone.wcs.repository.website.WarningWordRepository;
+import com.fpt.capstone.wcs.repository.website.*;
 import com.fpt.capstone.wcs.service.system.authenticate.AuthenticateImpl;
 import com.fpt.capstone.wcs.utils.Constant;
 import com.fpt.capstone.wcs.utils.EncodeUtil;
@@ -41,9 +38,24 @@ public class ManagerImpl implements ManagerService{
     WarningWordRepository warningWordRepository;
     final
     TopicRepository topicRepository;
+    final
+    PageOptionRepository pageOptionRepository;
+    final
+    PageRepository pageRepository;
+    final
+    VersionRepository versionRepository;
 
     @Autowired
-    public ManagerImpl(AuthenticateImpl authenticate, UserRepository userRepository, RoleRepository roleRepository, WebsiteRepository websiteRepository, SitemapController sitemapController, WarningWordRepository warningWordRepository, TopicRepository topicRepository) {
+    public ManagerImpl(AuthenticateImpl authenticate,
+                       UserRepository userRepository,
+                       RoleRepository roleRepository,
+                       WebsiteRepository websiteRepository,
+                       SitemapController sitemapController,
+                       WarningWordRepository warningWordRepository,
+                       TopicRepository topicRepository,
+                       PageOptionRepository pageOptionRepository,
+                       PageRepository pageRepository,
+                       VersionRepository versionRepository) {
         this.authenticate = authenticate;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
@@ -51,6 +63,9 @@ public class ManagerImpl implements ManagerService{
         this.sitemapController = sitemapController;
         this.warningWordRepository = warningWordRepository;
         this.topicRepository = topicRepository;
+        this.pageOptionRepository = pageOptionRepository;
+        this.pageRepository = pageRepository;
+        this.versionRepository = versionRepository;
     }
 
     @Override
@@ -225,6 +240,27 @@ public class ManagerImpl implements ManagerService{
 
                 tmp.setUser(listUser);
                 websiteRepository.save(tmp);
+                for (Long id : request.getListStaffId()) {
+                    User staff = userRepository.findOneById(id);
+                    PageOption existPageOption = pageOptionRepository.findOneByWebsiteAndNameEqualsAndDelFlagEqualsAndCreatedUser(tmp,"root", false, staff);
+                    if(existPageOption == null)
+                    {
+                        PageOption root = new PageOption();
+                        root.setName("root");
+                        Version version = versionRepository.findFirstByWebsiteOrderByVersionDesc(tmp);
+                        Page rootPage = pageRepository.findAllByWebsiteAndVersionAndUrlEquals(tmp,version , tmp.getUrl());
+                        List<Page> list = new ArrayList<>();
+                        list.add(rootPage);
+                        root.setPages(list);
+                        root.setCreatedUser(staff);
+                        root.setTime(new Date());
+                        root.setWebsite(tmp);
+                        root.setDelFlag(false);
+                        pageOptionRepository.save(root);
+                }
+
+                }
+
                 res.put("action", Constant.SUCCESS);
                 return res;
             } else {

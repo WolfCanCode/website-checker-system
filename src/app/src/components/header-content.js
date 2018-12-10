@@ -9,7 +9,8 @@ const cookies = new Cookies();
 export default class HeaderContent extends Component {
     state = {
         openPageOption: false,
-        pageNum: 0,
+        pageNum: '...',
+        pageName: 'loading...',
         message: null,
         listPage: null,
         currPage: null,
@@ -25,10 +26,11 @@ export default class HeaderContent extends Component {
         isLoading: false
     };
 
-    componentDidMount() {
-        this._getPageNum();
+    componentWillReceiveProps() {
+        if (this.props.doneRenderWeb) {
+            this._getPageNum();
+        }
     }
-
     _getPageNum() {
         fetch("/api/page/pageOption/size", {
             method: 'POST',
@@ -44,10 +46,8 @@ export default class HeaderContent extends Component {
             })
         }).then(async response => response.json()).then(async (data) => {
             if (data.action === "SUCCESS") {
-                if (cookies.get("u_option") !== undefined) {
-                    cookies.set("u_option", data.id, { path: '/' });
-                }
-                this.setState({ pageNum: data.size, pageName: data.name, activeItem: parseInt(data.id, 10) });
+                cookies.set("u_option", data.id, { path: '/' });
+                this.setState({ pageNum: data.size, pageName: data.name, activeItem: parseInt(data.id, 10), openPageOption: false, isLoading: false });
             } else if (data.action === "INCORRECT") {
             }
         });
@@ -119,17 +119,12 @@ export default class HeaderContent extends Component {
             }).then(async response => response.json()).then(async (data) => {
                 if (data.action === "SUCCESS") {
 
-                    if (data.allPageOption.length === 0) {
-                        cookies.set('u_option', -1, { path: '/' });
-                        this.setState({ activeItem: -1 })
-                    }
-
                     if (cookies.get('u_option') !== undefined) {
                         this.setState({ activeItem: parseInt(cookies.get('u_option'), 10) })
+                    } else {
+                        this.setState({ activeItem: parseInt(cookies.get('u_option'), 10) })
                     }
-                    else {
-                        this.setState({ activeItem: -1 })
-                    }
+
                     this.setState({
                         openPageOption: true,
                         websiteName: data.websiteName,
@@ -178,7 +173,7 @@ export default class HeaderContent extends Component {
                                 pages.push(defaultCheckedList[i].id);
                             }
                         }
-                        this.setState({ activeItem: data.allPageOption[0].id })
+                        this.setState({ activeItem: data.allPageOption[data.allPageOption.length - 1].id })
 
                         var pageOptions = data.allPageOption.map((item, index) => {
                             return (<Menu.Item
@@ -523,17 +518,18 @@ export default class HeaderContent extends Component {
 
     /* proceed */
     _proceedPageOption() {
-        this.setState({ openPageOption: false });
-        if (this.state.pageOptionsList.length === 0 || isNaN(this.state.activeItem)) {
-            cookies.set('u_option', -1, { path: '/' });
-        } else {
-            cookies.set("u_option", this.state.activeItem, { path: '/' });
-        }
-        window.location.reload();
+        this.setState({ isLoading: true });
+
+        cookies.set("u_option", this.state.activeItem, { path: '/' });
+        this._getPageNum();
     }
     /* handle dbclick */
     handleClick(e, item) {
-        this.setState({ activeItem: item.id, isLoading: true })
+        if (item.name !== "root") {
+            this.setState({ activeItem: item.id, isLoading: true });
+        } else {
+            this.setState({ activeItem: item.id });
+        }
         this._selectPageOption(item.id);
         if (!this._delayedClick) {
             this._delayedClick = _.debounce(this.doClick, 200);
@@ -541,7 +537,9 @@ export default class HeaderContent extends Component {
         if (this.clickedOnce) {
             this._delayedClick.cancel();
             this.clickedOnce = false;
-            this.setState({ editPageOption: true, editPOName: item.name, editPOId: item.id, isLoading: false });
+            if (item.name !== "root") {
+                this.setState({ editPageOption: true, editPOName: item.name, editPOId: item.id, isLoading: false });
+            }
         } else {
             this._delayedClick(e);
             this.clickedOnce = true;
@@ -571,7 +569,7 @@ export default class HeaderContent extends Component {
 
                 <Header as='h1' >{this.props.title} <span style={{ fontStyle: 'italic' }}>
                     <Popup
-                        trigger={<Icon className="question circle" avatar />}
+                        trigger={<Icon className="question circle" />}
                         header={this.props.title}
                         content={this.props.alt}
                     />
