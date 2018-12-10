@@ -49,7 +49,7 @@ public class PageOptionImpl implements PageOptionService {
         Map<String, Object> res = new HashMap<>();
         WebsiteUserPOJO websiteUser = authenticate.isAuthGetUserAndWebsite(request);
         if (websiteUser != null) {
-            PageOption firstPageOption = pageOptionRepository.findFirstByWebsiteAndDelFlagEqualsOrderByTimeDesc(websiteUser.getWebsite(), false);
+            PageOption firstPageOption = pageOptionRepository.findFirstByWebsiteAndCreatedUserAndDelFlagEqualsOrderByTimeDesc(websiteUser.getWebsite(), websiteUser.getUser(), false);
             List<PageOption> pageOptions = pageOptionRepository
                     .findAllByWebsiteAndCreatedUserAndDelFlagEqualsOrderByTimeAsc(
                             websiteUser.getWebsite(),
@@ -256,7 +256,7 @@ public class PageOptionImpl implements PageOptionService {
                 res.put("action", Constant.SUCCESS);
                 return res;
             } else {
-                PageOption pageOption = pageOptionRepository.findFirstByWebsiteAndDelFlagEqualsOrderByTimeDesc(website, false);
+                PageOption pageOption = pageOptionRepository.findFirstByWebsiteAndCreatedUserAndDelFlagEqualsOrderByTimeDesc(website,  user, false);
                 res.put("id", pageOption.getId());
                 res.put("size", pageOption.getPages().size());
                 res.put("name", pageOption.getName());
