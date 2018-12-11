@@ -12,11 +12,12 @@ import java.util.List;
 @Repository
 public interface PageOptionRepository extends JpaRepository<PageOption,Long> {
     PageOption findFirstByWebsiteAndCreatedUserAndDelFlagEqualsOrderByTimeDesc(Website website,User user, boolean delFlag);
-    PageOption findFirstByWebsiteAndDelFlagEqualsAndNameEqualsAndCreatedUser(Website website, boolean delFlag, String name, User createdUser);
+    PageOption findFirstByWebsiteAndDelFlagEqualsAndNameEqualsAndCreatedUserOrderByTimeDesc(Website website, boolean delFlag, String name, User createdUser);
     PageOption findByPagesAndDelFlagEquals(List<Page> pages, boolean delFlag);
     List<PageOption> findAllByWebsiteAndCreatedUserAndDelFlagEqualsOrderByTimeDesc(Website website, User user, boolean delFlag);
     List<PageOption> findAllByWebsiteAndCreatedUserAndDelFlagEqualsOrderByTimeAsc(Website website, User user, boolean delFlag);
     List<PageOption> findAllByWebsiteAndDelFlagEquals(Website website, boolean delFlag);
     PageOption findOneByIdAndWebsiteAndDelFlagEquals(Long id, Website website, boolean delFlag);
     PageOption findOneByWebsiteAndNameEqualsAndDelFlagEqualsAndCreatedUser(Website website, String name, boolean delFlag, User user);
+
 }

@@ -58,15 +58,25 @@ HomepageHeading.propTypes = {
 
 
 class DesktopContainer extends Component {
-    state = { txtSearch: "", searchLoading: false, spellingTxt: "" }
+    state = { txtSearch: "", searchLoading: false, spellingTxt: "", resSpellingtxt: [], wordAndSuggest: [] }
 
     hideFixedMenu = () => this.setState({ fixed: false })
     showFixedMenu = () => this.setState({ fixed: true })
 
-    _onChangeSpelling(event, data) {
-        this.setState({ spellingTxt: data.value });
-        var param = { paragraph: data.value };
+    componentDidMount() {
+        fetch("/api/lab/initTrie", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        }).then(() => {
+        });
+    }
 
+    _doSpellTest() {
+        var param = { paragraph: this.state.spellingTxt };
+        var comp = [];
         fetch("/api/lab/spelling", {
             method: 'POST',
             headers: {
@@ -74,11 +84,23 @@ class DesktopContainer extends Component {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(param)
-        }).then(response => response.json()).then((data) => {
-            if (data.action === "SUCCESS") {
-                console.log(data);
+        }).then(response => response.json()).then((res) => {
+            if (res.action === "SUCCESS") {
+                comp = res.data.map((item, index) => {
+                    if (item.suggest === null) {
+                        return (<span style={{ float: 'left', fontSize: 22 }}>{item.name} &nbsp;</span>);
+                    } else {
+                        return (<span style={{ background: 'red', color: 'white', float: 'left', fontSize: 22 }}>{item.name} &nbsp;</span>);
+                    }
+                });
+                this.setState({ wordAndSuggest: res.data, resSpellingtxt: comp });
             }
         });
+    }
+
+    _onChangeSpelling(event, data) {
+        this.setState({ spellingTxt: data.value });
+
     }
 
     render() {
@@ -131,11 +153,14 @@ class DesktopContainer extends Component {
                         </Menu>
                         <HomepageHeading />
                         <Segment.Group horizontal style={{ background: 'transparent' }}>
-                            <Segment>
+                            <Segment style={{ border: 0 }}>
                                 <TextArea autoHeight placeholder='Please insert ...' value={this.state.spellingTxt} onChange={(event, data) => this._onChangeSpelling(event, data)} style={{ fontSize: 30, minHeight: 400, minWidth: '80%' }} />
                             </Segment>
-                            <Segment>
-                                <TextArea autoHeight disabled style={{ fontSize: 30, minHeight: 400, minWidth: '80%' }} />
+
+                            <Button style={{ height: 100, margin: 'auto' }} onClick={() => this._doSpellTest()}>Test</Button>
+                            <Segment style={{ border: 0 }}>
+                                {/* <TextArea autoHeight disabled value={this.state.resSpellingtxt} style={{ fontSize: 30, minHeight: 400, minWidth: '80%' }} /> */}
+                                <div style={{ background: 'rgb(240, 240, 240)', width: '80%', height: '100%', margin: 'auto' }}>{this.state.resSpellingtxt}</div>
                             </Segment>
                         </Segment.Group>
                         <Image style={{ position: 'relative', width: '80vh', margin: 'auto', top: '5vh', }} src={laptop} />

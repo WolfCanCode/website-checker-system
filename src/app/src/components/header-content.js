@@ -23,7 +23,11 @@ export default class HeaderContent extends Component {
         addPOName: "",
         editPOId: 0,
         editPOName: "",
-        isLoading: false
+        isLoading: false,
+        rootId: null,
+        listPageId: [],
+        selectAll: true,
+        defaultChecked: []
     };
 
     componentWillReceiveProps() {
@@ -47,7 +51,7 @@ export default class HeaderContent extends Component {
         }).then(async response => response.json()).then(async (data) => {
             if (data.action === "SUCCESS") {
                 cookies.set("u_option", data.id, { path: '/' });
-                this.setState({ pageNum: data.size, pageName: data.name, activeItem: parseInt(data.id, 10), openPageOption: false, isLoading: false });
+                this.setState({ pageNum: data.size, pageName: data.name, activeItem: parseInt(data.id, 10), openPageOption: false, isLoading: false, rootId: data.rootId });
             } else if (data.action === "INCORRECT") {
             }
         });
@@ -94,6 +98,48 @@ export default class HeaderContent extends Component {
         });
         flag = false;
         this.setState({ pageCheck: pages });
+    }
+
+    /* add all page or remove all page */
+    _addPageAll() {
+        var pages = [];
+        var selectAll = false;
+        if (this.state.listDataPage.length === this.state.defaultChecked.length) {
+            selectAll = true
+        }
+        this.setState({ isLoading: true });
+        if (!selectAll) {
+            this.state.listDataPage.map((item, index) => {
+                pages.push(item.id);
+                return;
+            });
+        }
+        fetch("/api/page/pageOption/updatePage", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                "userId": cookies.get("u_id"),
+                "userToken": cookies.get("u_token"),
+                "websiteId": cookies.get("u_w_id"),
+                "pageOptionId": this.state.activeItem,
+                "listPageId": pages
+            })
+        }).then(async response => response.json()).then(async (data) => {
+            if (data.action === "SUCCESS") {
+                this.setState({
+                    pageCheck: pages,
+                    selectAll: !selectAll
+                }, () => this._selectPageOption(this.state.activeItem));
+
+            } else if (data.action === "INCORRECT") {
+                alert(data.message);
+            }
+        });
+
+
     }
 
     /* onChange value name */
@@ -447,6 +493,7 @@ export default class HeaderContent extends Component {
                     }
                 }
                 var pageOptions = [];
+                var selectAll = this.state.listDataPage.length === defaultCheckedList.length;
 
                 var pageOptionBinding = this.state.pageOptionsList.map((item, index) => {
 
@@ -475,16 +522,18 @@ export default class HeaderContent extends Component {
                                         </Table.Cell>
                                     </Table.Row>
                                 );
-                            } else return (
-                                <Table.Row key={index}>
-                                    <Table.Cell collapsing>
-                                        <Checkbox toggle onClick={() => this._addPage(item.id)} defaultChecked />
-                                    </Table.Cell>
-                                    <Table.Cell>
-                                        <a href={item.url} style={{ fontSize: 16 }}>{item.url}</a>
-                                    </Table.Cell>
-                                </Table.Row>
-                            );
+                            } else {
+                                return (
+                                    <Table.Row key={index}>
+                                        <Table.Cell collapsing>
+                                            <Checkbox toggle onClick={() => this._addPage(item.id)} defaultChecked />
+                                        </Table.Cell>
+                                        <Table.Cell>
+                                            <a href={item.url} style={{ fontSize: 16 }}>{item.url}</a>
+                                        </Table.Cell>
+                                    </Table.Row>
+                                );
+                            }
                         });
                     } else {
                         list = this.state.listDataPage.map((item, index) => {
@@ -504,11 +553,14 @@ export default class HeaderContent extends Component {
                     list = null;
                     pages = null;
                 }
+
                 this.setState({
                     listPage: list,
                     pageCheck: pages,
                     pageOptions: pageOptions,
-                    isLoading: false
+                    isLoading: false,
+                    defaultChecked: defaultCheckedList,
+                    selectAll: selectAll
                 });
             } else if (data.action === "INCORRECT") {
                 this.state.message = data.message;
@@ -518,10 +570,25 @@ export default class HeaderContent extends Component {
 
     /* proceed */
     _proceedPageOption() {
-        this.setState({ isLoading: true });
+        console.log(this.state.rootId + "   " + this.state.activeItem);
+        if (this.state.rootId !== this.state.activeItem) {
+            if (this.state.pageCheck.length === 0) {
+                cookies.remove("u_option");
+                alert('Please at least select one page in the current page option');
+            }
+            else {
+                this.setState({ isLoading: true });
+                cookies.set("u_option", this.state.activeItem, { path: '/' });
+                this._getPageNum();
 
-        cookies.set("u_option", this.state.activeItem, { path: '/' });
-        this._getPageNum();
+            }
+        }
+        else {
+            this.setState({ isLoading: true });
+            cookies.set("u_option", this.state.activeItem, { path: '/' });
+            this._getPageNum();
+
+        }
     }
     /* handle dbclick */
     handleClick(e, item) {
@@ -585,9 +652,10 @@ export default class HeaderContent extends Component {
                         />
                     </Segment> : ""}
                 <Transition animation="scale" duration={500} divided size='huge' verticalAlign='middle' visible={this.state.openPageOption}>
-                    <Modal open={this.state.openPageOption} dimmer="blurring" onClose={() => this.setState({ openPageOption: false })} >
-                        <Modal.Header>Page Option - <Label color='grey'>{this.state.websiteName}</Label></Modal.Header>
+                    <Modal open={this.state.openPageOption} dimmer="blurring" >
+                        <Modal.Header>Page Option - <Label color='grey'>{this.state.websiteName}</Label> </Modal.Header>
                         <Modal.Content style={{ margin: 0, padding: 0, border: 0 }}>
+
                             <Segment.Group vertical="true" style={{ margin: 0, padding: 0, border: 0 }}>
 
                                 <Segment basic style={{ margin: 0, padding: 0, border: 0 }} >
@@ -650,24 +718,42 @@ export default class HeaderContent extends Component {
                                             {this.state.pageOptions}
                                         </Menu></Menu>
                                 </Segment>
-
+                                <Segment style={{ border: 0, marginBottom: 0, boxShadow: '0px 5px 15px rgba(0,0,0,0.2)', zIndex: 999 }}>
+                                    <Checkbox
+                                        radio
+                                        label='All pages'
+                                        name='selOptionPage'
+                                        value='this'
+                                        checked={false}
+                                        onChange={() => alert('Chưa hỗ trợ')}
+                                        style={{ marginRight: 10 }}
+                                    />
+                                    <Checkbox
+                                        radio
+                                        label='Internal pages Only'
+                                        name='selOptionPage'
+                                        value='this'
+                                        checked={true}
+                                        onChange={() => alert('Chưa hỗ trợ')}
+                                    />
+                                </Segment>
                             </Segment.Group>
                             <Modal.Description style={{ maxHeight: '55vh', overflowY: 'scroll' }} >
                                 <Segment basic style={{ margin: 0, padding: 0, border: 0 }} loading={this.state.isLoading} >
                                     {this.state.activeItem !== -1 ?
-                                        <Table unstackable>
-                                            <Table.Body>
-                                                {this.state.listPage === null ?
-                                                    <Table.Row>
-                                                        <Image src="http://static1.squarespace.com/static/56eb2794cf80a1a469d140fb/t/5ab2a39203ce646492fb16aa/1542738603632/" centered />
-                                                    </Table.Row> :
-                                                    this.state.listPage
-                                                }</Table.Body>
-                                        </Table> : ""}
+
+                                        this.state.listPage === null ? <Image src="http://static1.squarespace.com/static/56eb2794cf80a1a469d140fb/t/5ab2a39203ce646492fb16aa/1542738603632/" centered />
+                                            : <Table unstackable>
+                                                <Table.Body>
+                                                    {this.state.listPage}
+                                                </Table.Body>
+                                            </Table>
+                                        : ""}
                                 </Segment>
                             </Modal.Description>
                         </Modal.Content>
                         <Modal.Actions>
+                            {this.state.activeItem === this.state.rootId ? "" : <div style={{ float: 'left' }}><Checkbox toggle onClick={() => this._addPageAll()} checked={this.state.selectAll} /></div>}
                             <Button primary onClick={() => this._proceedPageOption()}>
                                 Proceed <Icon name='right chevron' />
                             </Button>

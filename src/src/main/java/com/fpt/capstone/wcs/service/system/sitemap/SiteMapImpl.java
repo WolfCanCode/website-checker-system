@@ -219,7 +219,14 @@ public class SiteMapImpl implements SiteMapService {
                 sitemapRepository.save(sm);
 
                 List<Page> pages = sms.getAllPage(website, ver);
-
+                //clear root duplicate
+                for(int l = 0 ; l < pages.size();l++)
+                {
+                    if(pages.get(l).getUrl().equals(website.getUrl()+"/")){
+                        pages.remove(l);
+                        break;
+                    }
+                }
                 // renew page option
                 pageRepository.saveAll(pages);
                 List<Page> newPages = pageRepository.findAllByVersion(ver);

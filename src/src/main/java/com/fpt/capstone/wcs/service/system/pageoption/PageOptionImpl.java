@@ -123,13 +123,13 @@ public class PageOptionImpl implements PageOptionService {
                 pageOption.setCreatedUser(websiteUser.getUser());
                 pageOption.setTime(new Date());
                 PageOption addResult = pageOptionRepository.save(pageOption);
-                Version rootVer = versionRepository.findFirstByWebsiteOrderByVersionDesc(websiteUser.getWebsite());
-                Page rootPage = pageRepository.findFirstByUrlAndWebsiteAndVersion(websiteUser.getWebsite().getUrl(), websiteUser.getWebsite(), rootVer);
-                request.setPageOptionId(addResult.getId());
-                List<Long> rootPageList = new ArrayList<>();
-                rootPageList.add(rootPage.getId());
-                request.setListPageId(rootPageList);
-                updatePageOption(request);
+//                Version rootVer = versionRepository.findFirstByWebsiteOrderByVersionDesc(websiteUser.getWebsite());
+//                Page rootPage = pageRepository.findFirstByUrlAndWebsiteAndVersion(websiteUser.getWebsite().getUrl(), websiteUser.getWebsite(), rootVer);
+//                request.setPageOptionId(addResult.getId());
+//                List<Long> rootPageList = new ArrayList<>();
+//                rootPageList.add(rootPage.getId());
+//                request.setListPageId(rootPageList);
+//                updatePageOption(request);
                 res.put("action", Constant.SUCCESS);
             } else {
                 res.put("action", Constant.INCORRECT);
@@ -248,11 +248,14 @@ public class PageOptionImpl implements PageOptionService {
                     res.put("size", pageOption.getPages().size());
                     res.put("name", pageOption.getName());
                 } else {
-                    pageOption = pageOptionRepository.findFirstByWebsiteAndDelFlagEqualsAndNameEqualsAndCreatedUser(website, false, "root", user);
+                    pageOption = pageOptionRepository.findFirstByWebsiteAndDelFlagEqualsAndNameEqualsAndCreatedUserOrderByTimeDesc(website, false, "root", user);
                     res.put("id", pageOption.getId());
                     res.put("size", pageOption.getPages().size());
                     res.put("name", pageOption.getName());
                 }
+                //get root
+                PageOption rootPageOption = pageOptionRepository.findFirstByWebsiteAndDelFlagEqualsAndNameEqualsAndCreatedUserOrderByTimeDesc(website, false, "root", user);
+                res.put("rootId",rootPageOption.getId());
                 res.put("action", Constant.SUCCESS);
                 return res;
             } else {
