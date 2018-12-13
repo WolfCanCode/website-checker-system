@@ -434,25 +434,28 @@ public class TechnologyImpl implements TechnologyService {
                 public void run() {
                     try {
 
+                        String url = p.getUrl();
+                        int codeRespone = CheckHTTPResponse.verifyHttpMessage(url);
+                        if(codeRespone<400) {
+                            ChromeOptions chromeOptions = new ChromeOptions();
+                            chromeOptions.addArguments("--headless");
 
-                        ChromeOptions chromeOptions = new ChromeOptions();
-                        chromeOptions.addArguments("--headless");
+                            WebDriver driver = new ChromeDriver(chromeOptions);//chay an
 
-                        WebDriver driver = new ChromeDriver(chromeOptions);//chay an
+                            driver.get(p.getUrl());
 
-                        driver.get(p.getUrl());
+                            Set<org.openqa.selenium.Cookie> cookies = driver.manage().getCookies();
 
-                        Set<org.openqa.selenium.Cookie> cookies = driver.manage().getCookies();
+                            //To find the number of cookies used by this site
+                            System.out.println("Number of cookies in this site " + cookies.size());
 
-                        //To find the number of cookies used by this site
-                        System.out.println("Number of cookies in this site " + cookies.size());
+                            for (org.openqa.selenium.Cookie cookie : cookies) {
+                                // user.out.println(cookie.getName()+" "+cookie.getValue());
+                                resultList11.add(new CookieReport(cookie.getName(), cookie.getDomain()));
 
-                        for (org.openqa.selenium.Cookie cookie : cookies) {
-                            // user.out.println(cookie.getName()+" "+cookie.getValue());
-                            resultList11.add(new CookieReport(cookie.getName(), cookie.getDomain()));
-
+                            }
+                            System.out.println("size 1 " + resultList11.size());
                         }
-                        System.out.println("size 1 " + resultList11.size());
 
 
                     } catch (Exception e) {
