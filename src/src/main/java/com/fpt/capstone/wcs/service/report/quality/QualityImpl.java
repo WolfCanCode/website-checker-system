@@ -1216,40 +1216,46 @@ public class QualityImpl implements QualityService {
                 @Override
                 public void run() {
                     try {
+                        String url = p.getUrl();
+                        int codeRespone = CheckHTTPResponse.verifyHttpMessage(url);
+                        System.out.println("URL" + url);
 
-                        String verb,verb1, verb2, verb3, verbing, verbed;
+                        System.out.println("codeRespone" + codeRespone);
+                        if(codeRespone<400) {
 
-                        ChromeOptions chromeOptions = new ChromeOptions();
-                        chromeOptions.addArguments("--headless");
-                        WebDriver driver = new ChromeDriver(chromeOptions);//chay an
-                        driver.get(p.getUrl());
-                        WebElement texts = driver.findElement(By.tagName("body"));
-                        String  bodyTextWithSpace = texts.getText().toLowerCase();
-                        String  bodyText = bodyTextWithSpace.replaceAll("\\s+"," ");
-                        for (int i = 0; i< finalWordList.size(); i++){
-                            //String a = finalWordList.get(i).getWord().concat("," + );
-                            String a = finalWordList.get(i).getWord().concat(",");
-                            a = a.concat(English.plural(finalWordList.get(i).getWord()) + ",");
+                            String verb, verb1, verb2, verb3, verbing, verbed;
 
-                            verb = finalWordList.get(i).getWord().toLowerCase();
+                            ChromeOptions chromeOptions = new ChromeOptions();
+                            chromeOptions.addArguments("--headless");
+                            WebDriver driver = new ChromeDriver(chromeOptions);//chay an
+                            driver.get(p.getUrl());
+                            WebElement texts = driver.findElement(By.tagName("body"));
+                            String bodyTextWithSpace = texts.getText().toLowerCase();
+                            String bodyText = bodyTextWithSpace.replaceAll("\\s+", " ");
+                            for (int i = 0; i < finalWordList.size(); i++) {
+                                //String a = finalWordList.get(i).getWord().concat("," + );
+                                String a = finalWordList.get(i).getWord().concat(",");
+                                a = a.concat(English.plural(finalWordList.get(i).getWord()) + ",");
 
-                            if( verb.length()>1 && consonants.contains( verb.charAt(verb.length()-2)) && vowels.contains( verb.charAt(verb.length()-1))){
-                                verbing = verb.substring(0, verb.length()-1) + Constant.Verb_type[3];
-                                a = a.concat(verbing + ",");
-                                //tan cung khong phai y va w, , truoc la nguyen am, truoc nua khong phai la nguyen am
-                            }else{
-                                verbing = verb + Constant.Verb_type[3];
-                                a = a.concat(verbing + ",");
-                            }
+                                verb = finalWordList.get(i).getWord().toLowerCase();
 
-                            Boolean check = true;
-                            for (int j = 0; j < finalInrregularVerbList.size(); j++ ){
+                                if (verb.length() > 1 && consonants.contains(verb.charAt(verb.length() - 2)) && vowels.contains(verb.charAt(verb.length() - 1))) {
+                                    verbing = verb.substring(0, verb.length() - 1) + Constant.Verb_type[3];
+                                    a = a.concat(verbing + ",");
+                                    //tan cung khong phai y va w, , truoc la nguyen am, truoc nua khong phai la nguyen am
+                                } else {
+                                    verbing = verb + Constant.Verb_type[3];
+                                    a = a.concat(verbing + ",");
+                                }
+
+                                Boolean check = true;
+                                for (int j = 0; j < finalInrregularVerbList.size(); j++) {
 
                                     verb1 = finalInrregularVerbList.get(j).getVerbV1();
                                     verb2 = finalInrregularVerbList.get(j).getVerbV2();
                                     verb3 = finalInrregularVerbList.get(j).getVerbV3();
 
-                                    if (verb.equalsIgnoreCase(verb1)){
+                                    if (verb.equalsIgnoreCase(verb1)) {
                                         a = a.concat(verb2 + ",");
                                         a = a.concat(verb3 + ",");
                                         check = false;
@@ -1257,16 +1263,16 @@ public class QualityImpl implements QualityService {
                                     }
                                 }
 
-                                if(check == true){
-                                    if(verb.charAt(verb.length()-1)=='e'){//tan cung e
+                                if (check == true) {
+                                    if (verb.charAt(verb.length() - 1) == 'e') {//tan cung e
                                         verbed = verb + Constant.Verb_type[0];
                                         //tan cung y, truoc la phu am
-                                    }else if(consonants.contains(verb.charAt(verb.length()-2)) && verb.charAt(verb.length()-1)=='y'){
-                                        verbed = verb.substring(0, verb.length()-1) + Constant.Verb_type[2];
+                                    } else if (consonants.contains(verb.charAt(verb.length() - 2)) && verb.charAt(verb.length() - 1) == 'y') {
+                                        verbed = verb.substring(0, verb.length() - 1) + Constant.Verb_type[2];
                                         //tan cung khong phai y va w, , truoc la nguyen am, truoc nua khong phai la nguyen am
-                                    }else if(verb.length()>2 && !vowels.contains(verb.charAt(verb.length()-3)) && vowels.contains(verb.charAt(verb.length()-2)) && ( consonants.contains(verb.charAt(verb.length()-1)) && verb.charAt(verb.length()-1)!='w' && verb.charAt(verb.length()-1)!='y' )){
-                                        verbed = verb + verb.charAt(verb.length()-1) + Constant.Verb_type[1];
-                                    }else{
+                                    } else if (verb.length() > 2 && !vowels.contains(verb.charAt(verb.length() - 3)) && vowels.contains(verb.charAt(verb.length() - 2)) && (consonants.contains(verb.charAt(verb.length() - 1)) && verb.charAt(verb.length() - 1) != 'w' && verb.charAt(verb.length() - 1) != 'y')) {
+                                        verbed = verb + verb.charAt(verb.length() - 1) + Constant.Verb_type[1];
+                                    } else {
                                         verbed = verb + Constant.Verb_type[1];
                                     }
                                     a = a.concat(verbed + ",");
@@ -1274,31 +1280,28 @@ public class QualityImpl implements QualityService {
                                 }
 
 
+                                System.out.println("dsad" + a);
+                                String[] list1 = a.split(",");
+                                for (int j = 0; j < list1.length; j++) {
 
+                                    int index = bodyText.indexOf(list1[j].toLowerCase());
+                                    while (index >= 0) {
 
+                                        String fragment = bodyText.substring(index, index + 30);
 
-                            System.out.println("dsad" + a);
-                            String[] list1 = a.split(",");
-                            for(int j = 0; j < list1.length;j++){
-
-                                int index = bodyText.indexOf(list1[j].toLowerCase());
-                                while (index >= 0){
-
-                                    String fragment = bodyText.substring(index, index + 30);
-
-                                    ProhibitedContentReport prohibitedContentReport = new ProhibitedContentReport(p.getUrl(),list1[j],fragment,finalWordList.get(i).getTopic().getTypeName());
-                                    prohibitedContentReport.setPageOption(option);
-                                    prohibitedContentReport.setCreatedTime(createdTime);
-                                    resultList.add(prohibitedContentReport);
-                                    index = bodyText.indexOf(list1[j].toLowerCase(), index +1 );
+                                        ProhibitedContentReport prohibitedContentReport = new ProhibitedContentReport(p.getUrl(), list1[j], fragment, finalWordList.get(i).getTopic().getTypeName());
+                                        prohibitedContentReport.setPageOption(option);
+                                        prohibitedContentReport.setCreatedTime(createdTime);
+                                        resultList.add(prohibitedContentReport);
+                                        index = bodyText.indexOf(list1[j].toLowerCase(), index + 1);
+                                    }
                                 }
+
+
                             }
 
 
                         }
-
-
-
 
 
                     }catch (Exception e) {

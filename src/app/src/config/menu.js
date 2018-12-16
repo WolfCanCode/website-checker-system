@@ -5,7 +5,7 @@ import Grammar from '../assets/grammar.png';
 import SpeedTest from '../assets/desktopSpeed.png';
 import MissingFile from '../assets/missingFile.png';
 import Favicons from '../assets/favicon.png';
-import Prohibited from '../assets/prohibited.png';
+import Prohibited from '../assets/prohibited.PNG';
 
 export const menu = [
     // {
@@ -41,13 +41,13 @@ export const menu = [
                 name: "Broken links test",
                 to: "/admin/brokenLinks",
                 key: "test3",
-                alt: "This for test alt title",
+                alt: "Broken links test for checking internal and external links in your website",
                 image: BrokenLinks
             }, {
                 name: "Broken pages test",
                 to: "/admin/brokenPages",
                 key: "test4",
-                alt: "This for test alt title",
+                alt: "Broken pages test for checking all pages in your website",
                 image: BrokenPage
             }, {
                 name: "Missing files test",
@@ -59,7 +59,7 @@ export const menu = [
                 name: "Prohibited content test",
                 to: "/admin/prohibited",
                 key: "test6",
-                alt: "This for test alt title",
+                alt: "Prohibited content test for checking all prohibited word in your website",
                 image: Prohibited
             },
 
@@ -72,7 +72,7 @@ export const menu = [
                 name: "Mobile layout test",
                 to: "/admin/mobileLayout",
                 key: "test7",
-                alt: "This for test alt title"
+                alt: "Mobile layout test for checking all page layout in mobile screen"
             },
             {
                 name: "Speed test",
@@ -105,7 +105,7 @@ export const menu = [
                 name: "Law Cookie Test",
                 to: "/admin/cookielaw",
                 key: "test11",
-                alt: "This for test alt title"
+                alt: "Law Cookie Test for checking all cookies are used in your website"
             }, {
                 name: "Server Behavior Test",
                 to: "/admin/serverBehavior",
@@ -207,13 +207,13 @@ export const menuGuest = [
                 name: "Broken links test",
                 to: "/#",
                 key: "test3",
-                alt: "This for test alt title",
+                alt: "Broken links test for checking internal and external links in your website",
                 image: BrokenLinks
             }, {
                 name: "Broken pages test",
                 to: "/#",
                 key: "test4",
-                alt: "This for test alt title",
+                alt: "Broken pages test for checking all pages in your website",
                 image: BrokenPage
             }, {
                 name: "Missing files test",
@@ -225,7 +225,7 @@ export const menuGuest = [
                 name: "Prohibited content test",
                 to: "/#",
                 key: "test6",
-                alt: "This for test alt title",
+                alt: "Prohibited content test for checking all prohibited word in your website",
                 image: Prohibited
             },
 
@@ -238,7 +238,7 @@ export const menuGuest = [
                 name: "Mobile layout test",
                 to: "/#",
                 key: "test7",
-                alt: "This for test alt title"
+                alt: "Mobile layout test for checking all page layout in mobile screen"
             },
             {
                 name: "Speed test",
@@ -271,7 +271,7 @@ export const menuGuest = [
                 name: "Law Cookie Test",
                 to: "/#",
                 key: "test11",
-                alt: "This for test alt title"
+                alt: "Law Cookie Test for checking all cookies are used in your website"
             }, {
                 name: "Server Behavior Test",
                 to: "/admin/serverBehavior",
