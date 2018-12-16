@@ -215,51 +215,91 @@ public class QualityImpl implements QualityService {
                 @Override
                 public void run() {
                     try {
+                        String url = p.getUrl();
+                        int codeRespone = CheckHTTPResponse.verifyHttpMessage(url);
+                        System.out.println("URL" + url);
 
-                        HttpURLConnection connection = (HttpURLConnection) new URL(p.getUrl()).openConnection();
-                        connection.connect();
-                        String responseMessage = connection.getResponseMessage();
-                        int responseCode = connection.getResponseCode();
-                        connection.disconnect();
-                        System.out.println("URL: " + p.getUrl() + " returned " + responseMessage + " code " + responseCode);
-                        if(responseCode == HttpURLConnection.HTTP_NOT_FOUND){
-                            BrokenLinkReport brokenLinkReport =  new BrokenLinkReport(responseCode, responseMessage,"https://www.nottingham.ac.uk/about", p.getUrl());
-                            brokenLinkReport.setPageOption(option);
-                            brokenLinkReport.setCreatedTime(createdTime);
-                            resultList.add(brokenLinkReport);
+                        System.out.println("codeRespone" + codeRespone);
+                        if(codeRespone<400) {
+                            String mainDomain = null;
+                            if(url.contains("http://www.") || url.contains("https://www.") ){
+                                mainDomain = url.split("www.")[1].split("/")[0];
+                                System.out.println("main domain 1 : " + mainDomain);
+                            }else if(url.contains("http://")){
+                                mainDomain = url.split("http://")[1].split("/")[0];
+                                System.out.println("main domain 2 : " + mainDomain);
+                            }else if(url.contains("https://")){
+                                mainDomain = url.split("https://")[1].split("/")[0];
+                                System.out.println("main domain 3 : " + mainDomain);
+
+                            }
+                            String  type = null;
+                            Document doc = Jsoup.connect(p.getUrl()).get();
+                            Elements links = doc.select("a[href]");
+                            Element link;
+
+                            for (int j = 0; j < links.size(); j++) {
+                                link = links.get(j);
+                                //System.out.println("a= " + link.attr("abs:href"));
+                                if(link.attr("abs:href") != null && link.attr("abs:href") != ""){
+                                    if(link.attr("abs:href").contains(mainDomain)){
+                                        type = "1";
+                                    }else {
+                                        type = "2";
+                                    }
+                                    try {
+                                        HttpURLConnection connection = (HttpURLConnection) new URL(link.attr("abs:href")).openConnection();
+                                        connection.connect();
+                                        String responseMessage = connection.getResponseMessage();
+                                        int responseCode = connection.getResponseCode();
+                                        connection.disconnect();
+                                        System.out.println("URL: " + link.attr("abs:href") + " returned " + responseMessage + " code " + responseCode);
+                                        if (responseCode == HttpURLConnection.HTTP_NOT_FOUND) {
+                                            BrokenLinkReport brokenLinkReport = new BrokenLinkReport(responseCode, type,responseMessage, link.attr("abs:href"), p.getUrl());
+                                            brokenLinkReport.setPageOption(option);
+                                            brokenLinkReport.setCreatedTime(createdTime);
+                                            resultList.add(brokenLinkReport);
+                                        }
+
+                                        if (responseCode == HttpURLConnection.HTTP_BAD_REQUEST) {
+                                            BrokenLinkReport brokenLinkReport = new BrokenLinkReport(responseCode,type, responseMessage, link.attr("abs:href"), p.getUrl());
+                                            brokenLinkReport.setPageOption(option);
+                                            brokenLinkReport.setCreatedTime(createdTime);
+                                            resultList.add(brokenLinkReport);
+                                        }
+                                    } catch (MalformedURLException e) {
+                                        System.out.println("message 1" + e.getMessage());
+                                        if(e.toString().contains("java.net.MalformedURLException")){
+                                            BrokenLinkReport brokenLinkReport =  new BrokenLinkReport(HttpURLConnection.HTTP_BAD_REQUEST, type,"Bad Request",link.attr("abs:href"), p.getUrl());
+                                            brokenLinkReport.setPageOption(option);
+                                            brokenLinkReport.setCreatedTime(createdTime);
+                                            resultList.add(brokenLinkReport);
+                                            //resultList.add(new BrokenLinkReport(HttpURLConnection.HTTP_BAD_REQUEST, ,"https://www.nottingham.ac.uk/about", p.getUrl()));
+                                        }
+                                        // Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+
+                                        System.out.println("message 2" + e.getMessage());
+                                        System.out.println("message 2.1" + e.toString());
+                                        if(e.toString().contains("java.net.UnknownHostException")){
+                                            BrokenLinkReport brokenLinkReport =  new BrokenLinkReport(HttpURLConnection.HTTP_BAD_REQUEST,type, "Bad Request",link.attr("abs:href"), p.getUrl());
+                                            brokenLinkReport.setPageOption(option);
+                                            brokenLinkReport.setCreatedTime(createdTime);
+                                            resultList.add(brokenLinkReport);
+                                            //resultList.add(new BrokenLinkReport(HttpURLConnection.HTTP_BAD_REQUEST, "Bad Request","https://www.nottingham.ac.uk/about", p.getUrl()));
+                                        }
+                                    }
+                                }
+
+
+                            }
                         }
 
-                        if(responseCode == HttpURLConnection.HTTP_BAD_REQUEST){
-                            BrokenLinkReport brokenLinkReport =  new BrokenLinkReport(responseCode, responseMessage,"https://www.nottingham.ac.uk/about", p.getUrl());
-                            brokenLinkReport.setPageOption(option);
-                            brokenLinkReport.setCreatedTime(createdTime);
-                            resultList.add(brokenLinkReport);
-                        }
 
 
-                    }  catch (MalformedURLException e) {
-                        System.out.println("message 1" + e.getMessage());
-                        if(e.toString().contains("java.net.MalformedURLException")){
-                            BrokenLinkReport brokenLinkReport =  new BrokenLinkReport(HttpURLConnection.HTTP_BAD_REQUEST, "Bad Request","https://www.nottingham.ac.uk/about", p.getUrl());
-                            brokenLinkReport.setPageOption(option);
-                            brokenLinkReport.setCreatedTime(createdTime);
-                            resultList.add(brokenLinkReport);
-                            //resultList.add(new BrokenLinkReport(HttpURLConnection.HTTP_BAD_REQUEST, ,"https://www.nottingham.ac.uk/about", p.getUrl()));
-                        }
-                        // Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
-                    } catch (IOException e) {
-                        e.printStackTrace();
 
-                        System.out.println("message 2" + e.getMessage());
-                        System.out.println("message 2.1" + e.toString());
-                        if(e.toString().contains("java.net.UnknownHostException")){
-                            BrokenLinkReport brokenLinkReport =  new BrokenLinkReport(HttpURLConnection.HTTP_BAD_REQUEST, "Bad Request","https://www.nottingham.ac.uk/about", p.getUrl());
-                            brokenLinkReport.setPageOption(option);
-                            brokenLinkReport.setCreatedTime(createdTime);
-                            resultList.add(brokenLinkReport);
-                            //resultList.add(new BrokenLinkReport(HttpURLConnection.HTTP_BAD_REQUEST, "Bad Request","https://www.nottingham.ac.uk/about", p.getUrl()));
-                        }
-                    } catch (Exception e) {
+                    }  catch (Exception e) {
 
                         System.out.println("message 3" + e.getMessage());
                         //Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
