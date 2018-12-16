@@ -15,7 +15,7 @@ export default class managewebsitescreen extends Component {
 
 
     state = {
-        addModal: false, isLoading: false, listWeb: null, webName: "", webUrl: "",
+        addModal: false, isLoading: false, listWeb: [], webName: "", webUrl: "",
         isDisable: true, addLoading: false, showSitemapModal: false,
         showRefModal: false, showRefToResultModal: false, showRefByResultModal: false,
         currWeb: "", currWebId: "", selectedUrl: "",
@@ -66,7 +66,7 @@ export default class managewebsitescreen extends Component {
                     return (<PageTableRow key={index} srcUrl={item.srcUrl} desUrl={item.desUrl} desType={item.desType} />);
                 });
                 this.setState({ listPageRefTo: comp, });
-                this.setState({showRefToResultModal: true});
+                this.setState({ showRefToResultModal: true });
             }
         }
         );
@@ -88,7 +88,7 @@ export default class managewebsitescreen extends Component {
                     return (<PageTableRow key={index} srcUrl={item.srcUrl} desUrl={item.desUrl} desType={item.desType} />);
                 });
                 this.setState({ listPageRefBy: comp, });
-                this.setState({showRefByResultModal: true});
+                this.setState({ showRefByResultModal: true });
             }
         }
         );
@@ -255,7 +255,7 @@ export default class managewebsitescreen extends Component {
                                 </Modal.Actions>
                             </Modal>
                         </Transition>
-                        
+
                         {/*End reference*/}
 
 
@@ -263,22 +263,22 @@ export default class managewebsitescreen extends Component {
                         <Transition duration={600} divided verticalAlign='middle' visible={this.state.showRefToResultModal}>
                             <Modal open={this.state.showRefToResultModal} style={{ width: '400', height: 'auto', background: 'white' }}>
                                 <Modal.Header style={{ textAlign: 'left', fontSize: 25, fontWeight: 'bold', color: 'black' }}>
-                                Pages are referencing to: {this.state.selectedUrl}
+                                    Pages are referencing to: {this.state.selectedUrl}
                                 </Modal.Header>
                                 <Modal.Content >
-                                <Table singleLine unstackable>
-                                
-                                <Table.Header>
-                                    <Table.Row>
-                                        
-                                        <Table.HeaderCell>Destination</Table.HeaderCell>
-                                        <Table.HeaderCell>Type</Table.HeaderCell>
-                                    </Table.Row>
-                                </Table.Header>
-                                <Table.Body>
-                                {this.state.listPageRefTo}
-                                </Table.Body>
-                            </Table>
+                                    <Table singleLine unstackable>
+
+                                        <Table.Header>
+                                            <Table.Row>
+
+                                                <Table.HeaderCell>Destination</Table.HeaderCell>
+                                                <Table.HeaderCell>Type</Table.HeaderCell>
+                                            </Table.Row>
+                                        </Table.Header>
+                                        <Table.Body>
+                                            {this.state.listPageRefTo}
+                                        </Table.Body>
+                                    </Table>
                                 </Modal.Content>
                                 <Modal.Actions >
                                     <Button onClick={() => this.setState({ showRefToResultModal: false })}> Cancel</Button>
@@ -291,22 +291,22 @@ export default class managewebsitescreen extends Component {
                         <Transition duration={600} divided verticalAlign='middle' visible={this.state.showRefByResultModal}>
                             <Modal open={this.state.showRefByResultModal} style={{ width: '400', height: 'auto', background: 'white' }}>
                                 <Modal.Header style={{ textAlign: 'left', fontSize: 25, fontWeight: 'bold', color: 'black' }}>
-                                Pages are referencing to: {this.state.selectedUrl}
+                                    Pages are referencing to: {this.state.selectedUrl}
                                 </Modal.Header>
                                 <Modal.Content >
-                                <Table singleLine unstackable>
-                                
-                                <Table.Header>
-                                    <Table.Row>
-                                        
-                                        <Table.HeaderCell>Destination</Table.HeaderCell>
-                                        <Table.HeaderCell>Type</Table.HeaderCell>
-                                    </Table.Row>
-                                </Table.Header>
-                                <Table.Body>
-                                {this.state.listPageRefBy}
-                                </Table.Body>
-                            </Table>
+                                    <Table singleLine unstackable>
+
+                                        <Table.Header>
+                                            <Table.Row>
+
+                                                <Table.HeaderCell>Destination</Table.HeaderCell>
+                                                <Table.HeaderCell>Type</Table.HeaderCell>
+                                            </Table.Row>
+                                        </Table.Header>
+                                        <Table.Body>
+                                            {this.state.listPageRefBy}
+                                        </Table.Body>
+                                    </Table>
                                 </Modal.Content>
                                 <Modal.Actions >
                                     <Button onClick={() => this.setState({ showRefByResultModal: false })}> Cancel</Button>
@@ -330,7 +330,7 @@ export default class managewebsitescreen extends Component {
                                     </Table.Row>
                                 </Table.Header>
                                 <Table.Body>
-                                    {this.state.listWeb}
+                                    {this.state.listWeb.length === 0 ? "Please add website..." : this.state.listWeb}
                                 </Table.Body>
                             </Table>
                             {/* <Canvas /> */}

@@ -75,7 +75,7 @@ export default class managestaffscreen extends Component {
             body: JSON.stringify(param)
         }).then(response => response.json()).then((data) => {
             if (data.action === "SUCCESS") {
-                this.setState({ addModal: false });
+                this.setState({ addModal: false, staffName: "", staffEmail: "", staffPassword: "" });
                 this._doMappingRefresh();
             }
         });
@@ -130,7 +130,7 @@ export default class managestaffscreen extends Component {
                                 </Table.Row>
                             </Table.Header>
                             <Table.Body>
-                                {this.state.listComp}
+                                {this.state.listComp.length === 0 ? "Please add new staff.." : this.state.listComp}
                             </Table.Body>
                         </Table>
                     </Segment>

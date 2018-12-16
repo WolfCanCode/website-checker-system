@@ -13,7 +13,7 @@ import LAB from '../screens/techlab/index';
 import AdminScreen from '../screens/admin/index';
 import LoginScreen from '../screens/login/index';
 import RegisterScreen from '../screens/register/index';
-import Dashboard from '../screens/admin/dashboard/index';
+// import Dashboard from '../screens/admin/dashboard/index';
 
 import SiteMapScreen from '../screens/admin/sitemap/controller';
 import brokenLinksScreen from '../screens/admin/brokenLinks/index';
@@ -158,7 +158,7 @@ export const RouteStaff = withRouter(({ location }) => (
 
 
 export const RouteManager = withRouter(({ location }) => (
-    <div style={{ background: "#fff", boxShadow: "-5px 5px 15px rgba(0,0,0,0.1)", maxHeight: '74%', overflowX: "auto", margin: 'auto' }}>
+    <div style={{ background: "#fff", boxShadow: "-5px 5px 15px rgba(0,0,0,0.1)", maxHeight: '78vh', overflowX: "auto", margin: 'auto' }}>
         <TransitionGroup>
             <CSSTransition
                 key={location.key}

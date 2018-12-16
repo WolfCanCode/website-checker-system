@@ -60,7 +60,7 @@ class TableRow extends Component {
             body: JSON.stringify(param)
         }).then(response => response.json()).then(async (data) => {
             if (data.action === "SUCCESS") {
-                this.setState({ isDisabled: true, modalEdit: false });
+                this.setState({ isDisabled: true, modalEdit: false, staffPassword: "" });
                 this.props.onRefresh();
             } else {
                 alert("Something went wrong!!!");
