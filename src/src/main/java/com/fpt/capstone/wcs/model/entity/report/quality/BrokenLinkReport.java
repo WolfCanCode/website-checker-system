@@ -25,7 +25,7 @@ public class BrokenLinkReport {
     private boolean delFlag = true;
 
 
-    public BrokenLinkReport(int httpCode,String type, String httpMessage, String urlPage, String urlLink) {
+    public BrokenLinkReport(int httpCode,String type, String httpMessage, String urlLink, String urlPage) {
         this.httpCode = httpCode;
         this.type = type;
         this.httpMessage = httpMessage;
