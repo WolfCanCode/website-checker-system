@@ -11,7 +11,7 @@ const cookies = new Cookies();
 
 class brokenLinksScreen extends Component {
 
-    state = { list: [], loadingTable: false, isDisable: false, tested: false, isDoneTest: false, listReportId: [] };
+    state = { list: [], loadingTable: false, isDisable: false, tested: false, isDoneTest: false, listReportId: [], countInternalLink : 0 , countExternalLink : 0 };
 
 
     componentDidMount() {
@@ -34,8 +34,29 @@ class brokenLinksScreen extends Component {
             body: JSON.stringify(param)
         }).then(response => response.json()).then((data) => {
             comp = data.brokenLinkReport.map((item, index) => {
-                return (<TableRow key={index} urlPage={item.urlPage} urlLink={item.urlLink} httpCode={item.httpCode} httpMessage={item.httpMessage} />);
+                return (<TableRow key={index} urlPage={item.urlPage} urlLink={item.urlLink} type = {item.type} httpCode={item.httpCode} httpMessage={item.httpMessage} />);
             });
+            let countInternalLink = 0;
+            let countExternalLink = 0;
+
+             countInternalLink = data.brokenLinkReport.reduce((type,item) => {
+                 if(item.type === '1'){
+                    countInternalLink++;
+                 }
+
+                return countInternalLink;
+            }, 0)
+
+            countExternalLink = data.brokenLinkReport.reduce((type,item) => {
+                if(item.type === '2'){
+                    countExternalLink++;
+                }
+
+               return countExternalLink;
+           }, 0)
+            
+            this.setState({ countInternalLink: countInternalLink })
+            this.setState({ countExternalLink: countExternalLink })
 
             this.setState({ list: comp });
 
@@ -67,8 +88,29 @@ class brokenLinksScreen extends Component {
             var listReport = [];
             comp = data.brokenLinkReport.map((item, index) => {
                 listReport.push(item.id);
-                return (<TableRow key={index} urlPage={item.urlPage} urlLink={item.urlLink} httpCode={item.httpCode} httpMessage={item.httpMessage} />);
+                return (<TableRow key={index} urlPage={item.urlPage} urlLink={item.urlLink} type={item.type} httpCode={item.httpCode} httpMessage={item.httpMessage} />);
             });
+            let countInternalLink = 0;
+            let countExternalLink = 0;
+
+             countInternalLink = data.brokenLinkReport.reduce((type,item) => {
+                 if(item.type === '1'){
+                    countInternalLink++;
+                 }
+
+                return countInternalLink;
+            }, 0)
+
+            countExternalLink = data.brokenLinkReport.reduce((type,item) => {
+                if(item.type === '2'){
+                    countExternalLink++;
+                }
+
+               return countExternalLink;
+           }, 0)
+            
+            this.setState({ countInternalLink: countInternalLink })
+            this.setState({ countExternalLink: countExternalLink })
 
 
             this.setState({ list: comp });
@@ -130,13 +172,13 @@ class brokenLinksScreen extends Component {
                                 <Icon className="check" size='huge' color='green' />
                             </Segment>
                             <Segment style={{ paddingLeft: '10px' }}>
-                                <p style={{ fontSize: 24 }}>0 <br />
+                                <p style={{ fontSize: 24 }}>{this.state.countInternalLink} <br />
                                     Internal broken links</p>
                             </Segment >
                             <Segment style={{ margin: 'auto', textAlign: 'center', padding: 0 }}>
                                 <Icon className="broken chain" size='huge' color='red' /></Segment>
                             <Segment>
-                                <p style={{ fontSize: 24 }}>0 <br /> External broken links</p>
+                                <p style={{ fontSize: 24 }}>{this.state.countExternalLink} <br /> External broken links</p>
                             </Segment>
                         </Segment.Group>
                         <Segment basic style={{ marginBottom: '-18px', marginTop: '-18px' }}>

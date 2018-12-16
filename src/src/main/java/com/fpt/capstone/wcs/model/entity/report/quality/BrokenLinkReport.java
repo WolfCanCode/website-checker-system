@@ -17,6 +17,7 @@ public class BrokenLinkReport {
     @GeneratedValue
     private Long id;
     private int httpCode;
+    private String type;
     private String httpMessage;
     private String urlPage;
     private String urlLink;
@@ -24,8 +25,9 @@ public class BrokenLinkReport {
     private boolean delFlag = true;
 
 
-    public BrokenLinkReport(int httpCode, String httpMessage, String urlPage, String urlLink) {
+    public BrokenLinkReport(int httpCode,String type, String httpMessage, String urlPage, String urlLink) {
         this.httpCode = httpCode;
+        this.type = type;
         this.httpMessage = httpMessage;
         this.urlPage = urlPage;
         this.urlLink = urlLink;
