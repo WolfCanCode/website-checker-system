@@ -8,15 +8,15 @@ import Favicons from '../assets/favicon.png';
 import Prohibited from '../assets/prohibited.png';
 
 export const menu = [
-    {
-        name: "Dashboard",
-        to: "/admin/home",
-        key: "d",
-        items: null
-    },
+    // {
+    //     name: "Dashboard",
+    //     to: "/admin/home",
+    //     key: "d",
+    //     items: null
+    // },
     {
         name: "SiteMap",
-        to: "/admin/sitemap",
+        to: "/admin/home",
         key: "sitemap",
         alt: "The sitemap of page",
         items: null
