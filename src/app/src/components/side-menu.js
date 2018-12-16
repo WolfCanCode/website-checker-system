@@ -13,7 +13,7 @@ const cookies = new Cookies();
 export default class SideMenu extends Component {
     constructor(props) {
         super(props);
-        this.state = { menuActive: "d", listMenu: [] };
+        this.state = { menuActive: "sitemap", listMenu: [] };
     }
 
     componentDidMount() {

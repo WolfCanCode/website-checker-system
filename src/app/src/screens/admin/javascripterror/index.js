@@ -30,11 +30,13 @@ export default class JavascriptErrorScreen extends Component {
     }).then(response => response.json()).then((data) => {
       console.log(data)
       // if (data.jsErrorReport.length !== 0) {
-      comp = data.jsErrorReport.map((item, index) => {
-        // var msg = item.messages.replace(item.messages.split(" ")[0], "");
-        // alert(msg);
-        return (<TableRow key={index} page={item.pages} type={item.type} messages={item.messages} />);
-      });
+      if (data.jsErrorReport !== null) {
+        comp = data.jsErrorReport.map((item, index) => {
+          // var msg = item.messages.replace(item.messages.split(" ")[0], "");
+          // alert(msg);
+          return (<TableRow key={index} page={item.pages} type={item.type} messages={item.messages} />);
+        });
+      }
       this.setState({ list: comp });
       // }
       this.setState({ loadingTable: false });

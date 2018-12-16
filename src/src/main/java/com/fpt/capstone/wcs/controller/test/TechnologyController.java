@@ -45,18 +45,20 @@ public class TechnologyController {
 
     @CrossOrigin
     @PostMapping("/api/svbehavior")
-    public ServerBehaviorReport getServerBehavior(@RequestBody UrlPOJO url) throws InterruptedException, IOException {
-//        com.fpt.capstone.wcs.service.TechnologyService technologyService = new com.fpt.capstone.wcs.service.TechnologyService();
-//        ServerBehaviorReport result = technologyService.checkServerBehavior(url);
-//        serverBehaviorRepository.save(result);
-        return null;
+    public Map<String, Object> getServerBehavior(@RequestBody RequestCommonPOJO request) throws InterruptedException, IOException {
+        return  technologyService.getServerBehavior(request);
     }
 
     @CrossOrigin
     @PostMapping("/api/svbehavior/lastest")
-    public ServerBehaviorReport getLastestServerBehavior() {
-//        ServerBehaviorReport result = serverBehaviorRepository.findAll().get(0);
-        return null;
+    public Map<String, Object> getLastestServerBehavior(@RequestBody RequestCommonPOJO request) {
+        return technologyService.getLastestServerBehavior(request);
+    }
+
+    @CrossOrigin
+    @PostMapping("/api/svbehavior/saveReport")
+    public Map<String, Object> saveServerBehaviorReport(@RequestBody RequestReportPOJO request) {
+        return technologyService.saveServerBehaviorReport(request);
     }
 
     @CrossOrigin

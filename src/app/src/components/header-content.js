@@ -111,7 +111,7 @@ export default class HeaderContent extends Component {
         if (!selectAll) {
             this.state.listDataPage.map((item, index) => {
                 pages.push(item.id);
-                return;
+                return "";
             });
         }
         fetch("/api/page/pageOption/updatePage", {
@@ -330,24 +330,49 @@ export default class HeaderContent extends Component {
                                 pages.push(defaultCheckedList[i].id);
                             }
                         }
-                        if (data.allPageOption.size > 0) {
-                            this.setState({ activeItem: data.allPageOption[0].id })
-                        }
-                        var pageOptions = data.allPageOption.map((item, index) => {
-                            return (<Menu.Item
-                                key={index}
-                                name={item.name} id={item.id}
-                                active={this.state.activeItem === item.id ? true : false}
-                                onClick={(event, context) => this.handleClick(event, context)}
-                                style={{ fontSize: 18, fontWeight: 'bolder' }}
-                            />);
-                        })
-                        var list = [];
-                        this.setState({ listPage: [] });
 
-                        if (defaultCheckedList !== null) {
-                            list = this.state.listDataPage.map((item, index) => {
-                                if (!this._checkIfItsInList(defaultCheckedList, item)) {
+                        if (data.allPageOption.length === 1) {
+                            this.setState({ activeItem: data.allPageOption[0].id })
+                            this._selectPageOption(data.allPageOption[0].id);
+                        } else {
+                            var pageOptions = data.allPageOption.map((item, index) => {
+                                return (<Menu.Item
+                                    key={index}
+                                    name={item.name} id={item.id}
+                                    active={this.state.activeItem === item.id ? true : false}
+                                    onClick={(event, context) => this.handleClick(event, context)}
+                                    style={{ fontSize: 18, fontWeight: 'bolder' }}
+                                />);
+                            })
+                            var list = [];
+                            this.setState({ listPage: [] });
+
+                            if (defaultCheckedList !== null) {
+                                list = this.state.listDataPage.map((item, index) => {
+                                    if (!this._checkIfItsInList(defaultCheckedList, item)) {
+                                        return (
+                                            <Table.Row key={index}>
+                                                <Table.Cell collapsing>
+                                                    <Checkbox toggle onClick={() => this._addPage(item.id)} />
+                                                </Table.Cell>
+                                                <Table.Cell>
+                                                    <a href={item.url} style={{ fontSize: 16 }}>{item.url}</a>
+                                                </Table.Cell>
+                                            </Table.Row>
+                                        );
+                                    } else return (
+                                        <Table.Row key={index}>
+                                            <Table.Cell collapsing>
+                                                <Checkbox toggle onClick={() => this._addPage(item.id)} checked={true} />
+                                            </Table.Cell>
+                                            <Table.Cell>
+                                                <a href={item.url} style={{ fontSize: 16 }}>{item.url}</a>
+                                            </Table.Cell>
+                                        </Table.Row>
+                                    );
+                                });
+                            } else {
+                                list = this.state.listDataPage.map((item, index) => {
                                     return (
                                         <Table.Row key={index}>
                                             <Table.Cell collapsing>
@@ -358,30 +383,8 @@ export default class HeaderContent extends Component {
                                             </Table.Cell>
                                         </Table.Row>
                                     );
-                                } else return (
-                                    <Table.Row key={index}>
-                                        <Table.Cell collapsing>
-                                            <Checkbox toggle onClick={() => this._addPage(item.id)} checked={true} />
-                                        </Table.Cell>
-                                        <Table.Cell>
-                                            <a href={item.url} style={{ fontSize: 16 }}>{item.url}</a>
-                                        </Table.Cell>
-                                    </Table.Row>
-                                );
-                            });
-                        } else {
-                            list = this.state.listDataPage.map((item, index) => {
-                                return (
-                                    <Table.Row key={index}>
-                                        <Table.Cell collapsing>
-                                            <Checkbox toggle onClick={() => this._addPage(item.id)} />
-                                        </Table.Cell>
-                                        <Table.Cell>
-                                            <a href={item.url} style={{ fontSize: 16 }}>{item.url}</a>
-                                        </Table.Cell>
-                                    </Table.Row>
-                                );
-                            });
+                                });
+                            }
                         }
 
                         this.setState({
@@ -718,7 +721,7 @@ export default class HeaderContent extends Component {
                                             {this.state.pageOptions}
                                         </Menu></Menu>
                                 </Segment>
-                                <Segment style={{ border: 0, marginBottom: 0, boxShadow: '0px 5px 15px rgba(0,0,0,0.2)', zIndex: 999 }}>
+                                {/* <Segment style={{ border: 0, marginBottom: 0, boxShadow: '0px 5px 15px rgba(0,0,0,0.2)', zIndex: 999 }}>
                                     <Checkbox
                                         radio
                                         label='All pages'
@@ -736,7 +739,7 @@ export default class HeaderContent extends Component {
                                         checked={true}
                                         onChange={() => alert('Chưa hỗ trợ')}
                                     />
-                                </Segment>
+                                </Segment> */}
                             </Segment.Group>
                             <Modal.Description style={{ maxHeight: '55vh', overflowY: 'scroll' }} >
                                 <Segment basic style={{ margin: 0, padding: 0, border: 0 }} loading={this.state.isLoading} >

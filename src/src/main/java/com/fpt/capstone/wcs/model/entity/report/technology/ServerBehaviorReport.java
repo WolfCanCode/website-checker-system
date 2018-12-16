@@ -20,6 +20,7 @@ public class ServerBehaviorReport {
     @Id
     @GeneratedValue
     private long id;
+    private String url;
     private boolean isRedirectWWW;
     private boolean isPageSSL;
     private boolean isRedirectHTTPS;

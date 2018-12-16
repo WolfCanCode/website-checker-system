@@ -29,7 +29,7 @@ import JavascriptErrorScreen from '../screens/admin/javascripterror/index';
 import GrammarScreen from '../screens/admin/grammar/index';
 import MobileLayoutScreen from '../screens/admin/mobileLayout/index';
 import ProhibitedScreen from '../screens/admin/prohibitedcontent/index';
-import serverBehaviorScreen from '../screens/admin/serverBehavior/index';
+import ServerBehaviorScreen from '../screens/admin/serverBehavior/index';
 import CookieLawScreen from '../screens/admin/cookielaw/index';
 import ConfigScreen from '../screens/admin/config/index';
 
@@ -119,7 +119,7 @@ export class RouteClient extends Component {
 }
 
 export const RouteStaff = withRouter(({ location }) => (
-    <div style={{ background: "#fff", boxShadow: "-5px 5px 15px rgba(0,0,0,0.1)", maxHeight: '74%', overflowX: "auto", margin: 'auto' }}>
+    <div style={{ background: "#fff", boxShadow: "-5px 5px 15px rgba(0,0,0,0.1)", maxHeight: '68vh', overflowX: "auto", margin: 'auto' }}>
         <TransitionGroup>
             <CSSTransition
                 key={location.key}
@@ -129,7 +129,7 @@ export const RouteStaff = withRouter(({ location }) => (
                 <Switch>
                     {/* Router for admin page*/}
 
-                    <Route path="/admin/home" exact component={Dashboard} />
+                    <Route path="/admin/home" exact component={SiteMapScreen} />
                     <Route path="/admin/sitemap" component={SiteMapScreen} />
                     <Route path="/admin/brokenLinks" component={brokenLinksScreen} />
                     <Route path="/admin/brokenPages" component={brokenPagesScreen} />
@@ -139,7 +139,7 @@ export const RouteStaff = withRouter(({ location }) => (
                     <Route path="/admin/favicons" component={faviconScreen} />
                     <Route path="/admin/contact" component={ContactScreen} />
                     <Route path="/admin/mobileLayout" component={MobileLayoutScreen} />
-                    <Route path="/admin/serverBehavior" component={serverBehaviorScreen} />
+                    <Route path="/admin/serverBehavior" component={ServerBehaviorScreen} />
                     <Route path="/admin/direction" component={DireactionScreen} />
                     <Route path="/admin/pages" component={PagesScreen} />
                     <Route path="/admin/javascripterror" component={JavascriptErrorScreen} />

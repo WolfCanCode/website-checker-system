@@ -12,4 +12,12 @@ public class RequestCommonPOJO {
     String userToken;
     Long websiteId;
     Long pageOptionId;
+//    Long pageType;
+
+//    public RequestCommonPOJO(Long userId, String userToken, Long websiteId, Long pageOptionId) {
+//        this.userId = userId;
+//        this.userToken = userToken;
+//        this.websiteId = websiteId;
+//        this.pageOptionId = pageOptionId;
+//    }
 }

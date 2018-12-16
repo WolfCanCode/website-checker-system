@@ -16,4 +16,5 @@ public class PageOptionPOJO {
     List<Long> listPageId;
     String pageOptionName;
     Long pageOptionId;
+    Long pageType;
 }

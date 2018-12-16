@@ -227,7 +227,7 @@ class speedTestScreen extends Component {
                             </Segment>
                         </Segment.Group>
 
-                        <Segment basic style={{ maxHeight: '61vh', overflow: "auto" }}>
+                        <Segment basic style={{ maxHeight: '39vh', overflow: "auto" }}>
 
                             <Table unstackable id="table-to-xls">
                                 <Table.Header >
