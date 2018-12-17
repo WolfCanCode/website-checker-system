@@ -54,7 +54,7 @@ public class ContentImpl implements  ContentService {
     }
 
     @Override
-    public Map<String, Object> getDataPagesTest(RequestCommonPOJO request) {
+    public Map<String, Object> getDataPagesTest(RequestCommonPOJO request) throws InterruptedException {
         Map<String,Object> res = new HashMap<>();
         Website website =authenticate.isAuthGetSingleSite(request);
         if (website != null) {
@@ -160,7 +160,7 @@ public class ContentImpl implements  ContentService {
     }
 
     @Override
-    public Map<String, Object> getDataRedirectTest(RequestCommonPOJO request) {
+    public Map<String, Object> getDataRedirectTest(RequestCommonPOJO request) throws InterruptedException {
         Map<String,Object> res = new HashMap<>();
         Website website =authenticate.isAuthGetSingleSite(request);
         if (website != null) {
@@ -268,7 +268,7 @@ public class ContentImpl implements  ContentService {
     }
 
     @Override
-    public Map<String, Object> getDataContactDetail(RequestCommonPOJO request) {
+    public Map<String, Object> getDataContactDetail(RequestCommonPOJO request) throws InterruptedException {
         Map<String,Object> res = new HashMap<>();
         Website website =authenticate.isAuthGetSingleSite(request);
         if (website != null) {
@@ -375,7 +375,7 @@ public class ContentImpl implements  ContentService {
     }
 
 
-    public List<PageReport> getPageInfor(List<Page> list, PageOption option)  {
+    public List<PageReport> getPageInfor(List<Page> list, PageOption option) throws InterruptedException {
         Date createdTime = new Date();
         List<PageReport> pageCheck = new ArrayList<>();
         ExecutorService executor = Executors.newFixedThreadPool(Constant.MAX_THREAD);
@@ -394,15 +394,12 @@ public class ContentImpl implements  ContentService {
                 }});
         }
         executor.shutdown();
-        try {
-            executor.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException e) {
-            Logger.getLogger(ContentImpl.class.getName()).log(Level.SEVERE, null, e);
-        }
+        executor.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+
         return pageCheck;
     }
 
-    public  List<RedirectionReport> redirectionTest(List<Page> list, PageOption option)  {
+    public  List<RedirectionReport> redirectionTest(List<Page> list, PageOption option) throws InterruptedException {
         Date createdTime = new Date();
         List<RedirectionReport> pageCheck = new ArrayList<>();
 
@@ -440,11 +437,8 @@ public class ContentImpl implements  ContentService {
             });
         }
         executor.shutdown();
-        try {
             executor.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException e) {
-            Logger.getLogger(ContentImpl.class.getName()).log(Level.SEVERE, null, e);
-        }
+
         return pageCheck;
     }
 
@@ -568,7 +562,7 @@ public class ContentImpl implements  ContentService {
 //
 //    }
 
-    public List<ContactReport> getContactDetail(List<Page> list, PageOption option){
+    public List<ContactReport> getContactDetail(List<Page> list, PageOption option) throws InterruptedException {
         Date createdTime = new Date();
         List<ContactReport> list1 = new ArrayList<>();
         final CyclicBarrier gate = new CyclicBarrier(list.size());
@@ -745,11 +739,8 @@ public class ContentImpl implements  ContentService {
                 }});
         }
         executor.shutdown();
-        try {
-            executor.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException e) {
-            Logger.getLogger(ContentImpl.class.getName()).log(Level.SEVERE, null, e);
-        }
+        executor.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+
 
         return  list1;
     }

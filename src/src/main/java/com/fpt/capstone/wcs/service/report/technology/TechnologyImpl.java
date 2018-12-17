@@ -47,6 +47,7 @@ import javax.net.ssl.SSLException;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -695,7 +696,9 @@ public class TechnologyImpl implements TechnologyService {
         byte[] b = new byte[0];
         try {
             URL urlTesst = new URL(url);
-            URLConnection uc = urlTesst.openConnection();
+            HttpURLConnection uc = (HttpURLConnection) urlTesst.openConnection();
+            uc.setRequestMethod("GET");
+            uc.setRequestProperty("User-Agent","Mozilla/5.0 ");
             int len = uc.getContentLength();
             InputStream in = new BufferedInputStream(uc.getInputStream());
 

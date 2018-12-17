@@ -423,7 +423,7 @@ class missingFilesScreen extends Component {
                                 <Table.HeaderCell>Files</Table.HeaderCell>
                                 <Table.HeaderCell>Description</Table.HeaderCell>
                                 <Table.HeaderCell>Pages</Table.HeaderCell>
-                                <Table.HeaderCell>Action</Table.HeaderCell>
+                                {/* <Table.HeaderCell>Action</Table.HeaderCell> */}
 
                             </Table.Row>
                         </Table.Header>

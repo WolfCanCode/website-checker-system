@@ -19,7 +19,7 @@ public interface QualityService {
     public Map<String, Object> getLastestProhibitedContent(RequestCommonPOJO request);
     public Map<String, Object> saveProhibitedContentReport(RequestReportPOJO request);
     //Missing File
-    public Map<String, Object> getMissingFile(MissingFilePOJO request);
+    public Map<String, Object> getMissingFile(MissingFilePOJO request) throws InterruptedException;
     public Map<String, Object> getLastestMissingFile(MissingFilePOJO request);
     public Map<String, Object> saveMissingFileReport(RequestReportPOJO request);
 }

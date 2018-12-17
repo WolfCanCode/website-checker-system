@@ -16,7 +16,7 @@ export default class TableRow extends Component {
                     </div>);
                 })}
             </Table.Cell>
-            <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}><Button>Edit</Button></Table.Cell>
+            {/* <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}><Button>Edit</Button></Table.Cell> */}
             
 
             
