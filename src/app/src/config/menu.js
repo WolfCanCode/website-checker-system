@@ -53,7 +53,7 @@ export const menu = [
                 name: "Missing files test",
                 to: "/admin/missingFiles",
                 key: "test5",
-                alt: "This for test alt title",
+                alt: "Missing file test for checking file file used by a webpage (such as an image, document or stylesheet) that was not loaded for any reason.",
                 image: MissingFile
             }, {
                 name: "Prohibited content test",
@@ -98,7 +98,7 @@ export const menu = [
                 name: "Favicons Test",
                 to: "/admin/favicons",
                 key: "test10",
-                alt: "This for test alt title",
+                alt: "This test checks whether this website correctly defines Favicons, which are icons used to represent the website.",
                 image: Favicons
             },
             {
@@ -120,18 +120,18 @@ export const menu = [
                 name: "Contact Details",
                 to: "/admin/contact",
                 key: "test13",
-                alt: "This for test alt title"
+                alt: "This test lists all contact details – phone numbers and email addresses – that it is able to detect within the website."
             },
             {
                 name: "Redirection Test",
                 to: "/admin/direction",
                 key: "test14",
-                alt: "This for test alt title"
+                alt: "This test identifies redirections, i.e. where visiting a URL redirects to another URL."
             }, {
                 name: "Pages Test",
                 to: "/admin/pages",
                 key: "test15",
-                alt: "This for test alt title"
+                alt: "This test identifies title, canonical url and status code of webpage."
             }
         ]
     }
