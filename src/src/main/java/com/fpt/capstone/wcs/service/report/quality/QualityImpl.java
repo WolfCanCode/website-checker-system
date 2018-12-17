@@ -1125,6 +1125,14 @@ public class QualityImpl implements QualityService {
                                                     }
                                                     if (400 <= checkCode) {
                                                         String checkAgain = urlRoot + strChcek;
+                                                        String newStCheck = "";
+                                                        if(strChcek.startsWith("../")){
+                                                            newStCheck = strChcek.replaceFirst("../","/");
+                                                            System.out.println(newStCheck);
+                                                            checkAgain= urlRoot+ newStCheck;
+                                                        }
+
+
                                                         System.out.println("Check Again: " + checkAgain);
                                                         int codeCheckAgain = CheckHTTPResponse.verifyHttpMessage(checkAgain);
                                                         if (codeCheckAgain < 400) {
@@ -1142,7 +1150,14 @@ public class QualityImpl implements QualityService {
                                                             System.out.println("Image Again: " + checkAgain + " - Code:" + codeCheckAgain);
                                                         }
                                                         if (400 <= codeCheckAgain) {
+
                                                             String checkLast = "https:" + strChcek;
+                                                            String newStCheckLast = "";
+                                                            if(strChcek.startsWith("../")){
+                                                                newStCheckLast = strChcek.replaceFirst("../","/");
+                                                                System.out.println(newStCheck);
+                                                                checkLast= "https:"+ newStCheckLast;
+                                                            }
                                                             int codeCheclast = CheckHTTPResponse.verifyHttpMessage(checkLast);
                                                             if (codeCheclast < 400) {
                                                                 byte[] capacity = getBytes(checkLast);
@@ -1221,6 +1236,7 @@ public class QualityImpl implements QualityService {
                                                 }
                                             }
                                         }
+
         return  missing;
     }
     public List<ProhibitedContentReport> prohibitedContentService(List<Page> list, PageOption option) throws InterruptedException {

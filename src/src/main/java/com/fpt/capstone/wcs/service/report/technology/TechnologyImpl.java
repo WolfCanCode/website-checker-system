@@ -623,7 +623,7 @@ public class TechnologyImpl implements TechnologyService {
                             if (codeResspone < 400) {
 
                                 Document doc = Jsoup.connect(urlNew).ignoreContentType(true).get();
-                                Elements elem = doc.head().select("link[rel~=(shortcut icon|icon|apple-touch-icon-precomposed|nokia-touch-icon)]");
+                                Elements elem = doc.head().select("link[rel~=(SHORTCUT ICON|shortcut icon|Shortcut Icon|ICON|Icon|icon|APPLE-TOUCH-ICON-PRECOMPOSED|apple-touch-icon-precomposed|Apple-Touch-Icon-Precomposed|nokia-touch-icon)]");
                                 System.out.println(elem.size());
                                 if (elem.size() == 0) {
                                     FaviconReport favicon = new FaviconReport("Missing Favicon", urlNew, "", "undefine");
