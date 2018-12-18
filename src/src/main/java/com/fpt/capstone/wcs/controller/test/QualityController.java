@@ -29,36 +29,49 @@ public class QualityController {
 
     @Autowired
     SpellingTestService spellingTestService;
+//
+//    @CrossOrigin
+//    @Transactional
+//    @GetMapping("/api/spelling")
+//    public boolean checkExistWord(@RequestParam("word") String word) throws InterruptedException {
+//        return trieService.isExistInDictionary(word);
+//    }
+//
+//    @CrossOrigin
+//    @Transactional
+//    @GetMapping("/api/testNsuggest")
+//    public List<SpellingReport> checkExistWord() throws InterruptedException {
+//
+//        return spellingTestService.testSpelling(Arrays.asList(), trieService);
+//    }
 
     @CrossOrigin
     @Transactional
-    @GetMapping("/api/spelling")
-    public boolean checkExistWord(@RequestParam("word") String word) throws InterruptedException {
-        return trieService.isExistInDictionary(word);
-    }
-
-    @CrossOrigin
-    @Transactional
-    @GetMapping("/api/testNsuggest")
-    public List<SpellingReport> checkExistWord() throws InterruptedException {
-
-        return spellingTestService.testSpelling(Arrays.asList(), trieService);
-    }
-
-    @CrossOrigin
-    @Transactional
-    @PostMapping("/api/getWrongWords")
+    @PostMapping("/api/spelling/getWrongWords")
     public Map<String, Object> getSpellingMistake(@RequestBody RequestCommonPOJO request) throws InterruptedException {
         return spellingTestService.getSpellingMistakes(request, trieService);
     }
 
     @CrossOrigin
     @Transactional
-    @PostMapping("/api/getSuggestion")
+    @PostMapping("/api/spelling/getSuggestion")
     public Map<String, Object> getSuggestion(@RequestBody SpellingSuggestionRequestPOJO request) throws InterruptedException {
         return spellingTestService.getSuggestion(request, trieService);
     }
 
+    @CrossOrigin
+    @Transactional
+    @PostMapping("/api/spelling/save")
+    public Map<String, Object> saveData(@RequestBody RequestReportPOJO request) throws InterruptedException {
+        return spellingTestService.saveSpellingTestResult(request);
+    }
+
+    @CrossOrigin
+    @Transactional
+    @PostMapping("/api/spelling/loadData")
+    public Map<String, Object> loadData(@RequestBody RequestCommonPOJO request) throws InterruptedException {
+        return spellingTestService.loadPreviousSpellingTestResult(request);
+    }
 
 
     @CrossOrigin

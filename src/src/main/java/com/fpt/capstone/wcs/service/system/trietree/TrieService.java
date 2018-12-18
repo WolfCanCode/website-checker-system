@@ -7,12 +7,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 @Service
 public class TrieService {
     private TrieNodePOJO root;
     private List<String> suggestList;
+    private HashSet<String> differSuggest;
     final EnglishDictionaryRepository dictionaryRepository;
 
     @Autowired
@@ -20,6 +22,7 @@ public class TrieService {
         this.dictionaryRepository = dictionaryRepository;
         this.root = new TrieNodePOJO();
         this.suggestList = new ArrayList<>();
+        this.differSuggest = new HashSet<>();
         buildTrieTree();
     }
 
@@ -36,7 +39,9 @@ public class TrieService {
     }
 
     public List<String> getSuggestList(String word) {
+        word = word.toLowerCase();
         this.suggestList.clear();
+        this.differSuggest.clear();
         inspectWordApplyTrieTree(word, "", 0, 1, this.root);
         return this.suggestList;
     }
@@ -49,7 +54,6 @@ public class TrieService {
                 String w = word.getWord();
                 String type = word.getType();
                 String definition = word.getDefinition();
-                System.out.println("************" + w);
                 addWordToTrie(w, type, definition);
             }
         }
@@ -101,8 +105,10 @@ public class TrieService {
 
         if (position == word.length()) {
             if (node.isLeaf()) {
-                if (this.suggestList.size() < 3)
-                    this.suggestList.add(word);
+                if (this.suggestList.size() < 3 && !this.differSuggest.contains(suggestWord)) {
+                    this.suggestList.add(suggestWord);
+                    this.differSuggest.add(suggestWord);
+                }
             }
             return;
         }
@@ -146,20 +152,16 @@ public class TrieService {
     }
 
     public boolean isExistInDictionary(String word) {
-
         TrieNodePOJO curr = this.root;
-
         for (int i = 0; i < word.length(); i++) {
             char letter = word.toLowerCase().charAt(i);
             int pos = (int) letter - 'a';
-
             if (pos < 0 || pos > 26) {
                 return false;
             }
             if (curr.getRefNode().get(pos) == null) {
                 return false;
             }
-
             curr = curr.getRefNode().get(pos);
         }
         return curr.isLeaf();
@@ -173,7 +175,6 @@ public class TrieService {
         if (node.isLeaf()) {
             System.out.println(buffer);
         }
-
         for (int i = 0; i < 26; i++) {
             Character ch = new Character((char) ('a' + i));
             printTree(node.getRefNode().get(i), buffer + ch);

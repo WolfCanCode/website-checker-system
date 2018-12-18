@@ -21,23 +21,20 @@ public class SpellingReport {
     private long id;
 
     @NotNull
-//    @JsonIgnore
     private String wrongWord;
 
     @NotNull
-//    @JsonIgnore
+    @Column(columnDefinition = "MEDIUMTEXT")
     private String excerpt;
 
     @NotNull
-//    @JsonIgnore
-    private int pageId;
 
-//    @NotNull
-    @JsonIgnore
+    private String page;
+
+
     private String decision; // ignore - fix
 
-//    @NotNull
-    @JsonIgnore
+
     private String selectedSuggestion; // if fix, keep selected word, else null
 
     private Date createdTime;
