@@ -19,10 +19,7 @@ import com.fpt.capstone.wcs.model.entity.report.technology.ServerBehaviorReport;
 import com.fpt.capstone.wcs.model.entity.user.User;
 import com.fpt.capstone.wcs.model.entity.user.Website;
 import com.fpt.capstone.wcs.model.entity.website.*;
-import com.fpt.capstone.wcs.model.pojo.ManagerRequestPOJO;
-import com.fpt.capstone.wcs.model.pojo.ReportPOJO;
-import com.fpt.capstone.wcs.model.pojo.RequestCommonPOJO;
-import com.fpt.capstone.wcs.model.pojo.WebsitePOJO;
+import com.fpt.capstone.wcs.model.pojo.*;
 import com.fpt.capstone.wcs.repository.report.content.ContactDetailRepository;
 import com.fpt.capstone.wcs.repository.report.content.LinkRedirectionRepository;
 import com.fpt.capstone.wcs.repository.report.content.PageTestRepository;
@@ -40,7 +37,9 @@ import com.fpt.capstone.wcs.repository.user.RoleRepository;
 import com.fpt.capstone.wcs.repository.user.UserRepository;
 import com.fpt.capstone.wcs.repository.user.WebsiteRepository;
 import com.fpt.capstone.wcs.repository.website.*;
+import com.fpt.capstone.wcs.service.report.quality.QualityService;
 import com.fpt.capstone.wcs.service.system.authenticate.AuthenticateImpl;
+import com.fpt.capstone.wcs.service.system.sitemapProc.SiteMapProcService;
 import com.fpt.capstone.wcs.utils.Constant;
 import com.fpt.capstone.wcs.utils.EncodeUtil;
 import org.apache.catalina.Server;
@@ -98,6 +97,8 @@ public class ManagerImpl implements ManagerService {
     JSRepository jsRepository;
     final
     ServerBehaviorRepository serverBehaviorRepository;
+    final
+    QualityService qualityService;
 
     @Autowired
     public ManagerImpl(AuthenticateImpl authenticate,
@@ -122,7 +123,8 @@ public class ManagerImpl implements ManagerService {
                        CookieRepository cookieRepository,
                        FaviconRepository faviconRepository,
                        JSRepository jsRepository,
-                       ServerBehaviorRepository serverBehaviorRepository
+                       ServerBehaviorRepository serverBehaviorRepository,
+                       QualityService qualityService
     ) {
         this.authenticate = authenticate;
         this.userRepository = userRepository;
@@ -148,6 +150,7 @@ public class ManagerImpl implements ManagerService {
         this.jsRepository = jsRepository;
         this.pageTestRepository = pageTestRepository;
         this.serverBehaviorRepository = serverBehaviorRepository;
+        this.qualityService = qualityService;
     }
 
     @Override
@@ -647,7 +650,7 @@ public class ManagerImpl implements ManagerService {
         User manager = authenticate.isAuthAndManagerGet(request);
         if (manager != null) {
         //Speed test
-        List<SpeedTestReport> speedList = speedtestRepository.findAllGroupByCreatedTime();
+        List<SpeedTestReport> speedList = speedtestRepository.findAllGroupByCreatedTime(request.getManagerId());
         List<ReportPOJO> speedTestList = new ArrayList<>();
         for (SpeedTestReport item : speedList) {
             ReportPOJO report = new ReportPOJO();
@@ -661,7 +664,7 @@ public class ManagerImpl implements ManagerService {
             speedTestList.add(report);
         }
 
-        List<ContactReport> contactList = contactDetailRepository.findAllGroupByCreatedTime();
+        List<ContactReport> contactList = contactDetailRepository.findAllGroupByCreatedTime(request.getManagerId());
         List<ReportPOJO> contactTestList = new ArrayList<>();
         for (ContactReport item : contactList) {
             ReportPOJO report = new ReportPOJO();
@@ -675,7 +678,7 @@ public class ManagerImpl implements ManagerService {
             contactTestList.add(report);
         }
 
-        List<RedirectionReport> redirectionList = linkRedirectionRepository.findAllGroupByCreatedTime();
+        List<RedirectionReport> redirectionList = linkRedirectionRepository.findAllGroupByCreatedTime(request.getManagerId());
         List<ReportPOJO> redirectionTestList = new ArrayList<>();
         for (RedirectionReport item : redirectionList) {
             ReportPOJO report = new ReportPOJO();
@@ -689,7 +692,7 @@ public class ManagerImpl implements ManagerService {
             redirectionTestList.add(report);
         }
 
-        List<PageReport> pageList = pageTestRepository.findAllGroupByCreatedTime();
+        List<PageReport> pageList = pageTestRepository.findAllGroupByCreatedTime(request.getManagerId());
         List<ReportPOJO> pageTestList = new ArrayList<>();
         for (PageReport item : pageList) {
             ReportPOJO report = new ReportPOJO();
@@ -703,7 +706,7 @@ public class ManagerImpl implements ManagerService {
             pageTestList.add(report);
         }
 
-        List<MobileLayoutReport> mobileList = mobileLayoutRepository.findAllGroupByCreatedTime();
+        List<MobileLayoutReport> mobileList = mobileLayoutRepository.findAllGroupByCreatedTime(request.getManagerId());
         List<ReportPOJO> mobileTestList = new ArrayList<>();
         for (MobileLayoutReport item : mobileList) {
             ReportPOJO report = new ReportPOJO();
@@ -717,7 +720,7 @@ public class ManagerImpl implements ManagerService {
             mobileTestList.add(report);
         }
 
-        List<BrokenLinkReport> brokenLinkList = brokenLinkRepository.findAllGroupByCreatedTime();
+        List<BrokenLinkReport> brokenLinkList = brokenLinkRepository.findAllGroupByCreatedTime(request.getManagerId());
         List<ReportPOJO> brokenLinkTestList = new ArrayList<>();
         for (BrokenLinkReport item : brokenLinkList) {
             ReportPOJO report = new ReportPOJO();
@@ -731,7 +734,7 @@ public class ManagerImpl implements ManagerService {
             brokenLinkTestList.add(report);
         }
 
-        List<BrokenPageReport> brokenPageList = brokenPageRepository.findAllGroupByCreatedTime();
+        List<BrokenPageReport> brokenPageList = brokenPageRepository.findAllGroupByCreatedTime(request.getManagerId());
         List<ReportPOJO> brokenPageTestList = new ArrayList<>();
         for (BrokenPageReport item : brokenPageList) {
             ReportPOJO report = new ReportPOJO();
@@ -745,7 +748,7 @@ public class ManagerImpl implements ManagerService {
             brokenPageTestList.add(report);
         }
 
-        List<MissingFileReport> missingList = missingFilesPagesRepository.findAllGroupByCreatedTime();
+        List<MissingFileReport> missingList = missingFilesPagesRepository.findAllGroupByCreatedTime(request.getManagerId());
         List<ReportPOJO> missingTestList = new ArrayList<>();
         for (MissingFileReport item : missingList) {
             ReportPOJO report = new ReportPOJO();
@@ -759,7 +762,7 @@ public class ManagerImpl implements ManagerService {
             missingTestList.add(report);
         }
 
-        List<ProhibitedContentReport> prohibitedList = prohibitedContentRepository.findAllGroupByCreatedTime();
+        List<ProhibitedContentReport> prohibitedList = prohibitedContentRepository.findAllGroupByCreatedTime(request.getManagerId());
         List<ReportPOJO> prohibitedTestList = new ArrayList<>();
         for (ProhibitedContentReport item : prohibitedList) {
             ReportPOJO report = new ReportPOJO();
@@ -773,7 +776,7 @@ public class ManagerImpl implements ManagerService {
             prohibitedTestList.add(report);
         }
 
-        List<CookieReport> cookieList = cookieRepository.findAllGroupByCreatedTime();
+        List<CookieReport> cookieList = cookieRepository.findAllGroupByCreatedTime(request.getManagerId());
         List<ReportPOJO> cookieTestList = new ArrayList<>();
         for (CookieReport item : cookieList) {
             ReportPOJO report = new ReportPOJO();
@@ -787,7 +790,7 @@ public class ManagerImpl implements ManagerService {
             cookieTestList.add(report);
         }
 
-        List<FaviconReport> faviconList = faviconRepository.findAllGroupByCreatedTime();
+        List<FaviconReport> faviconList = faviconRepository.findAllGroupByCreatedTime(request.getManagerId());
         List<ReportPOJO> faviconTestList = new ArrayList<>();
         for (FaviconReport item : faviconList) {
             ReportPOJO report = new ReportPOJO();
@@ -801,7 +804,7 @@ public class ManagerImpl implements ManagerService {
             faviconTestList.add(report);
         }
 
-        List<JavascriptReport> jsList = jsRepository.findAllGroupByCreatedTime();
+        List<JavascriptReport> jsList = jsRepository.findAllGroupByCreatedTime(request.getManagerId());
         List<ReportPOJO> jsTestList = new ArrayList<>();
         for (JavascriptReport item : jsList) {
             ReportPOJO report = new ReportPOJO();
@@ -815,7 +818,7 @@ public class ManagerImpl implements ManagerService {
             jsTestList.add(report);
         }
 
-        List<ServerBehaviorReport> serverList = serverBehaviorRepository.findAllGroupByCreatedTime();
+        List<ServerBehaviorReport> serverList = serverBehaviorRepository.findAllGroupByCreatedTime(request.getManagerId());
         List<ReportPOJO> serverTestList = new ArrayList<>();
         for (ServerBehaviorReport item : serverList) {
             ReportPOJO report = new ReportPOJO();
@@ -882,6 +885,69 @@ public class ManagerImpl implements ManagerService {
             return res;
         }
     }
+
+    @Override
+    public Map<String, Object> autoguest(GuestPOJO request) throws MalformedURLException, InterruptedException {
+        Map<String, Object> res = new HashMap<>();
+        SiteMapProcService sms = new SiteMapProcService(request.getUrl());
+        sms.buildSiteMap();
+        List<Page> pages = sms.getAllPage(null,null);
+        List<Page> pagesForTest = new ArrayList<>();
+        for(int i = 0 ; i< 5; i++)
+        {
+            if(!pages.get(i).getUrl().equals("url")) {
+                pagesForTest.add(pages.get(i));
+            }
+        }
+
+        if(pagesForTest.size()!=5)
+        {
+            pagesForTest.add( pages.get(5));
+        }
+        String generateName = EncodeUtil.generateAuthToken();
+        PageOption pageOption = new PageOption();
+        pageOption.setName(generateName);
+        PageOption option = pageOptionRepository.save(pageOption);
+        List<Thread> threads = new ArrayList<>();
+        threads.add(new Thread(() -> {
+            try {
+              brokenLinkRepository.saveAll(qualityService.brokenLinkService(pagesForTest,option));
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }));
+        threads.add(new Thread(() -> {
+            try {
+               missingFilesPagesRepository.saveAll(qualityService.getMissingFile(pagesForTest,option, request.getUrl()));
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }));
+
+        for(Thread thread : threads)
+        {
+            thread.start();
+        }
+        res.put("token", generateName);
+        return res;
+    }
+
+    @Override
+    public Map<String, Object> getGuestBrokenLink(GuestPOJO request) {
+        PageOption pageOption = pageOptionRepository.findOneByName(request.getPageOptionName());
+        Map<String,Object> res = new HashMap<>();
+        res.put("data", brokenLinkRepository.findAllByPageOption(pageOption));
+        return res;
+    }
+
+    @Override
+    public Map<String, Object> getGuestMissingFile(GuestPOJO request) {
+        PageOption pageOption = pageOptionRepository.findOneByName(request.getPageOptionName());
+        Map<String,Object> res = new HashMap<>();
+        res.put("data", missingFilesPagesRepository.findAllByPageOption(pageOption));
+        return res;
+    }
+
 
 
 }

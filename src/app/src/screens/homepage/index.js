@@ -13,7 +13,9 @@ import {
   Segment,
   Sidebar,
   Visibility,
-  Input
+  Input,
+  Dimmer,
+  Progress
 } from 'semantic-ui-react'
 import 'semantic-ui-css/semantic.min.css';
 import logo from '../../assets/icon-wsc.png';
@@ -22,6 +24,8 @@ import laptop from '../../assets/laptop.png';
 import {
   Link
 } from "react-router-dom";
+import { Cookies } from "react-cookie";
+const cookies = new Cookies();
 //layout 
 const HomepageHeading = ({ mobile }) => (
   <Container text>
@@ -57,7 +61,7 @@ HomepageHeading.propTypes = {
 
 
 class DesktopContainer extends Component {
-  state = { txtSearch: "", searchLoading: false }
+  state = { txtSearch: "", searchLoading: false, percent: 0 }
 
   hideFixedMenu = () => this.setState({ fixed: false })
   showFixedMenu = () => this.setState({ fixed: true })
@@ -86,6 +90,11 @@ class DesktopContainer extends Component {
               size='large'
             >
               <Container>
+                {this.state.searchLoading ? <Dimmer active>
+                  <h1>Wait a little bit...</h1>
+                  <Progress style={{ width: 600 }} percent={this.state.percent} indicating />
+
+                </Dimmer> : ""}
 
                 <Menu.Item as='a' position="left" >
                   <Image src={logo} style={{ width: '50px', height: 'auto' }} />
@@ -111,7 +120,7 @@ class DesktopContainer extends Component {
               </Container>
             </Menu>
             <HomepageHeading />
-            <Input size='big' loading={this.state.searchLoading} label='http://' icon={<Icon name='search' inverted circular link onClick={() => this.onClickSearch()} />} placeholder='mysite.com' style={{ marginTop: '30px' }} value={this.state.txtSearch} onChange={event => this.onChangeText(event)} />
+            <Input size='big' type="" icon={<Icon name='search' inverted circular link onClick={() => this.onClickSearch()} />} placeholder='mysite.com' style={{ marginTop: '30px' }} value={this.state.txtSearch} onChange={event => this.onChangeText(event)} />
             <Image style={{ position: 'relative', width: '80vh', margin: 'auto', top: '5vh', }} src={laptop} />
 
           </Segment>
@@ -132,12 +141,51 @@ class DesktopContainer extends Component {
   }
 
   onClickSearch() {
-    if (this.state.txtSearch === "") { alert('Please input exact your website'); }
+    if (this.state.txtSearch === "" || !this.isURL(this.state.txtSearch)) { alert('Please input exact your website'); }
     else {
+      cookies.remove("u_id");
       this.setState({
         searchLoading: true
       });
+      setInterval(() => {
+        this.setState({
+          percent: this.state.percent + 1
+        });
+        if (this.state.percent >= 90) {
+          clearInterval();
+        }
+      }, 1000);
+
+      fetch("/api/guest/get", {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ "url": this.state.txtSearch })
+      }).then(response => response.json()).then((res) => {
+        if (res.token !== undefined && res.token !== null) {
+          this.setState({
+            percent: 100
+          });
+          cookies.set("u_guest_token", res.token, { path: "/" });
+          window.location.href = "../guest/brokenLink";
+        }
+      });
     }
+
+
+  }
+
+  isURL(str) {
+    var pattern = new RegExp('^(https?:\\/\\/)?' + // protocol
+      '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name and extension
+      '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
+      '(\\:\\d+)?' + // port
+      '(\\/[-a-z\\d%@_.~+&:]*)*' + // path
+      '(\\?[;&a-z\\d%@_.,~+&:=-]*)?' + // query string
+      '(\\#[-a-z\\d_]*)?$', 'i'); // fragment locator
+    return pattern.test(str);
   }
 }
 
@@ -189,6 +237,7 @@ class MobileContainer extends Component {
               vertical
             >
               <Container>
+
                 <Menu inverted pointing secondary size='large'>
                   <Menu.Item onClick={this.handleToggle}>
                     <Icon name='sidebar' />
@@ -213,6 +262,7 @@ class MobileContainer extends Component {
             {children}
           </Sidebar.Pusher>
         </Sidebar.Pushable>
+
       </Responsive>
     )
   }

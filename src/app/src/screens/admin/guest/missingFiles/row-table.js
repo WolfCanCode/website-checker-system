@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Table} from 'semantic-ui-react'
+import { Table } from 'semantic-ui-react'
 
 
 export default class TableRow extends Component {

@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import { Segment, Sidebar, Image } from 'semantic-ui-react'
-import { RouteManager, RouteStaff } from '../../config/routes';
+import { RouteManager, RouteStaff, RouteGuest } from '../../config/routes';
 import { BrowserRouter as Router } from "react-router-dom";
 import SideMenu from '../../components/side-menu';
 import HeaderContent from '../../components/header-content';
 import HeaderAdmin from '../../components/header-admin';
-import { menu, menuMan } from '../../config/menu';
+import { menu, menuMan, menuGuest } from '../../config/menu';
 import { Cookies } from "react-cookie";
 const cookies = new Cookies();
 
@@ -42,8 +42,12 @@ export default class AdminScreen extends Component {
                 this.setState({ done: true });
                 this.setState({ loadingContent: false, successLoad: true });
             } else {
-                alert("Phiên đăng nhập hết hạn");
-                return window.location = "../login";
+                if (cookies.get("u_guest_token")) {
+                    this.setState({ loadingContent: false, successLoad: true });
+                } else {
+                    alert("Phiên đăng nhập hết hạn");
+                    return window.location = "../login";
+                }
             }
         });
     }
@@ -52,9 +56,13 @@ export default class AdminScreen extends Component {
         var menuList = null;
         if (cookies.get("u_isManager") === "true") {
             menuList = menuMan;
-        } else {
-            menuList = menu;
-        }
+        } else
+            if (cookies.get("u_guest_token") !== undefined) {
+                menuList = menuGuest;
+            }
+            else {
+                menuList = menu;
+            }
         for (let i = 0; i < menuList.length; i++) {
             if (menuList[i].items === null) {
                 if (menuList[i].to === this.props.location.pathname) {
@@ -124,7 +132,7 @@ export default class AdminScreen extends Component {
                             <Image src={this.state.imageSrc} size='medium' style={{ margin: 'auto', position: 'absolute', zIndex: '999999', marginLeft: '86vw', marginTop: '8vh', height: 120, width: 'auto', transition: 'all 1s' }} />
                             <Segment style={{ background: "#F5F5F5", marginLeft: `${this.state.marginBody}px`, marginRight: '10px', marginTop: '60px', height: '90vh', minWidth: 300, overflow: 'auto', transition: "all 0.6s" }}>
                                 <HeaderContent title={this.state.titleHeader} alt={this.state.altHeader} doneRenderWeb={this.state.done} />
-                                {cookies.get("u_isManager") === "true" ? <RouteManager /> : <RouteStaff />}
+                                {cookies.get("u_isManager") === "true" ? <RouteManager /> : cookies.get("u_id") === undefined && cookies.get("u_guest_token") !== undefined ? <RouteGuest /> : <RouteStaff />}
                             </Segment>
                         </Sidebar.Pusher>
                     </Sidebar.Pushable> : ""}

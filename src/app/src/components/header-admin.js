@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-import { Input, Dropdown, Menu, Icon, Image } from 'semantic-ui-react';
+import { Dropdown, Menu, Icon, Image } from 'semantic-ui-react';
 // import { Redirect } from "react-router-dom";
 import { Cookies } from "react-cookie";
 import avatar from "../assets/avatar.png";
@@ -27,7 +27,7 @@ class HeaderAdmin extends Component {
                 body: JSON.stringify({ "userId": cookies.get("u_id"), "userToken": cookies.get("u_token") })
             }).then(response => response.json()).then((data) => {
                 if (data.action === "SUCCESS") {
-                    if (data.website.length === 0) {
+                    if (data.website.length === 0 && cookies.get("u_guest_token") === undefined) {
                         this._doLogout();
                     }
                     var list = data.website.map((item, index) => {
@@ -56,7 +56,7 @@ class HeaderAdmin extends Component {
 
                         this.props.isRenderWeb(true);
                     });
-                } else {
+                } else if (cookies.get("u_guest_token") === undefined) {
                     this._doLogout();
                 }
             });
@@ -80,7 +80,7 @@ class HeaderAdmin extends Component {
 
                     this.setState({ account_name: data.fullname, trigger: trigger });
 
-                } else {
+                } else if (cookies.get("u_guest_token") === undefined) {
                     this._doLogout();
                 }
             });
@@ -122,14 +122,14 @@ class HeaderAdmin extends Component {
         return (
             <Menu className="top" style={{ background: 'rgb(55, 33, 173)', position: 'absolute', width: '100%', zIndex: '6', margin: '0', height: '50px' }}>
                 <Menu.Item><Icon className='bars' style={{ color: "white", cursor: "pointer", marginLeft: `${this.state.marginBody}px`, transition: "all 0.6s" }} onClick={() => this._hideShowSideBar()} /></Menu.Item>
-                {cookies.get("u_isManager") !== "true" ? <Menu.Item><Dropdown key="1" onChange={(event, data) => this._changeWebPage(event, data)} options={this.state.listWeb} value={this.state.valWebpage} style={{ color: 'white', fontSize: '18px' }} /></Menu.Item> : ""}
+                {cookies.get("u_isManager") !== "true" && cookies.get("u_guest_token") === undefined ? <Menu.Item><Dropdown key="1" onChange={(event, data) => this._changeWebPage(event, data)} options={this.state.listWeb} value={this.state.valWebpage} style={{ color: 'white', fontSize: '18px' }} /></Menu.Item> : ""}
                 <Menu.Menu position='right'>
-                    <Menu.Item>
+                    {/* <Menu.Item>
                         <Input icon='search' placeholder='Search...' />
-                    </Menu.Item>
-                    <Menu.Item>
+                    </Menu.Item> */}
+                    {cookies.get("u_guest_token") === undefined ? <Menu.Item>
                         <Dropdown trigger={this.state.trigger} options={userOptions} pointing='top left' icon={null} />
-                    </Menu.Item>
+                    </Menu.Item> : ""}
 
                     <Menu.Item style={{ background: 'red', color: 'white', fontWeight: 'bold', fontSize: 16, margin: 0 }}
                         name='logout'

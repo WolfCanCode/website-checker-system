@@ -1,6 +1,7 @@
 package com.fpt.capstone.wcs.service.system.manager;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fpt.capstone.wcs.model.pojo.GuestPOJO;
 import com.fpt.capstone.wcs.model.pojo.ManagerRequestPOJO;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,5 +30,10 @@ public interface ManagerService {
     //dashboard
     public Map<String, Object> getReportDetail(ManagerRequestPOJO request);
     public Map<String, Object> getAllReport(ManagerRequestPOJO request);
+
+    //guest
+    public Map<String, Object> autoguest(GuestPOJO request) throws MalformedURLException, InterruptedException;
+    public Map<String, Object> getGuestBrokenLink(GuestPOJO request) ;
+    public Map<String, Object> getGuestMissingFile(GuestPOJO request);
 
 }

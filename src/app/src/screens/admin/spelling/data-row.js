@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Segment, Button, Table, Icon, Input, Label } from 'semantic-ui-react';
+import { Button, Table, Icon } from 'semantic-ui-react';
 
 
 export default class TableRow extends Component {

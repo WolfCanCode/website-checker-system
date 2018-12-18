@@ -109,6 +109,7 @@ class LoginScreen extends Component {
             cookies.set("u_id", user.id, { path: "/" });
             cookies.set("u_token", user.token, { path: "/" });
             cookies.set("u_isManager", user.isManager, { path: "/" });
+            cookies.remove("u_guest_token");
             this.setState({ isLogin: true });
             window.location.href = "../login";
         }

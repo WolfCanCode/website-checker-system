@@ -38,6 +38,9 @@ import ManageStaffManagerScreen from '../screens/admin/manager/managestaff/index
 import ManageWebsiteManagerScreen from '../screens/admin/manager/managewebsite/index';
 import ManageWordListManagerScreen from '../screens/admin/manager/managewordlist/index';
 
+import GuestBrokenLink from '../screens/admin/guest/brokenLinks/index';
+import GuestMissingFile from '../screens/admin/guest/missingFiles/index';
+
 import Error404 from '../screens/admin/error404/index';
 import { Cookies } from "react-cookie";
 
@@ -51,8 +54,11 @@ const cookies = new Cookies();
 const PrivateRoute = ({ component: Component, ...rest }) => {
     var isManager = cookies.get("u_isManager");
     var isUser = cookies.get("u_id");
+    var guestToken = cookies.get("u_guest_token");
     if (isUser === undefined) {
-
+        if (guestToken !== undefined && guestToken !== null) {
+            return (window.location = './guest/brokenLink');
+        }
     } else {
         if (isManager === "true") {
             return (
@@ -107,6 +113,7 @@ export class RouteClient extends Component {
                 <Route path="/admin" component={AdminScreen} />
                 <Route path="/wcs-lab" component={LAB} />
                 <Route path="/manager" component={AdminScreen} />
+                <Route path="/guest" component={AdminScreen} />
                 <Route path="/login" exact component={LoginScreen} />
                 <Route path="/register" component={RegisterScreen} />
                 <PrivateRoute path='/authenticate' />
@@ -157,6 +164,29 @@ export const RouteStaff = withRouter(({ location }) => (
 ));
 
 
+export const RouteGuest = withRouter(({ location }) => (
+    <div style={{ background: "#fff", boxShadow: "-5px 5px 15px rgba(0,0,0,0.1)", maxHeight: '78vh', overflowX: "auto", margin: 'auto' }}>
+        <TransitionGroup>
+            <CSSTransition
+                key={location.key}
+                classNames='fade'
+                timeout={800}
+            >
+                <Switch>
+                    {/* Router for admin page*/}
+
+                    <Route path="/guest/brokenLink" exact component={GuestBrokenLink} />
+                    <Route path="/guest/missingFile" component={GuestMissingFile} />
+                    <Route path='/guest/logout' component={() => window.location = '../../'} />
+                    <Route path="*" component={Error404} />
+                </Switch>
+            </CSSTransition>
+        </TransitionGroup>
+    </div>
+
+
+));
+
 export const RouteManager = withRouter(({ location }) => (
     <div style={{ background: "#fff", boxShadow: "-5px 5px 15px rgba(0,0,0,0.1)", maxHeight: '78vh', overflowX: "auto", margin: 'auto' }}>
         <TransitionGroup>
@@ -181,7 +211,7 @@ export const RouteManager = withRouter(({ location }) => (
     </div>
 
 
-))
+));
 
 
 

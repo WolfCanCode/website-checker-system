@@ -6,6 +6,7 @@ import com.fpt.capstone.wcs.model.entity.user.Website;
 import com.fpt.capstone.wcs.model.entity.website.Topic;
 import com.fpt.capstone.wcs.model.entity.website.Version;
 import com.fpt.capstone.wcs.model.entity.website.WarningWord;
+import com.fpt.capstone.wcs.model.pojo.GuestPOJO;
 import com.fpt.capstone.wcs.model.pojo.ManagerRequestPOJO;
 import com.fpt.capstone.wcs.model.pojo.RequestCommonPOJO;
 import com.fpt.capstone.wcs.model.pojo.WebsitePOJO;
@@ -135,4 +136,21 @@ public class ManagerController {
         return  managerService.getAllReport(request);
     }
 
+    @CrossOrigin
+    @PostMapping("/api/guest/get")
+    public Map<String, Object> getGuestToken(@RequestBody GuestPOJO request) throws MalformedURLException, InterruptedException {
+        return  managerService.autoguest(request);
+    }
+
+    @CrossOrigin
+    @PostMapping("/api/guest/brokenLink")
+    public Map<String, Object> getBrokenLinkGuest(@RequestBody GuestPOJO request) throws MalformedURLException, InterruptedException {
+        return  managerService.getGuestBrokenLink(request);
+    }
+
+    @CrossOrigin
+    @PostMapping("/api/guest/missingFile")
+    public Map<String, Object> getMissingFileGuest(@RequestBody GuestPOJO request) throws MalformedURLException, InterruptedException {
+        return  managerService.getGuestMissingFile(request);
+    }
 }

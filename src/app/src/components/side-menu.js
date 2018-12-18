@@ -3,7 +3,7 @@ import {
     Link
 } from "react-router-dom";
 import { Menu, Sidebar, Image } from 'semantic-ui-react';
-import { menu, menuMan } from '../config/menu';
+import { menu, menuMan, menuGuest } from '../config/menu';
 import logo from '../assets/icon-wsc.png';
 import sidebarBg from '../assets/sidebar.jpg';
 import { Cookies } from "react-cookie";
@@ -13,7 +13,7 @@ const cookies = new Cookies();
 export default class SideMenu extends Component {
     constructor(props) {
         super(props);
-        this.state = { menuActive: "sitemap", listMenu: [] };
+        this.state = { menuActive: "d", listMenu: [] };
     }
 
     componentDidMount() {
@@ -32,9 +32,13 @@ export default class SideMenu extends Component {
         var menuList = null;
         if (cookies.get("u_isManager") === "true") {
             menuList = menuMan;
-        } else {
-            menuList = menu;
-        }
+        } else
+            if (cookies.get("u_guest_token") !== undefined) {
+                menuList = menuGuest;
+            }
+            else {
+                menuList = menu;
+            }
         this.listMenuItem = menuList.map((item, index) => {
             if (item.items === null) {
                 return (

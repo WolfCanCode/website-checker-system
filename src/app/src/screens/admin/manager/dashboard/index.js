@@ -152,7 +152,7 @@ export default class DashboardManager extends Component {
                                     <Image src='https://react.semantic-ui.com/images/wireframe/short-paragraph.png' />
                                 </Feed.Event>
 
-                            </Feed> : <Feed>{this.state.spelling.length === 0 ? <Feed.Event style={{ margin: 'auto', marginTop: 10, padding: 5, background: '#FFF', borderRadius: 10, minHeight: 90 }}>This test function is haven't test yet</Feed.Event> : this.state.spelling}</Feed>}
+                            </Feed> : <Feed>{this.state.spelling.length === 0 ? <Feed.Event style={{ margin: 'auto', marginTop: 10, padding: 5, background: '#FFF', borderRadius: 10, minHeight: 90 }}><h3 style={{ fontSize: 17, margin: 'auto' }}>This test function is haven't test yet</h3></Feed.Event> : this.state.spelling}</Feed>}
                         </Card.Content>
                     </Card>
                     <Card color='orange' style={{ margin: 'auto', marginTop: 10 }}>
@@ -174,7 +174,7 @@ export default class DashboardManager extends Component {
                                     <Image src='https://react.semantic-ui.com/images/wireframe/short-paragraph.png' />
                                 </Feed.Event>
 
-                            </Feed> : <Feed>{this.state.grammar.length === 0 ? <Feed.Event style={{ margin: 'auto', marginTop: 10, padding: 5, background: '#FFF', borderRadius: 10, minHeight: 90 }}>This test function is haven't test yet</Feed.Event> : this.state.grammar}</Feed>}
+                            </Feed> : <Feed>{this.state.grammar.length === 0 ? <Feed.Event style={{ margin: 'auto', marginTop: 10, padding: 5, background: '#FFF', borderRadius: 10, minHeight: 90 }}><h3 style={{ fontSize: 17, margin: 'auto' }}>This test function is haven't test yet</h3></Feed.Event> : this.state.grammar}</Feed>}
                         </Card.Content>
                     </Card>
                     <Card color='yellow' style={{ margin: 'auto', marginTop: 10 }}>
@@ -196,7 +196,7 @@ export default class DashboardManager extends Component {
                                     <Image src='https://react.semantic-ui.com/images/wireframe/short-paragraph.png' />
                                 </Feed.Event>
 
-                            </Feed> : <Feed>{this.state.brokenLink.length === 0 ? <Feed.Event style={{ margin: 'auto', marginTop: 10, padding: 5, background: '#FFF', borderRadius: 10, minHeight: 90 }}>This test function is haven't test yet</Feed.Event> : this.state.brokenLink}</Feed>}
+                            </Feed> : <Feed>{this.state.brokenLink.length === 0 ? <Feed.Event style={{ margin: 'auto', marginTop: 10, padding: 5, background: '#FFF', borderRadius: 10, minHeight: 90 }}><h3 style={{ fontSize: 17, margin: 'auto' }}>This test function is haven't test yet</h3></Feed.Event> : this.state.brokenLink}</Feed>}
                         </Card.Content>
                     </Card>
                     <Card color='olive' style={{ margin: 'auto', marginTop: 10 }}>
@@ -218,7 +218,7 @@ export default class DashboardManager extends Component {
                                     <Image src='https://react.semantic-ui.com/images/wireframe/short-paragraph.png' />
                                 </Feed.Event>
 
-                            </Feed> : <Feed>{this.state.brokenPage.length === 0 ? <Feed.Event style={{ margin: 'auto', marginTop: 10, padding: 5, background: '#FFF', borderRadius: 10, minHeight: 90 }}>This test function is haven't test yet</Feed.Event> : this.state.brokenPage}</Feed>}
+                            </Feed> : <Feed>{this.state.brokenPage.length === 0 ? <Feed.Event style={{ margin: 'auto', marginTop: 10, padding: 5, background: '#FFF', borderRadius: 10, minHeight: 90 }}><h3 style={{ fontSize: 17, margin: 'auto' }}>This test function is haven't test yet</h3></Feed.Event> : this.state.brokenPage}</Feed>}
                         </Card.Content>
                     </Card>
                     <Card color='green' style={{ margin: 'auto', marginTop: 10 }}>
@@ -240,7 +240,7 @@ export default class DashboardManager extends Component {
                                     <Image src='https://react.semantic-ui.com/images/wireframe/short-paragraph.png' />
                                 </Feed.Event>
 
-                            </Feed> : <Feed>{this.state.missingFile.length === 0 ? <Feed.Event style={{ margin: 'auto', marginTop: 10, padding: 5, background: '#FFF', borderRadius: 10, minHeight: 90 }}>This test function is haven't test yet</Feed.Event> : this.state.missingFile}</Feed>}
+                            </Feed> : <Feed>{this.state.missingFile.length === 0 ? <Feed.Event style={{ margin: 'auto', marginTop: 10, padding: 5, background: '#FFF', borderRadius: 10, minHeight: 90 }}><h3 style={{ fontSize: 17, margin: 'auto' }}>This test function is haven't test yet</h3></Feed.Event> : this.state.missingFile}</Feed>}
                         </Card.Content>
                     </Card>
 
@@ -265,7 +265,7 @@ export default class DashboardManager extends Component {
                                     <Image src='https://react.semantic-ui.com/images/wireframe/short-paragraph.png' />
                                 </Feed.Event>
 
-                            </Feed> : <Feed>{this.state.prohibited.length === 0 ? <Feed.Event style={{ margin: 'auto', marginTop: 10, padding: 5, background: '#FFF', borderRadius: 10, minHeight: 90 }}>This test function is haven't test yet</Feed.Event> : this.state.prohibited}</Feed>}
+                            </Feed> : <Feed>{this.state.prohibited.length === 0 ? <Feed.Event style={{ margin: 'auto', marginTop: 10, padding: 5, background: '#FFF', borderRadius: 10, minHeight: 90 }}><h3 style={{ fontSize: 17, margin: 'auto' }}>This test function is haven't test yet</h3></Feed.Event> : this.state.prohibited}</Feed>}
                         </Card.Content>
                     </Card>
                     <Card color='blue' style={{ margin: 'auto', marginTop: 10 }}>
@@ -287,7 +287,7 @@ export default class DashboardManager extends Component {
                                     <Image src='https://react.semantic-ui.com/images/wireframe/short-paragraph.png' />
                                 </Feed.Event>
 
-                            </Feed> : <Feed>{this.state.mobileLayout.length === 0 ? <Feed.Event style={{ margin: 'auto', marginTop: 10, padding: 5, background: '#FFF', borderRadius: 10, minHeight: 90 }}>This test function is haven't test yet</Feed.Event> : this.state.mobileLayout}</Feed>}
+                            </Feed> : <Feed>{this.state.mobileLayout.length === 0 ? <Feed.Event style={{ margin: 'auto', marginTop: 10, padding: 5, background: '#FFF', borderRadius: 10, minHeight: 90 }}><h3 style={{ fontSize: 17, margin: 'auto' }}>This test function is haven't test yet</h3></Feed.Event> : this.state.mobileLayout}</Feed>}
                         </Card.Content>
                     </Card>
 
@@ -310,7 +310,7 @@ export default class DashboardManager extends Component {
                                     <Image src='https://react.semantic-ui.com/images/wireframe/short-paragraph.png' />
                                 </Feed.Event>
 
-                            </Feed> : <Feed>{this.state.speed.length === 0 ? <Feed.Event style={{ margin: 'auto', marginTop: 10, padding: 5, background: '#FFF', borderRadius: 10, minHeight: 90 }}>This test function is haven't test yet</Feed.Event> : this.state.speed}</Feed>}
+                            </Feed> : <Feed>{this.state.speed.length === 0 ? <Feed.Event style={{ margin: 'auto', marginTop: 10, padding: 5, background: '#FFF', borderRadius: 10, minHeight: 90 }}><h3 style={{ fontSize: 17, margin: 'auto' }}>This test function is haven't test yet</h3></Feed.Event> : this.state.speed}</Feed>}
                         </Card.Content>
                     </Card>
 
@@ -333,7 +333,7 @@ export default class DashboardManager extends Component {
                                     <Image src='https://react.semantic-ui.com/images/wireframe/short-paragraph.png' />
                                 </Feed.Event>
 
-                            </Feed> : <Feed>{this.state.javascript.length === 0 ? <Feed.Event style={{ margin: 'auto', marginTop: 10, padding: 5, background: '#FFF', borderRadius: 10, minHeight: 90 }}>This test function is haven't test yet</Feed.Event> : this.state.javascript}</Feed>}
+                            </Feed> : <Feed>{this.state.javascript.length === 0 ? <Feed.Event style={{ margin: 'auto', marginTop: 10, padding: 5, background: '#FFF', borderRadius: 10, minHeight: 90 }}><h3 style={{ fontSize: 17, margin: 'auto' }}>This test function is haven't test yet</h3></Feed.Event> : this.state.javascript}</Feed>}
                         </Card.Content>
                     </Card>
 
@@ -356,7 +356,7 @@ export default class DashboardManager extends Component {
                                     <Image src='https://react.semantic-ui.com/images/wireframe/short-paragraph.png' />
                                 </Feed.Event>
 
-                            </Feed> : <Feed>{this.state.favicon.length === 0 ? <Feed.Event style={{ margin: 'auto', marginTop: 10, padding: 5, background: '#FFF', borderRadius: 10, minHeight: 90 }}>This test function is haven't test yet</Feed.Event> : this.state.favicon}</Feed>}
+                            </Feed> : <Feed>{this.state.favicon.length === 0 ? <Feed.Event style={{ margin: 'auto', marginTop: 10, padding: 5, background: '#FFF', borderRadius: 10, minHeight: 90 }}><h3 style={{ fontSize: 17, margin: 'auto' }}>This test function is haven't test yet</h3></Feed.Event> : this.state.favicon}</Feed>}
                         </Card.Content>
                     </Card>
 
@@ -382,7 +382,7 @@ export default class DashboardManager extends Component {
                                     <Image src='https://react.semantic-ui.com/images/wireframe/short-paragraph.png' />
                                 </Feed.Event>
 
-                            </Feed> : <Feed>{this.state.cookie.length === 0 ? <Feed.Event style={{ margin: 'auto', marginTop: 10, padding: 5, background: '#FFF', borderRadius: 10, minHeight: 90 }}>This test function is haven't test yet</Feed.Event> : this.state.cookie}</Feed>}
+                            </Feed> : <Feed>{this.state.cookie.length === 0 ? <Feed.Event style={{ margin: 'auto', marginTop: 10, padding: 5, background: '#FFF', borderRadius: 10, minHeight: 90 }}><h3 style={{ fontSize: 17, margin: 'auto' }}>This test function is haven't test yet</h3></Feed.Event> : this.state.cookie}</Feed>}
                         </Card.Content>
                     </Card>
 
@@ -405,7 +405,7 @@ export default class DashboardManager extends Component {
                                     <Image src='https://react.semantic-ui.com/images/wireframe/short-paragraph.png' />
                                 </Feed.Event>
 
-                            </Feed> : <Feed>{this.state.server.length === 0 ? <Feed.Event style={{ margin: 'auto', marginTop: 10, padding: 5, background: '#FFF', borderRadius: 10, minHeight: 90 }}>This test function is haven't test yet</Feed.Event> : this.state.server}</Feed>}
+                            </Feed> : <Feed>{this.state.server.length === 0 ? <Feed.Event style={{ margin: 'auto', marginTop: 10, padding: 5, background: '#FFF', borderRadius: 10, minHeight: 90 }}><h3 style={{ fontSize: 17, margin: 'auto' }}>This test function is haven't test yet</h3></Feed.Event> : this.state.server}</Feed>}
                         </Card.Content>
                     </Card>
 
@@ -428,7 +428,7 @@ export default class DashboardManager extends Component {
                                     <Image src='https://react.semantic-ui.com/images/wireframe/short-paragraph.png' />
                                 </Feed.Event>
 
-                            </Feed> : <Feed>{this.state.contact.length === 0 ? <Feed.Event style={{ margin: 'auto', marginTop: 10, padding: 5, background: '#FFF', borderRadius: 10, minHeight: 90 }}>This test function is haven't test yet</Feed.Event> : this.state.contact}</Feed>}
+                            </Feed> : <Feed>{this.state.contact.length === 0 ? <Feed.Event style={{ margin: 'auto', marginTop: 10, padding: 5, background: '#FFF', borderRadius: 10, minHeight: 90 }}><h3 style={{ fontSize: 17, margin: 'auto' }}>This test function is haven't test yet</h3></Feed.Event> : this.state.contact}</Feed>}
                         </Card.Content>
                     </Card>
 
@@ -451,7 +451,7 @@ export default class DashboardManager extends Component {
                                     <Image src='https://react.semantic-ui.com/images/wireframe/short-paragraph.png' />
                                 </Feed.Event>
 
-                            </Feed> : <Feed>{this.state.redirection.length === 0 ? <Feed.Event style={{ margin: 'auto', marginTop: 10, padding: 5, background: '#FFF', borderRadius: 10, minHeight: 90 }}>This test function is haven't test yet</Feed.Event> : this.state.redirection}</Feed>}
+                            </Feed> : <Feed>{this.state.redirection.length === 0 ? <Feed.Event style={{ margin: 'auto', marginTop: 10, padding: 5, background: '#FFF', borderRadius: 10, minHeight: 90 }}><h3 style={{ fontSize: 17, margin: 'auto' }}>This test function is haven't test yet</h3></Feed.Event> : this.state.redirection}</Feed>}
                         </Card.Content>
                     </Card>
 
@@ -474,7 +474,7 @@ export default class DashboardManager extends Component {
                                     <Image src='https://react.semantic-ui.com/images/wireframe/short-paragraph.png' />
                                 </Feed.Event>
 
-                            </Feed> : <Feed>{this.state.page.length === 0 ? <Feed.Event style={{ margin: 'auto', marginTop: 10, padding: 5, background: '#FFF', borderRadius: 10, minHeight: 90 }}>This test function is haven't test yet</Feed.Event> : this.state.page}</Feed>}
+                            </Feed> : <Feed>{this.state.page.length === 0 ? <Feed.Event style={{ margin: 'auto', marginTop: 10, padding: 5, background: '#FFF', borderRadius: 10, minHeight: 90 }}><h3 style={{ fontSize: 17, margin: 'auto' }}>This test function is haven't test yet</h3></Feed.Event> : this.state.page}</Feed>}
                         </Card.Content>
                     </Card>
 

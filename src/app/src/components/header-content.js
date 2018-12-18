@@ -644,7 +644,7 @@ export default class HeaderContent extends Component {
                         content={this.props.alt}
                     />
                 </span></Header>
-                {cookies.get("u_isManager") !== "true" ?
+                {cookies.get("u_isManager") !== "true" && cookies.get("u_guest_token") === undefined ?
                     <Segment>
                         <Button
                             color='grey'

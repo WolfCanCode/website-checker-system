@@ -45,7 +45,6 @@ public class PageOption {
     @JsonIgnore
     boolean delFlag=false;
 
-    @NotNull
     @ManyToOne()
     @JoinColumn(name="website_id")
     @JsonIgnore

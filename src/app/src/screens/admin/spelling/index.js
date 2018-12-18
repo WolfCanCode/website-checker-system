@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import 'semantic-ui-css/semantic.min.css';
-import { Segment, Button, Table, Icon, Input, Label } from 'semantic-ui-react';
+import { Segment, Button, Table, Icon, Input} from 'semantic-ui-react';
 import { Cookies } from "react-cookie";
-import ReactToExcel from "react-html-table-to-excel";
 import TableRow from './data-row';
 
 const cookies = new Cookies();

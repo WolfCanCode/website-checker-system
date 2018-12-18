@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class HeaderImpl implements HeaderService {
@@ -28,17 +29,24 @@ public class HeaderImpl implements HeaderService {
 
     @Override
     public Map<String, Object> headerStaff(RequestCommonPOJO request) {
-        List<Website> websites = authenticate.isAuthGetListSite(request);
-        User user = userRepository.findById(request.getUserId()).get();
         Map<String, Object> res = new HashMap<>();
-        if (websites != null) {
-            res.put("action", Constant.SUCCESS);
-            res.put("website", websites);
-            res.put("fullname", user.getName());
-            return res;
+        List<Website> websites = authenticate.isAuthGetListSite(request);
+        Optional<User> u = userRepository.findById(request.getUserId());
+        if(u.isPresent()) {
+            User user = u.get();
+            if (websites != null) {
+                res.put("action", Constant.SUCCESS);
+                res.put("website", websites);
+                res.put("fullname", user.getName());
+                return res;
+            } else {
+                res.put("action", Constant.INCORRECT);
+                return res;
+            }
         } else {
-            res.put("action", Constant.INCORRECT);
+            res.put("action", Constant.SUCCESS);
             return res;
+
         }
     }
 

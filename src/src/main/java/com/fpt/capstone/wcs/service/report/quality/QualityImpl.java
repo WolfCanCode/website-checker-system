@@ -204,6 +204,7 @@ public class QualityImpl implements QualityService {
         }
     }
 
+    @Override
     public List<BrokenLinkReport> brokenLinkService(List<Page> list, PageOption option) throws InterruptedException {
         //Asign list Broken Link
         List<BrokenLinkReport> resultList = new ArrayList<>();
