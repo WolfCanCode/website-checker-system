@@ -816,8 +816,8 @@ public class ManagerImpl implements ManagerService {
         }
 
         List<ServerBehaviorReport> serverList = serverBehaviorRepository.findAllGroupByCreatedTime();
-        List<ReportPOJO> servertestList = new ArrayList<>();
-        for (SpeedTestReport item : speedList) {
+        List<ReportPOJO> serverTestList = new ArrayList<>();
+        for (ServerBehaviorReport item : serverList) {
             ReportPOJO report = new ReportPOJO();
             report.setPageOptionId(item.getPageOption().getId());
             report.setPageOptionName(item.getPageOption().getName());
@@ -826,7 +826,7 @@ public class ManagerImpl implements ManagerService {
             report.setWebsiteName(item.getPageOption().getWebsite().getName());
             report.setUserId(item.getPageOption().getCreatedUser().getId());
             report.setUserName(item.getPageOption().getCreatedUser().getName());
-            servertestList.add(report);
+            serverTestList.add(report);
         }
 
 //        List<SpeedTestReport> speedList = speedtestRepository.findAllGroupByCreatedTime();
@@ -871,7 +871,7 @@ public class ManagerImpl implements ManagerService {
         data.put("cookieTest", cookieTestList);
         data.put("faviconTest", faviconTestList);
         data.put("javascriptTest", jsTestList);
-        data.put("serverBehaviorTest", servertestList);
+        data.put("serverBehaviorTest", serverTestList);
         res.put("action", Constant.SUCCESS);
         res.put("data",data);
 
