@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 @Data
@@ -18,8 +19,27 @@ public class SpellingReport {
     @Id
     @GeneratedValue
     private long id;
-    private String word;
-    private String suggestion;
+
+    @NotNull
+//    @JsonIgnore
+    private String wrongWord;
+
+    @NotNull
+//    @JsonIgnore
+    private String excerpt;
+
+    @NotNull
+//    @JsonIgnore
+    private int pageId;
+
+//    @NotNull
+    @JsonIgnore
+    private String decision; // ignore - fix
+
+//    @NotNull
+    @JsonIgnore
+    private String selectedSuggestion; // if fix, keep selected word, else null
+
     private Date createdTime;
     private boolean delFlag = true;
 
