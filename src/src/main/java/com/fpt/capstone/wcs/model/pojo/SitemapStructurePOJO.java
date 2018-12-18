@@ -9,7 +9,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class SitemapValuePOJO {
+public class SitemapStructurePOJO {
     private String websiteUrl;
     private int version;
     private List<VerticePOJO> vertices;

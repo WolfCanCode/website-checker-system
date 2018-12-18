@@ -7,7 +7,7 @@ import lombok.*;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class SiteMapOutputPOJO {
+public class SiteMapDecodeResultPOJO {
     private String map;
     private String typeMap;
     private String urlMap;

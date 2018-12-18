@@ -18,10 +18,6 @@ import com.fpt.capstone.wcs.repository.website.VersionRepository;
 import com.fpt.capstone.wcs.service.system.authenticate.AuthenticateImpl;
 import com.fpt.capstone.wcs.service.system.sitemapProc.SiteMapProcService;
 import com.fpt.capstone.wcs.utils.Constant;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -52,14 +48,14 @@ public class SiteMapImpl implements SiteMapService {
     }
 
     @Override
-    public List<SiteMapOutputPOJO> getVisualSitemap(RequestCommonPOJO request) throws MalformedURLException {
-        List<SiteMapOutputPOJO> sm = null;
+    public List<SiteMapDecodeResultPOJO> getVisualSitemap(RequestCommonPOJO request) throws MalformedURLException {
+        List<SiteMapDecodeResultPOJO> sm = null;
         Website website = authenticate.isAuthGetSingleSite(request);
         if (website != null) {
             Version ver = versionRepository.findFirstByWebsiteOrderByVersionDesc(website);
             Sitemap smData = sitemapRepository.findByWebsiteAndVersion(website, ver);
             sm = new ArrayList<>();
-            sm.add(new SiteMapOutputPOJO(smData.getMap(), smData.getTypeMap(), smData.getUrlMap()));
+            sm.add(new SiteMapDecodeResultPOJO(smData.getMap(), smData.getTypeMap(), smData.getUrlMap()));
         }
         return sm;
     }
@@ -77,7 +73,7 @@ public class SiteMapImpl implements SiteMapService {
 
                 ObjectMapper mapper = new ObjectMapper();
                 String jsonString = smData.getStructureValue();
-                SitemapValuePOJO smVal = mapper.readValue(jsonString, SitemapValuePOJO.class);
+                SitemapStructurePOJO smVal = mapper.readValue(jsonString, SitemapStructurePOJO.class);
 
                 String curPage = "";
                 List<SiteLinkPOJO> resultList = new ArrayList<>();
@@ -88,13 +84,6 @@ public class SiteMapImpl implements SiteMapService {
                         resultList.add(new SiteLinkPOJO(curPage, list.get(j).getValue(), list.get(j).getType()));
                     }
                 }
-
-//                SiteMapProcService sms = new SiteMapProcService(website.getUrl());
-//                sms.buildSiteMap();
-//                sms.buildInverseGraph();
-//                int id = sms.getUrlMap().get(request.getUrl());
-//                List<SiteLinkPOJO> resultList = sms.getInvGraph().get(id);
-
                 res.put("pageList", resultList);
                 res.put("action", Constant.SUCCESS);
                 return res;
@@ -115,16 +104,12 @@ public class SiteMapImpl implements SiteMapService {
         if (user.getManager() == null) {
             Website website = websiteRepository.findOneByUserAndIdAndDelFlagEquals(user, request.getWebsiteId(), false);
             if (website != null) {
-//                SiteMapProcService sms = new SiteMapProcService(website.getUrl());
-//                sms.buildSiteMap();
-//                int mapId = sms.getUrlMap().get(request.getUrl());
-//                List<SiteLinkPOJO> resultList = sms.getGraph().get(mapId);
                 Version ver = versionRepository.findFirstByWebsiteOrderByVersionDesc(website);
                 Sitemap smData = sitemapRepository.findByWebsiteAndVersion(website, ver);
 
                 ObjectMapper mapper = new ObjectMapper();
                 String jsonString = smData.getStructureValue();
-                SitemapValuePOJO smVal = mapper.readValue(jsonString, SitemapValuePOJO.class);
+                SitemapStructurePOJO smVal = mapper.readValue(jsonString, SitemapStructurePOJO.class);
 
                 String curPage = "";
                 List<SiteLinkPOJO> resultList = new ArrayList<>();

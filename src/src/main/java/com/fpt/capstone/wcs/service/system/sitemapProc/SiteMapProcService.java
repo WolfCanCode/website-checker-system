@@ -7,7 +7,7 @@ import com.fpt.capstone.wcs.model.entity.website.Page;
 import com.fpt.capstone.wcs.model.entity.website.Version;
 import com.fpt.capstone.wcs.model.pojo.LinkPOJO;
 import com.fpt.capstone.wcs.model.pojo.SiteLinkPOJO;
-import com.fpt.capstone.wcs.model.pojo.SitemapValuePOJO;
+import com.fpt.capstone.wcs.model.pojo.SitemapStructurePOJO;
 import com.fpt.capstone.wcs.model.pojo.VerticePOJO;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -26,7 +26,8 @@ public class SiteMapProcService {
     private int verticesNum;
     private List<Integer> typeNode = new ArrayList<Integer>(); //Type link: 1 is internal, 2 is external and 3 is error internal link
     private List<String> links = new ArrayList<String>();
-//    private String originDomain = "";
+    private String originDomain = "";
+    private String prefixDomain = "";
 
 
 
@@ -37,7 +38,12 @@ public class SiteMapProcService {
         invGraph.clear();
         graph.clear();
         verticesNum = 0;
-//        this.originDomain = getOriginUrl(rootDomain);
+        this.originDomain = getOriginUrl(rootDomain);
+        if (rootDomain.contains("https://")) {
+            prefixDomain = "https://";
+        }
+        else
+            prefixDomain = "http://";
     }
 
     public HashMap<String, Integer> getUrlMap() {
@@ -169,67 +175,76 @@ public class SiteMapProcService {
     }
 
 
-//    private String getOriginUrl(String rootDomain) {
-//        String originDomain = rootDomain;
-//        String[] ignoreSTR = {"https://", "http://"};
-//        for (String ignore : ignoreSTR) {
-//            if (originDomain.contains(ignore)) {
-//                originDomain = originDomain.replace(ignore, "");
-//            }
-//        }
-//        String[] igonreSTROFF = {"javascript:", "mailto:", "tel:"};
-//        for (String ignore : igonreSTROFF) {
-//            if (originDomain.contains(ignore)) {
-//                int pos = originDomain.indexOf(ignore);
-//                originDomain = originDomain.substring(0, pos);
-//            }
-//        }
-//
-//        int fly_pos = -1;
-//        for (int i = 0; i < originDomain.length(); i++)
-//            if (originDomain.charAt(i) == '#' || originDomain.charAt(i) == '(' || originDomain.charAt(i) == ':') {
-//                fly_pos = i;
-//            }
-//
-//        if (fly_pos != -1) {
-//            originDomain = originDomain.substring(0, fly_pos);
-//        }
-//
-//        //System.out.println("after: " + originDomain);
-//
-//        while (originDomain.length() > 0 && originDomain.charAt(originDomain.length() - 1) == '/') {
-//            originDomain = originDomain.substring(0, originDomain.length() - 1);
-//        }
-//
-//        while (originDomain.length() > 0 && originDomain.charAt(0) == '/') {
-//            originDomain = originDomain.substring(1);
-//        }
-//
-//        return originDomain;
-//    }
+    private String getOriginUrl(String rootDomain) {
+        //System.out.println("origin = " + rootDomain);
 
-//    private String remakeCandidateUrl(String Url) {
-//        Url = getOriginUrl(Url);
-//        if (Url.length() == 0) return "";
-//
-//        if (Url.contains(originDomain)) {
-//            return "https://" + Url;
-//        }
-//        else {
-//            boolean could = true;
-//            for (int i = 0; i < Url.length(); i++)
-//                if (Url.charAt(i) == '.') {
-//                    could = false;
-//                    break;
-//                }
-//            if (could) {
-//                return "https://" + originDomain + "/" + Url;
-//            }
-//            else
-//                return originDomain;
-//        }
-//    }
+        String originDomain = rootDomain;
 
+        String[] ignoreSTR = {"https://", "http://"};
+
+        for (String ignore : ignoreSTR) {
+            if (originDomain.contains(ignore)) {
+                originDomain = originDomain.replace(ignore, "");
+            }
+        }
+
+
+        String[] igonreSTROFF = {"javascript:", "mailto:", "tel:"};
+
+        for (String ignore : igonreSTROFF) {
+            if (originDomain.contains(ignore)) {
+                int pos = originDomain.indexOf(ignore);
+                originDomain = originDomain.substring(0, pos);
+            }
+        }
+
+        int fly_pos = -1;
+        for (int i = 0; i < originDomain.length(); i++)
+            if (originDomain.charAt(i) == '#' || originDomain.charAt(i) == '(' || originDomain.charAt(i) == ':') {
+                fly_pos = i;
+            }
+
+        if (fly_pos != -1) {
+            originDomain = originDomain.substring(0, fly_pos);
+        }
+
+        //System.out.println("after: " + originDomain);
+
+        while (originDomain.length() > 0 && originDomain.charAt(originDomain.length() - 1) == '/') {
+            originDomain = originDomain.substring(0, originDomain.length() - 1);
+        }
+
+        while (originDomain.length() > 0 && originDomain.charAt(0) == '/') {
+            originDomain = originDomain.substring(1);
+        }
+
+        return originDomain;
+    }
+
+    private String remakeCandidateUrl(String Url) {
+        Url = getOriginUrl(Url);
+        if (Url.length() == 0) return "";
+
+        if (Url.contains(originDomain)) {
+
+            return prefixDomain + Url;
+        }
+        else {
+            boolean could = true;
+            for (int i = 0; i < Url.length(); i++)
+                if (Url.charAt(i) == '.') {
+                    could = false;
+                    break;
+                }
+            if (could) {
+                //System.out.println("prefix = " + originDomain);
+                //System.out.println("url = " + Url);
+                return prefixDomain + originDomain + "/" + Url;
+            }
+            else
+                return prefixDomain + originDomain;
+        }
+    }
 
     public List<String> getDecodeGraph() {
         int root = 0;
@@ -511,7 +526,7 @@ public class SiteMapProcService {
     }
 
     public String convertToJson(int version) throws JsonProcessingException {
-        SitemapValuePOJO valueObj = new SitemapValuePOJO();
+        SitemapStructurePOJO valueObj = new SitemapStructurePOJO();
         valueObj.setWebsiteUrl(rootDomain);
         valueObj.setVersion(version);
         List<VerticePOJO> vertices = new ArrayList<>();
