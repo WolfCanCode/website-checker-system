@@ -1072,10 +1072,8 @@ public class QualityImpl implements QualityService {
         }
         //check redirect to external
         boolean flagExternal =false;
-                                        System.out.println(" URL PAGE: "+u.getUrl());
-                                        int code = CheckHTTPResponse.verifyHttpMessage(u.getUrl());
-                                        System.out.println("Hello");
 
+                                        int code = CheckHTTPResponse.verifyHttpMessage(u.getUrl());
                                         if(code>=300&& code<400){
                                             String urlRedirect = CheckHTTPResponse.getURLDirectsTo(u.getUrl());
                                             Pattern pattern = Pattern.compile("(http\\:|https\\:)//(([\\w\\-?\\.?]+)?\\.([a-zA-Z]{2,3})?)",Pattern.CASE_INSENSITIVE);
@@ -1110,7 +1108,7 @@ public class QualityImpl implements QualityService {
                                                 String strChcek = matcher.group();
                                                 if (!strChcek.startsWith("//$")) {
                                                     int checkCode = CheckHTTPResponse.verifyHttpMessage(strChcek);
-                                                    System.out.println(strChcek + " _" + checkCode);
+
                                                     //check
                                                     if (checkCode < 400) {
                                                         byte[] capacity = getBytes(strChcek);
@@ -1121,7 +1119,6 @@ public class QualityImpl implements QualityService {
                                                             fileNew.setCreatedTime(createdTime);
                                                             missing.add(fileNew);
                                                         }
-                                                        System.out.println("Image: " + strChcek + " - Code:" + checkCode);
                                                     }
                                                     if (400 <= checkCode) {
                                                         String checkAgain = urlRoot + strChcek;
@@ -1131,9 +1128,6 @@ public class QualityImpl implements QualityService {
                                                             System.out.println(newStCheck);
                                                             checkAgain= urlRoot+ newStCheck;
                                                         }
-
-
-                                                        System.out.println("Check Again: " + checkAgain);
                                                         int codeCheckAgain = CheckHTTPResponse.verifyHttpMessage(checkAgain);
                                                         if (codeCheckAgain < 400) {
                                                             if (codeCheckAgain >= 300 && codeCheckAgain < 400) {
@@ -1147,7 +1141,6 @@ public class QualityImpl implements QualityService {
                                                                 fileNew.setCreatedTime(createdTime);
                                                                 missing.add(fileNew);
                                                             }
-                                                            System.out.println("Image Again: " + checkAgain + " - Code:" + codeCheckAgain);
                                                         }
                                                         if (400 <= codeCheckAgain) {
 
@@ -1155,7 +1148,6 @@ public class QualityImpl implements QualityService {
                                                             String newStCheckLast = "";
                                                             if(strChcek.startsWith("../")){
                                                                 newStCheckLast = strChcek.replaceFirst("../","/");
-                                                                System.out.println(newStCheck);
                                                                 checkLast= "https:"+ newStCheckLast;
                                                             }
                                                             int codeCheclast = CheckHTTPResponse.verifyHttpMessage(checkLast);
@@ -1167,7 +1159,6 @@ public class QualityImpl implements QualityService {
                                                                     fileNew.setCreatedTime(createdTime);
                                                                     missing.add(fileNew);
                                                                 }
-                                                                System.out.println("Image Last: " + checkLast + " - Code:" + codeCheclast);
                                                             } else {
                                                                 if (flagBase == true) {
                                                                     if (strChcek.startsWith("../")) {
@@ -1191,7 +1182,7 @@ public class QualityImpl implements QualityService {
                                                                                 missing.add(fileNew);
 
                                                                             }
-                                                                            System.out.println("Image Base: " + checkLastBase + " - Code:" + codeCheckLastBase + " Size: " + weBase.length);
+
 
 
                                                                         } else {
@@ -1212,7 +1203,6 @@ public class QualityImpl implements QualityService {
                                                                                 fileNew.setCreatedTime(createdTime);
                                                                                 missing.add(fileNew);
                                                                             }
-                                                                            System.out.println("Image Base: " + checkBaseLast + " - Code:" + codeCheckLastBase + " Size: " + weBase.length);
 
                                                                         } else {
 
@@ -1227,7 +1217,6 @@ public class QualityImpl implements QualityService {
                                                                     fileNew.setPageOption(option);
                                                                     fileNew.setCreatedTime(createdTime);
                                                                     missing.add(fileNew);
-                                                                    System.out.println("Image Last Fail: " + strChcek + " -Code: " + codeCheclast);
                                                                 }
                                                             }
                                                         }

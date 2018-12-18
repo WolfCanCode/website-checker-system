@@ -594,7 +594,7 @@ public class TechnologyImpl implements TechnologyService {
                     if (httpMessage == 200) {
                         byte[] capacity = getBytes(urlFaviconMethod1);
                         if (capacity.length != 0) {
-                            System.out.println("Favicon URL: " + urlFaviconMethod1 + " Message: " + httpMessage + " Capacity: " + capacity.length);
+//                            System.out.println("Favicon URL: " + urlFaviconMethod1 + " Message: " + httpMessage + " Capacity: " + capacity.length);
                             flagMethod1 = true;
                         }
                     }
@@ -602,7 +602,7 @@ public class TechnologyImpl implements TechnologyService {
                         int codeResspone = CheckHTTPResponse.verifyHttpMessage(urlNew);
                         if (codeResspone < 400) {
 
-                            System.out.println(urlNew.startsWith(urlRoot));
+//                            System.out.println(urlNew.startsWith(urlRoot));
                             if (urlNew.startsWith(urlRoot)) {
                                 FaviconReport faviconMethod1 = new FaviconReport(urlFaviconMethod1, urlNew, "any", "16x16");
                                 faviconMethod1.setPageOption(option);
@@ -619,7 +619,7 @@ public class TechnologyImpl implements TechnologyService {
                     } else if (flagMethod1 == false) {
                         try {
                             int codeResspone = CheckHTTPResponse.verifyHttpMessage(urlNew);
-                            System.out.println(urlNew);
+//                            System.out.println(urlNew);
                             if (codeResspone < 400) {
 
                                 Document doc = Jsoup.connect(urlNew).ignoreContentType(true).get();
@@ -646,7 +646,7 @@ public class TechnologyImpl implements TechnologyService {
                                         resultList.add(faviconMethod2);
                                     }
                                     if (code >= 400) {
-                                        System.out.println("vao vao khac 200");
+//                                        System.out.println("vao vao khac 200");
                                         String urlFavAgain = urlRoot + href;
                                         int checkFaviconResponeAgain = CheckHTTPResponse.verifyHttpMessage(urlFavAgain);
                                         if (checkFaviconResponeAgain < 400) {
