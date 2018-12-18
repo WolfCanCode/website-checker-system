@@ -8,6 +8,8 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Date;
+
 
 @Data
 @Getter
@@ -19,4 +21,7 @@ public class ManagerRequestPOJO {
     private User staff;
     private WarningWord warningWord;
     private Long[] listStaffId;
+    private long reportDate;
+    private String reportType;
+    private long pageOptionId;
 }

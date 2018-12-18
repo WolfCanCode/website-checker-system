@@ -41,7 +41,7 @@ export default class TableRow extends Component {
             } else {
                 alert("Thất bại");
             }
-            
+
         });
     }
 
@@ -284,7 +284,7 @@ export default class TableRow extends Component {
                     // alert("Your URL: " + rectCoord[id].url);
                     selectedRectangleValue = rectCoord[id].url;
                     console.log("Selected: " + selectedRectangleValue);
-                    
+
                     // that.setState({selectedUrl : selectedRectangleValue});
                     // console.log("State: " + that.state.selectedUrl);
                     that.props.setSelectedRectValue(selectedRectangleValue);
@@ -335,7 +335,7 @@ export default class TableRow extends Component {
             body: JSON.stringify(param)
         }).then(response => response.json()).then((data) => {
             if (data.action === "SUCCESS") {
-                this.setState({ open1: false, close1: true, loadingDelete: true });
+                this.setState({ open1: false, close1: true, loadingDelete: false });
                 this.props.refreshTable();
             }
         });

@@ -25,4 +25,9 @@ public interface ManagerService {
     public Map<String, Object> addWarningWord(ManagerRequestPOJO request) throws MalformedURLException;
     public Map<String, Object> editWarningWord(ManagerRequestPOJO request);
     public Map<String, Object> deleteWarningWord(ManagerRequestPOJO request);
+
+    //dashboard
+    public Map<String, Object> getReportDetail(ManagerRequestPOJO request);
+    public Map<String, Object> getAllReport(ManagerRequestPOJO request);
+
 }

@@ -123,5 +123,16 @@ public class ManagerController {
         return  managerService.deleteWarningWord(request);
     }
 
+    @CrossOrigin
+    @PostMapping("/api/report/detail")
+    public Map<String, Object> getReportDetail(@RequestBody ManagerRequestPOJO request) {
+        return  managerService.getReportDetail(request);
+    }
+
+    @CrossOrigin
+    @PostMapping("/api/report/viewAll")
+    public Map<String, Object> getAllReport(@RequestBody ManagerRequestPOJO request) {
+        return  managerService.getAllReport(request);
+    }
 
 }
