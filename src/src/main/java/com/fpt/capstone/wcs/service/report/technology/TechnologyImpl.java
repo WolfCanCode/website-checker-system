@@ -47,6 +47,7 @@ import javax.net.ssl.SSLException;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -593,7 +594,7 @@ public class TechnologyImpl implements TechnologyService {
                     if (httpMessage == 200) {
                         byte[] capacity = getBytes(urlFaviconMethod1);
                         if (capacity.length != 0) {
-                            System.out.println("Favicon URL: " + urlFaviconMethod1 + " Message: " + httpMessage + " Capacity: " + capacity.length);
+//                            System.out.println("Favicon URL: " + urlFaviconMethod1 + " Message: " + httpMessage + " Capacity: " + capacity.length);
                             flagMethod1 = true;
                         }
                     }
@@ -601,7 +602,7 @@ public class TechnologyImpl implements TechnologyService {
                         int codeResspone = CheckHTTPResponse.verifyHttpMessage(urlNew);
                         if (codeResspone < 400) {
 
-                            System.out.println(urlNew.startsWith(urlRoot));
+//                            System.out.println(urlNew.startsWith(urlRoot));
                             if (urlNew.startsWith(urlRoot)) {
                                 FaviconReport faviconMethod1 = new FaviconReport(urlFaviconMethod1, urlNew, "any", "16x16");
                                 faviconMethod1.setPageOption(option);
@@ -618,11 +619,11 @@ public class TechnologyImpl implements TechnologyService {
                     } else if (flagMethod1 == false) {
                         try {
                             int codeResspone = CheckHTTPResponse.verifyHttpMessage(urlNew);
-                            System.out.println(urlNew);
+//                            System.out.println(urlNew);
                             if (codeResspone < 400) {
 
                                 Document doc = Jsoup.connect(urlNew).ignoreContentType(true).get();
-                                Elements elem = doc.head().select("link[rel~=(shortcut icon|icon|apple-touch-icon-precomposed|nokia-touch-icon)]");
+                                Elements elem = doc.head().select("link[rel~=(SHORTCUT ICON|shortcut icon|Shortcut Icon|ICON|Icon|icon|APPLE-TOUCH-ICON-PRECOMPOSED|apple-touch-icon-precomposed|Apple-Touch-Icon-Precomposed|nokia-touch-icon)]");
                                 System.out.println(elem.size());
                                 if (elem.size() == 0) {
                                     FaviconReport favicon = new FaviconReport("Missing Favicon", urlNew, "", "undefine");
@@ -645,7 +646,7 @@ public class TechnologyImpl implements TechnologyService {
                                         resultList.add(faviconMethod2);
                                     }
                                     if (code >= 400) {
-                                        System.out.println("vao vao khac 200");
+//                                        System.out.println("vao vao khac 200");
                                         String urlFavAgain = urlRoot + href;
                                         int checkFaviconResponeAgain = CheckHTTPResponse.verifyHttpMessage(urlFavAgain);
                                         if (checkFaviconResponeAgain < 400) {
@@ -695,7 +696,9 @@ public class TechnologyImpl implements TechnologyService {
         byte[] b = new byte[0];
         try {
             URL urlTesst = new URL(url);
-            URLConnection uc = urlTesst.openConnection();
+            HttpURLConnection uc = (HttpURLConnection) urlTesst.openConnection();
+            uc.setRequestMethod("GET");
+            uc.setRequestProperty("User-Agent","Mozilla/5.0 ");
             int len = uc.getContentLength();
             InputStream in = new BufferedInputStream(uc.getInputStream());
 

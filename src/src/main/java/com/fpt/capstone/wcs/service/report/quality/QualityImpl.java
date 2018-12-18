@@ -632,7 +632,7 @@ public class QualityImpl implements QualityService {
 
 
     @Override
-    public Map<String, Object> getMissingFile(MissingFilePOJO request) {
+    public Map<String, Object> getMissingFile(MissingFilePOJO request) throws InterruptedException {
         Map<String, Object> res = new HashMap<>();
         RequestCommonPOJO pojo = new RequestCommonPOJO();
         pojo.setPageOptionId(request.getPageOptionId());
@@ -667,7 +667,7 @@ public class QualityImpl implements QualityService {
                 if(request.getListType().size()==0|| request.getListType().size()==4){
                     System.out.println("Vo ne");
                     List<MissingFileReport> resultList =  getMissingFile(pages,pageOption, urlRoot);
-                    missingFilesPagesRepository.removeAllByPageOption(pageOption);
+
                     missingFilesPagesRepository.saveAll(resultList);
                     res.put("action", Constant.SUCCESS);
                     res.put("missingFileReport", resultList);
@@ -677,7 +677,7 @@ public class QualityImpl implements QualityService {
                         switch (missingFilePOJODTO){
                             case 1:{
                                 List<MissingFileReport> resultList=getMissingFileImg(pages,pageOption, urlRoot);
-                                missingFilesPagesRepository.removeAllByPageOption(pageOption);
+
                                 missingFilesPagesRepository.saveAll(resultList);
                                 res.put("action", Constant.SUCCESS);
                                 res.put("missingFileReport", resultList);
@@ -685,7 +685,7 @@ public class QualityImpl implements QualityService {
                             }
                             case 2:{
                                 List<MissingFileReport> resultList =getMissingFileCss(pages,pageOption, urlRoot);
-                                missingFilesPagesRepository.removeAllByPageOption(pageOption);
+
                                 missingFilesPagesRepository.saveAll(resultList);
                                 res.put("action", Constant.SUCCESS);
                                 res.put("missingFileReport", resultList);
@@ -693,7 +693,7 @@ public class QualityImpl implements QualityService {
                             }
                             case 3:{
                                 List<MissingFileReport> resultList =getMissingFileDoc(pages,pageOption, urlRoot);
-                                missingFilesPagesRepository.removeAllByPageOption(pageOption);
+
                                 missingFilesPagesRepository.saveAll(resultList);
                                 res.put("action", Constant.SUCCESS);
                                 res.put("missingFileReport", resultList);
@@ -702,7 +702,7 @@ public class QualityImpl implements QualityService {
                             }
                             case 4:{
                                 List<MissingFileReport> resultList =getMissingFileARCHIVES(pages,pageOption, urlRoot);
-                                missingFilesPagesRepository.removeAllByPageOption(pageOption);
+
                                 missingFilesPagesRepository.saveAll(resultList);
                                 res.put("action", Constant.SUCCESS);
                                 res.put("missingFileReport", resultList);
@@ -739,7 +739,7 @@ public class QualityImpl implements QualityService {
                 if(request.getListType().size()==0|| request.getListType().size()==4){
                     System.out.println("Vo ne");
                     List<MissingFileReport> resultList =  getMissingFile(pages,pageOption, urlRoot);
-                    missingFilesPagesRepository.removeAllByPageOption(pageOption);
+
                     missingFilesPagesRepository.saveAll(resultList);
                     res.put("action", Constant.SUCCESS);
                     res.put("missingFileReport", resultList);
@@ -749,7 +749,7 @@ public class QualityImpl implements QualityService {
                         switch (missingFilePOJODTO){
                             case 1:{
                                 List<MissingFileReport> resultList=getMissingFileImg(pages,pageOption, urlRoot);
-                                missingFilesPagesRepository.removeAllByPageOption(pageOption);
+
                                 missingFilesPagesRepository.saveAll(resultList);
                                 res.put("action", Constant.SUCCESS);
                                 res.put("missingFileReport", resultList);
@@ -757,7 +757,7 @@ public class QualityImpl implements QualityService {
                             }
                             case 2:{
                                 List<MissingFileReport> resultList =getMissingFileCss(pages,pageOption, urlRoot);
-                                missingFilesPagesRepository.removeAllByPageOption(pageOption);
+
                                 missingFilesPagesRepository.saveAll(resultList);
                                 res.put("action", Constant.SUCCESS);
                                 res.put("missingFileReport", resultList);
@@ -765,7 +765,7 @@ public class QualityImpl implements QualityService {
                             }
                             case 3:{
                                 List<MissingFileReport> resultList =getMissingFileDoc(pages,pageOption, urlRoot);
-                                missingFilesPagesRepository.removeAllByPageOption(pageOption);
+
                                 missingFilesPagesRepository.saveAll(resultList);
                                 res.put("action", Constant.SUCCESS);
                                 res.put("missingFileReport", resultList);
@@ -774,7 +774,7 @@ public class QualityImpl implements QualityService {
                             }
                             case 4:{
                                 List<MissingFileReport> resultList =getMissingFileARCHIVES(pages,pageOption, urlRoot);
-                                missingFilesPagesRepository.removeAllByPageOption(pageOption);
+
                                 missingFilesPagesRepository.saveAll(resultList);
                                 res.put("action", Constant.SUCCESS);
                                 res.put("missingFileReport", resultList);
@@ -864,7 +864,7 @@ public class QualityImpl implements QualityService {
         }
     }
 
-    public List<MissingFileReport> getMissingFileImg(List<Page> list,PageOption option, String urlNew) {
+    public List<MissingFileReport> getMissingFileImg(List<Page> list,PageOption option, String urlNew) throws InterruptedException {
         Date createdTime = new Date();
         List<MissingFileReport> missing = new ArrayList<>();
         ExecutorService executor = Executors.newFixedThreadPool(Constant.MAX_THREAD);
@@ -885,16 +885,12 @@ public class QualityImpl implements QualityService {
                             });
         }
         executor.shutdown();
-        try {
-            executor.awaitTermination(Long.MAX_VALUE,TimeUnit.MILLISECONDS);
-        } catch (InterruptedException e) {
-            Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
-        }
+        executor.awaitTermination(Long.MAX_VALUE,TimeUnit.MILLISECONDS);
         return missing;
     }
 
 
-    public List<MissingFileReport> getMissingFileDoc(List<Page> list,PageOption option, String urlNew)  {
+    public List<MissingFileReport> getMissingFileDoc(List<Page> list,PageOption option, String urlNew) throws InterruptedException {
         Date createdTime = new Date();
         List<MissingFileReport> missing = new ArrayList<>();
         ExecutorService executor = Executors.newFixedThreadPool(Constant.MAX_THREAD);
@@ -914,16 +910,13 @@ public class QualityImpl implements QualityService {
             System.out.println(urlRoot);
         }
         executor.shutdown();
-        try {
-            executor.awaitTermination(Long.MAX_VALUE,TimeUnit.MILLISECONDS);
-        } catch (InterruptedException e) {
-            Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
-        }
+        executor.awaitTermination(Long.MAX_VALUE,TimeUnit.MILLISECONDS);
+
         return missing;
     }
 
 
-    public List<MissingFileReport> getMissingFileCss(List<Page> list,PageOption option, String urlNew)  {
+    public List<MissingFileReport> getMissingFileCss(List<Page> list,PageOption option, String urlNew) throws InterruptedException {
         Date createdTime = new Date();
         List<MissingFileReport> missing = new ArrayList<>();
         ExecutorService executor = Executors.newFixedThreadPool(Constant.MAX_THREAD);
@@ -946,15 +939,12 @@ public class QualityImpl implements QualityService {
 
         }
         executor.shutdown();
-        try {
-            executor.awaitTermination(Long.MAX_VALUE,TimeUnit.MILLISECONDS);
-        } catch (InterruptedException e) {
-            Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
-        }
+        executor.awaitTermination(Long.MAX_VALUE,TimeUnit.MILLISECONDS);
+
         return missing;
     }
 
-    public List<MissingFileReport> getMissingFileMP3andMP4(List<Page> list,PageOption option, String urlNew) {
+    public List<MissingFileReport> getMissingFileMP3andMP4(List<Page> list,PageOption option, String urlNew) throws InterruptedException {
 
         Date createdTime = new Date();
         List<MissingFileReport> missing = new ArrayList<>();
@@ -976,11 +966,8 @@ public class QualityImpl implements QualityService {
             System.out.println(urlRoot);
         }
         executor.shutdown();
-        try {
-            executor.awaitTermination(Long.MAX_VALUE,TimeUnit.MILLISECONDS);
-        } catch (InterruptedException e) {
-            Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
-        }
+        executor.awaitTermination(Long.MAX_VALUE,TimeUnit.MILLISECONDS);
+
         return missing;
     }
 
@@ -1014,7 +1001,7 @@ public class QualityImpl implements QualityService {
         return missing;
     }
 
-    public List<MissingFileReport> getMissingFile(List<Page> list,PageOption option, String urlNew) {
+    public List<MissingFileReport> getMissingFile(List<Page> list,PageOption option, String urlNew) throws InterruptedException {
         Date createdTime = new Date();
         List<MissingFileReport> missing = new ArrayList<>();
         ExecutorService executor = Executors.newFixedThreadPool(Constant.MAX_THREAD);
@@ -1041,11 +1028,8 @@ public class QualityImpl implements QualityService {
                 }});
         }
         executor.shutdown();
-        try {
-            executor.awaitTermination(Long.MAX_VALUE,TimeUnit.MILLISECONDS);
-        } catch (InterruptedException e) {
-            Logger.getLogger(ExperienceImpl.class.getName()).log(Level.SEVERE, null, e);
-        }
+        executor.awaitTermination(Long.MAX_VALUE,TimeUnit.MILLISECONDS);
+
         return missing;
     }
 
@@ -1055,7 +1039,9 @@ public class QualityImpl implements QualityService {
         byte[] b = new byte[0];
         try {
             URL urlTesst = new URL(url);
-            URLConnection uc = urlTesst.openConnection();
+            HttpURLConnection uc =(HttpURLConnection) urlTesst.openConnection();
+            uc.setRequestMethod("GET");
+            uc.setRequestProperty("User-Agent","Mozilla/5.0 ");
             int len = uc.getContentLength();
             InputStream in = new BufferedInputStream(uc.getInputStream());
 
@@ -1086,10 +1072,8 @@ public class QualityImpl implements QualityService {
         }
         //check redirect to external
         boolean flagExternal =false;
-                                        System.out.println(" URL PAGE: "+u.getUrl());
-                                        int code = CheckHTTPResponse.verifyHttpMessage(u.getUrl());
-                                        System.out.println("Hello");
 
+                                        int code = CheckHTTPResponse.verifyHttpMessage(u.getUrl());
                                         if(code>=300&& code<400){
                                             String urlRedirect = CheckHTTPResponse.getURLDirectsTo(u.getUrl());
                                             Pattern pattern = Pattern.compile("(http\\:|https\\:)//(([\\w\\-?\\.?]+)?\\.([a-zA-Z]{2,3})?)",Pattern.CASE_INSENSITIVE);
@@ -1117,117 +1101,127 @@ public class QualityImpl implements QualityService {
                                             flagExternal=false;
                                         }
                                         //start check missing file
-                                        else{
+                                        else {
                                             Pattern pattern = Pattern.compile(patternForma, Pattern.CASE_INSENSITIVE);
                                             Matcher matcher = pattern.matcher(doc.html());
                                             while (matcher.find()) {
                                                 String strChcek = matcher.group();
-                                                int checkCode = CheckHTTPResponse.verifyHttpMessage(strChcek);
-                                                System.out.println(strChcek+" _" +checkCode);
-                                                //check
-                                                if (checkCode<400) {
-                                                    byte[] capacity =  getBytes(strChcek);
-                                                    System.out.println();
-                                                    if(capacity.length==0){
-                                                        MissingFileReport fileNew = new MissingFileReport(strChcek, " size: "+capacity.length, u.getUrl());
-                                                        fileNew.setPageOption(option);
-                                                        fileNew.setCreatedTime(createdTime);
-                                                        missing.add(fileNew);
-                                                    }
-                                                    System.out.println("Image: " + strChcek + " - Code:" + checkCode);
-                                                }
-                                                if (400<=checkCode) {
-                                                    String checkAgain = urlRoot + strChcek;
-                                                    System.out.println("Check Again: "+ checkAgain);
-                                                    int codeCheckAgain = CheckHTTPResponse.verifyHttpMessage(checkAgain);
-                                                    if (codeCheckAgain<400) {
-                                                        if(codeCheckAgain>=300 && codeCheckAgain<400){
-                                                            String newUrl = CheckHTTPResponse.getURLDirectsTo(checkAgain);
-                                                            urlRoot=newUrl;
-                                                        }
-                                                        byte[] capacity =  getBytes(checkAgain);
-                                                        if(capacity.length==0){
-                                                            MissingFileReport fileNew = new MissingFileReport(checkAgain, " size: "+capacity.length, u.getUrl());
+                                                if (!strChcek.startsWith("//$")) {
+                                                    int checkCode = CheckHTTPResponse.verifyHttpMessage(strChcek);
+
+                                                    //check
+                                                    if (checkCode < 400) {
+                                                        byte[] capacity = getBytes(strChcek);
+                                                        System.out.println();
+                                                        if (capacity.length == 0) {
+                                                            MissingFileReport fileNew = new MissingFileReport(strChcek, " size: " + capacity.length, u.getUrl());
                                                             fileNew.setPageOption(option);
                                                             fileNew.setCreatedTime(createdTime);
                                                             missing.add(fileNew);
                                                         }
-                                                        System.out.println("Image Again: " + checkAgain + " - Code:" + codeCheckAgain);
                                                     }
-                                                    if (400<=codeCheckAgain) {
-                                                        String checkLast = "https:" + strChcek;
-                                                        int codeCheclast = CheckHTTPResponse.verifyHttpMessage(checkLast);
-                                                        if ( codeCheclast<400 ) {
-                                                            byte[] capacity =  getBytes(checkLast);
-                                                            if(capacity.length==0){
-                                                                MissingFileReport fileNew = new MissingFileReport(checkLast, " size: "+capacity.length, u.getUrl());
+                                                    if (400 <= checkCode) {
+                                                        String checkAgain = urlRoot + strChcek;
+                                                        String newStCheck = "";
+                                                        if(strChcek.startsWith("../")){
+                                                            newStCheck = strChcek.replaceFirst("../","/");
+                                                            System.out.println(newStCheck);
+                                                            checkAgain= urlRoot+ newStCheck;
+                                                        }
+                                                        int codeCheckAgain = CheckHTTPResponse.verifyHttpMessage(checkAgain);
+                                                        if (codeCheckAgain < 400) {
+                                                            if (codeCheckAgain >= 300 && codeCheckAgain < 400) {
+                                                                String newUrl = CheckHTTPResponse.getURLDirectsTo(checkAgain);
+                                                                urlRoot = newUrl;
+                                                            }
+                                                            byte[] capacity = getBytes(checkAgain);
+                                                            if (capacity.length == 0) {
+                                                                MissingFileReport fileNew = new MissingFileReport(checkAgain, " size: " + capacity.length, u.getUrl());
                                                                 fileNew.setPageOption(option);
                                                                 fileNew.setCreatedTime(createdTime);
                                                                 missing.add(fileNew);
                                                             }
-                                                            System.out.println("Image Last: " + checkLast + " - Code:" + codeCheclast);
-                                                        } else {
-                                                            if (flagBase == true) {
-                                                                if (strChcek.startsWith("../")) {
-                                                                    List<String> partoFBase = new ArrayList<>();
-                                                                    System.out.println(baseHref.replaceFirst("", ""));;
-                                                                    StringTokenizer strToken = new StringTokenizer(baseHref, "/");
-                                                                    while (strToken.hasMoreTokens()) {
-                                                                        partoFBase.add(strToken.nextToken());
-                                                                    }
-                                                                    String newBaseurl = baseHref.replaceFirst(partoFBase.get(partoFBase.size() - 1), "");
-                                                                    String newStrcheck = strChcek.replaceFirst("../", "");
-                                                                    String checkLastBase =newBaseurl+newStrcheck;
-                                                                    int codeCheckLastBase = CheckHTTPResponse.verifyHttpMessage(checkLastBase);
-                                                                    if (codeCheckLastBase<400) {
-                                                                        byte[] weBase = getBytes(checkLastBase);
-                                                                        if (weBase.length == 0) {
-                                                                            MissingFileReport fileNew = new MissingFileReport(strChcek, "size "+weBase.length, u.getUrl());
-                                                                            fileNew.setPageOption(option);
-                                                                            fileNew.setCreatedTime(createdTime);
-                                                                            missing.add(fileNew);
+                                                        }
+                                                        if (400 <= codeCheckAgain) {
 
-                                                                        }
-                                                                        System.out.println("Image Base: " + checkLastBase + " - Code:" + codeCheckLastBase + " Size: " + weBase.length);
-
-
-                                                                    } else {
-                                                                        MissingFileReport fileNew = new MissingFileReport(strChcek,""+ codeCheckLastBase, u.getUrl());
-                                                                        fileNew.setPageOption(option);
-                                                                        fileNew.setCreatedTime(createdTime);
-                                                                        missing.add(fileNew);
-                                                                    }
-
-                                                                } else {
-                                                                    String checkBaseLast = baseHref + strChcek;
-                                                                    int codeCheckLastBase = CheckHTTPResponse.verifyHttpMessage(checkBaseLast);
-                                                                    if (codeCheckLastBase<400 ) {
-                                                                        byte[] weBase = getBytes(checkBaseLast);
-                                                                        if (weBase.length == 0) {
-                                                                            MissingFileReport fileNew = new MissingFileReport(strChcek, "size: "+weBase.length, u.getUrl());
-                                                                            fileNew.setPageOption(option);
-                                                                            fileNew.setCreatedTime(createdTime);
-                                                                            missing.add(fileNew);
-                                                                        }
-                                                                            System.out.println("Image Base: " + checkBaseLast + " - Code:" + codeCheckLastBase + " Size: " + weBase.length);
-
-                                                                    } else {
-
-                                                                        MissingFileReport fileNew = new MissingFileReport(strChcek,""+ codeCheckLastBase, u.getUrl());
-                                                                        fileNew.setPageOption(option);
-                                                                        fileNew.setCreatedTime(createdTime);
-                                                                        missing.add(fileNew);
-                                                                    }
+                                                            String checkLast = "https:" + strChcek;
+                                                            String newStCheckLast = "";
+                                                            if(strChcek.startsWith("../")){
+                                                                newStCheckLast = strChcek.replaceFirst("../","/");
+                                                                checkLast= "https:"+ newStCheckLast;
+                                                            }
+                                                            int codeCheclast = CheckHTTPResponse.verifyHttpMessage(checkLast);
+                                                            if (codeCheclast < 400) {
+                                                                byte[] capacity = getBytes(checkLast);
+                                                                if (capacity.length == 0) {
+                                                                    MissingFileReport fileNew = new MissingFileReport(checkLast, " size: " + capacity.length, u.getUrl());
+                                                                    fileNew.setPageOption(option);
+                                                                    fileNew.setCreatedTime(createdTime);
+                                                                    missing.add(fileNew);
                                                                 }
                                                             } else {
-                                                                MissingFileReport fileNew = new MissingFileReport(strChcek, ""+codeCheclast, u.getUrl());
-                                                                fileNew.setPageOption(option);
-                                                                fileNew.setCreatedTime(createdTime);
-                                                                missing.add(fileNew);
-                                                                System.out.println("Image Last Fail: " + strChcek + " -Code: " + codeCheclast);
+                                                                if (flagBase == true) {
+                                                                    if (strChcek.startsWith("../")) {
+                                                                        List<String> partoFBase = new ArrayList<>();
+                                                                        System.out.println(baseHref.replaceFirst("", ""));
+                                                                        ;
+                                                                        StringTokenizer strToken = new StringTokenizer(baseHref, "/");
+                                                                        while (strToken.hasMoreTokens()) {
+                                                                            partoFBase.add(strToken.nextToken());
+                                                                        }
+                                                                        String newBaseurl = baseHref.replaceFirst(partoFBase.get(partoFBase.size() - 1), "");
+                                                                        String newStrcheck = strChcek.replaceFirst("../", "");
+                                                                        String checkLastBase = newBaseurl + newStrcheck;
+                                                                        int codeCheckLastBase = CheckHTTPResponse.verifyHttpMessage(checkLastBase);
+                                                                        if (codeCheckLastBase < 400) {
+                                                                            byte[] weBase = getBytes(checkLastBase);
+                                                                            if (weBase.length == 0) {
+                                                                                MissingFileReport fileNew = new MissingFileReport(strChcek, "size " + weBase.length, u.getUrl());
+                                                                                fileNew.setPageOption(option);
+                                                                                fileNew.setCreatedTime(createdTime);
+                                                                                missing.add(fileNew);
+
+                                                                            }
+
+
+
+                                                                        } else {
+                                                                            MissingFileReport fileNew = new MissingFileReport(strChcek, "" + codeCheckLastBase, u.getUrl());
+                                                                            fileNew.setPageOption(option);
+                                                                            fileNew.setCreatedTime(createdTime);
+                                                                            missing.add(fileNew);
+                                                                        }
+
+                                                                    } else {
+                                                                        String checkBaseLast = baseHref + strChcek;
+                                                                        int codeCheckLastBase = CheckHTTPResponse.verifyHttpMessage(checkBaseLast);
+                                                                        if (codeCheckLastBase < 400) {
+                                                                            byte[] weBase = getBytes(checkBaseLast);
+                                                                            if (weBase.length == 0) {
+                                                                                MissingFileReport fileNew = new MissingFileReport(strChcek, "size: " + weBase.length, u.getUrl());
+                                                                                fileNew.setPageOption(option);
+                                                                                fileNew.setCreatedTime(createdTime);
+                                                                                missing.add(fileNew);
+                                                                            }
+
+                                                                        } else {
+
+                                                                            MissingFileReport fileNew = new MissingFileReport(strChcek, "" + codeCheckLastBase, u.getUrl());
+                                                                            fileNew.setPageOption(option);
+                                                                            fileNew.setCreatedTime(createdTime);
+                                                                            missing.add(fileNew);
+                                                                        }
+                                                                    }
+                                                                } else {
+                                                                    MissingFileReport fileNew = new MissingFileReport(strChcek, "" + codeCheclast, u.getUrl());
+                                                                    fileNew.setPageOption(option);
+                                                                    fileNew.setCreatedTime(createdTime);
+                                                                    missing.add(fileNew);
+                                                                }
                                                             }
                                                         }
                                                     }
+
                                                 }
                                             }
                                         }

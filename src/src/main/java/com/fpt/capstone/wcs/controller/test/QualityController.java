@@ -1,18 +1,21 @@
 package com.fpt.capstone.wcs.controller.test;
 
+import com.fpt.capstone.wcs.model.entity.report.quality.SpellingReport;
 import com.fpt.capstone.wcs.model.pojo.MissingFilePOJO;
 import com.fpt.capstone.wcs.model.pojo.RequestCommonPOJO;
 import com.fpt.capstone.wcs.model.pojo.RequestReportPOJO;
+import com.fpt.capstone.wcs.model.pojo.SpellingSuggestionRequestPOJO;
 import com.fpt.capstone.wcs.service.report.quality.QualityService;
 
 
+import com.fpt.capstone.wcs.service.spelling.SpellingTestService;
+import com.fpt.capstone.wcs.service.system.trietree.TrieService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -20,6 +23,41 @@ public class QualityController {
 
     @Autowired
     QualityService qualityService;
+
+    @Autowired
+    TrieService trieService;
+
+    @Autowired
+    SpellingTestService spellingTestService;
+
+    @CrossOrigin
+    @Transactional
+    @GetMapping("/api/spelling")
+    public boolean checkExistWord(@RequestParam("word") String word) throws InterruptedException {
+        return trieService.isExistInDictionary(word);
+    }
+
+    @CrossOrigin
+    @Transactional
+    @GetMapping("/api/testNsuggest")
+    public List<SpellingReport> checkExistWord() throws InterruptedException {
+
+        return spellingTestService.testSpelling(Arrays.asList(), trieService);
+    }
+
+    @CrossOrigin
+    @Transactional
+    @PostMapping("/api/getWrongWords")
+    public Map<String, Object> getSpellingMistake(@RequestBody RequestCommonPOJO request) throws InterruptedException {
+        return spellingTestService.getSpellingMistakes(request, trieService);
+    }
+
+    @CrossOrigin
+    @Transactional
+    @PostMapping("/api/getSuggestion")
+    public Map<String, Object> getSuggestion(@RequestBody SpellingSuggestionRequestPOJO request) throws InterruptedException {
+        return spellingTestService.getSuggestion(request, trieService);
+    }
 
 
 

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpt.capstone.wcs.model.pojo.ReferencePOJO;
 import com.fpt.capstone.wcs.model.pojo.RequestCommonPOJO;
 import com.fpt.capstone.wcs.service.system.sitemap.SiteMapService;
-import com.fpt.capstone.wcs.model.pojo.SiteMapOutputPOJO;
+import com.fpt.capstone.wcs.model.pojo.SiteMapDecodeResultPOJO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,7 +19,7 @@ public class SitemapController {
     SiteMapService siteMapService;
 
     @PostMapping("/api/sitemap/getVisualSitemap")
-    public List<SiteMapOutputPOJO> getVisualSitemap(@RequestBody RequestCommonPOJO request) throws MalformedURLException {
+    public List<SiteMapDecodeResultPOJO> getVisualSitemap(@RequestBody RequestCommonPOJO request) throws MalformedURLException {
         return siteMapService.getVisualSitemap(request);
     }
 

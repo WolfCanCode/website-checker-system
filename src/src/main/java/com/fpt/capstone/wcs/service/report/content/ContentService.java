@@ -11,16 +11,16 @@ import java.util.Map;
 
 public interface ContentService {
     //Page Test
-    public Map<String, Object> getDataPagesTest(RequestCommonPOJO request);
+    public Map<String, Object> getDataPagesTest(RequestCommonPOJO request) throws InterruptedException;
     public Map<String, Object> getLastestPageTest(RequestCommonPOJO request);
     public Map<String, Object> savePageReport(RequestReportPOJO request);
     //Redirection Test
-    public Map<String, Object> getDataRedirectTest(RequestCommonPOJO request);
+    public Map<String, Object> getDataRedirectTest(RequestCommonPOJO request) throws InterruptedException;
     public Map<String, Object> getLastestLinkRedirection(RequestCommonPOJO request);
     public Map<String, Object> saveRedirectionReport(RequestReportPOJO request);
-    public List<RedirectionReport> redirectionTest(List<Page> list, PageOption option); //export reuse
+    public List<RedirectionReport> redirectionTest(List<Page> list, PageOption option) throws InterruptedException; //export reuse
         //Contact Detail
-    public Map<String, Object> getDataContactDetail(RequestCommonPOJO request);
+    public Map<String, Object> getDataContactDetail(RequestCommonPOJO request) throws InterruptedException;
     public Map<String, Object> getLastestContactDetail(RequestCommonPOJO request);
     public Map<String, Object> saveContactDetailReport(RequestReportPOJO request);
 }

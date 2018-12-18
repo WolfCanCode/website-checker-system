@@ -1,89 +1,139 @@
 import React, { Component } from 'react';
 import 'semantic-ui-css/semantic.min.css';
-import { Segment, Button, Table, Icon, Input, Label } from 'semantic-ui-react'
-// import { Cookies } from "react-cookie";
+import { Segment, Button, Table, Icon, Input, Label } from 'semantic-ui-react';
+import { Cookies } from "react-cookie";
+import ReactToExcel from "react-html-table-to-excel";
+import TableRow from './data-row';
 
-// const cookies = new Cookies();
-
+const cookies = new Cookies();
 class spellingScreen extends Component {
+    state = { list: [], loadingTable: false, isDisable: false, listReportId: [], isDoneTest: false };
 
+    componentDidMount() {
+        var comp = [];
+        this.setState({ loadingTable: true });
+        var param = {
+            "userId": cookies.get("u_id"),
+            "userToken": cookies.get("u_token"),
+            "websiteId": cookies.get("u_w_id"),
+            "pageOptionId": cookies.get("u_option"),
+        };
+
+        fetch("/api/getWrongWords", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(param)
+        }).then(response => response.json()).then((data) => {
+            var idList = []
+            comp = data.spellingReport.map((item, index) => {
+                idList.push(item.id);
+                return (<TableRow no={index} word={item.wrongWord} excerpt={item.excerpt} page={item.pageId} />);
+            });
+            
+            this.setState({ list: comp, loadingTable: false, isDisable: false, isDoneTest: true, listReportId: idList });
+        });
+
+
+    }
+
+    _doSpellingTest(){
+        var comp = [];
+        this.setState({ loadingTable: true });
+        var param = {
+            "userId": cookies.get("u_id"),
+            "userToken": cookies.get("u_token"),
+            "websiteId": cookies.get("u_w_id"),
+            "pageOptionId": cookies.get("u_option"),
+        };
+
+        fetch("/api/getWrongWords", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(param)
+        }).then(response => response.json()).then((data) => {
+            comp = data.spellingReport.map((item, index) => {
+                console.log('word: '  + item.wrongWord);
+                return (<TableRow word={item.wrongWord} excerpt={item.excerpt} page={item.pageId} />);
+            });
+            this.setState({ list: comp });
+            this.setState({ loadingTable: false });
+        });
+
+    }
+    // _saveSpellingReport() {
+    //     var comp = [];
+    //     this.setState({ loadingTable: true, isDisable: true });
+    //     var param = {
+    //         "userId": cookies.get("u_id"),
+    //         "userToken": cookies.get("u_token"),
+    //         "websiteId": cookies.get("u_w_id"),
+    //         "pageOptionId": cookies.get("u_option"),
+    //         "listReportId": this.state.listReportId
+    //     }
+
+    //     fetch("/api/spelling/save", {
+    //         method: 'POST',
+    //         headers: {
+    //             'Accept': 'application/json',
+    //             'Content-Type': 'application/json'
+    //         },
+    //         body: JSON.stringify(param)
+    //     }).then(response => response.json()).then((data) => {
+    //         comp = data.prohibitedContentReport.map((item, index) => {
+    //             return (<TableRow key={index} urlPage={item.urlPage} word={item.word} fragment={item.fragment} type={item.type} />);
+    //         });
+    //         this.setState({ list: comp });
+    //         this.setState({ loadingTable: false, isDisable: false, isDoneTest: false });
+    //     });
+    // }
     render() {
         return (
             <div>
                 <Segment.Group>
-                    <Segment.Group horizontal>
+                <Segment basic loading={this.state.loadingTable} >
+                    <Button icon primary labelPosition='right' disabled={this.state.isDisable} onClick={() => this._doSpellingTest()}>
+                        Check
+                       <Icon name='right arrow' />
+                    </Button>
+                    {this.state.isDoneTest ? <Button icon color="green" labelPosition='right' onClick={() => this._saveReport()}>
+                                    Save <Icon name='check' />
+                                </Button> : ""}
+                    <div style={{ marginBottom: '10px', float: 'right' }}>
 
-                        <Segment basic>
 
-
-
-                            <Segment.Group horizontal >
-                                <Segment style={{ margin: 'auto', textAlign: 'center', padding: 0 }}>
-                                    <Icon className="warning sign" size='huge' color='red' />
-                                </Segment>
-                                <Segment style={{ paddingLeft: '10px' }}>
-                                    <p style={{ fontSize: 24 }}>4 <br />
-                                        Unrecognigzed spellings</p>
-                                </Segment >
-                                <Segment style={{ margin: 'auto', textAlign: 'center', padding: 0 }}>
-                                    <Icon className="file outline" size='huge' color='grey' /></Segment>
-                                <Segment>
-                                    <p style={{ fontSize: 24 }}>2 <br /> Affected Pages</p>
-                                </Segment>
-                            </Segment.Group>
-                            <div style={{ marginBottom: '60px', marginRight: '20px' }}>
-                                <Button floated='right' ><Icon name="print" />Export</Button>
-
-                                <Input icon='search' placeholder='Search...' style={{ float: 'right' }} />
-                            </div>
+                        {/* <ReactToExcel
+                            className="btn1"
+                            table="table-to-xls"
+                            filename="pages_test_file"
+                            sheet="sheet 1"
+                            buttonText={<Button color="green" ><Icon name="print" />Export</Button>}
+                        /> */}
+                    </div>
+                    <div style={{ float: 'right', marginBottom: '10px' }}>
+                        <Input icon='search' placeholder='Search...' />
+                    </div>
+                    
+                </Segment>  
+                    <Segment.Group horizontal>                    
+                        <Segment basic>                        
                             <Table singleLine unstackable textAlign='center' style={{ tableLayout: 'auto' }}>
                                 <Table.Header >
                                     <Table.Row>
+                                        <Table.HeaderCell>No.</Table.HeaderCell>
                                         <Table.HeaderCell>Word</Table.HeaderCell>
-                                        <Table.HeaderCell>Suggesttons</Table.HeaderCell>
-                                        <Table.HeaderCell>Found in</Table.HeaderCell>
-                                        <Table.HeaderCell>Pages</Table.HeaderCell>
+                                        <Table.HeaderCell>Excerpt</Table.HeaderCell>
+                                        <Table.HeaderCell>Page</Table.HeaderCell>
                                         <Table.HeaderCell>Action</Table.HeaderCell>
-
                                     </Table.Row>
                                 </Table.Header>
                                 <Table.Body>
-                                    <Table.Row>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>suberd</Table.Cell>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>suburd superd subduer</Table.Cell>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>Text</Table.Cell>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}> <Label style={{ fontSize: '13px' }} >1</Label></Table.Cell>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}><Button color='blue'>Learn Spelling</Button> </Table.Cell>
-
-                                    </Table.Row>
-                                    <Table.Row>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>suberd</Table.Cell>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>suburd superd subduer</Table.Cell>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>Text</Table.Cell>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}> <Label style={{ fontSize: '13px' }} >1</Label></Table.Cell>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}><Button color='blue'>Learn Spelling</Button> </Table.Cell>
-
-                                    </Table.Row>
-                                    <Table.Row>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>suberd</Table.Cell>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>suburd superd subduer</Table.Cell>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>Text</Table.Cell>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}> <Label style={{ fontSize: '13px' }} >1</Label></Table.Cell>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}><Button color='blue'>Learn Spelling</Button> </Table.Cell>
-
-                                    </Table.Row>
-                                    <Table.Row>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>suberd</Table.Cell>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>suburd superd subduer</Table.Cell>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}>Text</Table.Cell>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}> <Label style={{ fontSize: '13px' }} >1</Label></Table.Cell>
-                                        <Table.Cell style={{ width: '100px', whiteSpace: 'normal', wordBreak: 'break-all' }}><Button color='blue'>Learn Spelling</Button> </Table.Cell>
-
-                                    </Table.Row>
-
-
-
-
+                                {this.state.list.length === 0 ? <Table.Row><Table.Cell>This page haven't test yet, please try to test</Table.Cell></Table.Row> : this.state.list}
                                 </Table.Body>
                             </Table>
 

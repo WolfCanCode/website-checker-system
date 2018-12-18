@@ -1,5 +1,6 @@
 package com.fpt.capstone.wcs.model.pojo;
 
+
 import lombok.*;
 
 @Data
@@ -7,9 +8,9 @@ import lombok.*;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class SiteMapOutputPOJO {
-    private String map;
-    private String typeMap;
-    private String urlMap;
-
+public class EnWordPOJO {
+    private String word;
+    private String type;
+    private String definition;
+    
 }

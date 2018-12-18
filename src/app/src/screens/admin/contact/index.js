@@ -300,7 +300,7 @@ export default class Contact extends Component {
                 <Table.Row>
                   <Table.HeaderCell>Contact</Table.HeaderCell>
                   <Table.HeaderCell>Page affected</Table.HeaderCell>
-                  <Table.HeaderCell>Action</Table.HeaderCell>
+                  {/* <Table.HeaderCell>Action</Table.HeaderCell> */}
                 </Table.Row>
               </Table.Header>
               <Table.Body>

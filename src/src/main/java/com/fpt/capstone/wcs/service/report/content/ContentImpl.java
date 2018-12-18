@@ -54,7 +54,7 @@ public class ContentImpl implements  ContentService {
     }
 
     @Override
-    public Map<String, Object> getDataPagesTest(RequestCommonPOJO request) {
+    public Map<String, Object> getDataPagesTest(RequestCommonPOJO request) throws InterruptedException {
         Map<String,Object> res = new HashMap<>();
         Website website =authenticate.isAuthGetSingleSite(request);
         if (website != null) {
@@ -160,7 +160,7 @@ public class ContentImpl implements  ContentService {
     }
 
     @Override
-    public Map<String, Object> getDataRedirectTest(RequestCommonPOJO request) {
+    public Map<String, Object> getDataRedirectTest(RequestCommonPOJO request) throws InterruptedException {
         Map<String,Object> res = new HashMap<>();
         Website website =authenticate.isAuthGetSingleSite(request);
         if (website != null) {
@@ -268,7 +268,7 @@ public class ContentImpl implements  ContentService {
     }
 
     @Override
-    public Map<String, Object> getDataContactDetail(RequestCommonPOJO request) {
+    public Map<String, Object> getDataContactDetail(RequestCommonPOJO request) throws InterruptedException {
         Map<String,Object> res = new HashMap<>();
         Website website =authenticate.isAuthGetSingleSite(request);
         if (website != null) {
@@ -375,7 +375,7 @@ public class ContentImpl implements  ContentService {
     }
 
 
-    public List<PageReport> getPageInfor(List<Page> list, PageOption option)  {
+    public List<PageReport> getPageInfor(List<Page> list, PageOption option) throws InterruptedException {
         Date createdTime = new Date();
         List<PageReport> pageCheck = new ArrayList<>();
         ExecutorService executor = Executors.newFixedThreadPool(Constant.MAX_THREAD);
@@ -394,15 +394,12 @@ public class ContentImpl implements  ContentService {
                 }});
         }
         executor.shutdown();
-        try {
-            executor.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException e) {
-            Logger.getLogger(ContentImpl.class.getName()).log(Level.SEVERE, null, e);
-        }
+        executor.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+
         return pageCheck;
     }
 
-    public  List<RedirectionReport> redirectionTest(List<Page> list, PageOption option)  {
+    public  List<RedirectionReport> redirectionTest(List<Page> list, PageOption option) throws InterruptedException {
         Date createdTime = new Date();
         List<RedirectionReport> pageCheck = new ArrayList<>();
 
@@ -440,11 +437,8 @@ public class ContentImpl implements  ContentService {
             });
         }
         executor.shutdown();
-        try {
             executor.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException e) {
-            Logger.getLogger(ContentImpl.class.getName()).log(Level.SEVERE, null, e);
-        }
+
         return pageCheck;
     }
 
@@ -505,7 +499,6 @@ public class ContentImpl implements  ContentService {
         try {
             Document doc = Jsoup.connect(url).get();
             titleUrl=doc.title();
-            System.out.println(titleUrl);
         }catch (Exception ex){
         }
         return titleUrl;
@@ -525,7 +518,6 @@ public class ContentImpl implements  ContentService {
             }
         }catch (Exception ex){
         }
-        System.out.println(canUrl);
         return canUrl;
     }
 
@@ -568,7 +560,7 @@ public class ContentImpl implements  ContentService {
 //
 //    }
 
-    public List<ContactReport> getContactDetail(List<Page> list, PageOption option){
+    public List<ContactReport> getContactDetail(List<Page> list, PageOption option) throws InterruptedException {
         Date createdTime = new Date();
         List<ContactReport> list1 = new ArrayList<>();
         final CyclicBarrier gate = new CyclicBarrier(list.size());
@@ -600,10 +592,11 @@ public class ContentImpl implements  ContentService {
                             String patternPhone9 = "\\d{3}-\\d{3}-\\d{4}";
                             String patternphone10 = "\\d{3}[ ]\\d{2}[ ]\\d{3}[ ]\\d{3}";
                             String patternPhone11 = "\\(\\d{3}\\)[ ]\\d{2}[ ]\\d{2}[ ]\\d{2}[ ]\\d{2}";
+                            String patternPhone12 = "[+]\\d{2,3}[ ]\\(\\d{1}\\)\\d{2}[ ]\\d{4}[ ]\\d{4}";
                             Pattern pattern = Pattern.compile(patternPhone0);
                             Matcher matcher = pattern.matcher(doc.wholeText());
                             while (matcher.find()) {
-                                System.out.println("Phone0: " + matcher.group());
+//                                System.out.println("Phone0: " + matcher.group());
                                 ContactReport phoneNumber = new ContactReport(matcher.group(),url,"Phone");
                                 phoneNumber.setPageOption(option);
                                 phoneNumber.setCreatedTime(createdTime);
@@ -615,7 +608,7 @@ public class ContentImpl implements  ContentService {
                             matcher = pattern.matcher(doc.wholeText());
                             // check all occurance
                             while (matcher.find()) {
-                                System.out.println("Phone1: " + matcher.group() + " . " + matcher.start() + " " + matcher.end()+" ");
+//                                System.out.println("Phone1: " + matcher.group() + " . " + matcher.start() + " " + matcher.end()+" ");
                                 ContactReport phoneNumber = new ContactReport(matcher.group(),url,"Phone");
                                 phoneNumber.setCreatedTime(createdTime);
                                 phoneNumber.setPageOption(option);
@@ -626,7 +619,7 @@ public class ContentImpl implements  ContentService {
                             matcher = pattern.matcher(doc.wholeText());
                             // check all occurance
                             while (matcher.find()) {
-                                System.out.println("PHONE 2:" + matcher.group());
+//                                System.out.println("PHONE 2:" + matcher.group());
                                 ContactReport phoneNumber = new ContactReport(matcher.group(),url,"Phone");
                                 phoneNumber.setPageOption(option);
                                 phoneNumber.setCreatedTime(createdTime);
@@ -637,7 +630,7 @@ public class ContentImpl implements  ContentService {
                             matcher = pattern.matcher(doc.wholeText());
                             // check all occurance
                             while (matcher.find()) {
-                                System.out.println("PHONE 3:" + matcher.group());
+//                                System.out.println("PHONE 3:" + matcher.group());
                                 ContactReport phoneNumber = new ContactReport(matcher.group(),url,"Phone");
                                 phoneNumber.setPageOption(option);
                                 phoneNumber.setCreatedTime(createdTime);
@@ -648,7 +641,7 @@ public class ContentImpl implements  ContentService {
                             matcher = pattern.matcher(doc.wholeText());
                             // check all occurance
                             while (matcher.find()) {
-                                System.out.println("PHONE 4:" + matcher.group());
+//                                System.out.println("PHONE 4:" + matcher.group());
                                 ContactReport phoneNumber = new ContactReport(matcher.group(),url,"Phone");
                                 phoneNumber.setPageOption(option);
                                 phoneNumber.setCreatedTime(createdTime);
@@ -659,7 +652,7 @@ public class ContentImpl implements  ContentService {
                             matcher = pattern.matcher(doc.wholeText());
                             // check all occurance
                             while (matcher.find()) {
-                                System.out.println("PHONE 5:" + matcher.group());
+//                                System.out.println("PHONE 5:" + matcher.group());
                                 ContactReport phoneNumber = new ContactReport(matcher.group(),url,"Phone");
                                 phoneNumber.setPageOption(option);
                                 phoneNumber.setCreatedTime(createdTime);
@@ -670,7 +663,7 @@ public class ContentImpl implements  ContentService {
                             matcher = pattern.matcher(doc.wholeText());
                             // check all occurance
                             while (matcher.find()) {
-                                System.out.println("PHONE 6:" + matcher.group());
+//                                System.out.println("PHONE 6:" + matcher.group());
                                 ContactReport phoneNumber = new ContactReport(matcher.group(),url,"Phone");
                                 phoneNumber.setPageOption(option);
                                 phoneNumber.setCreatedTime(createdTime);
@@ -681,7 +674,7 @@ public class ContentImpl implements  ContentService {
                             matcher = pattern.matcher(doc.wholeText());
                             // check all occurance
                             while (matcher.find()) {
-                                System.out.println("PHONE 7:" + matcher.group());
+//                                System.out.println("PHONE 7:" + matcher.group());
                                 ContactReport phoneNumber = new ContactReport(matcher.group(),url,"Phone");
                                 phoneNumber.setCreatedTime(createdTime);
                                 list1.add(phoneNumber);
@@ -691,7 +684,7 @@ public class ContentImpl implements  ContentService {
                             matcher = pattern.matcher(doc.wholeText());
                             // check all occurance
                             while (matcher.find()) {
-                                System.out.println("PHONE 8:" + matcher.group());
+//                                System.out.println("PHONE 8:" + matcher.group());
                                 ContactReport phoneNumber = new ContactReport(matcher.group(),url,"Phone");
                                 phoneNumber.setPageOption(option);
                                 phoneNumber.setCreatedTime(createdTime);
@@ -701,7 +694,7 @@ public class ContentImpl implements  ContentService {
                             matcher = pattern.matcher(doc.wholeText());
                             // check all occurance
                             while (matcher.find()) {
-                                System.out.println("PHONE 9:" + matcher.group());
+//                                System.out.println("PHONE 9:" + matcher.group());
                                 ContactReport phoneNumber = new ContactReport(matcher.group(),url,"Phone");
                                 phoneNumber.setPageOption(option);
                                 phoneNumber.setCreatedTime(createdTime);
@@ -711,7 +704,7 @@ public class ContentImpl implements  ContentService {
                             matcher = pattern.matcher(doc.wholeText());
                             // check all occurance
                             while (matcher.find()) {
-                                System.out.println("PHONE 10:" + matcher.group());
+//                                System.out.println("PHONE 10:" + matcher.group());
                                 ContactReport phoneNumber = new ContactReport(matcher.group(),url,"Phone");
                                 phoneNumber.setPageOption(option);
                                 phoneNumber.setCreatedTime(createdTime);
@@ -721,7 +714,17 @@ public class ContentImpl implements  ContentService {
                             matcher = pattern.matcher(doc.wholeText());
                             // check all occurance
                             while (matcher.find()) {
-                                System.out.println("PHONE 11:" + matcher.group());
+//                                System.out.println("PHONE 11:" + matcher.group());
+                                ContactReport phoneNumber = new ContactReport(matcher.group(),url,"Phone");
+                                phoneNumber.setPageOption(option);
+                                phoneNumber.setCreatedTime(createdTime);
+                                list1.add(phoneNumber);
+                            }
+                            pattern = Pattern.compile(patternPhone12);
+                            matcher = pattern.matcher(doc.wholeText());
+                            // check all occurance
+                            while (matcher.find()) {
+//                                System.out.println("PHONE 11:" + matcher.group());
                                 ContactReport phoneNumber = new ContactReport(matcher.group(),url,"Phone");
                                 phoneNumber.setPageOption(option);
                                 phoneNumber.setCreatedTime(createdTime);
@@ -737,20 +740,13 @@ public class ContentImpl implements  ContentService {
                             }
                         }
 
-                        // so my  ^\\(?(\\d{3,4})\\)?[-.\\s]?(\\d{3,4})[-.\\s]?(\\d{2,4})$
-                        // \\d{3,4}
                     }catch (Exception ex){
                         Logger.getLogger(ContentService.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }});
         }
         executor.shutdown();
-        try {
-            executor.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException e) {
-            Logger.getLogger(ContentImpl.class.getName()).log(Level.SEVERE, null, e);
-        }
-
+        executor.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
         return  list1;
     }
 }

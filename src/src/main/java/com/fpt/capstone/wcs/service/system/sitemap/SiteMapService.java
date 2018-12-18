@@ -3,7 +3,7 @@ package com.fpt.capstone.wcs.service.system.sitemap;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fpt.capstone.wcs.model.pojo.ReferencePOJO;
 import com.fpt.capstone.wcs.model.pojo.RequestCommonPOJO;
-import com.fpt.capstone.wcs.model.pojo.SiteMapOutputPOJO;
+import com.fpt.capstone.wcs.model.pojo.SiteMapDecodeResultPOJO;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -12,7 +12,7 @@ import java.util.Map;
 
 public interface SiteMapService {
 
-    public List<SiteMapOutputPOJO> getVisualSitemap(RequestCommonPOJO request) throws MalformedURLException;
+    public List<SiteMapDecodeResultPOJO> getVisualSitemap(RequestCommonPOJO request) throws MalformedURLException;
     public Map<String, Object> getPagesReferenceToThisURL(ReferencePOJO request) throws IOException;
     public Map<String, Object> getUrlsReferencedByThisPage(ReferencePOJO request) throws IOException;;
     public Map<String, Object> getLatestVer(RequestCommonPOJO request);
