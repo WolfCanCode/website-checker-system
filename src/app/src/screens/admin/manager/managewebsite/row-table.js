@@ -90,7 +90,7 @@ export default class TableRow extends Component {
 
             // var boxW = 300;
             // var boxH = 25;
-            var boxW = 270;
+            var boxW = 280;
             var boxH = 30;
 
             var halfBoxH = boxH / 2;

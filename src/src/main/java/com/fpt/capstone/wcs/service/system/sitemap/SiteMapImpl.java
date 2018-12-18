@@ -78,10 +78,16 @@ public class SiteMapImpl implements SiteMapService {
                 String curPage = "";
                 List<SiteLinkPOJO> resultList = new ArrayList<>();
                 List<VerticePOJO> vertices = smVal.getVertices();
+                HashSet<String> duplicateChecker = new HashSet<>();
+
                 for (int i = 0; i < vertices.size(); i++) {
-                    List<LinkPOJO> list = vertices.get(i).getRefTo();
+                    List<LinkPOJO> list = vertices.get(i).getRefBy();
                     for (int j = 0; j < list.size(); j++) {
-                        resultList.add(new SiteLinkPOJO(curPage, list.get(j).getValue(), list.get(j).getType()));
+                        String newRef = list.get(j).getValue();
+                        if (!duplicateChecker.contains(newRef)) {
+                            resultList.add(new SiteLinkPOJO(curPage, list.get(j).getValue(), list.get(j).getType()));
+                            duplicateChecker.add(newRef);
+                        }
                     }
                 }
                 res.put("pageList", resultList);
@@ -114,10 +120,17 @@ public class SiteMapImpl implements SiteMapService {
                 String curPage = "";
                 List<SiteLinkPOJO> resultList = new ArrayList<>();
                 List<VerticePOJO> vertices = smVal.getVertices();
+                HashSet<String> duplicateChecker = new HashSet<>();
+
                 for (int i = 0; i < vertices.size(); i++) {
-                    List<LinkPOJO> list = vertices.get(i).getRefBy();
+                    List<LinkPOJO> list = vertices.get(i).getRefTo();
+
                     for (int j = 0; j < list.size(); j++) {
-                        resultList.add(new SiteLinkPOJO(curPage, list.get(j).getValue(), list.get(j).getType()));
+                        String newRef = list.get(j).getValue();
+                        if (!duplicateChecker.contains(newRef)) {
+                            resultList.add(new SiteLinkPOJO(curPage, list.get(j).getValue(), list.get(j).getType()));
+                            duplicateChecker.add(newRef);
+                        }
                     }
                 }
                 res.put("pageList", resultList);

@@ -18,7 +18,7 @@ class spellingScreen extends Component {
             "pageOptionId": cookies.get("u_option"),
         };
 
-        fetch("/api/getWrongWords", {
+        fetch("/api/spelling/loadData", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -26,13 +26,14 @@ class spellingScreen extends Component {
             },
             body: JSON.stringify(param)
         }).then(response => response.json()).then((data) => {
-            var idList = []
+            
             comp = data.spellingReport.map((item, index) => {
-                idList.push(item.id);
-                return (<TableRow no={index} word={item.wrongWord} excerpt={item.excerpt} page={item.pageId} />);
+                
+                return (<TableRow no={index} word={item.wrongWord} excerpt={item.excerpt}
+                     page={item.page} decision={item.decision} selectedSuggestion={item.selectedSuggestion}/>);
             });
             
-            this.setState({ list: comp, loadingTable: false, isDisable: false, isDoneTest: true, listReportId: idList });
+            this.setState({ list: comp, loadingTable: false, isDisable: false, isDoneTest: true });
         });
 
 
@@ -48,7 +49,7 @@ class spellingScreen extends Component {
             "pageOptionId": cookies.get("u_option"),
         };
 
-        fetch("/api/getWrongWords", {
+        fetch("/api/spelling/getWrongWords", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -56,41 +57,41 @@ class spellingScreen extends Component {
             },
             body: JSON.stringify(param)
         }).then(response => response.json()).then((data) => {
+            var idList = []
             comp = data.spellingReport.map((item, index) => {
-                console.log('word: '  + item.wrongWord);
-                return (<TableRow word={item.wrongWord} excerpt={item.excerpt} page={item.pageId} />);
+                idList.push(item.id);
+                return (<TableRow no={index} word={item.wrongWord} excerpt={item.excerpt} page={item.page} />);
             });
-            this.setState({ list: comp });
-            this.setState({ loadingTable: false });
+            this.setState({ list: comp, loadingTable: false, isDisable: false, isDoneTest: true, listReportId: idList });
         });
 
     }
-    // _saveSpellingReport() {
-    //     var comp = [];
-    //     this.setState({ loadingTable: true, isDisable: true });
-    //     var param = {
-    //         "userId": cookies.get("u_id"),
-    //         "userToken": cookies.get("u_token"),
-    //         "websiteId": cookies.get("u_w_id"),
-    //         "pageOptionId": cookies.get("u_option"),
-    //         "listReportId": this.state.listReportId
-    //     }
+    _saveSpellingReport() {
+        var comp = [];
+        this.setState({ loadingTable: true, isDisable: true });
+        var param = {
+            "userId": cookies.get("u_id"),
+            "userToken": cookies.get("u_token"),
+            "websiteId": cookies.get("u_w_id"),
+            "pageOptionId": cookies.get("u_option"),
+            "listReportId": this.state.listReportId,
+        }
 
-    //     fetch("/api/spelling/save", {
-    //         method: 'POST',
-    //         headers: {
-    //             'Accept': 'application/json',
-    //             'Content-Type': 'application/json'
-    //         },
-    //         body: JSON.stringify(param)
-    //     }).then(response => response.json()).then((data) => {
-    //         comp = data.prohibitedContentReport.map((item, index) => {
-    //             return (<TableRow key={index} urlPage={item.urlPage} word={item.word} fragment={item.fragment} type={item.type} />);
-    //         });
-    //         this.setState({ list: comp });
-    //         this.setState({ loadingTable: false, isDisable: false, isDoneTest: false });
-    //     });
-    // }
+        fetch("/api/spelling/save", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(param)
+        }).then(response => response.json()).then((data) => {
+            comp = data.spellingSaveResult.map((item, index) => {                
+                return (<TableRow no={index} word={item.wrongWord} excerpt={item.excerpt} page={item.page} />);
+            });
+            
+            this.setState({ list: comp, loadingTable: false, isDisable: false, isDoneTest: false});
+        });
+    }
     render() {
         return (
             <div>
@@ -100,7 +101,7 @@ class spellingScreen extends Component {
                         Check
                        <Icon name='right arrow' />
                     </Button>
-                    {this.state.isDoneTest ? <Button icon color="green" labelPosition='right' onClick={() => this._saveReport()}>
+                    {this.state.isDoneTest ? <Button icon color="green" labelPosition='right' onClick={() => this._saveSpellingReport()}>
                                     Save <Icon name='check' />
                                 </Button> : ""}
                     <div style={{ marginBottom: '10px', float: 'right' }}>

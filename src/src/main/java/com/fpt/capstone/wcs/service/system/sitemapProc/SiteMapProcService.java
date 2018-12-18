@@ -530,22 +530,26 @@ public class SiteMapProcService {
         valueObj.setWebsiteUrl(rootDomain);
         valueObj.setVersion(version);
         List<VerticePOJO> vertices = new ArrayList<>();
+        List<LinkPOJO> refTo = new ArrayList<>();
+        List<LinkPOJO> refBy = new ArrayList<>();
+
         for (int i = 0; i <graph.size(); i++) {
             List<SiteLinkPOJO> linkList = graph.get(i);
             if(linkList.size() > 0){
                 String url = linkList.get(0).getSrcUrl();
-                List<LinkPOJO> refTo = new ArrayList<>();
-                List<LinkPOJO> refBy = new ArrayList<>();
                 for (int j = 0; j < linkList.size(); j++) {
                     SiteLinkPOJO siteLink = linkList.get(j);
                     refTo.add(new LinkPOJO(siteLink.getDesUrl(), siteLink.getDesType()));
                 }
-                for (int k = 0; k < linkList.size(); k++) {
-                    SiteLinkPOJO siteLink = linkList.get(k);
+                for (int k = 0; k < invGraph.get(i).size(); k++) {
+                    SiteLinkPOJO siteLink = invGraph.get(i).get(k);
                     refBy.add(new LinkPOJO(siteLink.getDesUrl(), siteLink.getDesType()));
                 }
+
                 vertices.add(new VerticePOJO(url, refTo, refBy));
             }
+
+
         }
 
         valueObj.setVertices(vertices);
