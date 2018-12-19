@@ -2,89 +2,66 @@ import React, { Component } from 'react';
 import { Segment, Input, Button } from 'semantic-ui-react';
 // import ModelSitemap from './modal';
 import Canvas from './canvas';
+import { Cookies } from "react-cookie";
 
+const cookies = new Cookies();
 export default class SiteMap extends Component {
     constructor(props) {
         super(props);
         this.state = { urlRoot: "", map: [], typeMap: [], urlMap: [], isDisabled: false, isLoading: false };
-        this.handleChange = this.handleChange.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
+        
+       
     }
 
-
-    handleChange(event) {
-        this.setState({ urlRoot: event.target.value });
+    componentDidMount() {
+        this._viewSitemap()
     }
-
-    handleSubmit(event) {
-        // alert('A URL was submitted: ' + this.state.urlRoot);
-        event.preventDefault();
-    }
-
-    getSitemap() {
-        this.setState({ isDisabled: true, isLoading: true });
-        var inputParam = { "url": this.state.urlRoot };
+    _viewSitemap() {
         // eslint-disable-next-line
         var result = [];
-
-        fetch("/api/sitemap", {
+        var urlRoot = "";
+        
+        var param = { "userId": cookies.get("u_id"), "userToken": cookies.get("u_token"), "websiteId": cookies.get("u_w_id"), };
+        fetch("/api/sitemap/getVisualSitemap", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(inputParam)
+            body: JSON.stringify(param)
         }).then(response => response.json()).then((data) => {
-            // console.log("Data: " + data);
-            // var ex = JSON.parse(JSON.stringify(data));
-            // console.log("EX: " + ex);
-            // data[9]
             // eslint-disable-next-line
             result = data.map((item, index) => {
-                console.log("Index: " + index);
-                console.log("Map: " + item.map);
-                console.log("Type: " + item.typeMap);
-                console.log("Url: " + item.urlMap);
                 // eslint-disable-next-line
                 var mapArray = eval("[" + item.map + "]");
-                // console.log("[0]: " + mapArray[0]);
-                // console.log("[1]: " + mapArray[1]);
-                // console.log("[2]: " + mapArray[2]);
                 // eslint-disable-next-line
                 var typeArray = eval("[" + item.typeMap + "]");
                 // eslint-disable-next-line
                 var urlArray = eval("[" + item.urlMap + "]");
-
-                // console.log("Is array: " + Array.isArray(array_of_objects));
-
                 this.setState({ map: mapArray, typeMap: typeArray, urlMap: urlArray });
-                // console.log("[0]: " + this.state.map[0]);
-                // console.log("[1]: " + this.state.map[1]);
-                // console.log("[2]: " + this.state.map[2]);
-                // this.setState({ typeMap: typeArray });
-                // this.setState({ urlMap: urlArray });
-
-                // alert("Map: " + this.state.map);
-                // alert("Type: " + this.state.typeMap);
-                // alert("Url: " + this.state.urlMap);
-
+                console.log("Map: " + mapArray);
+                console.log("Type: " + typeArray);
+                console.log("Url: " + urlArray);
             });
             var map = [];
             var typeMap = [];
             var urlMap = [];
-
             map = this.state.map;
             typeMap = this.state.typeMap;
             urlMap = this.state.urlMap;
+            urlRoot = this.state.urlMap[0];
+            var urlLength = urlRoot.length;
 
-            var canvas = document.getElementById("myCanvas");
+            var canvas = document.getElementById("myCanvas1");
             var context = canvas.getContext("2d");
             var rectCoord = [];
             context.beginPath();
-            context.font = '12px serif';
+            context.font = '18px serif';
 
-            var boxW = 300;
-            var boxH = 25;
+            // var boxW = 300;
+            // var boxH = 25;
+            var boxW = 280;
+            var boxH = 30;
 
             var halfBoxH = boxH / 2;
 
@@ -95,12 +72,36 @@ export default class SiteMap extends Component {
 
             var StartDrawingX = mxWidth - 10 - boxW;
             var StartDrawingY = 10;
-            function addTextToBox(coordX, coordY, fontType, content) {
+
+            function addTextToBox(coordX, coordY, fontType, content, type) {
                 context.save();
                 context.fillStyle = "black";
-                context.font = content;
+                context.font = fontType;
                 context.textAlign = 'left';
                 context.translate(coordX + 10, coordY + boxH - 10);
+
+                if (content === urlRoot) {
+
+                }
+
+                else if (type === 1 || type === 3) {
+                    var distance = content.length - urlLength;
+                    if (distance > 30) {
+                        content = content.substring(urlLength, urlLength + 30) + '...';
+                    } else {
+                        content = content.substring(urlLength, urlLength + 30);
+                    }
+
+                    // alert(content);
+                }
+                else if (type === 2) {
+                    if (distance > 30) {
+                        content = content.substring(0, 30) + "...";
+                    } else {
+                        content = content.substring(0, 30);
+                    }
+
+                }
                 context.fillText(content, 0, 0);
                 context.restore();
             }
@@ -130,6 +131,7 @@ export default class SiteMap extends Component {
 
                             // analysis color of type
                             context.fillStyle = "#79c5fc";
+
                             if (typeMap[floor][i] === 3) context.fillStyle = "red";
                             if (typeMap[floor][i] === 2) context.fillStyle = "gray";
 
@@ -137,7 +139,10 @@ export default class SiteMap extends Component {
                             context.stroke();
 
                             // add text
-                            addTextToBox(deep, curRow, '12px serif', urlMap[floor][i]);
+
+                            addTextToBox(deep, curRow, '18px serif', urlMap[floor][i], typeMap[floor][i]);
+
+
                             //addTextToBox(deep, curRow, '12px serif', 'x = ' + deep + " y = " + curRow);
                         }
                         rect.push(curRow);
@@ -165,7 +170,7 @@ export default class SiteMap extends Component {
                             context.stroke();
 
                             // add text
-                            addTextToBox(deep, coord[i], '12px serif', urlMap[floor][i]);
+                            addTextToBox(deep, coord[i], '18px serif', urlMap[floor][i], typeMap[floor][i]);
                             //addTextToBox(deep, coord[i], '12px serif', 'x = ' + deep + "y = " + coord[i]);
                         }
                         rect.push(coord[i]);
@@ -213,7 +218,9 @@ export default class SiteMap extends Component {
             buildTreeMap(nfloor - 1, StartDrawingX, []);
             ////Update UI
             this.setState({ isDisabled: false, isLoading: false });
-
+            // this.props.loadingTable(false);
+            var selectedRectangleValue = "";
+            var that = this;
             // add 'click event' to canvas
             canvas.addEventListener('click', function (event) {
 
@@ -243,31 +250,23 @@ export default class SiteMap extends Component {
                 }
 
                 if (isInside === true) {
-                    // pop-up the url
-                    alert("Your URL: " + rectCoord[id].url);
+
+                    // alert("Your URL: " + rectCoord[id].url);
+                    selectedRectangleValue = rectCoord[id].url;
+                    console.log("Selected: " + selectedRectangleValue);
+
+                    // that.props.setSelectedRectValue(selectedRectangleValue);
                 }
             });
 
         });
-
     }
-
     render() {
+        
         return (
-            <Segment basic style={{ maxHeight: '60vh' }}>
-                <form onSubmit={this.handleSubmit}>
-                    <Input type="text" value={this.state.urlRoot} placeholder='Input your website URL...'
-                        onChange={this.handleChange}
-                        focus ref="urlInput"
-                        style={{ margin: '5px', width: '400px' }} />
-                    <Button content="Get Sitemap" primary type="Submit"
-                        disabled={this.state.isDisabled} onClick={() => this.getSitemap()} />
-                </form>
-                <Segment loading={this.state.isLoading} secondary style={{ maxHeight: '350px', overflow: 'scroll' }} >
-                    <Canvas />
-                </Segment>
-
-            </Segment>
+            <canvas id="myCanvas1" ref="myCanvas" >
+                The canvas display Website's sitemap
+        </canvas>
         );
 
     }
