@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import 'semantic-ui-css/semantic.min.css';
-import { Segment, Button, Table, Icon, Input } from 'semantic-ui-react'
+import { Segment, Button, Table, Icon, Dropdown } from 'semantic-ui-react'
 import TableRow from './row-table';
 import { Cookies } from "react-cookie";
 import ReactToExcel from "react-html-table-to-excel";
@@ -15,7 +15,17 @@ const cookies = new Cookies();
 
 
 class faviconScreen extends Component {
-    state = { list: [], loadingTable: false, isDisable: false, faviconCount: 0, faviconMissingCount: 0, isDoneTest: false, listReportID: [] };
+    state = {
+        list: [],
+        loadingTable: false,
+        isDisable: false,
+        faviconCount: 0,
+        faviconMissingCount: 0,
+        isDoneTest: false,
+        listReportID: [],
+        dateOption: [],
+        dateValue: null
+    };
     componentDidMount() {
         var comp = [];
         var listCom = [];
@@ -29,6 +39,26 @@ class faviconScreen extends Component {
             "websiteId": cookies.get("u_w_id"),
             "pageOptionId": cookies.get("u_option"),
         };
+
+        fetch("/api/faviconTest/getHistoryList", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(param)
+        }).then(response => response.json()).then((res) => {
+            if (res.action === "SUCCESS") {
+                if (res.data.length !== 0) {
+                    var dateOption = res.data.map((item, index) => {
+                        return { key: index, value: item, text: new Date(item).toLocaleString() };
+                    })
+                    console.log(dateOption);
+                    this.setState({ dateOption: dateOption, dateValue: dateOption[0] })
+                }
+            }
+        });
+
         console.log("U-Option" + cookies.get("u_option"))
         fetch("/api/faviconTest/lastest", {
             method: 'POST',
@@ -66,6 +96,77 @@ class faviconScreen extends Component {
 
 
     }
+
+    _changeDate(event, data) {
+        var listCom = [];
+        var favUrlCount = 0;
+        var faviconMissCount = 0;
+        var flag = false;
+        this.setState({ dateValue: data.value, loadingTable: true });
+        var comp = [];
+        fetch("/api/faviconTest/getHistoryReport", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ reportTime: data.value })
+        }).then(response => response.json()).then((res) => {
+            comp = res.data.map((item, index) => {
+                for (let i = 0; i < listCom.length; i++) {
+                    if (item.faviconUrl === listCom[i]) {
+                        flag = true;
+                    }
+                }
+                if (flag === false && item.faviconUrl !== "Missing Favicon") {
+                    listCom.push(item.faviconUrl);
+                    favUrlCount++;
+                }
+                else {
+                    flag = false;
+                }
+                if (item.faviconUrl === "Missing Favicon") {
+                    faviconMissCount++;
+                }
+
+                return (<TableRow key={index} image={item.faviconUrl} url={item.faviconUrl} sizeFav={item.sizeFavicon} typeFavicon={item.typeFavicon} webAddress={item.url} />);
+            });
+            this.setState({ faviconMissingCount: faviconMissCount })
+            this.setState({ faviconCount: favUrlCount });
+            this.setState({ list: comp });
+            this.setState({ loadingTable: false });
+        });
+    }
+
+    _clickUpdateListDate() {
+        var param = {
+            "userId": cookies.get("u_id"),
+            "userToken": cookies.get("u_token"),
+            "websiteId": cookies.get("u_w_id"),
+            "pageOptionId": cookies.get("u_option"),
+        }
+
+        fetch("/api/faviconTest/getHistoryList", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(param)
+        }).then(response => response.json()).then((res) => {
+            if (res.action === "SUCCESS") {
+                if (res.data.length !== 0) {
+                    var dateOption = res.data.map((item, index) => {
+                        return { key: index, value: item, text: new Date(item).toLocaleString() };
+                    })
+                    console.log(dateOption);
+                    this.setState({ dateOption: dateOption })
+                }
+            }
+        });
+
+    }
+
     _doFaviconTest() {
         this.setState({ loadingTable: true, isDisable: true });
         var comp = [];
@@ -165,7 +266,7 @@ class faviconScreen extends Component {
                 return (<TableRow key={index} image={item.faviconUrl} url={item.faviconUrl} sizeFav={item.sizeFavicon} typeFavicon={item.typeFavicon} w webAddress={item.url} />);
             });
 
-          
+
 
             this.setState({ faviconCount: favUrlCount });
             this.setState({ faviconMissingCount: faviconMissCount });
@@ -215,18 +316,19 @@ class faviconScreen extends Component {
                                 <Input icon='search' placeholder='Search...' />
                             </Segment> */}
                             <Segment basic>
-                                
+
                                 <div style={{ marginBottom: '30px' }}>
-                                <Button icon primary labelPosition='right' disabled={this.state.isDisable} onClick={() => this._doFaviconTest()}>
-                                    Check
+                                    <Button icon primary labelPosition='right' disabled={this.state.isDisable} onClick={() => this._doFaviconTest()}>
+                                        Check
                        <Icon name='right arrow' />
-                                </Button>
-                                {this.state.isDoneTest ? <Button icon color="green" labelPosition='right' onClick={() => this._saveReport()}>
-                                    Save <Icon name='check' />
-                                </Button> : ""}
+                                    </Button>
+                                    {this.state.isDoneTest ? <Button icon color="green" labelPosition='right' onClick={() => this._saveReport()}>
+                                        Save <Icon name='check' />
+                                    </Button> : ""}
                                     <div style={{ marginBottom: '10px', float: 'right' }}>
 
 
+                                        <Dropdown style={{ marginRight: 10, zIndex: 9999 }} placeholder='Select history' selection defaultValue={this.state.dateValue} options={this.state.dateOption} value={this.state.dateValue} onClick={() => this._clickUpdateListDate()} onChange={(event, data) => this._changeDate(event, data)} />
                                         <ReactToExcel
                                             className="btn1"
                                             table="table-to-xls"
@@ -236,7 +338,7 @@ class faviconScreen extends Component {
                                         />
                                     </div>
 
-                                    <Input icon='search' placeholder='Search...' style={{ float: 'right' }} />
+                                    {/* <Input icon='search' placeholder='Search...' style={{ float: 'right' }} /> */}
                                 </div>
                             </Segment>
                             <Table unstackable singleLine textAlign='center' style={{ tableLayout: 'auto' }} loading={this.state.loadingTable} id="table-to-xls">

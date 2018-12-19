@@ -114,7 +114,7 @@ export default class managestaffscreen extends Component {
                 {/* body */}
                 <Segment basic >
                     <div style={{ marginBottom: '30px' }}>
-                        <Input icon='search' placeholder='Search...' style={{ float: 'right' }} />
+                        {/* <Input icon='search' placeholder='Search...' style={{ float: 'right' }} /> */}
                         <Button style={{ float: 'right' }} onClick={() => this.setState({ addModal: true })}> Add </Button>
                     </div>
                 </Segment>

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import 'semantic-ui-css/semantic.min.css';
-import { Segment, Button, Table, Icon, Input } from 'semantic-ui-react'
+import { Segment, Button, Table, Icon, Dropdown } from 'semantic-ui-react'
 import { Cookies } from "react-cookie";
 import ReactToExcel from "react-html-table-to-excel";
 import TableRow from './row-table';
@@ -8,7 +8,7 @@ import TableRow from './row-table';
 const cookies = new Cookies();
 
 class ServerBehaviorScreen extends Component {
-    state = { done: 0, list: [], loadingTable: false, isDisable: false, listReportId: [], isDoneTest: false };
+    state = { done: 0, list: [], loadingTable: false, isDisable: false, listReportId: [], isDoneTest: false, dateOption: [], dateValue: null };
     componentDidMount() {
         var comp = [];
         this.setState({ loadingTable: true });
@@ -18,6 +18,26 @@ class ServerBehaviorScreen extends Component {
             "websiteId": cookies.get("u_w_id"),
             "pageOptionId": cookies.get("u_option"),
         }
+
+        fetch("/api/svbehavior/getHistoryList", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(param)
+        }).then(response => response.json()).then((res) => {
+            if (res.action === "SUCCESS") {
+                if (res.data.length !== 0) {
+                    var dateOption = res.data.map((item, index) => {
+                        return { key: index, value: item, text: new Date(item).toLocaleString() };
+                    })
+                    console.log(dateOption);
+                    this.setState({ dateOption: dateOption, dateValue: dateOption[0] })
+                }
+            }
+        });
+
         fetch("/api/svbehavior/lastest", {
             method: 'POST',
             headers: {
@@ -32,6 +52,55 @@ class ServerBehaviorScreen extends Component {
                 });
             }
             this.setState({ list: comp, loadingTable: false });
+        });
+
+    }
+
+    _changeDate(event, data) {
+        var comp = [];
+        this.setState({ dateValue: data.value, loadingTable: true });
+        fetch("/api/svbehavior/getHistoryReport", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ reportTime: data.value })
+        }).then(response => response.json()).then((res) => {
+            comp = res.data.map((item, index) => {
+                return (<TableRow key={index} url={item.url} isPageSSL={item.pageSSL} isRedirectHTTPS={item.redirectHTTPS} isRedirectWWW={item.redirectWWW} />);
+            });
+
+            this.setState({ list: comp, loadingTable: false });
+        });
+
+    }
+
+    _clickUpdateListDate() {
+        var param = {
+            "userId": cookies.get("u_id"),
+            "userToken": cookies.get("u_token"),
+            "websiteId": cookies.get("u_w_id"),
+            "pageOptionId": cookies.get("u_option"),
+        }
+
+        fetch("/api/svbehavior/getHistoryList", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(param)
+        }).then(response => response.json()).then((res) => {
+            if (res.action === "SUCCESS") {
+                if (res.data.length !== 0) {
+                    var dateOption = res.data.map((item, index) => {
+                        return { key: index, value: item, text: new Date(item).toLocaleString() };
+                    })
+                    console.log(dateOption);
+                    this.setState({ dateOption: dateOption })
+                }
+            }
         });
 
     }
@@ -96,7 +165,7 @@ class ServerBehaviorScreen extends Component {
     render() {
         return (
             <Segment.Group>
-                <Segment style={{ border: 0, minWidth: 300, overflow: "auto" }}>
+                <Segment style={{ border: 0, minWidth: 300 }}>
                     <Button icon primary labelPosition='right' disabled={this.state.isDisable} onClick={() => this._doBehaviorTest()}>
                         Check
                        <Icon name='right arrow' />
@@ -106,6 +175,8 @@ class ServerBehaviorScreen extends Component {
                     </Button> : ""}
 
                     <div style={{ float: 'right' }}>
+                        <Dropdown style={{ marginRight: 10, zIndex: 9999 }} placeholder='Select history' selection defaultValue={this.state.dateValue} options={this.state.dateOption} value={this.state.dateValue} onClick={() => this._clickUpdateListDate()} onChange={(event, data) => this._changeDate(event, data)} />
+
                         <ReactToExcel
                             className="btn1"
                             table="table-to-xls"
@@ -115,7 +186,7 @@ class ServerBehaviorScreen extends Component {
                         />
                     </div>
 
-                    <Input icon='search' placeholder='Search...' style={{ float: 'right', marginRight: 5 }} />
+                    {/* <Input icon='search' placeholder='Search...' style={{ float: 'right', marginRight: 5 }} /> */}
                 </Segment>
 
                 <Segment.Group horizontal >

@@ -89,6 +89,18 @@ public class QualityController {
     }
 
     @CrossOrigin
+    @PostMapping("/api/brokenLink/getHistoryList")
+    public Map<String, Object> getHistoryBrokenLinkList(@RequestBody RequestCommonPOJO request) {
+        return qualityService.getHistoryBrokenLinkList(request);
+    }
+
+    @CrossOrigin
+    @PostMapping("/api/brokenLink/getHistoryReport")
+    public Map<String, Object> getHistoryBrokenLinkReport(@RequestBody RequestCommonPOJO request) {
+        return qualityService.getHistoryBrokenLinkReport(request);
+    }
+
+    @CrossOrigin
     @PostMapping("/api/brokenLink/SaveReport")
     public Map<String, Object> saveBrokenLinkReport(@RequestBody RequestReportPOJO request) {
         return qualityService.saveBrokenLinkReport(request);
@@ -106,6 +118,19 @@ public class QualityController {
     public Map<String, Object> getLastestBrokenPage(@RequestBody RequestCommonPOJO request) {
         return qualityService.getLastestBrokenPage(request);
     }
+
+    @CrossOrigin
+    @PostMapping("/api/brokenPage/getHistoryList")
+    public Map<String, Object> getHistoryBrokenPageTestList(@RequestBody RequestCommonPOJO request) {
+        return qualityService.getHistoryBrokenPageTestList(request);
+    }
+
+    @CrossOrigin
+    @PostMapping("/api/brokenPage/getHistoryReport")
+    public Map<String, Object> getHistoryBrokenPageTestReport(@RequestBody RequestCommonPOJO request) {
+        return qualityService.getHistoryBrokenPageTestReport(request);
+    }
+
     @CrossOrigin
     @PostMapping("/api/brokenPage/SaveReport")
     public Map<String, Object> saveBrokenPageReport(@RequestBody RequestReportPOJO request) {
@@ -126,6 +151,18 @@ public class QualityController {
     }
 
     @CrossOrigin
+    @PostMapping("/api/prohibitedContent/getHistoryList")
+    public Map<String, Object> getHistoryProhibitedTestList(@RequestBody RequestCommonPOJO request) {
+        return qualityService.getHistoryProhibitedContentList(request);
+    }
+
+    @CrossOrigin
+    @PostMapping("/api/prohibitedContent/getHistoryReport")
+    public Map<String, Object> getHistoryProhibitedTestReport(@RequestBody RequestCommonPOJO request) {
+        return qualityService.getHistoryProhibitedContentReport(request);
+    }
+
+    @CrossOrigin
     @PostMapping("/api/prohibitedContent/SaveReport")
     public Map<String, Object> saveProhibitedContentReport(@RequestBody RequestReportPOJO request) {
         return qualityService.saveProhibitedContentReport(request);
@@ -141,6 +178,18 @@ public class QualityController {
     @PostMapping("/api/missingtest/lastest")
     public Map<String, Object> getLastestMissingFile(@RequestBody MissingFilePOJO request) {
         return  qualityService.getLastestMissingFile(request);
+    }
+
+    @CrossOrigin
+    @PostMapping("/api/missingtest/getHistoryList")
+    public Map<String, Object> getHistoryMissingFileTestList(@RequestBody RequestCommonPOJO request) {
+        return qualityService.getHistoryMissingFileTestList(request);
+    }
+
+    @CrossOrigin
+    @PostMapping("/api/missingtest/getHistoryReport")
+    public Map<String, Object> getHistoryMissingFileTestReport(@RequestBody RequestCommonPOJO request) {
+        return qualityService.getHistoryMissingFileTestReport(request);
     }
 
     @PostMapping("/api/missingtest/saveReport")

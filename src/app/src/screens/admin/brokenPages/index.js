@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import 'semantic-ui-css/semantic.min.css';
-import { Segment, Button, Table, Icon, Input } from 'semantic-ui-react'
+import { Segment, Button, Table, Icon, Dropdown } from 'semantic-ui-react'
 import TableRow from './row-table';
 import { Cookies } from "react-cookie";
 import ReactToExcel from "react-html-table-to-excel";
@@ -14,7 +14,7 @@ const cookies = new Cookies();
 
 class brokenPagesScreen extends Component {
 
-    state = { list: [], loadingTable: false, isDisable: false, tested: false , countErrorPage : 0 , countMissingPage : 0, isDoneTest: false, listReportId: []};
+    state = { list: [], loadingTable: false, isDisable: false, tested: false, countErrorPage: 0, countMissingPage: 0, isDoneTest: false, listReportId: [], dateOption: [], dateValue: null };
 
 
     componentDidMount() {
@@ -26,6 +26,26 @@ class brokenPagesScreen extends Component {
             "websiteId": cookies.get("u_w_id"),
             "pageOptionId": cookies.get("u_option"),
         }
+
+        fetch("/api/brokenPage/getHistoryList", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(param)
+        }).then(response => response.json()).then((res) => {
+            if (res.action === "SUCCESS") {
+                if (res.data.length !== 0) {
+                    var dateOption = res.data.map((item, index) => {
+                        return { key: index, value: item, text: new Date(item).toLocaleString() };
+                    })
+                    console.log(dateOption);
+                    this.setState({ dateOption: dateOption, dateValue: dateOption[0] })
+                }
+            }
+        });
+
         fetch("/api/brokenPage/lastest", {
             method: 'POST',
             headers: {
@@ -40,22 +60,22 @@ class brokenPagesScreen extends Component {
             let countErrorPage = 0;
             let countMissingPage = 0;
 
-             countErrorPage = data.brokenPageReport.reduce((stt,item) => {
-                 if(item.stt === 'Error Page'){
+            countErrorPage = data.brokenPageReport.reduce((stt, item) => {
+                if (item.stt === 'Error Page') {
                     countErrorPage++;
-                 }
+                }
 
                 return countErrorPage;
             }, 0)
 
-            countMissingPage = data.brokenPageReport.reduce((stt,item) => {
-                if(item.stt === 'Missing Page'){
+            countMissingPage = data.brokenPageReport.reduce((stt, item) => {
+                if (item.stt === 'Missing Page') {
                     countMissingPage++;
                 }
 
-               return countMissingPage;
-           }, 0)
-            
+                return countMissingPage;
+            }, 0)
+
             this.setState({ countErrorPage: countErrorPage })
             this.setState({ countMissingPage: countMissingPage })
             this.setState({ list: comp });
@@ -65,9 +85,77 @@ class brokenPagesScreen extends Component {
 
     }
 
+    _changeDate(event, data) {
+        this.setState({ dateValue: data.value, loadingTable: true });
+        var comp = [];
+        fetch("/api/brokenPage/getHistoryReport", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ reportTime: data.value })
+        }).then(response => response.json()).then((res) => {
+            comp = res.data.map((item, index) => {
+                return (<TableRow key={index} urlPage={item.urlPage} stt={item.stt} httpCode={item.httpCode} httpMessage={item.httpMessage} />);
+            });
+            let countErrorPage = 0;
+            let countMissingPage = 0;
+
+            countErrorPage = res.data.reduce((stt, item) => {
+                if (item.stt === 'Error Page') {
+                    countErrorPage++;
+                }
+
+                return countErrorPage;
+            }, 0)
+
+            countMissingPage = res.data.reduce((stt, item) => {
+                if (item.stt === 'Missing Page') {
+                    countMissingPage++;
+                }
+
+                return countMissingPage;
+            }, 0)
+
+            this.setState({ countErrorPage: countErrorPage })
+            this.setState({ countMissingPage: countMissingPage })
+            this.setState({ list: comp });
+            this.setState({ loadingTable: false });
+        });
+    }
+
+    _clickUpdateListDate() {
+        var param = {
+            "userId": cookies.get("u_id"),
+            "userToken": cookies.get("u_token"),
+            "websiteId": cookies.get("u_w_id"),
+            "pageOptionId": cookies.get("u_option"),
+        }
+
+        fetch("/api/brokenPage/getHistoryList", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(param)
+        }).then(response => response.json()).then((res) => {
+            if (res.action === "SUCCESS") {
+                if (res.data.length !== 0) {
+                    var dateOption = res.data.map((item, index) => {
+                        return { key: index, value: item, text: new Date(item).toLocaleString() };
+                    })
+                    console.log(dateOption);
+                    this.setState({ dateOption: dateOption })
+                }
+            }
+        });
+
+    }
 
     _doBrokenPage() {
-        
+
         var comp = [];
         this.setState({ loadingTable: true, isDisable: true });
         var param = {
@@ -97,26 +185,26 @@ class brokenPagesScreen extends Component {
             let countErrorPage = 0;
             let countMissingPage = 0;
 
-             countErrorPage = data.brokenPageReport.reduce((stt,item) => {
-                 if(item.stt === 'Error Page'){
+            countErrorPage = data.brokenPageReport.reduce((stt, item) => {
+                if (item.stt === 'Error Page') {
                     countErrorPage++;
-                 }
+                }
 
                 return countErrorPage;
             }, 0)
 
-            countMissingPage = data.brokenPageReport.reduce((stt,item) => {
-                if(item.stt === 'Missing Page'){
+            countMissingPage = data.brokenPageReport.reduce((stt, item) => {
+                if (item.stt === 'Missing Page') {
                     countMissingPage++;
                 }
 
-               return countMissingPage;
-           }, 0)
-            
+                return countMissingPage;
+            }, 0)
+
             this.setState({ countErrorPage: countErrorPage })
             this.setState({ countMissingPage: countMissingPage })
 
-           
+
 
 
             this.setState({ loadingTable: false, isDisable: false, isDoneTest: true, listReportId: listReport });
@@ -125,7 +213,7 @@ class brokenPagesScreen extends Component {
 
     }
 
-    _saveReport(){
+    _saveReport() {
         var comp = [];
         this.setState({ loadingTable: true, isDisable: true });
         var param = {
@@ -154,26 +242,26 @@ class brokenPagesScreen extends Component {
             let countErrorPage = 0;
             let countMissingPage = 0;
 
-             countErrorPage = data.brokenPageReport.reduce((stt,item) => {
-                 if(item.stt === 'Error Page'){
+            countErrorPage = data.brokenPageReport.reduce((stt, item) => {
+                if (item.stt === 'Error Page') {
                     countErrorPage++;
-                 }
+                }
 
                 return countErrorPage;
             }, 0)
 
-            countMissingPage = data.brokenPageReport.reduce((stt,item) => {
-                if(item.stt === 'Missing Page'){
+            countMissingPage = data.brokenPageReport.reduce((stt, item) => {
+                if (item.stt === 'Missing Page') {
                     countMissingPage++;
                 }
 
-               return countMissingPage;
-           }, 0)
-            
+                return countMissingPage;
+            }, 0)
+
             this.setState({ countErrorPage: countErrorPage })
             this.setState({ countMissingPage: countMissingPage })
 
-           
+
 
 
             this.setState({ loadingTable: false, isDisable: false, isDoneTest: false });
@@ -185,7 +273,7 @@ class brokenPagesScreen extends Component {
     render() {
         return (
             <Segment.Group>
-                
+
                 <Segment.Group horizontal style={{ margin: 0 }}>
 
                     <Segment basic loading={this.state.loadingTable}>
@@ -207,15 +295,16 @@ class brokenPagesScreen extends Component {
                             </Segment>
                         </Segment.Group>
                         <Segment basic style={{ marginBottom: '-18px', marginTop: '-18px' }}>
-                        <Button icon primary labelPosition='right' disabled={this.state.isDisable} onClick={() => this._doBrokenPage()}>
-                        Check
+                            <Button icon primary labelPosition='right' disabled={this.state.isDisable} onClick={() => this._doBrokenPage()}>
+                                Check
                        <Icon name='right arrow' />
-                    </Button>
-                    {this.state.isDoneTest && this.state.list.length !== 0 ? <Button icon color="green" labelPosition='right' onClick={() => this._saveReport()}>
-                        Save <Icon name='check' />
-                    </Button> : ""}
+                            </Button>
+                            {this.state.isDoneTest && this.state.list.length !== 0 ? <Button icon color="green" labelPosition='right' onClick={() => this._saveReport()}>
+                                Save <Icon name='check' />
+                            </Button> : ""}
                             <div style={{ marginBottom: '10px', float: 'right' }}>
 
+                                <Dropdown style={{ marginRight: 10, zIndex: 9999 }} placeholder='Select history' selection defaultValue={this.state.dateValue} options={this.state.dateOption} value={this.state.dateValue} onClick={() => this._clickUpdateListDate()} onChange={(event, data) => this._changeDate(event, data)} />
 
                                 <ReactToExcel
                                     className="btn1"
@@ -225,9 +314,9 @@ class brokenPagesScreen extends Component {
                                     buttonText={<Button color="green"><Icon name="print" />Export</Button>}
                                 />
                             </div>
-                            <Input icon='search' placeholder='Search...' style={{ float: 'right' }} />
+                            {/* <Input icon='search' placeholder='Search...' style={{ float: 'right' }} /> */}
                         </Segment>
-                        <Segment style={{ maxHeight: '50vh', overflow: "auto" }}>
+                        <Segment style={{ maxHeight: '50vh', border: 0 }}>
 
                             <Table singleLine unstackable textAlign='center' style={{ tableLayout: 'auto' }} id="table-to-xls">
                                 <Table.Header >

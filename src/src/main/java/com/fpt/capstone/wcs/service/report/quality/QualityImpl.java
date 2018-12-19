@@ -205,6 +205,30 @@ public class QualityImpl implements QualityService {
     }
 
     @Override
+    public Map<String, Object> getHistoryBrokenLinkList(RequestCommonPOJO request) {
+        List<BrokenLinkReport> list = brokenLinkRepository.findAllGroupByCreatedTimeAndPageOption(request.getUserId(), request.getPageOptionId());
+        Map<String, Object> res = new HashMap<>();
+        List<Long> dates = new ArrayList<>();
+        for(int i = 0 ; i< list.size();i++)
+        {
+            dates.add(list.get(i).getCreatedTime().getTime());
+        }
+        res.put("action",Constant.SUCCESS);
+        res.put("data",dates);
+        return res;
+    }
+
+    @Override
+    public Map<String, Object> getHistoryBrokenLinkReport(RequestCommonPOJO request) {
+        Map<String, Object> res = new HashMap<>();
+        Date time = new Date(request.getReportTime());
+        List<BrokenLinkReport> brokenLinkReports = brokenLinkRepository.findALlByCreatedTime(time);
+        res.put("action",Constant.SUCCESS);
+        res.put("data",brokenLinkReports);
+        return res;
+    }
+
+    @Override
     public List<BrokenLinkReport> brokenLinkService(List<Page> list, PageOption option) throws InterruptedException {
         //Asign list Broken Link
         List<BrokenLinkReport> resultList = new ArrayList<>();
@@ -430,6 +454,30 @@ public class QualityImpl implements QualityService {
         }
     }
 
+    @Override
+    public Map<String, Object> getHistoryBrokenPageTestReport(RequestCommonPOJO request) {
+        Map<String, Object> res = new HashMap<>();
+        Date time = new Date(request.getReportTime());
+        List<BrokenPageReport> brokenPageReports = brokenPageRepository.findALlByCreatedTime(time);
+        res.put("action",Constant.SUCCESS);
+        res.put("data",brokenPageReports);
+        return res;
+    }
+
+    @Override
+    public Map<String, Object> getHistoryBrokenPageTestList(RequestCommonPOJO request) {
+        List<BrokenPageReport> list = brokenPageRepository.findAllGroupByCreatedTimeAndPageOption(request.getUserId(), request.getPageOptionId());
+        Map<String, Object> res = new HashMap<>();
+        List<Long> dates = new ArrayList<>();
+        for(int i = 0 ; i< list.size();i++)
+        {
+            dates.add(list.get(i).getCreatedTime().getTime());
+        }
+        res.put("action",Constant.SUCCESS);
+        res.put("data",dates);
+        return res;
+    }
+
 
     public List<BrokenPageReport> brokenPageService(List<Page> list, PageOption option) throws InterruptedException {
         //Asign list Broken Page
@@ -629,6 +677,30 @@ public class QualityImpl implements QualityService {
             res.put("action", Constant.INCORRECT);
             return res;
         }
+    }
+
+    @Override
+    public Map<String, Object> getHistoryProhibitedContentReport(RequestCommonPOJO request) {
+        Map<String, Object> res = new HashMap<>();
+        Date time = new Date(request.getReportTime());
+        List<ProhibitedContentReport> prohibitedContentReports = prohibitedContentRepository.findALlByCreatedTime(time);
+        res.put("action",Constant.SUCCESS);
+        res.put("data",prohibitedContentReports);
+        return res;
+    }
+
+    @Override
+    public Map<String, Object> getHistoryProhibitedContentList(RequestCommonPOJO request) {
+        List<ProhibitedContentReport> list = prohibitedContentRepository.findAllGroupByCreatedTimeAndPageOption(request.getUserId(), request.getPageOptionId());
+        Map<String, Object> res = new HashMap<>();
+        List<Long> dates = new ArrayList<>();
+        for(int i = 0 ; i< list.size();i++)
+        {
+            dates.add(list.get(i).getCreatedTime().getTime());
+        }
+        res.put("action",Constant.SUCCESS);
+        res.put("data",dates);
+        return res;
     }
 
 
@@ -863,6 +935,30 @@ public class QualityImpl implements QualityService {
             res.put("action", Constant.INCORRECT);
             return res;
         }
+    }
+
+    @Override
+    public Map<String, Object> getHistoryMissingFileTestReport(RequestCommonPOJO request) {
+        Map<String, Object> res = new HashMap<>();
+        Date time = new Date(request.getReportTime());
+        List<MissingFileReport> missingFileReports = missingFilesPagesRepository.findALlByCreatedTime(time);
+        res.put("action",Constant.SUCCESS);
+        res.put("data",missingFileReports);
+        return res;
+    }
+
+    @Override
+    public Map<String, Object> getHistoryMissingFileTestList(RequestCommonPOJO request) {
+        List<MissingFileReport> list = missingFilesPagesRepository.findAllGroupByCreatedTimeAndPageOption(request.getUserId(), request.getPageOptionId());
+        Map<String, Object> res = new HashMap<>();
+        List<Long> dates = new ArrayList<>();
+        for(int i = 0 ; i< list.size();i++)
+        {
+            dates.add(list.get(i).getCreatedTime().getTime());
+        }
+        res.put("action",Constant.SUCCESS);
+        res.put("data",dates);
+        return res;
     }
 
     public List<MissingFileReport> getMissingFileImg(List<Page> list,PageOption option, String urlNew) throws InterruptedException {

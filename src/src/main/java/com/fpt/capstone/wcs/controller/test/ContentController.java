@@ -31,6 +31,18 @@ public class ContentController {
        return  contentService.getLastestPageTest(request);
     }
 
+    @CrossOrigin
+    @PostMapping("/api/pagestest/getHistoryList")
+    public Map<String, Object> getHistoryPagesTestList(@RequestBody RequestCommonPOJO request) {
+        return contentService.getHistoryPagesTestList(request);
+    }
+
+    @CrossOrigin
+    @PostMapping("/api/pagestest/getHistoryReport")
+    public Map<String, Object> getHistoryPagesTestReport(@RequestBody RequestCommonPOJO request) {
+        return contentService.getHistoryPagesTestReport(request);
+    }
+
     @PostMapping("/api/pageTest/saveReport")
     public  Map<String, Object> savePageReport(@RequestBody RequestReportPOJO report){
         return  contentService.savePageReport(report);
@@ -48,6 +60,18 @@ public class ContentController {
     public Map<String, Object> getLastestLinkRedirection(@RequestBody RequestCommonPOJO request)
     {
        return contentService.getLastestLinkRedirection(request);
+    }
+
+    @CrossOrigin
+    @PostMapping("/api/redirectiontest/getHistoryList")
+    public Map<String, Object> getHistoryRedirectionTestList(@RequestBody RequestCommonPOJO request) {
+        return contentService.getHistoryRedirectionTestList(request);
+    }
+
+    @CrossOrigin
+    @PostMapping("/api/redirectiontest/getHistoryReport")
+    public Map<String, Object> getHistoryRedirectionTestReport(@RequestBody RequestCommonPOJO request) {
+        return contentService.getHistoryRedirectionTestReport(request);
     }
 
     @PostMapping("/api/redirectiontest/saveReport")
@@ -68,6 +92,19 @@ public class ContentController {
     {
        return  contentService.getLastestContactDetail(request);
     }
+
+    @CrossOrigin
+    @PostMapping("/api/contactDetail/getHistoryList")
+    public Map<String, Object> getHistoryContactTestList(@RequestBody RequestCommonPOJO request) {
+        return contentService.getHistoryContactDetailTestList(request);
+    }
+
+    @CrossOrigin
+    @PostMapping("/api/contactDetail/getHistoryReport")
+    public Map<String, Object> getHistoryContactTestReport(@RequestBody RequestCommonPOJO request) {
+        return contentService.getHistoryContactDetailTestReport(request);
+    }
+
     @PostMapping("/api/contactDetail/saveReport")
     public Map<String, Object> saveContactDetailReport(@RequestBody RequestReportPOJO report){
         return contentService.saveContactDetailReport(report);

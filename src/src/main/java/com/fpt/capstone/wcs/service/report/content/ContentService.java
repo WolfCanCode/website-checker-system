@@ -14,13 +14,19 @@ public interface ContentService {
     public Map<String, Object> getDataPagesTest(RequestCommonPOJO request) throws InterruptedException;
     public Map<String, Object> getLastestPageTest(RequestCommonPOJO request);
     public Map<String, Object> savePageReport(RequestReportPOJO request);
+    public Map<String, Object> getHistoryPagesTestReport(RequestCommonPOJO request);
+    public Map<String, Object> getHistoryPagesTestList(RequestCommonPOJO request);
     //Redirection Test
     public Map<String, Object> getDataRedirectTest(RequestCommonPOJO request) throws InterruptedException;
     public Map<String, Object> getLastestLinkRedirection(RequestCommonPOJO request);
     public Map<String, Object> saveRedirectionReport(RequestReportPOJO request);
     public List<RedirectionReport> redirectionTest(List<Page> list, PageOption option) throws InterruptedException; //export reuse
+    public Map<String, Object> getHistoryRedirectionTestReport(RequestCommonPOJO request);
+    public Map<String, Object> getHistoryRedirectionTestList(RequestCommonPOJO request);
         //Contact Detail
     public Map<String, Object> getDataContactDetail(RequestCommonPOJO request) throws InterruptedException;
     public Map<String, Object> getLastestContactDetail(RequestCommonPOJO request);
     public Map<String, Object> saveContactDetailReport(RequestReportPOJO request);
+    public Map<String, Object> getHistoryContactDetailTestReport(RequestCommonPOJO request);
+    public Map<String, Object> getHistoryContactDetailTestList(RequestCommonPOJO request);
 }

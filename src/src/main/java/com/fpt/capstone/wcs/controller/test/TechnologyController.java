@@ -38,6 +38,19 @@ public class TechnologyController {
     }
 
     @CrossOrigin
+    @PostMapping("/api/jsTest/getHistoryList")
+    public Map<String, Object> getHistoryJSTestList(@RequestBody RequestCommonPOJO request) {
+        return technologyService.getHistoryJSTestList(request);
+    }
+
+    @CrossOrigin
+    @PostMapping("/api/jsTest/getHistoryReport")
+    public Map<String, Object> getHistoryJSTestReport(@RequestBody RequestCommonPOJO request) {
+        return technologyService.getHistoryJSTestReport(request);
+    }
+
+
+    @CrossOrigin
     @PostMapping("/api/jsTest/saveReport")
     public Map<String, Object> saveJSTestReport(@RequestBody RequestReportPOJO request) {
         return technologyService.saveJSTestReport(request);
@@ -53,6 +66,18 @@ public class TechnologyController {
     @PostMapping("/api/svbehavior/lastest")
     public Map<String, Object> getLastestServerBehavior(@RequestBody RequestCommonPOJO request) {
         return technologyService.getLastestServerBehavior(request);
+    }
+
+    @CrossOrigin
+    @PostMapping("/api/svbehavior/getHistoryList")
+    public Map<String, Object> getHistoryServerBehaviorTestList(@RequestBody RequestCommonPOJO request) {
+        return technologyService.getHistoryServerBehaviorTestList(request);
+    }
+
+    @CrossOrigin
+    @PostMapping("/api/svbehavior/getHistoryReport")
+    public Map<String, Object> getHistoryServerBehaviorTestReport(@RequestBody RequestCommonPOJO request) {
+        return technologyService.getHistoryServerBehaviorTestReport(request);
     }
 
     @CrossOrigin
@@ -75,6 +100,18 @@ public class TechnologyController {
     }
 
     @CrossOrigin
+    @PostMapping("/api/cookie/getHistoryList")
+    public Map<String, Object> getHistoryCookieTestList(@RequestBody RequestCommonPOJO request) {
+        return technologyService.getHistoryCookiesTestList(request);
+    }
+
+    @CrossOrigin
+    @PostMapping("/api/cookie/getHistoryReport")
+    public Map<String, Object> getHistoryCookiesTestReport(@RequestBody RequestCommonPOJO request) {
+        return technologyService.getHistoryCookiesTestReport(request);
+    }
+
+    @CrossOrigin
     @PostMapping("/api/cookie/SaveReport")
     public Map<String, Object> saveCookiesReport(@RequestBody RequestReportPOJO request) {
         return technologyService.saveCookieReport(request);
@@ -91,6 +128,18 @@ public class TechnologyController {
     public Map<String, Object> getLastestPageTest(@RequestBody RequestCommonPOJO request)
     {
        return technologyService.getLastestFaviconTest(request);
+    }
+
+    @CrossOrigin
+    @PostMapping("/api/faviconTest/getHistoryList")
+    public Map<String, Object> getHistoryFaviconTestList(@RequestBody RequestCommonPOJO request) {
+        return technologyService.getHistoryFaviconTestList(request);
+    }
+
+    @CrossOrigin
+    @PostMapping("/api/faviconTest/getHistoryReport")
+    public Map<String, Object> getHistoryFaviconTestReport(@RequestBody RequestCommonPOJO request) {
+        return technologyService.getHistoryFaviconTestReport(request);
     }
 
     @PostMapping("/api/faviconTest/saveReport")

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import 'semantic-ui-css/semantic.min.css';
-import { Segment, Button, Table, Icon, Input, SegmentGroup } from 'semantic-ui-react'
+import { Segment, Button, Table, Icon, SegmentGroup, Dropdown } from 'semantic-ui-react'
 import TableRow from '../missingFiles/row-table'
 import { Cookies } from "react-cookie";
 import ReactToExcel from "react-html-table-to-excel";
@@ -23,7 +23,9 @@ class missingFilesScreen extends Component {
         isActiveARCHIRES: false,
         statusNoResult: "",
         isDoneTest: false,
-        listReportId:[]
+        listReportId: [],
+        dateOption: [],
+        dateValue: null
 
     };
 
@@ -43,6 +45,25 @@ class missingFilesScreen extends Component {
             "websiteId": cookies.get("u_w_id"),
             "pageOptionId": cookies.get("u_option"),
         };
+
+        fetch("/api/missingtest/getHistoryList", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(param)
+        }).then(response => response.json()).then((res) => {
+            if (res.action === "SUCCESS") {
+                if (res.data.length !== 0) {
+                    var dateOption = res.data.map((item, index) => {
+                        return { key: index, value: item, text: new Date(item).toLocaleString() };
+                    })
+                    console.log(dateOption);
+                    this.setState({ dateOption: dateOption, dateValue: dateOption[0] })
+                }
+            }
+        });
 
         fetch("/api/missingtest/lastest", {
             method: 'POST',
@@ -93,10 +114,99 @@ class missingFilesScreen extends Component {
         });
 
     }
+
+    _changeDate(event, data) {
+        var comp = [];
+        var countPageAffected1 = 0;
+        var countMissingFile1 = 0;
+        let flag = false;
+        var listCom = [];
+        var flagMissingFile = false;
+        var listMissingFileCount = [];
+        var statusResult = "";
+        this.setState({ dateValue: data.value, loadingTable: true });
+        fetch("/api/missingtest/getHistoryReport", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ reportTime: data.value })
+        }).then(response => response.json()).then((res) => {
+            comp = res.data.map((item, index) => {
+                for (let i = 0; i < listCom.length; i++) {
+                    if (item.pages === listCom[i]) {
+                        flag = true;
+                    }
+                }
+                if (flag === false) {
+                    listCom.push(item.pages);
+                    countPageAffected1++;
+                } else {
+                    flag = false;
+                }
+
+                for (let i = 0; i < listMissingFileCount.length; i++) {
+                    if (item.fileMissing === listMissingFileCount[i]) {
+                        flagMissingFile = true;
+                    }
+                }
+                if (flagMissingFile === false) {
+                    listMissingFileCount.push(item.fileMissing);
+                    countMissingFile1++;
+                }
+                else {
+                    flagMissingFile = false;
+                }
+
+                return (<TableRow key={index} fileMissing={item.fileMissing} description={item.description} pages={item.pages} />);
+            });
+
+            if (comp.length === 0) {
+                statusResult = "This page haven't test yet, please try to test";
+            }
+            console.log(comp.length)
+            this.setState({ statusNoResult: statusResult })
+            this.setState({ countMissingFile: countMissingFile1 })
+            this.setState({ countPageAffected: countPageAffected1 })
+            this.setState({ list: comp });
+            this.setState({ loadingTable: false });
+        });
+    }
+
+    _clickUpdateListDate() {
+        var param = {
+            "userId": cookies.get("u_id"),
+            "userToken": cookies.get("u_token"),
+            "websiteId": cookies.get("u_w_id"),
+            "pageOptionId": cookies.get("u_option"),
+        }
+
+        fetch("/api/missingtest/getHistoryList", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(param)
+        }).then(response => response.json()).then((res) => {
+            if (res.action === "SUCCESS") {
+                if (res.data.length !== 0) {
+                    var dateOption = res.data.map((item, index) => {
+                        return { key: index, value: item, text: new Date(item).toLocaleString() };
+                    })
+                    console.log(dateOption);
+                    this.setState({ dateOption: dateOption })
+                }
+            }
+        });
+
+    }
+
     _doMissingFilePagesTest() {
         this.setState({ loadingTable: true, isDisable: true });
         var comp = [];
-        var listReport=[];
+        var listReport = [];
         var param = {
             "userId": cookies.get("u_id"),
             "userToken": cookies.get("u_token"),
@@ -151,8 +261,8 @@ class missingFilesScreen extends Component {
             if (comp.length === 0) {
                 statusResult = "No Missing File Found";
             }
-            if(comp.length !== 0){
-                this.setState({isDoneTest:true})
+            if (comp.length !== 0) {
+                this.setState({ isDoneTest: true })
             }
             console.log(comp.length)
             this.setState({ statusNoResult: statusResult })
@@ -161,8 +271,8 @@ class missingFilesScreen extends Component {
             this.setState({ list: comp });
             this.setState({ loadingTable: false });
             this.setState({ isDisable: false });
-            this.setState({listReportId:listReport})
-           
+            this.setState({ listReportId: listReport })
+
 
         });
     }
@@ -315,7 +425,7 @@ class missingFilesScreen extends Component {
             if (comp.length === 0) {
                 statusResult = "No Missing File Found";
             }
-           
+
             console.log(comp.length)
             this.setState({ statusNoResult: statusResult })
             this.setState({ countMissingFile: countMissingFile1 });
@@ -323,7 +433,7 @@ class missingFilesScreen extends Component {
             this.setState({ list: comp });
             this.setState({ loadingTable: false });
             this.setState({ isDisable: false });
-            this.setState({isDoneTest:false})
+            this.setState({ isDoneTest: false })
         });
     }
 
@@ -383,16 +493,16 @@ class missingFilesScreen extends Component {
                         </Segment> */}
                             <SegmentGroup basic>
                                 <Segment basic>
-                                <div style={{ marginBottom: '10px' }}>
-                                <Button icon primary labelPosition='right' disabled={this.state.isDisable} onClick={() => this._doMissingFilePagesTest()}>
-                                        Check
+                                    <div style={{ marginBottom: '10px' }}>
+                                        <Button icon primary labelPosition='right' disabled={this.state.isDisable} onClick={() => this._doMissingFilePagesTest()}>
+                                            Check
                        <Icon name='right arrow' />
-                                    </Button>
-                                    {this.state.isDoneTest ? <Button icon color="green" labelPosition='right' onClick={() => this._saveReport()}>
-                                    Save <Icon name='check' />
-                                </Button> : ""}
-                                </div>
-                                
+                                        </Button>
+                                        {this.state.isDoneTest ? <Button icon color="green" labelPosition='right' onClick={() => this._saveReport()}>
+                                            Save <Icon name='check' />
+                                        </Button> : ""}
+                                    </div>
+
                                     <div style={{ marginBottom: '50px' }}>
                                         <Button.Group style={{ float: 'left' }}>
                                             <Button onClick={() => this._doClickImage()} active={this.state.isActiveImg}>Image</Button>
@@ -401,6 +511,8 @@ class missingFilesScreen extends Component {
                                             <Button onClick={() => this._doClickARCHIRES()} active={this.state.isActiveARCHIRES}>ARCHIRES</Button>
                                         </Button.Group>
                                         <div style={{ marginBottom: '10px', float: 'right' }}>
+                                            <Dropdown style={{ marginRight: 10, zIndex: 9999 }} placeholder='Select history' selection defaultValue={this.state.dateValue} options={this.state.dateOption} value={this.state.dateValue} onClick={() => this._clickUpdateListDate()} onChange={(event, data) => this._changeDate(event, data)} />
+
                                             <ReactToExcel
                                                 className="btn1"
                                                 table="table-to-xls"
@@ -409,7 +521,7 @@ class missingFilesScreen extends Component {
                                                 buttonText={<Button color="green"><Icon name="print" />Export</Button>}
                                             />
                                         </div>
-                                        <Input icon='search' placeholder='Search...' style={{ float: 'right' }} />
+                                        {/* <Input icon='search' placeholder='Search...' style={{ float: 'right' }} /> */}
                                     </div>
                                 </Segment>
                             </SegmentGroup>

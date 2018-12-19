@@ -37,6 +37,18 @@ public class ExperienceController {
     }
 
     @CrossOrigin
+    @PostMapping("/api/speedTest/getHistoryList")
+    public Map<String, Object> getHistorySpeedTestList(@RequestBody RequestCommonPOJO request) {
+        return experienceService.getHistorySpeedTestList(request);
+    }
+
+    @CrossOrigin
+    @PostMapping("/api/speedTest/getHistoryReport")
+    public Map<String, Object> getHistorySpeedTestReport(@RequestBody RequestCommonPOJO request) {
+        return experienceService.getHistorySpeedTestReport(request);
+    }
+
+    @CrossOrigin
     @PostMapping("/api/speedTest/saveReport")
     public Map<String, Object> saveReport(@RequestBody RequestReportPOJO request) {
         return experienceService.saveSpeedTestReport(request);
@@ -61,6 +73,16 @@ public class ExperienceController {
         return experienceService.saveMobileReport(request);
     }
 
+    @CrossOrigin
+    @PostMapping("/api/mobileLayoutTest/getHistoryList")
+    public Map<String, Object> getHistoryMobileLayoutTestList(@RequestBody RequestCommonPOJO request) {
+        return experienceService.getHistoryMobileLayoutTestList(request);
+    }
 
+    @CrossOrigin
+    @PostMapping("/api/mobileLayoutTest/getHistoryReport")
+    public Map<String, Object> getHistoryMobileLayoutTestReport(@RequestBody RequestCommonPOJO request) {
+        return experienceService.getHistoryMobileLayoutTestReport(request);
+    }
 
 }

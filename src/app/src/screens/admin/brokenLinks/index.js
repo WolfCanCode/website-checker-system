@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import 'semantic-ui-css/semantic.min.css';
-import { Segment, Button, Table, Icon, Input } from 'semantic-ui-react'
+import { Segment, Button, Table, Icon, Dropdown } from 'semantic-ui-react'
 import TableRow from './row-table';
 import { Cookies } from "react-cookie";
 import ReactToExcel from "react-html-table-to-excel";
@@ -11,7 +11,7 @@ const cookies = new Cookies();
 
 class brokenLinksScreen extends Component {
 
-    state = { list: [], loadingTable: false, isDisable: false, tested: false, isDoneTest: false, listReportId: [], countInternalLink : 0 , countExternalLink : 0 };
+    state = { list: [], loadingTable: false, isDisable: false, tested: false, isDoneTest: false, listReportId: [], countInternalLink: 0, countExternalLink: 0, dateOption: [], dateValue: null };
 
 
     componentDidMount() {
@@ -24,6 +24,27 @@ class brokenLinksScreen extends Component {
             "pageOptionId": cookies.get("u_option"),
         }
 
+        fetch("/api/brokenLink/getHistoryList", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(param)
+        }).then(response => response.json()).then((res) => {
+            if (res.action === "SUCCESS") {
+                if (res.data.length !== 0) {
+                    var dateOption = res.data.map((item, index) => {
+                        return { key: index, value: item, text: new Date(item).toLocaleString() };
+                    })
+                    console.log(dateOption);
+                    this.setState({ dateOption: dateOption, dateValue: dateOption[0] })
+                }
+            }
+        });
+
+
+
 
         fetch("/api/brokenLink/lastest", {
             method: 'POST',
@@ -34,27 +55,27 @@ class brokenLinksScreen extends Component {
             body: JSON.stringify(param)
         }).then(response => response.json()).then((data) => {
             comp = data.brokenLinkReport.map((item, index) => {
-                return (<TableRow key={index} urlPage={item.urlPage} urlLink={item.urlLink} type = {item.type} httpCode={item.httpCode} httpMessage={item.httpMessage} />);
+                return (<TableRow key={index} urlPage={item.urlPage} urlLink={item.urlLink} type={item.type} httpCode={item.httpCode} httpMessage={item.httpMessage} />);
             });
             let countInternalLink = 0;
             let countExternalLink = 0;
 
-             countInternalLink = data.brokenLinkReport.reduce((type,item) => {
-                 if(item.type === '1'){
+            countInternalLink = data.brokenLinkReport.reduce((type, item) => {
+                if (item.type === '1') {
                     countInternalLink++;
-                 }
+                }
 
                 return countInternalLink;
             }, 0)
 
-            countExternalLink = data.brokenLinkReport.reduce((type,item) => {
-                if(item.type === '2'){
+            countExternalLink = data.brokenLinkReport.reduce((type, item) => {
+                if (item.type === '2') {
                     countExternalLink++;
                 }
 
-               return countExternalLink;
-           }, 0)
-            
+                return countExternalLink;
+            }, 0)
+
             this.setState({ countInternalLink: countInternalLink })
             this.setState({ countExternalLink: countExternalLink })
 
@@ -67,6 +88,78 @@ class brokenLinksScreen extends Component {
 
     }
 
+    _clickUpdateListDate() {
+        var param = {
+            "userId": cookies.get("u_id"),
+            "userToken": cookies.get("u_token"),
+            "websiteId": cookies.get("u_w_id"),
+            "pageOptionId": cookies.get("u_option"),
+        }
+
+        fetch("/api/brokenLink/getHistoryList", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(param)
+        }).then(response => response.json()).then((res) => {
+            if (res.action === "SUCCESS") {
+                if (res.data.length !== 0) {
+                    var dateOption = res.data.map((item, index) => {
+                        return { key: index, value: item, text: new Date(item).toLocaleString() };
+                    })
+                    console.log(dateOption);
+                    this.setState({ dateOption: dateOption })
+                }
+            }
+        });
+
+    }
+
+    _changeDate(event, data) {
+        this.setState({ dateValue: data.value, loadingTable: true });
+        var comp = [];
+        fetch("/api/brokenLink/getHistoryReport", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ reportTime: data.value })
+        }).then(response => response.json()).then((res) => {
+            comp = res.data.map((item, index) => {
+                return (<TableRow key={index} urlPage={item.urlPage} urlLink={item.urlLink} type={item.type} httpCode={item.httpCode} httpMessage={item.httpMessage} />);
+            });
+            let countInternalLink = 0;
+            let countExternalLink = 0;
+
+            countInternalLink = res.data.reduce((type, item) => {
+                if (item.type === '1') {
+                    countInternalLink++;
+                }
+
+                return countInternalLink;
+            }, 0)
+
+            countExternalLink = res.data.reduce((type, item) => {
+                if (item.type === '2') {
+                    countExternalLink++;
+                }
+
+                return countExternalLink;
+            }, 0)
+
+            this.setState({ countInternalLink: countInternalLink })
+            this.setState({ countExternalLink: countExternalLink })
+
+            this.setState({ list: comp });
+
+
+            this.setState({ loadingTable: false });
+        });
+    }
+
     _doBrokenLink() {
         var comp = [];
         this.setState({ loadingTable: true, isDisable: true });
@@ -76,6 +169,7 @@ class brokenLinksScreen extends Component {
             "websiteId": cookies.get("u_w_id"),
             "pageOptionId": cookies.get("u_option"),
         };
+
 
         fetch("/api/brokenLink", {
             method: 'POST',
@@ -93,22 +187,22 @@ class brokenLinksScreen extends Component {
             let countInternalLink = 0;
             let countExternalLink = 0;
 
-             countInternalLink = data.brokenLinkReport.reduce((type,item) => {
-                 if(item.type === '1'){
+            countInternalLink = data.brokenLinkReport.reduce((type, item) => {
+                if (item.type === '1') {
                     countInternalLink++;
-                 }
+                }
 
                 return countInternalLink;
             }, 0)
 
-            countExternalLink = data.brokenLinkReport.reduce((type,item) => {
-                if(item.type === '2'){
+            countExternalLink = data.brokenLinkReport.reduce((type, item) => {
+                if (item.type === '2') {
                     countExternalLink++;
                 }
 
-               return countExternalLink;
-           }, 0)
-            
+                return countExternalLink;
+            }, 0)
+
             this.setState({ countInternalLink: countInternalLink })
             this.setState({ countExternalLink: countExternalLink })
 
@@ -118,7 +212,7 @@ class brokenLinksScreen extends Component {
                 this.setState({ tested: true });
             }
 
-            this.setState({ loadingTable: false, isDisable: false, isDoneTest: true, listReportId: listReport  });
+            this.setState({ loadingTable: false, isDisable: false, isDoneTest: true, listReportId: listReport });
         });
 
     }
@@ -152,7 +246,7 @@ class brokenLinksScreen extends Component {
                 this.setState({ tested: true });
             }
 
-            this.setState({ loadingTable: false, isDisable: false, isDoneTest: false  });
+            this.setState({ loadingTable: false, isDisable: false, isDoneTest: false });
         });
 
     }
@@ -187,9 +281,10 @@ class brokenLinksScreen extends Component {
                        <Icon name='right arrow' />
                             </Button>
                             {this.state.isDoneTest && this.state.list.length !== 0 ? <Button icon color="green" labelPosition='right' onClick={() => this._saveReport()}>
-                        Save <Icon name='check' />
-                    </Button> : ""}
+                                Save <Icon name='check' />
+                            </Button> : ""}
                             <div style={{ float: 'right' }}>
+                                <Dropdown style={{ marginRight: 10, zIndex: 9999 }} placeholder='Select history' selection defaultValue={this.state.dateValue} options={this.state.dateOption} value={this.state.dateValue} onClick={() => this._clickUpdateListDate()} onChange={(event, data) => this._changeDate(event, data)} />
                                 <ReactToExcel
                                     className="btn1"
                                     table="table-to-xls"
@@ -199,7 +294,7 @@ class brokenLinksScreen extends Component {
                                 />
                             </div>
 
-                            <Input icon='search' placeholder='Search...' style={{ float: 'right' }} />
+                            {/* <Input icon='search' placeholder='Search...' style={{ float: 'right' }} /> */}
                         </Segment>
                         <Segment style={{ maxHeight: '50vh', overflow: "auto" }}>
 

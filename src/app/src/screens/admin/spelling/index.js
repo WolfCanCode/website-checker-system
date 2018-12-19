@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import 'semantic-ui-css/semantic.min.css';
-import { Segment, Button, Table, Icon, Input} from 'semantic-ui-react';
+import { Segment, Button, Table, Icon } from 'semantic-ui-react';
 import { Cookies } from "react-cookie";
 import TableRow from './data-row';
 
@@ -26,20 +26,20 @@ class spellingScreen extends Component {
             },
             body: JSON.stringify(param)
         }).then(response => response.json()).then((data) => {
-            
+
             comp = data.spellingReport.map((item, index) => {
-                
+
                 return (<TableRow no={index} word={item.wrongWord} excerpt={item.excerpt}
-                     page={item.page} decision={item.decision} selectedSuggestion={item.selectedSuggestion}/>);
+                    page={item.page} decision={item.decision} selectedSuggestion={item.selectedSuggestion} />);
             });
-            
+
             this.setState({ list: comp, loadingTable: false, isDisable: false, isDoneTest: true });
         });
 
 
     }
 
-    _doSpellingTest(){
+    _doSpellingTest() {
         var comp = [];
         this.setState({ loadingTable: true });
         var param = {
@@ -85,43 +85,43 @@ class spellingScreen extends Component {
             },
             body: JSON.stringify(param)
         }).then(response => response.json()).then((data) => {
-            comp = data.spellingSaveResult.map((item, index) => {                
+            comp = data.spellingSaveResult.map((item, index) => {
                 return (<TableRow no={index} word={item.wrongWord} excerpt={item.excerpt} page={item.page} />);
             });
-            
-            this.setState({ list: comp, loadingTable: false, isDisable: false, isDoneTest: false});
+
+            this.setState({ list: comp, loadingTable: false, isDisable: false, isDoneTest: false });
         });
     }
     render() {
         return (
             <div>
                 <Segment.Group>
-                <Segment basic loading={this.state.loadingTable} >
-                    <Button icon primary labelPosition='right' disabled={this.state.isDisable} onClick={() => this._doSpellingTest()}>
-                        Check
+                    <Segment basic loading={this.state.loadingTable} >
+                        <Button icon primary labelPosition='right' disabled={this.state.isDisable} onClick={() => this._doSpellingTest()}>
+                            Check
                        <Icon name='right arrow' />
-                    </Button>
-                    {this.state.isDoneTest ? <Button icon color="green" labelPosition='right' onClick={() => this._saveSpellingReport()}>
-                                    Save <Icon name='check' />
-                                </Button> : ""}
-                    <div style={{ marginBottom: '10px', float: 'right' }}>
+                        </Button>
+                        {this.state.isDoneTest ? <Button icon color="green" labelPosition='right' onClick={() => this._saveSpellingReport()}>
+                            Save <Icon name='check' />
+                        </Button> : ""}
+                        <div style={{ marginBottom: '10px', float: 'right' }}>
 
 
-                        {/* <ReactToExcel
+                            {/* <ReactToExcel
                             className="btn1"
                             table="table-to-xls"
                             filename="pages_test_file"
                             sheet="sheet 1"
                             buttonText={<Button color="green" ><Icon name="print" />Export</Button>}
                         /> */}
-                    </div>
-                    <div style={{ float: 'right', marginBottom: '10px' }}>
-                        <Input icon='search' placeholder='Search...' />
-                    </div>
-                    
-                </Segment>  
-                    <Segment.Group horizontal>                    
-                        <Segment basic>                        
+                        </div>
+                        <div style={{ float: 'right', marginBottom: '10px' }}>
+                            {/* <Input icon='search' placeholder='Search...' /> */}
+                        </div>
+
+                    </Segment>
+                    <Segment.Group horizontal>
+                        <Segment basic>
                             <Table singleLine unstackable textAlign='center' style={{ tableLayout: 'auto' }}>
                                 <Table.Header >
                                     <Table.Row>
@@ -133,7 +133,7 @@ class spellingScreen extends Component {
                                     </Table.Row>
                                 </Table.Header>
                                 <Table.Body>
-                                {this.state.list.length === 0 ? <Table.Row><Table.Cell>This page haven't test yet, please try to test</Table.Cell></Table.Row> : this.state.list}
+                                    {this.state.list.length === 0 ? <Table.Row><Table.Cell>This page haven't test yet, please try to test</Table.Cell></Table.Row> : this.state.list}
                                 </Table.Body>
                             </Table>
 

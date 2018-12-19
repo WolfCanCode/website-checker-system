@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Segment, Button, SegmentGroup, Table, Input, Icon } from 'semantic-ui-react'
+import { Segment, Button, SegmentGroup, Table, Icon, Dropdown } from 'semantic-ui-react'
 import TableRow from './row-table';
 import { Cookies } from "react-cookie";
 import ReactToExcel from "react-html-table-to-excel";
@@ -7,19 +7,45 @@ import ReactToExcel from "react-html-table-to-excel";
 const cookies = new Cookies();
 export default class JavascriptErrorScreen extends Component {
   state = {
-    list: [], loadingTable: false, isDisable: false, listReportId: [], isDoneTest: false, messages: "This page haven't test yet, please try to test"
+    list: [],
+    loadingTable: false,
+    isDisable: false,
+    listReportId: [],
+    isDoneTest: false,
+    messages: "This page haven't test yet, please try to test",
+    dateOption: [],
+    dateValue: null
   };
 
   componentDidMount() {
     var comp = [];
     this.setState({ loadingTable: true });
-
     var param = {
       "userId": cookies.get("u_id"),
       "userToken": cookies.get("u_token"),
       "websiteId": cookies.get("u_w_id"),
       "pageOptionId": cookies.get("u_option"),
     };
+
+    fetch("/api/jsTest/getHistoryList", {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(param)
+    }).then(response => response.json()).then((res) => {
+      if (res.action === "SUCCESS") {
+        if (res.data.length !== 0) {
+          var dateOption = res.data.map((item, index) => {
+            return { key: index, value: item, text: new Date(item).toLocaleString() };
+          })
+          console.log(dateOption);
+          this.setState({ dateOption: dateOption, dateValue: dateOption[0] })
+        }
+      }
+    });
+
     fetch("/api/jsTest/lastest", {
       method: 'POST',
       headers: {
@@ -40,6 +66,62 @@ export default class JavascriptErrorScreen extends Component {
       this.setState({ list: comp });
       // }
       this.setState({ loadingTable: false });
+    });
+
+  }
+
+  _changeDate(event, data) {
+    this.setState({ dateValue: data.value, loadingTable: true });
+    var comp = [];
+    fetch("/api/jsTest/getHistoryReport", {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ reportTime: data.value })
+    }).then(response => response.json()).then((res) => {
+      console.log(data)
+      // if (data.jsErrorReport.length !== 0) {
+      if (data.jsErrorReport !== null) {
+        comp = res.data.map((item, index) => {
+          // var msg = item.messages.replace(item.messages.split(" ")[0], "");
+          // alert(msg);
+          return (<TableRow key={index} page={item.pages} type={item.type} messages={item.messages} />);
+        });
+      }
+      this.setState({ list: comp });
+      // }
+      this.setState({ loadingTable: false });
+    });
+  }
+
+
+  _clickUpdateListDate() {
+    var param = {
+      "userId": cookies.get("u_id"),
+      "userToken": cookies.get("u_token"),
+      "websiteId": cookies.get("u_w_id"),
+      "pageOptionId": cookies.get("u_option"),
+    }
+
+    fetch("/api/jsTest/getHistoryList", {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(param)
+    }).then(response => response.json()).then((res) => {
+      if (res.action === "SUCCESS") {
+        if (res.data.length !== 0) {
+          var dateOption = res.data.map((item, index) => {
+            return { key: index, value: item, text: new Date(item).toLocaleString() };
+          })
+          console.log(dateOption);
+          this.setState({ dateOption: dateOption })
+        }
+      }
     });
 
   }
@@ -128,6 +210,7 @@ export default class JavascriptErrorScreen extends Component {
             </Button> : ""}
             <div style={{ marginBottom: '10px', float: 'right' }}>
 
+              <Dropdown style={{ marginRight: 10, zIndex: 9999 }} placeholder='Select history' selection defaultValue={this.state.dateValue} options={this.state.dateOption} value={this.state.dateValue} onClick={() => this._clickUpdateListDate()} onChange={(event, data) => this._changeDate(event, data)} />
 
               <ReactToExcel
                 className="btn1"
@@ -138,7 +221,7 @@ export default class JavascriptErrorScreen extends Component {
               />
             </div>
             <div style={{ marginBottom: '10px', float: 'right' }}>
-              <Input icon='search' placeholder='Search...' />
+              {/* <Input icon='search' placeholder='Search...' /> */}
             </div>
             <Table unstackable singleLine style={{ fontSize: '14px' }} id="table-to-xls">
               <Table.Header>

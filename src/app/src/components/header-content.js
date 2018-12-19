@@ -583,6 +583,8 @@ export default class HeaderContent extends Component {
                 this.setState({ isLoading: true });
                 cookies.set("u_option", this.state.activeItem, { path: '/' });
                 this._getPageNum();
+                window.location.reload();
+
 
             }
         }
@@ -590,8 +592,11 @@ export default class HeaderContent extends Component {
             this.setState({ isLoading: true });
             cookies.set("u_option", this.state.activeItem, { path: '/' });
             this._getPageNum();
+            window.location.reload();
+
 
         }
+
     }
     /* handle dbclick */
     handleClick(e, item) {

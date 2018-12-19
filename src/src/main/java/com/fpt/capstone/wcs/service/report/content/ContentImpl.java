@@ -1,5 +1,6 @@
 package com.fpt.capstone.wcs.service.report.content;
 
+import com.fpt.capstone.wcs.model.entity.report.experience.MobileLayoutReport;
 import com.fpt.capstone.wcs.model.entity.user.Website;
 import com.fpt.capstone.wcs.model.entity.report.content.ContactReport;
 import com.fpt.capstone.wcs.model.entity.report.content.PageReport;
@@ -157,6 +158,30 @@ public class ContentImpl implements  ContentService {
             res.put("action", Constant.INCORRECT);
             return res;
         }
+    }
+
+    @Override
+    public Map<String, Object> getHistoryPagesTestReport(RequestCommonPOJO request) {
+        Map<String, Object> res = new HashMap<>();
+        Date time = new Date(request.getReportTime());
+        List<PageReport> pageReports = pageTestRepository.findALlByCreatedTime(time);
+        res.put("action",Constant.SUCCESS);
+        res.put("data",pageReports);
+        return res;
+    }
+
+    @Override
+    public Map<String, Object> getHistoryPagesTestList(RequestCommonPOJO request) {
+        List<PageReport> list = pageTestRepository.findAllGroupByCreatedTimeAndPageOption(request.getUserId(), request.getPageOptionId());
+        Map<String, Object> res = new HashMap<>();
+        List<Long> dates = new ArrayList<>();
+        for(int i = 0 ; i< list.size();i++)
+        {
+            dates.add(list.get(i).getCreatedTime().getTime());
+        }
+        res.put("action",Constant.SUCCESS);
+        res.put("data",dates);
+        return res;
     }
 
     @Override
@@ -374,6 +399,30 @@ public class ContentImpl implements  ContentService {
         }
     }
 
+    @Override
+    public Map<String, Object> getHistoryContactDetailTestReport(RequestCommonPOJO request) {
+        Map<String, Object> res = new HashMap<>();
+        Date time = new Date(request.getReportTime());
+        List<ContactReport> contactReports = contactDetailRepository.findALlByCreatedTime(time);
+        res.put("action",Constant.SUCCESS);
+        res.put("data",contactReports);
+        return res;
+    }
+
+    @Override
+    public Map<String, Object> getHistoryContactDetailTestList(RequestCommonPOJO request) {
+        List<ContactReport> list = contactDetailRepository.findAllGroupByCreatedTimeAndPageOption(request.getUserId(), request.getPageOptionId());
+        Map<String, Object> res = new HashMap<>();
+        List<Long> dates = new ArrayList<>();
+        for(int i = 0 ; i< list.size();i++)
+        {
+            dates.add(list.get(i).getCreatedTime().getTime());
+        }
+        res.put("action",Constant.SUCCESS);
+        res.put("data",dates);
+        return res;
+    }
+
 
     public List<PageReport> getPageInfor(List<Page> list, PageOption option) throws InterruptedException {
         Date createdTime = new Date();
@@ -442,6 +491,29 @@ public class ContentImpl implements  ContentService {
         return pageCheck;
     }
 
+    @Override
+    public Map<String, Object> getHistoryRedirectionTestReport(RequestCommonPOJO request) {
+        Map<String, Object> res = new HashMap<>();
+        Date time = new Date(request.getReportTime());
+        List<RedirectionReport> redirectionReports = linkRedirectionRepository.findALlByCreatedTime(time);
+        res.put("action",Constant.SUCCESS);
+        res.put("data",redirectionReports);
+        return res;
+    }
+
+    @Override
+    public Map<String, Object> getHistoryRedirectionTestList(RequestCommonPOJO request) {
+        List<RedirectionReport> list = linkRedirectionRepository.findAllGroupByCreatedTimeAndPageOption(request.getUserId(), request.getPageOptionId());
+        Map<String, Object> res = new HashMap<>();
+        List<Long> dates = new ArrayList<>();
+        for(int i = 0 ; i< list.size();i++)
+        {
+            dates.add(list.get(i).getCreatedTime().getTime());
+        }
+        res.put("action",Constant.SUCCESS);
+        res.put("data",dates);
+        return res;
+    }
 
 
     //check redirection for Server Behavior TruongLN

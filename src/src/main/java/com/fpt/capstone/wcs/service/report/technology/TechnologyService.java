@@ -16,16 +16,24 @@ public interface TechnologyService {
     public Map<String, Object> getfaviconTest(RequestCommonPOJO request);
     public Map<String, Object> getLastestFaviconTest(RequestCommonPOJO request);
     public Map<String, Object> saveFaviconTest(RequestReportPOJO request);
+    public Map<String, Object> getHistoryFaviconTestReport(RequestCommonPOJO request);
+    public Map<String, Object> getHistoryFaviconTestList(RequestCommonPOJO request);
     //Test JS error
     public Map<String, Object> getJavaErrrorTest(RequestCommonPOJO request) throws InterruptedException;
     public Map<String, Object> getLastestJS(RequestCommonPOJO request);
     public Map<String, Object> saveJSTestReport(RequestReportPOJO request) ;
+    public Map<String, Object> getHistoryJSTestReport(RequestCommonPOJO request);
+    public Map<String, Object> getHistoryJSTestList(RequestCommonPOJO request);
     //Test cookie
     public Map<String, Object> getCookies(RequestCommonPOJO request) throws InterruptedException;
     public Map<String, Object> getLastestCookies(RequestCommonPOJO request);
     public Map<String, Object> saveCookieReport(RequestReportPOJO request);
+    public Map<String, Object> getHistoryCookiesTestReport(RequestCommonPOJO request);
+    public Map<String, Object> getHistoryCookiesTestList(RequestCommonPOJO request);
     //ServerBehavior
     public Map<String, Object> getServerBehavior(RequestCommonPOJO request)  throws IOException, InterruptedException;
     public Map<String, Object> saveServerBehaviorReport(RequestReportPOJO request);
     public Map<String, Object> getLastestServerBehavior(RequestCommonPOJO request);
+    public Map<String, Object> getHistoryServerBehaviorTestReport(RequestCommonPOJO request);
+    public Map<String, Object> getHistoryServerBehaviorTestList(RequestCommonPOJO request);
 }

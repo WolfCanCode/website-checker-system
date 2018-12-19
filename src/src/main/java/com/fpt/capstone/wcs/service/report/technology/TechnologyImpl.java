@@ -213,6 +213,30 @@ public class TechnologyImpl implements TechnologyService {
     }
 
     @Override
+    public Map<String, Object> getHistoryFaviconTestReport(RequestCommonPOJO request) {
+        Map<String, Object> res = new HashMap<>();
+        Date time = new Date(request.getReportTime());
+        List<FaviconReport> faviconReports = faviconRepository.findALlByCreatedTime(time);
+        res.put("action",Constant.SUCCESS);
+        res.put("data",faviconReports);
+        return res;
+    }
+
+    @Override
+    public Map<String, Object> getHistoryFaviconTestList(RequestCommonPOJO request) {
+        List<FaviconReport> list = faviconRepository.findAllGroupByCreatedTimeAndPageOption(request.getUserId(), request.getPageOptionId());
+        Map<String, Object> res = new HashMap<>();
+        List<Long> dates = new ArrayList<>();
+        for(int i = 0 ; i< list.size();i++)
+        {
+            dates.add(list.get(i).getCreatedTime().getTime());
+        }
+        res.put("action",Constant.SUCCESS);
+        res.put("data",dates);
+        return res;
+    }
+
+    @Override
     public Map<String, Object> getJavaErrrorTest(RequestCommonPOJO request) throws InterruptedException {
 
         Map<String, Object> res = new HashMap<>();
@@ -311,6 +335,30 @@ public class TechnologyImpl implements TechnologyService {
             res.put("action", Constant.INCORRECT);
             return res;
         }
+    }
+
+    @Override
+    public Map<String, Object> getHistoryJSTestReport(RequestCommonPOJO request) {
+        Map<String, Object> res = new HashMap<>();
+        Date time = new Date(request.getReportTime());
+        List<JavascriptReport> javascriptReports = jsRepository.findALlByCreatedTime(time);
+        res.put("action",Constant.SUCCESS);
+        res.put("data",javascriptReports);
+        return res;
+    }
+
+    @Override
+    public Map<String, Object> getHistoryJSTestList(RequestCommonPOJO request) {
+        List<JavascriptReport> list = jsRepository.findAllGroupByCreatedTimeAndPageOption(request.getUserId(), request.getPageOptionId());
+        Map<String, Object> res = new HashMap<>();
+        List<Long> dates = new ArrayList<>();
+        for(int i = 0 ; i< list.size();i++)
+        {
+            dates.add(list.get(i).getCreatedTime().getTime());
+        }
+        res.put("action",Constant.SUCCESS);
+        res.put("data",dates);
+        return res;
     }
 
     @Override
@@ -424,6 +472,30 @@ public class TechnologyImpl implements TechnologyService {
             res.put("action", Constant.INCORRECT);
             return res;
         }
+    }
+
+    @Override
+    public Map<String, Object> getHistoryCookiesTestReport(RequestCommonPOJO request) {
+        Map<String, Object> res = new HashMap<>();
+        Date time = new Date(request.getReportTime());
+        List<CookieReport> cookieReports = cookieRepository.findALlByCreatedTime(time);
+        res.put("action",Constant.SUCCESS);
+        res.put("data",cookieReports);
+        return res;
+    }
+
+    @Override
+    public Map<String, Object> getHistoryCookiesTestList(RequestCommonPOJO request) {
+        List<CookieReport> list = cookieRepository.findAllGroupByCreatedTimeAndPageOption(request.getUserId(), request.getPageOptionId());
+        Map<String, Object> res = new HashMap<>();
+        List<Long> dates = new ArrayList<>();
+        for(int i = 0 ; i< list.size();i++)
+        {
+            dates.add(list.get(i).getCreatedTime().getTime());
+        }
+        res.put("action",Constant.SUCCESS);
+        res.put("data",dates);
+        return res;
     }
 
 
@@ -879,6 +951,30 @@ public class TechnologyImpl implements TechnologyService {
             res.put("action", Constant.INCORRECT);
             return res;
         }
+    }
+
+    @Override
+    public Map<String, Object> getHistoryServerBehaviorTestReport(RequestCommonPOJO request) {
+        Map<String, Object> res = new HashMap<>();
+        Date time = new Date(request.getReportTime());
+        List<ServerBehaviorReport> serverBehaviorReports = serverBehaviorRepository.findALlByCreatedTime(time);
+        res.put("action",Constant.SUCCESS);
+        res.put("data",serverBehaviorReports);
+        return res;
+    }
+
+    @Override
+    public Map<String, Object> getHistoryServerBehaviorTestList(RequestCommonPOJO request) {
+        List<ServerBehaviorReport> list = serverBehaviorRepository.findAllGroupByCreatedTimeAndPageOption(request.getUserId(), request.getPageOptionId());
+        Map<String, Object> res = new HashMap<>();
+        List<Long> dates = new ArrayList<>();
+        for(int i = 0 ; i< list.size();i++)
+        {
+            dates.add(list.get(i).getCreatedTime().getTime());
+        }
+        res.put("action",Constant.SUCCESS);
+        res.put("data",dates);
+        return res;
     }
 
 

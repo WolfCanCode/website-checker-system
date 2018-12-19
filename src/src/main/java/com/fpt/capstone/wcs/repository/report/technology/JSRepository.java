@@ -30,4 +30,20 @@ public interface JSRepository extends JpaRepository<JavascriptReport,Long> {
             "ORDER BY a.created_time DESC " +
             "LIMIT 5", nativeQuery = true)
     List<JavascriptReport> findAllGroupByCreatedTime(@Param("id") long id);
+
+    @Query(value = "SELECT DISTINCT * " +
+            "FROM javascript_report a, page_option p, website w, user u, website_user wu " +
+            "WHERE a.del_flag = 0 " +
+            "AND a.page_option_id = p.id " +
+            "AND p.website_id = w.id " +
+            "AND w.id = wu.web_id " +
+            "AND u.id = wu.user_id " +
+            "AND u.id = :id " +
+            "AND p.id = :pageId " +
+            "GROUP BY a.created_time " +
+            "ORDER BY a.created_time DESC " +
+            "LIMIT 5", nativeQuery = true)
+    List<JavascriptReport> findAllGroupByCreatedTimeAndPageOption(@Param("id") long id, @Param("pageId") long pageId);
+
+    List<JavascriptReport> findALlByCreatedTime(Date time);
 }

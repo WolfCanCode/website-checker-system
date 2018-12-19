@@ -1,5 +1,6 @@
 package com.fpt.capstone.wcs.service.report.experience;
 
+import com.fpt.capstone.wcs.model.entity.report.quality.BrokenLinkReport;
 import com.fpt.capstone.wcs.model.entity.user.Website;
 import com.fpt.capstone.wcs.model.entity.report.experience.MobileLayoutReport;
 import com.fpt.capstone.wcs.model.entity.report.experience.SpeedTestReport;
@@ -142,6 +143,30 @@ public class ExperienceImpl implements ExperienceService {
             res.put("action", Constant.INCORRECT);
             return res;
         }
+    }
+
+    @Override
+    public Map<String, Object> getHistorySpeedTestReport(RequestCommonPOJO request) {
+        Map<String, Object> res = new HashMap<>();
+        Date time = new Date(request.getReportTime());
+        List<SpeedTestReport> speedList = speedtestRepository.findALlByCreatedTime(time);
+        res.put("action",Constant.SUCCESS);
+        res.put("data",speedList);
+        return res;
+    }
+
+    @Override
+    public Map<String, Object> getHistorySpeedTestList(RequestCommonPOJO request) {
+        List<SpeedTestReport> list = speedtestRepository.findAllGroupByCreatedTimeAndPageOption(request.getUserId(), request.getPageOptionId());
+        Map<String, Object> res = new HashMap<>();
+        List<Long> dates = new ArrayList<>();
+        for(int i = 0 ; i< list.size();i++)
+        {
+            dates.add(list.get(i).getCreatedTime().getTime());
+        }
+        res.put("action",Constant.SUCCESS);
+        res.put("data",dates);
+        return res;
     }
 
     @Override
@@ -358,6 +383,33 @@ public class ExperienceImpl implements ExperienceService {
             return res;
         }
     }
+
+    @Override
+    public Map<String, Object> getHistoryMobileLayoutTestReport(RequestCommonPOJO request) {
+        Map<String, Object> res = new HashMap<>();
+        Date time = new Date(request.getReportTime());
+        List<MobileLayoutReport> mobileLayoutReports = mobileLayoutRepository.findALlByCreatedTime(time);
+        res.put("action",Constant.SUCCESS);
+        res.put("data",mobileLayoutReports);
+        return res;
+    }
+
+    @Override
+    public Map<String, Object> getHistoryMobileLayoutTestList(RequestCommonPOJO request) {
+        List<MobileLayoutReport> list = mobileLayoutRepository.findAllGroupByCreatedTimeAndPageOption(request.getUserId(), request.getPageOptionId());
+        Map<String, Object> res = new HashMap<>();
+        List<Long> dates = new ArrayList<>();
+        for(int i = 0 ; i< list.size();i++)
+        {
+            dates.add(list.get(i).getCreatedTime().getTime());
+        }
+        res.put("action",Constant.SUCCESS);
+        res.put("data",dates);
+        return res;
+    }
+
+
+
 
     public List<MobileLayoutReport> mobileLayoutTestService(List<Page> list, PageOption option) throws InterruptedException {
         final Cloudinary cloudinary = new Cloudinary(ObjectUtils.asMap("cloud_name", Constant.CLOUDARY_NAME, "api_key", Constant.CLOUDARY_API_KEY, "api_secret", Constant.CLOUDARY_API_SECRET));

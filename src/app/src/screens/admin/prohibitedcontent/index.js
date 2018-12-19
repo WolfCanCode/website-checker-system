@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Segment, Button, Icon, Table, Input } from 'semantic-ui-react'
+import { Segment, Button, Icon, Table, Dropdown } from 'semantic-ui-react'
 import TableRow from './row-table';
 import { Cookies } from "react-cookie";
 import ReactToExcel from "react-html-table-to-excel";
@@ -8,9 +8,9 @@ import ReactToExcel from "react-html-table-to-excel";
 
 const cookies = new Cookies();
 export default class ProhibitedContent extends Component {
-    
 
-    state = { list: [], loadingTable: false, isDisable: false,tested:false, isDoneTest: false, listReportId: [] };
+
+    state = { list: [], loadingTable: false, isDisable: false, tested: false, isDoneTest: false, listReportId: [], dateOption: [], dateValue: null };
 
 
     componentDidMount() {
@@ -22,6 +22,27 @@ export default class ProhibitedContent extends Component {
             "websiteId": cookies.get("u_w_id"),
             "pageOptionId": cookies.get("u_option"),
         }
+
+        fetch("/api/prohibitedContent/getHistoryList", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(param)
+        }).then(response => response.json()).then((res) => {
+            if (res.action === "SUCCESS") {
+                if (res.data.length !== 0) {
+                    var dateOption = res.data.map((item, index) => {
+                        return { key: index, value: item, text: new Date(item).toLocaleString() };
+                    })
+                    console.log(dateOption);
+                    this.setState({ dateOption: dateOption, dateValue: dateOption[0] })
+                }
+            }
+        });
+
+
         fetch("/api/prohibitedContent/lastest", {
             method: 'POST',
             headers: {
@@ -37,6 +58,56 @@ export default class ProhibitedContent extends Component {
             this.setState({ loadingTable: false });
         });
 
+
+    }
+
+    _changeDate(event, data) {
+        var comp = [];
+        this.setState({ dateValue: data.value, loadingTable: true });
+        fetch("/api/prohibitedContent/getHistoryReport", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ reportTime: data.value })
+        }).then(response => response.json()).then((res) => {
+            comp = res.data.map((item, index) => {
+                return (<TableRow key={index} urlPage={item.urlPage} word={item.word} fragment={item.fragment} type={item.type} />);
+            });
+            this.setState({ list: comp });
+            this.setState({ loadingTable: false });
+        });
+
+    }
+
+
+    _clickUpdateListDate() {
+        var param = {
+            "userId": cookies.get("u_id"),
+            "userToken": cookies.get("u_token"),
+            "websiteId": cookies.get("u_w_id"),
+            "pageOptionId": cookies.get("u_option"),
+        }
+
+        fetch("/api/prohibitedContent/getHistoryList", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(param)
+        }).then(response => response.json()).then((res) => {
+            if (res.action === "SUCCESS") {
+                if (res.data.length !== 0) {
+                    var dateOption = res.data.map((item, index) => {
+                        return { key: index, value: item, text: new Date(item).toLocaleString() };
+                    })
+                    console.log(dateOption);
+                    this.setState({ dateOption: dateOption })
+                }
+            }
+        });
 
     }
 
@@ -117,6 +188,7 @@ export default class ProhibitedContent extends Component {
                         Save <Icon name='check' />
                     </Button> : ""}
                     <div style={{ marginBottom: '10px', float: 'right' }}>
+                        <Dropdown style={{ marginRight: 10, zIndex: 9999 }} placeholder='Select history' selection defaultValue={this.state.dateValue} options={this.state.dateOption} value={this.state.dateValue} onClick={() => this._clickUpdateListDate()} onChange={(event, data) => this._changeDate(event, data)} />
 
 
                         <ReactToExcel
@@ -129,23 +201,23 @@ export default class ProhibitedContent extends Component {
                     </div>
 
                     <div style={{ marginBottom: '10px', float: 'right' }}>
-                        <Input icon='search' placeholder='Search...' />
+                        {/* <Input icon='search' placeholder='Search...' /> */}
                     </div>
                     <Table singleLine unstackable style={{ fontSize: '16px', }} id="table-to-xls">
                         <Table.Header textAlign='center'>
                             <Table.Row>
-                               
+
                                 <Table.HeaderCell>Word</Table.HeaderCell>
                                 <Table.HeaderCell>Type</Table.HeaderCell>
                                 <Table.HeaderCell>Fragment</Table.HeaderCell>
                                 <Table.HeaderCell>Page</Table.HeaderCell>
-                                
+
 
                             </Table.Row>
                         </Table.Header>
                         <Table.Body>
                             {this.state.list.length === 0 ? <Table.Row><Table.Cell>{this.state.tested ? "This site has no prohibited content!" : "This page haven't test yet, please try to test!"}</Table.Cell></Table.Row> : this.state.list}
-                           
+
 
                         </Table.Body>
                     </Table>

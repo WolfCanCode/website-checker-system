@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Segment, Button, Icon, Table, Input } from 'semantic-ui-react'
+import { Segment, Button, Icon, Table, Dropdown } from 'semantic-ui-react'
 import TableRow from './row-table';
 import { Cookies } from "react-cookie";
 import ReactToExcel from "react-html-table-to-excel";
@@ -9,7 +9,7 @@ import ReactToExcel from "react-html-table-to-excel";
 const cookies = new Cookies();
 export default class CookieLaw extends Component {
 
-    state = { list: [], loadingTable: false, isDisable: false,tested:false, isDoneTest: false, listReportId: [] };
+    state = { list: [], loadingTable: false, isDisable: false, tested: false, isDoneTest: false, listReportId: [], dateOption: [], dateValue: null };
 
 
     componentDidMount() {
@@ -21,6 +21,26 @@ export default class CookieLaw extends Component {
             "websiteId": cookies.get("u_w_id"),
             "pageOptionId": cookies.get("u_option"),
         }
+
+        fetch("/api/cookie/getHistoryList", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(param)
+        }).then(response => response.json()).then((res) => {
+            if (res.action === "SUCCESS") {
+                if (res.data.length !== 0) {
+                    var dateOption = res.data.map((item, index) => {
+                        return { key: index, value: item, text: new Date(item).toLocaleString() };
+                    })
+                    console.log(dateOption);
+                    this.setState({ dateOption: dateOption, dateValue: dateOption[0] })
+                }
+            }
+        });
+
         fetch("/api/cookie/lastest", {
             method: 'POST',
             headers: {
@@ -36,6 +56,55 @@ export default class CookieLaw extends Component {
             this.setState({ loadingTable: false });
         });
 
+
+    }
+
+    _changeDate(event, data) {
+        this.setState({ dateValue: data.value, loadingTable: true });
+        var comp = [];
+        fetch("/api/cookie/getHistoryReport", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ reportTime: data.value })
+        }).then(response => response.json()).then((res) => {
+            comp = res.data.map((item, index) => {
+                return (<TableRow key={index} cookieName={item.cookieName} category={item.category} party={item.party} description={item.description} />);
+            });
+            this.setState({ list: comp });
+            this.setState({ loadingTable: false });
+        });
+    }
+
+
+    _clickUpdateListDate() {
+        var param = {
+            "userId": cookies.get("u_id"),
+            "userToken": cookies.get("u_token"),
+            "websiteId": cookies.get("u_w_id"),
+            "pageOptionId": cookies.get("u_option"),
+        }
+
+        fetch("/api/cookie/getHistoryList", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(param)
+        }).then(response => response.json()).then((res) => {
+            if (res.action === "SUCCESS") {
+                if (res.data.length !== 0) {
+                    var dateOption = res.data.map((item, index) => {
+                        return { key: index, value: item, text: new Date(item).toLocaleString() };
+                    })
+                    console.log(dateOption);
+                    this.setState({ dateOption: dateOption })
+                }
+            }
+        });
 
     }
 
@@ -66,7 +135,7 @@ export default class CookieLaw extends Component {
             if (this.state.list.length === 0) {
                 this.setState({ tested: true });
             }
-            this.setState({ loadingTable: false, isDisable: false,isDoneTest: true, listReportId: listReport });
+            this.setState({ loadingTable: false, isDisable: false, isDoneTest: true, listReportId: listReport });
         });
 
     }
@@ -90,12 +159,12 @@ export default class CookieLaw extends Component {
             },
             body: JSON.stringify(param)
         }).then(response => response.json()).then((data) => {
-            
+
             comp = data.cookieReport.map((item, index) => {
                 return (<TableRow key={index} cookieName={item.cookieName} category={item.category} party={item.party} description={item.description} />);
             });
             this.setState({ list: comp });
-            this.setState({ loadingTable: false, isDisable: false,isDoneTest: false });
+            this.setState({ loadingTable: false, isDisable: false, isDoneTest: false });
         });
     }
 
@@ -109,15 +178,16 @@ export default class CookieLaw extends Component {
             <Segment.Group horizontal style={{ margin: 0 }}>
 
                 <Segment basic loading={this.state.loadingTable} >
-                    <Button icon  primary labelPosition='right' disabled={this.state.isDisable} onClick={() => this._doCookies()}>
+                    <Button icon primary labelPosition='right' disabled={this.state.isDisable} onClick={() => this._doCookies()}>
                         Check
                        <Icon name='right arrow' />
                     </Button>
                     {this.state.isDoneTest && this.state.list.length !== 0 ? <Button icon color="green" labelPosition='right' onClick={() => this._saveReport()}>
-                                    Save <Icon name='check' />
-                                </Button> : ""}
-                    <div style={{ marginBottom: '10px', float: 'right', color : 'green' }}>
+                        Save <Icon name='check' />
+                    </Button> : ""}
+                    <div style={{ marginBottom: '10px', float: 'right', color: 'green' }}>
 
+                        <Dropdown style={{ marginRight: 10, zIndex: 9999 }} placeholder='Select history' selection defaultValue={this.state.dateValue} options={this.state.dateOption} value={this.state.dateValue} onClick={() => this._clickUpdateListDate()} onChange={(event, data) => this._changeDate(event, data)} />
 
                         <ReactToExcel
                             className="btn1"
@@ -129,7 +199,7 @@ export default class CookieLaw extends Component {
                     </div>
 
                     <div style={{ marginBottom: '10px', float: 'right' }}>
-                        <Input icon='search' placeholder='Search...' />
+                        {/* <Input icon='search' placeholder='Search...' /> */}
                     </div>
                     <Table singleLine unstackable style={{ fontSize: '16px', }} id="table-to-xls">
                         <Table.Header textAlign='center'>
